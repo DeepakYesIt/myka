@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="@dimen/_145sdp"
+    android:id="@+id/relMainLayouts"
+    android:layout_marginStart="@dimen/_8sdp"
+    android:layout_height="@dimen/_200sdp">
+
+    <ImageView
+        android:id="@+id/imageMinus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:elevation="@dimen/_15sdp"
+        android:padding="@dimen/_5sdp"
+        android:visibility="visible"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:src="@drawable/minus_icon" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViews"
+        android:layout_width="@dimen/_140sdp"
+        android:layout_height="@dimen/_180sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:elevation="@dimen/_10sdp"
+        app:cardCornerRadius="@dimen/_10sdp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/_10sdp">
+
+            <RelativeLayout
+                android:id="@+id/relBreakfast"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_120sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:background="@drawable/breakfast_images">
+
+                <RelativeLayout
+                    android:id="@+id/relWatchTimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_6sdp"
+                    android:layout_marginTop="@dimen/_6sdp"
+                    android:paddingVertical="@dimen/_3sdp"
+                    android:paddingHorizontal="@dimen/_4sdp"
+                    android:background="@drawable/small_transparent_bg">
+
+                    <ImageView
+                        android:id="@+id/imgWatch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/watch_white_icon"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/imgWatch"
+                        android:text="45 min"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:textSize="@dimen/_10sdp"
+                        android:textColor="@color/white"/>
+
+                </RelativeLayout>
+
+                <ImageView
+                    android:id="@+id/imgHeartRed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="@dimen/_6sdp"
+                    android:layout_marginEnd="@dimen/_5sdp"
+                    android:src="@drawable/heart_red_icon" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relBreakfast">
+
+                <TextView
+                    android:id="@+id/tvBreakfast"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:text="Pasta"
+                    android:textSize="@dimen/_13sdp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvBreakfast"
+                    android:layout_marginTop="@dimen/_7sdp">
+
+                    <ImageView
+                        android:id="@+id/imgDiyas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ingredients_diya_images" />
+
+                    <TextView
+                        android:id="@+id/tvIngredients"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginHorizontal="@dimen/_5sdp"
+                        android:layout_toEndOf="@+id/imgDiyas"
+                        android:fontFamily="@font/montserrat_semibold"
+                        android:text="Ingredients"
+                        android:textSize="@dimen/_12sdp" />
+
+                    <ImageView
+                        android:id="@+id/checkBoxImg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="@dimen/_3sdp"
+                        android:layout_toEndOf="@+id/tvIngredients"
+                        android:src="@drawable/orange_checkbox_images" />
+
+                    <ImageView
+                        android:id="@+id/missingIngredientsImg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:visibility="gone"
+                        android:layout_marginStart="@dimen/_3sdp"
+                        android:layout_toEndOf="@+id/tvIngredients"
+                        android:src="@drawable/missing_ingredients_icon" />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

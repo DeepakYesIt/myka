@@ -1,0 +1,70 @@
+package com.yesitlabs.mykaapp.activity
+
+import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import com.yesitlabs.mykaapp.basedata.SessionManagement
+import com.yesitlabs.mykaapp.R
+import com.yesitlabs.mykaapp.databinding.ActivityCookingForScreenBinding
+
+class CookingForScreenActivity : AppCompatActivity() {
+    private var binding: ActivityCookingForScreenBinding?=null
+    private lateinit var sessionManagement: SessionManagement
+    private var clickStatus:String?="Myself"
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding= ActivityCookingForScreenBinding.inflate(LayoutInflater.from(this))
+        setContentView(binding!!.root)
+
+        sessionManagement = SessionManagement(this@CookingForScreenActivity)
+        sessionManagement.setCookingFor(clickStatus!!)
+
+        initialize()
+    }
+
+    private fun initialize() {
+
+        binding!!.relMySelf.setOnClickListener{
+            clickStatus="Myself"
+            binding!!.relMySelf.setBackgroundResource(R.drawable.orange_box_bg)
+            binding!!.relMySelfPartner.setBackgroundResource(R.drawable.gray_box_border_bg)
+            binding!!.relMyFamily.setBackgroundResource(R.drawable.gray_box_border_bg)
+
+            binding!!.imageMyselfTick.visibility= View.VISIBLE
+            binding!!.imageMyselfMyPartnerTick.visibility= View.GONE
+            binding!!.imageMyFamily.visibility= View.GONE
+        }
+
+        binding!!.relMySelfPartner.setOnClickListener{
+            clickStatus="MyPartner"
+            binding!!.relMySelf.setBackgroundResource(R.drawable.gray_box_border_bg)
+            binding!!.relMySelfPartner.setBackgroundResource(R.drawable.orange_box_bg)
+            binding!!.relMyFamily.setBackgroundResource(R.drawable.gray_box_border_bg)
+
+            binding!!.imageMyselfTick.visibility= View.GONE
+            binding!!.imageMyselfMyPartnerTick.visibility= View.VISIBLE
+            binding!!.imageMyFamily.visibility= View.GONE
+        }
+
+        binding!!.relMyFamily.setOnClickListener{
+            clickStatus="MyFamily"
+            binding!!.relMySelf.setBackgroundResource(R.drawable.gray_box_border_bg)
+            binding!!.relMySelfPartner.setBackgroundResource(R.drawable.gray_box_border_bg)
+            binding!!.relMyFamily.setBackgroundResource(R.drawable.orange_box_bg)
+
+            binding!!.imageMyselfTick.visibility= View.GONE
+            binding!!.imageMyselfMyPartnerTick.visibility= View.GONE
+            binding!!.imageMyFamily.visibility= View.VISIBLE
+        }
+
+        binding!!.rlNextCooking.setOnClickListener{
+            sessionManagement.setCookingFor(clickStatus!!)
+            val intent = Intent(this@CookingForScreenActivity, CookingForMyselfActivity::class.java)
+            startActivity(intent)
+        }
+
+    }
+}

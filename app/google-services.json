@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1008724107712",
+    "project_id": "myka-app",
+    "storage_bucket": "myka-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1008724107712:android:44b9a2837ebcebaf3de825",
+        "android_client_info": {
+          "package_name": "com.yesitlabs.mykaapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1008724107712-a98hc0af1puvmh7ulkflmdul9js2mmbv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yesitlabs.mykaapp",
+            "certificate_hash": "c93edcf5913bf13588a6d6fb5217f219b2cf2516"
+          }
+        },
+        {
+          "client_id": "1008724107712-aqr04398vrkjjg2r7acob0k905j8r4m3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1WtrB2oHQmyIX1ZpaXzbI9kOA2FlkCXk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1008724107712-aqr04398vrkjjg2r7acob0k905j8r4m3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1008724107712-u4qakv0qbd9u3h4p0td8jqeln458uj76.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.yesitlabs.MykaApp.com"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

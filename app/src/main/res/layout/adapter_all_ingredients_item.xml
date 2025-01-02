@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/white"
+    android:elevation="@dimen/_5sdp"
+    android:layout_marginTop="@dimen/_10sdp"
+    android:layout_marginBottom="@dimen/_5sdp"
+    app:cardCornerRadius="@dimen/_10sdp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/imageShapeable"
+        android:layout_width="@dimen/_120sdp"
+        android:layout_height="@dimen/_140sdp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:layout_margin="@dimen/_8sdp"
+        android:src="@drawable/apple_ing_image"
+        app:shapeAppearanceOverlay="@style/CornerCut" />
+
+    <TextView
+        android:id="@+id/textTittles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageShapeable"
+        android:layout_centerHorizontal="true"
+        android:text="Apple"
+        android:layout_marginBottom="@dimen/_15sdp"
+        android:fontFamily="@font/poppins_semibold"
+        android:textSize="@dimen/_14sdp"/>
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

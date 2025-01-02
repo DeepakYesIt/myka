@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/cardViewMainLayout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardElevation="@dimen/_10sdp"
+    app:cardCornerRadius="@dimen/_10sdp"
+    android:layout_margin="@dimen/_10sdp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/_5sdp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imageSuperMarket"
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_100sdp"
+            android:src="@drawable/ic_food_image"
+            android:scaleType="fitXY"
+            android:elevation="@dimen/_10sdp"
+            app:shapeAppearanceOverlay="@style/RoundedSquare"
+            android:layout_margin="@dimen/_10sdp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/tvSuperMarketName"
+            android:layout_width="@dimen/_60sdp"
+            android:layout_height="wrap_content"
+            android:text="Tesco"
+            android:singleLine="true"
+            android:fontFamily="@font/poppins"
+            android:textColor="#0A2533"
+            android:textStyle="bold"
+            android:textSize="@dimen/_9ssp"
+            android:layout_margin="@dimen/_3sdp"
+            app:layout_constraintStart_toStartOf="@+id/imageSuperMarket"
+            app:layout_constraintTop_toBottomOf="@+id/imageSuperMarket"/>
+
+        <TextView
+            android:id="@+id/tvSuperMarketRupees"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$25*"
+            android:singleLine="true"
+            android:maxWidth="@dimen/_40sdp"
+            android:fontFamily="@font/poppins"
+            android:textColor="#0A2533"
+            android:textStyle="bold"
+            android:textSize="@dimen/_9ssp"
+            android:layout_margin="@dimen/_3sdp"
+            app:layout_constraintEnd_toEndOf="@+id/imageSuperMarket"
+           app:layout_constraintStart_toEndOf="@+id/tvSuperMarketName"
+            app:layout_constraintTop_toBottomOf="@+id/imageSuperMarket"/>
+        <ImageView
+            android:layout_width="@dimen/_14sdp"
+            android:layout_height="@dimen/_14sdp"
+            android:src="@drawable/ic_bucket_market_icon"
+            app:layout_constraintStart_toStartOf="@+id/imageSuperMarket"
+            app:layout_constraintTop_toBottomOf="@+id/tvSuperMarketName"/>
+
+        <TextView
+            android:id="@+id/textMiles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/imageSuperMarket"
+            android:textSize="@dimen/_9ssp"
+            app:layout_constraintTop_toBottomOf="@+id/tvSuperMarketName"
+            android:text="0.7 mile"/>
+
+        <ImageView
+            android:layout_width="@dimen/_14sdp"
+            android:layout_height="@dimen/_14sdp"
+            android:src="@drawable/ic_location_market_icon"
+            app:layout_constraintEnd_toStartOf="@+id/textMiles"
+            android:layout_marginEnd="@dimen/_5ssp"
+            app:layout_constraintTop_toBottomOf="@+id/tvSuperMarketName"/>
+
+
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.cardview.widget.CardView>

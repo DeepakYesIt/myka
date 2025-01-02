@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragment.mainfragment.commonscreen.BasketScreenFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_15sdp"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/rlHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/imageBackIcon"
+                    android:layout_width="@dimen/_18sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_centerVertical="true"
+                    android:padding="@dimen/_4sdp"
+                    android:src="@drawable/back_icon"
+                    app:tint="@color/black" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="Basket"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13ssp"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:id="@+id/textShoppingList"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:background="@drawable/button_bg"
+                    android:drawablePadding="@dimen/_5sdp"
+                    android:fontFamily="@font/poppins"
+                    android:paddingHorizontal="@dimen/_10sdp"
+                    android:paddingVertical="@dimen/_5sdp"
+                    android:text="Shopping list"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_9ssp"
+                    app:drawableStartCompat="@drawable/ic_shopping_list" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rlSuperMarket"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_15sdp">
+
+                <TextView
+                    android:id="@+id/textSuperMarket"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="Supermarket"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textSeeAll1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="@dimen/_15sdp"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="See All"
+                    android:textColor="#06C169"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold" />
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcvSuperMarket"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textSuperMarket"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/rlYourRecipes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_15sdp">
+
+                <TextView
+                    android:id="@+id/textYourRecipes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="Your Recipes"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:id="@+id/textSeeAll2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="@dimen/_15sdp"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="See All"
+                    android:textColor="#06C169"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold" />
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcvYourRecipes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textYourRecipes"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/rlIngredients"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_15sdp">
+
+                <TextView
+                    android:id="@+id/textIngredients"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="Ingredients"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textSeeAll3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="@dimen/_15sdp"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="See All"
+                    android:textColor="#06C169"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold" />
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcvIngredients"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_below="@+id/textIngredients"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:orientation="vertical"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFF7F0"
+
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginHorizontal="@dimen/_20sdp">
+
+                <TextView
+                    android:id="@+id/textRecipe"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins"
+                    android:layout_marginTop="@dimen/_13sdp"
+                    android:paddingHorizontal="@dimen/_20sdp"
+                    android:text="Recipe"
+                    android:textColor="#4A4A4A" />
+
+                <TextView
+                    android:id="@+id/textRecipeCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:fontFamily="@font/poppins"
+                    android:layout_marginTop="@dimen/_13sdp"
+                    android:paddingHorizontal="@dimen/_20sdp"
+                    android:text="7"
+                    android:textColor="#4A4A4A" />
+
+
+                <TextView
+                    android:id="@+id/textServings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textRecipe"
+                    android:layout_marginTop="@dimen/_13sdp"
+                    android:fontFamily="@font/poppins"
+                    android:paddingHorizontal="@dimen/_20sdp"
+                    android:text="Servings"
+                    android:textColor="#4A4A4A" />
+
+                <TextView
+                    android:id="@+id/textServingsCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textRecipe"
+                    android:layout_marginTop="@dimen/_13sdp"
+                    android:layout_alignParentEnd="true"
+                    android:paddingHorizontal="@dimen/_20sdp"
+                    android:fontFamily="@font/poppins"
+                    android:text="3"
+                    android:textColor="#4A4A4A" />
+
+                <TextView
+                    android:id="@+id/textCostPerServing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textServings"
+                    android:layout_marginTop="@dimen/_13sdp"
+                    android:paddingHorizontal="@dimen/_20sdp"
+                    android:fontFamily="@font/poppins"
+                    android:text="Cost Per Serving"
+                    android:textColor="#4A4A4A" />
+
+                <TextView
+                    android:id="@+id/textCostPerServingCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textServings"
+                    android:layout_marginTop="@dimen/_13sdp"
+                    android:layout_alignParentEnd="true"
+                    android:paddingHorizontal="@dimen/_20sdp"
+                    android:fontFamily="@font/poppins"
+                    android:text="$200"
+                    android:textColor="#4A4A4A" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/_13sdp"
+                    android:weightSum="2"
+                    android:paddingVertical="@dimen/_4sdp"
+                    android:background="#FE9F45"
+                    android:paddingHorizontal="@dimen/_20sdp"
+                    android:layout_below="@+id/textCostPerServing"
+                    >
+
+                    <TextView
+                        android:id="@+id/textTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/textServings"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/poppins"
+                        android:text="Total"
+                        android:textColor="#FFFFFF" />
+
+                    <TextView
+                        android:id="@+id/textTotalAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textAlignment="textEnd"
+                        android:layout_gravity="end"
+                        android:fontFamily="@font/poppins"
+                        android:text="$200"
+                        android:textColor="#FFFFFF" />
+
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+
+
+            <TextView
+                android:id="@+id/textCheckoutTesco"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Checkout with Tesco"
+                android:textAlignment="center"
+                android:fontFamily="@font/poppins"
+                android:textColor="@color/white"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:background="@drawable/button_bg"
+                android:paddingVertical="@dimen/_7sdp"
+                android:layout_marginBottom="@dimen/_20sdp"
+                android:layout_marginHorizontal="@dimen/_20sdp"/>
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

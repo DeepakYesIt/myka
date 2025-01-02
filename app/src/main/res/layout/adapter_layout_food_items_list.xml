@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?><!--<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    android:layout_width="wrap_content"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_margin="@dimen/_5sdp"-->
+<!--    app:cardCornerRadius="@dimen/_10sdp"-->
+<!--    app:cardElevation="@dimen/_10sdp">-->
+
+<!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content">-->
+
+<!--        <com.google.android.material.imageview.ShapeableImageView-->
+<!--            android:id="@+id/imageFood"-->
+<!--            android:layout_width="@dimen/_100sdp"-->
+<!--            android:layout_height="@dimen/_100sdp"-->
+<!--            android:layout_margin="@dimen/_10sdp"-->
+<!--            android:elevation="@dimen/_10sdp"-->
+<!--            android:scaleType="fitXY"-->
+<!--            android:src="@drawable/ic_food_image"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:shapeAppearanceOverlay="@style/RoundedSquare" />-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/imageRemoveIcon"-->
+<!--            android:layout_width="@dimen/_13sdp"-->
+<!--            android:layout_height="@dimen/_13sdp"-->
+<!--            android:layout_margin="@dimen/_4sdp"-->
+<!--            android:elevation="@dimen/_180sdp"-->
+<!--            android:src="@drawable/ic_apple_icon"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/imageFood"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/imageFood" />-->
+
+<!--        <ImageView-->
+<!--            android:layout_width="@dimen/_13sdp"-->
+<!--            android:layout_height="@dimen/_13sdp"-->
+<!--            android:layout_margin="@dimen/_4sdp"-->
+<!--            android:elevation="@dimen/_180sdp"-->
+<!--            android:src="@drawable/ic_wishlist_icon"-->
+<!--            app:layout_constraintEnd_toEndOf="@+id/imageFood"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/imageFood" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/tvFoodName"-->
+<!--            android:layout_width="@dimen/_90sdp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_margin="@dimen/_3sdp"-->
+<!--            android:fontFamily="@font/poppins"-->
+<!--            android:singleLine="true"-->
+<!--            android:text="Sandwich"-->
+<!--            android:textColor="#0A2533"-->
+<!--            android:textSize="@dimen/_9ssp"-->
+<!--            android:textStyle="bold"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/imageFood"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/imageFood" />-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/imageClockIcon"-->
+<!--            android:layout_width="@dimen/_15sdp"-->
+<!--            android:layout_height="@dimen/_15sdp"-->
+<!--            android:layout_margin="@dimen/_3sdp"-->
+<!--            android:src="@drawable/ic_food_clock"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/imageFood"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/tvFoodName" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/textTimeAgo"-->
+<!--            android:layout_width="@dimen/_75sdp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginHorizontal="@dimen/_3sdp"-->
+<!--            android:layout_marginTop="@dimen/_2sdp"-->
+<!--            android:fontFamily="@font/poppins"-->
+<!--            android:singleLine="true"-->
+<!--            android:text="2 days ago"-->
+<!--            android:textColor="#3C4541"-->
+<!--            android:textSize="@dimen/_9ssp"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/imageClockIcon"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/tvFoodName" />-->
+
+
+<!--        <ImageView-->
+<!--            android:id="@+id/imageMinusItem"-->
+<!--            android:layout_width="@dimen/_10sdp"-->
+<!--            android:layout_height="@dimen/_10sdp"-->
+<!--            android:layout_marginVertical="@dimen/_8sdp"-->
+<!--            android:layout_marginStart="@dimen/_10sdp"-->
+<!--            android:src="@drawable/minus_food_item_icon"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/imageFood"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/imageClockIcon" />-->
+
+
+<!--        <TextView-->
+<!--            android:id="@+id/textServes"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginHorizontal="@dimen/_3sdp"-->
+<!--            android:text="Serves 2"-->
+<!--            android:textAlignment="center"-->
+<!--            android:textSize="@dimen/_8ssp"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/imageMinusItem"-->
+<!--            app:layout_constraintEnd_toStartOf="@+id/imagePlusItem"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/imageMinusItem"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/imageMinusItem" />-->
+
+
+<!--        <ImageView-->
+<!--            android:id="@+id/imagePlusItem"-->
+<!--            android:layout_width="@dimen/_12sdp"-->
+<!--            android:layout_height="@dimen/_12sdp"-->
+<!--            android:layout_marginHorizontal="@dimen/_3sdp"-->
+<!--            android:layout_marginVertical="@dimen/_8sdp"-->
+<!--            android:src="@drawable/add_food_item_icon"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="@+id/imageFood"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/imageClockIcon" />-->
+
+
+<!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+
+<!--</androidx.cardview.widget.CardView>-->
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardViews"
+    android:layout_width="@dimen/_140sdp"
+    android:layout_height="@dimen/_190sdp"
+    android:layout_marginTop="@dimen/_10sdp"
+    android:layout_marginBottom="@dimen/_10sdp"
+    android:elevation="@dimen/_10sdp"
+    app:cardCornerRadius="@dimen/_10sdp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="@dimen/_8sdp">
+
+        <RelativeLayout
+            android:id="@+id/relBreakfast"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_110sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="@drawable/breakfast_images">
+
+
+<!--            <com.google.android.material.imageview.ShapeableImageView-->
+<!--                android:id="@+id/imageFood"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="@dimen/_110sdp"-->
+<!--                android:layout_margin="@dimen/_10sdp"-->
+<!--                android:elevation="@dimen/_10sdp"-->
+<!--                android:scaleType="fitXY"-->
+<!--                android:src="@drawable/ic_food_image"-->
+<!--                app:shapeAppearanceOverlay="@style/RoundedSquare" />-->
+
+            <ImageView
+                android:id="@+id/imgAppleRemove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_4sdp"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_4sdp"
+                android:paddingVertical="@dimen/_3sdp"
+                android:src="@drawable/ic_apple_icon" />
+
+
+            <ImageView
+                android:id="@+id/imgHeartRed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="@dimen/_6sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:src="@drawable/heart_red_icon" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/relBreakfast">
+
+            <TextView
+                android:id="@+id/tvBreakfast"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_semibold"
+                android:text="Pasta"
+                android:textSize="@dimen/_13sdp" />
+
+            <RelativeLayout
+                android:id="@+id/relYearsAgo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvBreakfast">
+
+                <ImageView
+                    android:id="@+id/imageClockIcon"
+                    android:layout_width="@dimen/_15sdp"
+                    android:layout_height="@dimen/_15sdp"
+                    android:layout_margin="@dimen/_3sdp"
+                    android:src="@drawable/ic_food_clock" />
+
+                <TextView
+                    android:id="@+id/textTimeAgo"
+                    android:layout_width="@dimen/_75sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_3sdp"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:layout_toEndOf="@+id/imageClockIcon"
+                    android:fontFamily="@font/poppins"
+                    android:singleLine="true"
+                    android:text="2 days ago"
+                    android:textColor="#3C4541"
+                    android:textSize="@dimen/_10sdp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relYearsAgo"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/_7sdp">
+
+                <ImageView
+                    android:id="@+id/imageMinusItem"
+                    android:layout_width="@dimen/_15sdp"
+                    android:layout_height="@dimen/_15sdp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_minus_iconss" />
+
+                <TextView
+                    android:id="@+id/tvServes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginHorizontal="@dimen/_10sdp"
+                    android:layout_toEndOf="@+id/imageMinusItem"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="Serves 2"
+                    android:textSize="@dimen/_11sdp" />
+
+                <ImageView
+                    android:id="@+id/imagePlusItem"
+                    android:layout_width="@dimen/_15sdp"
+                    android:layout_height="@dimen/_15sdp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/_3sdp"
+                    android:layout_toEndOf="@+id/tvServes"
+                    android:src="@drawable/add_food_item_icon" />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

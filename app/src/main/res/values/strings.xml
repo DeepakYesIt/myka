@@ -1,0 +1,112 @@
+<resources>
+    <string name="app_name">Myka App</string>
+    <string name="my_kitchen_assistant">My Kitchen Assistant</string>
+    <string name="publish_key">pk_test_51PdDwn2MfdrjGdokeRO8ulheGv5oP8xXkvE7izmXQbSrmXPO2g6S9x0QoiafnAi3F52AwyC1NHJWOOJqPpcmNbuw00Q2OcA9nr</string>
+
+    <string name="simplify_cooking_meal_planning_and_shopping_all_in_one_place">Simplify cooking, meal planning,\n and shopping all in one place</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tvDescriptions1">Get meal plans tailored to your\n preferences and goals</string>
+    <string name="tvDescriptions2">Track spending and meal choices to\n reach your goals</string>
+    <string name="tvDescription3">Automatically generate organized grocery\n lists from your meal plans, tailored to your\n preferences and dietary needs, making\n shopping faster and stress-free</string>
+    <string name="bit_about_you"><font color="#3C4541"> I’ll need to know a bit </font><font color="#06C169">about you</font></string>
+    <string name="enter_your_name">Enter your Name</string>
+    <string name="type_amount">Type Amount</string>
+    <string name="partner_name">Partner\'s name</string>
+    <string name="partner_age">Partner\'s age</string>
+    <string name="select_gender">Select Gender</string>
+
+    <string name="myka_meal_planner"> <font color="#06C169">Myka</font><font color="#FE9F45"> Meal Planner</font></string>
+    <string name="sept_meal_planner"> <font color="#3C4541">Next meal to be cooked on </font><font color="#06C169">20 Sept.</font></string>
+    <string name="login_to_your_account"><font color="#000000">Login to Your</font><font color="#06C169"> Account</font></string>
+    <string name="forgot_password"><font color="#000000">Forgot</font><font color="#06C169"> Password</font></string>
+    <string name="reset_password"><font color="#000000">Reset</font><font color="#06C169"> Password</font></string>
+    <string name="turn_on_location"><font color="#000000">Turn on</font><font color="#06C169"> Location</font></string>
+    <string name="turn_on_notifications"><font color="#000000">Turn on</font><font color="#06C169"> Notifications</font></string>
+    <string name="sign_up_to_myka"><font color="#000000">Sign-up to</font><font color="#06C169"> Myka</font></string>
+    <string name="resend"> <font color="#06C169"> Resend</font></string>
+    <string name="your_password_has_been_changed_successfully">Your password has been changed\n successfully.</string>
+    <string name="your_account_has_been_created_successfully">Your account has been created\n successfully.</string>
+    <string name="turn_on_locationDesc">Enable location services to find nearby supermarkets and get accurate delivery or pickup options. We\’ll use your location to make shopping easier and faster.</string>
+    <string name="turn_on_notificationDesc">Never miss a thing! Get reminders for missing ingredients, updates on your grocery orders, recipe tips, and exclusive deals. Enable notifications to stay organized and save time with Myka!</string>
+
+    <string name="what_s_your_name"><font color="#3C4541">What\’s your</font><font color="#06C169"> Name</font></string>
+    <string name="who_will_be_you_cooking_for"><font color="#3C4541">Who will be you</font><font color="#06C169"> cooking for?</font></string>
+    <string name="choose_your_gender"><font color="#3C4541">Choose your</font><font color="#06C169"> Gender</font></string>
+    <string name="body_goals"><font color="#3C4541">Body</font><font color="#06C169"> Goals</font></string>
+    <string name="members_goals"><font color="#3C4541">Family Member’s\n</font><font color="#06C169">Body Goals</font></string>
+    <string name="dietary_restrictions"><font color="#3C4541">Dietary</font><font color="#06C169"> Restrictions</font></string>
+    <string name="favourite_cuisines"><font color="#3C4541">Favorite</font><font color="#06C169"> Cuisines</font></string>
+    <string name="hey_skipping_help_you_best">Hey! Skipping means I won\'t be fully\n personalized to help you best</string>
+
+    <string name="dislike_ingredients"><font color="#3C4541">Disliked</font><font color="#06C169"> Ingredients</font></string>
+
+    <string name="ingredient_dislikes"><font color="#3C4541">Dislike</font><font color="#06C169"> Ingredients</font></string>
+    <string name="allergens_ingredients"><font color="#3C4541">Allergies</font></string>
+    <string name="allergic_ingredients"><font color="#3C4541">“Allergic</font><font color="#06C169"> Ingredients”</font></string>
+    <string name="allergens_ingredients_desc">Search and select the ingredients you\’re allergic to, so I can help you avoid them</string>
+
+    <string name="meal_routine"><font color="#3C4541">Meal</font><font color="#06C169"> Routine</font></string>
+    <string name="meal_routine_desc">What meals do you typically cook at home?</string>
+
+    <string name="cooking_frequency"><font color="#3C4541">Cooking</font><font color="#06C169"> Frequency</font></string>
+    <string name="cooking_schedule"><font color="#3C4541">Cooking</font><font color="#06C169"> Schedule</font></string>
+    <string name="meal_prep_days"><font color="#3C4541">Meal</font><font color="#06C169"> Prep Days</font></string>
+    <string name="family_meal_preferences"><font color="#3C4541">Family Meal\n</font><font color="#06C169">Preferences</font></string>
+    <string name="spending_on_groceries"><font color="#3C4541">Spending on</font><font color="#06C169"> Groceries</font></string>
+
+    <string name="eating_out"><font color="#3C4541">Eating </font><font color="#06C169"> Out</font></string>
+    <string name="take_away"><font color="#3C4541">Reason for </font><font color="#06C169"> Takeaway</font></string>
+    <string name="partner_name_age"><font color="#3C4541">Partner\'s </font><font color="#06C169">Name and Age</font></string>
+    <string name="sign_in_to_create_plan_and_enjoy_delicious_meals">Sign in to create, plan, and\n enjoy delicious meals!</string>
+    <string name="select_the_days_you_usually_cook_or_prep_meals">Select the days you usually cook or prep meals</string>
+    <string name="hello_danny"><font color="#06C169">Hello</font><font color="#000000"> , Danny</font></string>
+    <string name="let_s_plan_your_week">  <font color="#06C169">Let’s plan</font><font color="#000000"> your week</font></string>
+
+    <string name="add_meals_to_your_planner_and_start_saving">Add meals to your\n planner and start saving</string>
+    <string name="you_want_to_remove_this_meal_from_the_schedule_day">You want to remove this Meal from the\n schedule day?</string>
+    <string name="feedback_support"><![CDATA[Feedback & Support]]></string>
+    <string name="your_macronutrient_targets"><font color="#000000">Your Macronutrient</font><font color="#06C169"> Targets</font></string>
+
+
+    <string name="terms_and_conditions">
+        <![CDATA[
+        <b>1. Introduction</b><br/>
+        Welcome to <font color="#06C169">Myka Meal Planner</font>! These Terms and Conditions outline the rules and regulations for using our meal planner application. By downloading or using the app, you agree to comply with these terms. If you do not agree with any part of the terms, you may not access the app or services.<br/><br/>
+
+        <b>2. Account and Registration</b><br/>
+        You must create an account to use certain features of the app. When creating an account, you agree to provide accurate and complete information. You are responsible for maintaining the confidentiality of your account and password, and you are fully responsible for all activities that occur under your account.<br/><br/>
+
+        <b>3. Usage of Services</b><br/>
+        Our app allows you to plan meals, create shopping lists, and track your dietary habits. You agree to use the app only for its intended purpose and in compliance with all applicable laws and regulations.<br/><br/>
+
+        <b>4. Content and Intellectual Property</b><br/>
+        All content provided on this app, including recipes, images, and design, is the intellectual property of <font color="#06C169">Myka Meal Planner</font> or its licensors. You may not reproduce, distribute, or modify any content without written permission from <font color="#06C169">Myka Meal Planner</font>.
+        ]]>
+    </string>
+
+    <string name="terms_and_condition_desc1"></string>
+    <string name="terms_and_condition_desc4"><font color="#000000">All content provided on this app, including recipes, images, and design, is the intellectual property of</font><font color="#06C169">Myka Meal Planner</font> or its licensors. You may not reproduce, distribute, or modify any content without written permission from <font color="#06C169">Myka Meal Planner.</font></string>
+    <string name="nutrition_per_serving"><font color="#000000">Nutrition Per </font><font color="#06C169">Serving</font></string>
+    <string name="do_you_want_to_add_this_dish_to_your_cooked_meals"><font color="#000000">Do you want to add this dish to your\n</font><b><font color="#06C169">cooked meals?</font></b></string>
+
+    <string name="if_your_cookbook_is_public_the_people_you_invite_will_have_a_snapshot_of_this_cookbook">If your cookbook is public, the people you invite will have a snapshot of this cookbook.</string>
+    <string name="uh_oh_the_fridge_is_empty_let_s_fill_it_up_with_some_delicious_dishes"> <font color="#000000"><b>Uh oh,</b></font> <font color="#3C4541"> the fridge is empty!\n Let’s fill it up with some delicious dishes!</font></string>
+    <string name="do_you_really_want_to_remove_this_recipe">Do you really want to remove this\nRecipe?</string>
+    <string name="do_you_really_want_to_remove_from_list">Do you really want to remove this item\nfrom list?</string>
+    <string name="missed_anything">Are you sure you haven\'t missed\nany thing?</string>
+    <string name="remove_this_recipe_basket">Do you want to remove this recipe\nand ingredients from your basket?</string>
+    <string name="do_you_really_want_to_remove_this_meal">Do you really want to remove this\nmeal?</string>
+    <string name="do_you_really_want_to_remove_this_cookbook">Do you really want to remove this\nCookbook?</string>
+    <string name="your_recipe_has_been_saved_n_successfully">Your Recipe has been saved\n successfully.</string>
+    <string name="your_didn_t_save_the_recipe">Your didn’t save the recipe. Do you want to discard changes.</string>
+    <string name="ingredients_missing_in_your_recipe"><font color="#3C4541">Ingredients missing in your</font><b><font color="#06C169"> recipe</font></b></string>
+    <string name="added_ingredients"><font color="#3C4541">Added</font><font color="#06C169"> Ingredients</font></string>
+
+    <string name="select_the_ingredients_that_are_missing_at_tesco"><font color="#3C4541">Select the ingredients that are\nmissing at</font> <font color="#06C169">Tesco</font></string>
+    <string name="you_have_invited_12_friends_to_use_myka">You have invited 12 friends to use<b> MYKA</b></string>
+    <string name="choose_a_file">Choose a file</string>
+    <string name="upload">Upload</string>
+
+
+</resources>

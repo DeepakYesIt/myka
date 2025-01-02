@@ -1,0 +1,94 @@
+package com.yesitlabs.mykaapp.fragment.authfragment.resetpassword
+
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.RelativeLayout
+import androidx.activity.OnBackPressedCallback
+import androidx.navigation.fragment.findNavController
+import com.yesitlabs.mykaapp.R
+import com.yesitlabs.mykaapp.commonworkutils.CommonWorkUtils
+import com.yesitlabs.mykaapp.databinding.FragmentResetPasswordBinding
+import com.yesitlabs.mykaapp.messageclass.ErrorMessage
+import dagger.hilt.android.AndroidEntryPoint
+import java.util.regex.Pattern
+
+@AndroidEntryPoint
+class ResetPasswordFragment : Fragment() {
+    private var binding: FragmentResetPasswordBinding? = null
+    private lateinit var commonWorkUtils: CommonWorkUtils
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        binding = FragmentResetPasswordBinding.inflate(inflater, container, false)
+        commonWorkUtils= CommonWorkUtils(requireActivity())
+
+        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                findNavController().navigateUp()
+            }
+        })
+
+        initialize()
+
+        return binding!!.root
+    }
+
+    private fun initialize() {
+
+        binding!!.imagesBackReset.setOnClickListener{
+            findNavController().navigateUp()
+        }
+        binding!!.rlResetSubmit.setOnClickListener{
+            if (validate()) {
+                resetDialog()
+            }
+        }
+    }
+
+    private fun resetDialog() {
+        val dialogPasswordChange: Dialog = context?.let { Dialog(it) }!!
+        dialogPasswordChange.setContentView(R.layout.alert_dialog_password_changed)
+        dialogPasswordChange.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.WRAP_CONTENT)
+        dialogPasswordChange.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val rlOkayBtn = dialogPasswordChange.findViewById<RelativeLayout>(R.id.rlOkayBtn)
+        dialogPasswordChange.show()
+        dialogPasswordChange.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        rlOkayBtn.setOnClickListener {
+            dialogPasswordChange.dismiss()
+            findNavController().navigate(R.id.loginFragment)
+        }
+    }
+
+    private fun validate(): Boolean {
+        val passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%^&+=])(?=\\S+\$).{6,}\$"
+        val pattern = Pattern.compile(passwordPattern)
+        val passMatcher = pattern.matcher(binding!!.etCreatePassword.text.toString().trim())
+        if (binding!!.etCreatePassword.text.toString().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(),ErrorMessage.password,false)
+            return false
+        } else if (binding!!.etConfirmPassword.text.toString().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(),ErrorMessage.confirmPassword,false)
+            return false
+        } else if (!passMatcher.find()) {
+            commonWorkUtils.alertDialog(requireActivity(),ErrorMessage.passwordMatch,false)
+            return false
+        } else if (binding!!.etCreatePassword.text.toString().trim() != binding!!.etConfirmPassword.text.toString().trim()) {
+            commonWorkUtils.alertDialog(requireActivity(),ErrorMessage.passwordSame,false)
+            return false
+        }
+        return true
+    }
+
+
+}
