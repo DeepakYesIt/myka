@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.yesitlabs.mykaapp.OnItemClickListener
+import com.yesitlabs.mykaapp.OnItemClickedListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.databinding.AdapterBodyGoalsBinding
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModelData
@@ -13,10 +14,10 @@ import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.mealRoutine.model.Mea
 class MealRoutineAdapter(
     private var mealRoutineModelData: List<MealRoutineModelData>,
     private var requireActivity: FragmentActivity,
-    private var onItemClickListener: OnItemClickListener
+    private var onItemClickedListener: OnItemClickedListener
 ) : RecyclerView.Adapter<MealRoutineAdapter.ViewHolder>() {
 
-    private var selectedPositions = mutableSetOf<Int>()
+    private val selectedIds = mutableListOf<String>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -29,33 +30,39 @@ class MealRoutineAdapter(
 
         holder.binding.tvTitleName.text = mealRoutineModelData[position].name
 
-        if (selectedPositions.contains(position)) {
+        /// Handle background and tick visibility
+        if (selectedIds.contains(mealRoutineModelData[position].id.toString())) {
             holder.binding.imageRightTick.visibility = View.VISIBLE
             holder.binding.relMainLayout.setBackgroundResource(R.drawable.orange_box_bg)
-            onItemClickListener.itemClick(position, "2", "")
         } else {
             holder.binding.imageRightTick.visibility = View.GONE
             holder.binding.relMainLayout.setBackgroundResource(R.drawable.gray_box_border_bg)
         }
 
+        /// Handle click events
         holder.binding.relMainLayout.setOnClickListener {
+            val currentId = mealRoutineModelData[position].id.toString()
             if (position == 0) {
-                if (selectedPositions.size == mealRoutineModelData.size) {
-                    selectedPositions.clear()
+                if (selectedIds.size == mealRoutineModelData.size) {
+                    // Clear all selections
+                    selectedIds.clear()
                 } else {
-                    selectedPositions = (0 until mealRoutineModelData.size).toMutableSet()
-                    holder.binding.imageRightTick.visibility = View.VISIBLE
-                    holder.binding.relMainLayout.setBackgroundResource(R.drawable.orange_box_bg)
-                    onItemClickListener.itemClick(position, "2", "")
+                    // Select all items
+                    selectedIds.clear()
+                    selectedIds.addAll(mealRoutineModelData.map { it.id.toString() })
                 }
             } else {
-                selectedPositions.clear()
-                selectedPositions.add(position)
-                holder.binding.imageRightTick.visibility = View.VISIBLE
-                holder.binding.relMainLayout.setBackgroundResource(R.drawable.orange_box_bg)
-                onItemClickListener.itemClick(position, "2", "")
+                if (selectedIds.contains(currentId)) {
+                    selectedIds.remove(currentId)
+                } else {
+                    selectedIds.add(currentId)
+                }
             }
-            notifyDataSetChanged()
+
+            // Pass the updated list of selected IDs to the interface
+            onItemClickedListener.itemClicked(position, selectedIds,"2","")
+
+            notifyDataSetChanged() // Refresh the UI
         }
     }
 

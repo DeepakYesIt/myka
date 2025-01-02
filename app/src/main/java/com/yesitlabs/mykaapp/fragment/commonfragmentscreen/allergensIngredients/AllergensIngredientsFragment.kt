@@ -20,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.yesitlabs.mykaapp.basedata.SessionManagement
 import com.yesitlabs.mykaapp.OnItemClickListener
+import com.yesitlabs.mykaapp.OnItemClickedListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.adapter.DietaryRestrictionsAdapter
 import com.yesitlabs.mykaapp.basedata.BaseApplication
@@ -34,7 +35,7 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 @AndroidEntryPoint
-class AllergensIngredientsFragment : Fragment(), OnItemClickListener {
+class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
 
     private var binding: FragmentAllergensIngredientsBinding? = null
     private var dietaryRestrictionsAdapter: DietaryRestrictionsAdapter? = null
@@ -42,8 +43,8 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickListener {
     private var dietaryRestrictionsModelData = mutableListOf<DietaryRestrictionsModelData>()
     private var totalProgressValue: Int = 0
     private var status:String?=null
+    private var allergensSelectedId = mutableListOf<String>()
     private lateinit var allergenIngredientViewModel: AllergenIngredientViewModel
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,8 +54,9 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickListener {
         binding = FragmentAllergensIngredientsBinding.inflate(inflater, container, false)
 
         allergenIngredientViewModel = ViewModelProvider(this)[AllergenIngredientViewModel::class.java]
-
         sessionManagement = SessionManagement(requireContext())
+
+        /// checked session value cooking for
         if (sessionManagement.getCookingFor().equals("Myself")) {
             binding!!.tvAllergensDesc.text = getString(R.string.allergens_ingredients_desc)
             binding!!.progressBar5.max = 10
@@ -73,6 +75,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickListener {
             updateProgress(5)
         }
 
+        //// handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
             object : OnBackPressedCallback(true) {
@@ -81,17 +84,21 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickListener {
                 }
             })
 
+        ///checking the device of mobile data in online and offline(show network error message)
+        /// allergies api implement 
         if (BaseApplication.isOnline(requireContext())) {
             allergenIngredientApi()
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
+        ///main function using all triggered of this screen
         initialize()
 
         return binding!!.root
     }
 
+    /// update progressbar value and progress
     private fun updateProgress(progress: Int) {
         binding!!.progressBar5.progress = progress
         binding!!.tvProgressText.text = "$progress/$totalProgressValue"
@@ -99,14 +106,18 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickListener {
 
     private fun initialize() {
 
+        /// handle on back pressed
         binding!!.imgBackAllergensIng.setOnClickListener {
             findNavController().navigateUp()
         }
 
+        /// handle click event for skip this screen
         binding!!.tvSkipBtn.setOnClickListener {
             stillSkipDialog()
         }
 
+        // Add a TextWatcher to monitor changes in the username EditText field.
+        // The searchable() function is triggered after text changes to search ingredient
         binding!!.etAllergensIngSearchBar.addTextChangedListener(object :
             TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -116,8 +127,10 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickListener {
             }
         })
 
+        /// handle click event for redirect next part
         binding!!.tvNextBtn.setOnClickListener {
             if (status=="2"){
+                sessionManagement.setAllergenIngredientList(allergensSelectedId)
                 if (sessionManagement.getCookingFor().equals("Myself")) {
                     findNavController().navigate(R.id.mealRoutineFragment)
                 } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
@@ -128,6 +141,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickListener {
             }
         }
     }
+
 
     private fun searchable(editText: String) {
         val filteredList: MutableList<DietaryRestrictionsModelData> = java.util.ArrayList<DietaryRestrictionsModelData>()
@@ -153,7 +167,6 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickListener {
                     is NetworkResult.Success -> {
                         val gson = Gson()
                         val dietaryModel = gson.fromJson(it.data, DietaryRestrictionsModel::class.java)
-                        Log.d("@@@ Response profile", "message :- ${it.data}")
                         if (dietaryModel.code == 200 && dietaryModel.success) {
                             showDataInUi(dietaryModel.data)
                         } else {
@@ -176,7 +189,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickListener {
     }
 
     private fun showDataInUi(dietaryModelData: List<DietaryRestrictionsModelData>) {
-        if (dietaryModelData!=null && dietaryModelData.size>0){
+        if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
             dietaryRestrictionsModelData= dietaryModelData.toMutableList()
             dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
             binding!!.rcyAllergensDesc.adapter = dietaryRestrictionsAdapter
@@ -202,13 +215,12 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickListener {
 
         tvDialogSkipBtn.setOnClickListener {
             dialogStillSkip.dismiss()
+            sessionManagement.setAllergenIngredientList(null)
             findNavController().navigate(R.id.mealRoutineFragment)
         }
     }
 
-
-
-    override fun itemClick(position: Int?, status1: String?, type: String?) {
+    override fun itemClicked(position: Int?, list: MutableList<String>, status1: String?, type: String?) {
         if (status1 == "1") {
             status = ""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
@@ -216,6 +228,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickListener {
             status = "2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            allergensSelectedId=list
 
         }
     }

@@ -1,4 +1,4 @@
-package com.yesitlabs.mykaapp.fragment.mainfragment.searchtab
+package com.yesitlabs.mykaapp.fragment.mainfragment.searchtab.searchedresipebreakfast
 
 import android.app.Dialog
 import android.graphics.Color
@@ -19,7 +19,6 @@ import com.yesitlabs.mykaapp.OnItemClickListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.activity.MainActivity
 import com.yesitlabs.mykaapp.adapter.AdapterPlanBreakFast
-import com.yesitlabs.mykaapp.adapter.CalendarDayAdapter
 import com.yesitlabs.mykaapp.adapter.ChooseDayAdapter
 import com.yesitlabs.mykaapp.databinding.FragmentSearchedRecipeBreakfastBinding
 import com.yesitlabs.mykaapp.model.DataModel

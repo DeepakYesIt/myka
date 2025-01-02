@@ -35,11 +35,11 @@ import kotlinx.coroutines.launch
 class CookingFrequencyFragment : Fragment(),OnItemClickListener {
 
     private var binding: FragmentCookingFrequencyBinding? = null
-    private val dataList = ArrayList<DataModel>()
     private var bodyGoalAdapter: BodyGoalAdapter? = null
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue:Int=0
     private var status:String?=null
+    private var cookingSelect: String? = null
     private lateinit var cookingFrequencyViewModel: CookingFrequencyViewModel
 
     override fun onCreateView(
@@ -103,6 +103,7 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
+                sessionManagement.setCookingFrequency(cookingSelect.toString())
                 if (sessionManagement.getCookingFor().equals("Myself")){
                     findNavController().navigate(R.id.spendingOnGroceriesFragment)
 //                    findNavController().navigate(R.id.cookingScheduleFragment)
@@ -131,6 +132,7 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
 
         tvDialogSkipBtn.setOnClickListener {
             dialogStillSkip.dismiss()
+            sessionManagement.setCookingFrequency("")
             if (sessionManagement.getCookingFor().equals("Myself")){
                 findNavController().navigate(R.id.cookingScheduleFragment)
             } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
@@ -150,7 +152,6 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
                     is NetworkResult.Success -> {
                         val gson = Gson()
                         val bodyGoalModel = gson.fromJson(it.data, BodyGoalModel::class.java)
-                        Log.d("@@@ Response profile", "message :- ${it.data}")
                         if (bodyGoalModel.code == 200 && bodyGoalModel.success) {
                             showDataInUi(bodyGoalModel.data)
                         } else {
@@ -186,7 +187,7 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
     }
 
 
-    override fun itemClick(position: Int?, status1: String?, type: String?) {
+    override fun itemClick(selectItem: Int?, status1: String?, type: String?) {
         if (status1 == "1") {
             status=""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
@@ -194,6 +195,7 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
             status="2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            cookingSelect=selectItem.toString()
 
         }
     }

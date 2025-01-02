@@ -18,8 +18,10 @@ import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.yesitlabs.mykaapp.basedata.SessionManagement
 import com.yesitlabs.mykaapp.OnItemClickListener
+import com.yesitlabs.mykaapp.OnItemClickedListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.adapter.AdapterCookingSchedule
+import com.yesitlabs.mykaapp.adapter.AdapterFavouriteCuisinesItem
 import com.yesitlabs.mykaapp.basedata.BaseApplication
 import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.databinding.FragmentFavouriteCuisinesBinding
@@ -31,13 +33,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class FavouriteCuisinesFragment : Fragment(),OnItemClickListener {
+class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
 
     private var binding: FragmentFavouriteCuisinesBinding? = null
-    private var adapterCookingSchedule: AdapterCookingSchedule? = null
+    private var adapterFavouriteCuisinesItem: AdapterFavouriteCuisinesItem? = null
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue:Int=0
     private var status:String?=""
+    private var favouriteSelectId = mutableListOf<String>()
     private lateinit var favouriteCuisineViewModel: FavouriteCuisineViewModel
 
 
@@ -103,6 +106,7 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickListener {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
+                sessionManagement.setFavouriteCuisineList(favouriteSelectId)
                 if (sessionManagement.getCookingFor().equals("Myself")){
                     findNavController().navigate(R.id.ingredientDislikesFragment)
                 } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
@@ -130,6 +134,7 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickListener {
 
         tvDialogSkipBtn.setOnClickListener {
             dialogStillSkip.dismiss()
+            sessionManagement.setFavouriteCuisineList(null)
             if (sessionManagement.getCookingFor().equals("Myself")){
                 findNavController().navigate(R.id.ingredientDislikesFragment)
             } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
@@ -149,7 +154,6 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickListener {
                     is NetworkResult.Success -> {
                         val gson = Gson()
                         val dietaryModel = gson.fromJson(it.data, DietaryRestrictionsModel::class.java)
-                        Log.d("@@@ Response profile", "message :- ${it.data}")
                         if (dietaryModel.code == 200 && dietaryModel.success) {
                             showDataInUi(dietaryModel.data)
                         } else {
@@ -173,9 +177,9 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickListener {
 
     private fun showDataInUi(dietaryModelData: List<DietaryRestrictionsModelData>) {
 
-        if (dietaryModelData!=null && dietaryModelData.size>0){
-            adapterCookingSchedule = AdapterCookingSchedule(dietaryModelData, requireActivity(), this)
-            binding!!.rcyFavCuisines.adapter = adapterCookingSchedule
+        if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
+            adapterFavouriteCuisinesItem = AdapterFavouriteCuisinesItem(dietaryModelData, requireActivity(), this)
+            binding!!.rcyFavCuisines.adapter = adapterFavouriteCuisinesItem
         }
     }
 
@@ -244,7 +248,9 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickListener {
 //        binding!!.rcyFavCuisines.adapter = dietaryRestrictionsAdapter
 //    }
 
-    override fun itemClick(position: Int?, status1: String?, type: String?) {
+
+    override fun itemClicked(position: Int?, list: MutableList<String>, status1: String?, type: String?
+    ) {
         if (status1 == "1") {
             status=""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
@@ -252,7 +258,7 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickListener {
             status="2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-
+            favouriteSelectId=list
         }
     }
 

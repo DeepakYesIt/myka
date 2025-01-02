@@ -23,10 +23,12 @@ class AuthActivity : AppCompatActivity() {
             type=intent.getStringExtra("type").toString()
         }
 
+        //handle destination for using this function
         startDestination()
 
     }
 
+    //handle destinations for Login or Signup
     private fun startDestination(){
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.frameContainerAuth) as NavHostFragment
@@ -43,5 +45,6 @@ class AuthActivity : AppCompatActivity() {
 
         // Set the modified graph to the NavController
         navController.graph = navGraph
+
     }
 }

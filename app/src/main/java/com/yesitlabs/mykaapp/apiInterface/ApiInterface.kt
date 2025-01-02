@@ -45,41 +45,70 @@ interface ApiInterface {
 
 
     @FormUrlEncoded
+    @POST(ApiEndPoint.socialLogin)
+    suspend fun socialLogin(
+        @Field("email_or_phone") email_or_phone:String?,
+        @Field("social_id") socialId:String?,
+        @Field("username") username:String?,
+        @Field("usergender") userGender:String?,
+        @Field("bodygoal") bodygoal:String?,
+        @Field("cooking_frequency") cookingFrequency:String?,
+        @Field("take_way") takeWay:String?,
+        @Field("cooking_for_type") cookingForType:String?,
+        @Field("partner_name") partnerName:String?,
+        @Field("partner_gender") partnerGender:String?,
+        @Field("family_member_name") familyMemberName:String?,
+        @Field("family_member_age") familyMemberAge:String?,
+        @Field("child_friendly_meals") childFriendlyMeals:String?,
+        @Field("meal_routine_id[]") mealRoutineId:List<String>?,
+        @Field("spending_amount") spendingAmount:String?,
+        @Field("duration") duration:String?,
+        @Field("dietary_id[]") dietaryId:List<String>?,
+        @Field("favourite[]") favourite:List<String>?,
+        @Field("allergies[]") allergies:List<String>?,
+        @Field("dislike_ingredients_id[]") dislikeIngredientsId:List<String>?,
+        @Field("device_type") deviceType:String?,
+        @Field("fcm_token") fcmToken:String?,
+    ):Response<JsonObject>
+
+    @FormUrlEncoded
     @POST(ApiEndPoint.otpVerify)
     suspend fun otpVerify(
-        @Field("user_id") user_id:String?,
+        @Field("user_id") userId:String?,
         @Field("otp") otp:String?,
         @Field("username") username:String?,
-        @Field("usergender") usergender:String?,
+        @Field("usergender") userGender:String?,
         @Field("bodygoal") bodygoal:String?,
-        @Field("cooking_frequency") cooking_frequency:String?,
-        @Field("take_way") take_way:String?,
-        @Field("cooking_for_type") cooking_for_type:String?,
-        @Field("partner_name") partner_name:String?,
-        @Field("partner_gender") partner_gender:String?,
-        @Field("family_member_name") family_member_name:String?,
-        @Field("family_member_age") family_member_age:String?,
-        @Field("child_friendly_meals") child_friendly_meals:String?,
-        @Field("meal_routine_id") meal_routine_id:List<String>?,
-        @Field("spending_amount") spending_amount:String?,
+        @Field("cooking_frequency") cookingFrequency:String?,
+        @Field("take_way") takeWay:String?,
+        @Field("cooking_for_type") cookingForType:String?,
+        @Field("partner_name") partnerName:String?,
+        @Field("partner_gender") partnerGender:String?,
+        @Field("family_member_name") familyMemberName:String?,
+        @Field("family_member_age") familyMemberAge:String?,
+        @Field("child_friendly_meals") childFriendlyMeals:String?,
+        @Field("meal_routine_id[]") mealRoutineId:List<String>?,
+        @Field("spending_amount") spendingAmount:String?,
         @Field("duration") duration:String?,
-        @Field("dietary_id") dietary_id:List<String>?,
-        @Field("dislike_ingredients_id") dislike_ingredients_id:List<String>?,
-        @Field("device_type") device_type:String?,
-        @Field("fcm_token") fcm_token:String?,
+        @Field("dietary_id[]") dietaryId:List<String>?,
+        @Field("favourite[]") favourite:List<String>?,
+        @Field("allergies[]") allergies: List<String>?,
+        @Field("dislike_ingredients_id[]") dislikeIngredientsId: List<String>?,
+        @Field("device_type") deviceType:String?,
+        @Field("fcm_token") fcmToken:String?,
     ):Response<JsonObject>
 
     @FormUrlEncoded
     @POST(ApiEndPoint.forgotPassword)
     suspend fun forgotPassword(
-        @Field("email_or_phone") email_or_phone:String
+        @Field("email_or_phone") emailOrPhone:String
     ):Response<JsonObject>
 
 
     @FormUrlEncoded
     @POST(ApiEndPoint.forgotOtpVerify)
     suspend fun forgotOtpVerify(
-        @Field("email_or_phone") email_or_phone:String,
+        @Field("email_or_phone") emailOrPhone:String,
         @Field("otp") otp:String,
     ):Response<JsonObject>
 
@@ -95,28 +124,19 @@ interface ApiInterface {
     suspend fun resetPassword(
         @Field("email_or_phone") emailOrPhone:String,
         @Field("password") password:String,
-        @Field("conformpassword") conformpassword:String,
+        @Field("conformpassword") conformPassword:String,
     ):Response<JsonObject>
 
 
     @FormUrlEncoded
     @POST(ApiEndPoint.userLogin)
     suspend fun userLogin(
-        @Field("email_or_phone") email_or_phone:String,
+        @Field("email_or_phone") emailOrPhone:String,
         @Field("password") password:String,
-        @Field("device_type") device_type:String,
-        @Field("fcm_token") fcm_token:String
+        @Field("device_type") deviceType:String,
+        @Field("fcm_token") fcmToken:String
     ):Response<JsonObject>
 
-
-    @FormUrlEncoded
-    @POST(ApiEndPoint.socialLogin)
-    suspend fun socialLogin(
-        @Field("email_or_phone") email_or_phone:String,
-        @Field("social_id") socialId:String,
-        @Field("device_type") device_type:String,
-        @Field("fcm_token") fcm_token:String
-    ):Response<JsonObject>
 
     @FormUrlEncoded
     @POST(ApiEndPoint.updateLocation)
@@ -129,6 +149,21 @@ interface ApiInterface {
     suspend fun updateNotification(
         @Field("notification_status") notification_status:String
     ):Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.saveFeedback)
+    suspend fun saveFeedback(
+        @Field("email") email:String,
+        @Field("message") message:String,
+    ):Response<JsonObject>
+
+
+    @GET(ApiEndPoint.termsCondition)
+    suspend fun getTermsCondition(): Response<JsonObject>
+
+    @GET(ApiEndPoint.privacyPolicy)
+    suspend fun getPrivacyPolicy(): Response<JsonObject>
 
 
     @POST(ApiEndPoint.userProfileUrl)

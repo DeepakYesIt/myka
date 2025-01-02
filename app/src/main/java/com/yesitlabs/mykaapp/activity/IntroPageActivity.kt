@@ -17,16 +17,17 @@ class IntroPageActivity : AppCompatActivity() {
         binding= ActivityIntroPageBinding.inflate(LayoutInflater.from(this))
         setContentView(binding!!.root)
 
+        ///main function using all triggered of this screen
         initialize()
     }
 
     private fun initialize() {
 
+        ///handle for click event
         binding!!.rlNextBtn.setOnClickListener{
             val intent = Intent(this@IntroPageActivity, OnBoardingActivity::class.java)
             startActivity(intent)
             finish()
         }
-
     }
 }

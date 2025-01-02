@@ -12,6 +12,7 @@ data class LoginModelData(
     val email: String,
     val fcm_token: Any,
     val id: Int,
+    val user_type: Int,
     val name: String,
     val profile_img: Any,
     val token: String,

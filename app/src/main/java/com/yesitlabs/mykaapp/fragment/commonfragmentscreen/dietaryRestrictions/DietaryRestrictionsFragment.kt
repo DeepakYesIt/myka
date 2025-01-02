@@ -17,7 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.yesitlabs.mykaapp.basedata.SessionManagement
-import com.yesitlabs.mykaapp.OnItemClickListener
+import com.yesitlabs.mykaapp.OnItemClickedListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.adapter.DietaryRestrictionsAdapter
 import com.yesitlabs.mykaapp.basedata.BaseApplication
@@ -27,19 +27,18 @@ import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.dietaryRestrictions.m
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.dietaryRestrictions.viewmodel.DietaryRestrictionsViewModel
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
-import com.yesitlabs.mykaapp.model.DataModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class DietaryRestrictionsFragment : Fragment(),OnItemClickListener {
+class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
 
     private var binding: FragmentDietaryRestrictionsBinding? = null
     private var dietaryRestrictionsAdapter: DietaryRestrictionsAdapter? = null
-    private val dataList = ArrayList<DataModel>()
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue:Int=0
     private var status:String?=null
+    private var dietarySelectedId = mutableListOf<String>()
     private lateinit var dietaryRestrictionsViewModel: DietaryRestrictionsViewModel
 
     override fun onCreateView(
@@ -95,7 +94,6 @@ class DietaryRestrictionsFragment : Fragment(),OnItemClickListener {
                     is NetworkResult.Success -> {
                         val gson = Gson()
                         val dietaryModel = gson.fromJson(it.data, DietaryRestrictionsModel::class.java)
-                        Log.d("@@@ Response profile", "message :- ${it.data}")
                         if (dietaryModel.code == 200 && dietaryModel.success) {
                             showDataInUi(dietaryModel.data)
                         } else {
@@ -119,7 +117,7 @@ class DietaryRestrictionsFragment : Fragment(),OnItemClickListener {
 
     private fun showDataInUi(dietaryModelData: List<DietaryRestrictionsModelData>) {
 
-        if (dietaryModelData!=null && dietaryModelData.size>0){
+        if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
             dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
             binding!!.rcyDietaryRestrictions.adapter = dietaryRestrictionsAdapter
         }
@@ -147,6 +145,7 @@ class DietaryRestrictionsFragment : Fragment(),OnItemClickListener {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
+                sessionManagement.setDietaryRestrictionList(dietarySelectedId)
                 if (sessionManagement.getCookingFor().equals("Myself")){
                     findNavController().navigate(R.id.favouriteCuisinesFragment)
                 } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
@@ -174,6 +173,7 @@ class DietaryRestrictionsFragment : Fragment(),OnItemClickListener {
 
         tvDialogSkipBtn.setOnClickListener {
             dialogStillSkip.dismiss()
+            sessionManagement.setDietaryRestrictionList(null)
             if (sessionManagement.getCookingFor().equals("Myself")){
                 findNavController().navigate(R.id.favouriteCuisinesFragment)
             } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
@@ -184,7 +184,20 @@ class DietaryRestrictionsFragment : Fragment(),OnItemClickListener {
         }
     }
 
-    override fun itemClick(position: Int?, status1: String?, type: String?) {
+    override fun itemClicked(position: Int?, list: MutableList<String>, status1: String?, type: String?) {
+        if (status1 == "1") {
+            status = ""
+            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+        } else {
+            status = "2"
+            binding!!.tvNextBtn.isClickable = true
+            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            dietarySelectedId=list
+
+        }
+    }
+
+/*    override fun itemClick(position: Int?, status1: String?, type: String?) {
         if (status1 == "1") {
             status = ""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
@@ -194,5 +207,5 @@ class DietaryRestrictionsFragment : Fragment(),OnItemClickListener {
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
 
         }
-    }
+    }*/
 }

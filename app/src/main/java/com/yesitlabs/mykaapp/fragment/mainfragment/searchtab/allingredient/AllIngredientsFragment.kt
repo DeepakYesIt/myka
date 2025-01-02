@@ -1,4 +1,4 @@
-package com.yesitlabs.mykaapp.fragment.mainfragment.searchtab
+package com.yesitlabs.mykaapp.fragment.mainfragment.searchtab.allingredient
 
 import android.graphics.Color
 import android.os.Bundle
@@ -13,7 +13,6 @@ import androidx.navigation.fragment.findNavController
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.activity.MainActivity
 import com.yesitlabs.mykaapp.adapter.AdapterAllIngredientsItem
-import com.yesitlabs.mykaapp.adapter.SearchRecipeAdapter
 import com.yesitlabs.mykaapp.databinding.FragmentAllIngredientsBinding
 import com.yesitlabs.mykaapp.model.DataModel
 import java.util.Locale

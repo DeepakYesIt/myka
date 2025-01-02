@@ -9,33 +9,38 @@ import com.yesitlabs.mykaapp.databinding.ActivityCookingMyselfBinding
 import com.yesitlabs.mykaapp.databinding.ActivityLetsStartOptionBinding
 
 class LetsStartOptionActivity : AppCompatActivity() {
-
-    private var binding: ActivityLetsStartOptionBinding?=null
+    private var binding: ActivityLetsStartOptionBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding= ActivityLetsStartOptionBinding.inflate(LayoutInflater.from(this))
+        binding = ActivityLetsStartOptionBinding.inflate(LayoutInflater.from(this))
         setContentView(binding!!.root)
 
+        ///main function using all triggered of this screen
         initialize()
     }
 
     private fun initialize() {
-        binding!!.tvLogin.setOnClickListener{
+
+        // Set an OnClickListener for the "Login" TextView.
+        // When clicked, navigate to the AuthActivity with the "login" type passed as an extra in the intent.
+        binding!!.tvLogin.setOnClickListener {
             val intent = Intent(this@LetsStartOptionActivity, AuthActivity::class.java)
-            intent.putExtra("type","login")
+            intent.putExtra("type", "login")
             startActivity(intent)
-            finish()
         }
 
-        binding!!.rlLetsCooking.setOnClickListener{
+        // Set an OnClickListener for the "Lets Start cooking" Button.
+        // When clicked, navigate to the AuthActivity with the "Signup" type passed as an extra in the intent.
+        // Finish the current activity to prevent returning to it.
+        binding!!.rlLetsCooking.setOnClickListener {
             val intent = Intent(this@LetsStartOptionActivity, AuthActivity::class.java)
-            intent.putExtra("type","signup")
+            intent.putExtra("type", "signup")
             startActivity(intent)
-            finish()
         }
     }
 
+    ///handle on back pressed
     override fun onBackPressed() {
         super.onBackPressed()
         onBackPressed()

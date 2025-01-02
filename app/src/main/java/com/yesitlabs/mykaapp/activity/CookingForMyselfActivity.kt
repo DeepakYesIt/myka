@@ -22,14 +22,17 @@ class CookingForMyselfActivity : AppCompatActivity() {
         setContentView(binding!!.root)
         sessionManagement = SessionManagement(this@CookingForMyselfActivity)
 
+        ///main function using all triggered of this screen
         initialize()
     }
 
     private fun initialize() {
 
+        /// handle find destination for Cooking type
         startDestination()
     }
 
+    ///handle destination for Cooking for Myself, Partner, FamilyMember
     private fun startDestination(){
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.frameLayoutAuth) as? NavHostFragment
         if (navHostFragment != null) {
@@ -37,7 +40,6 @@ class CookingForMyselfActivity : AppCompatActivity() {
             val navGraph = navController.navInflater.inflate(R.navigation.main_graph)
 
             val cookingFor = sessionManagement.getCookingFor() ?: ""
-            Toast.makeText(this, "sessionManagement :- $cookingFor", Toast.LENGTH_SHORT).show()
             val startDestination = when (cookingFor) {
                 "Myself" -> R.id.bodyGoalsFragment
                 "MyPartner" -> R.id.partnerInfoDetailsFragment

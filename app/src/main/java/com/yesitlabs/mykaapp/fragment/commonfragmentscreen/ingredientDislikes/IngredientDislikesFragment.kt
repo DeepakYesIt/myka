@@ -20,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.yesitlabs.mykaapp.basedata.SessionManagement
 import com.yesitlabs.mykaapp.OnItemClickListener
+import com.yesitlabs.mykaapp.OnItemClickedListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.adapter.DietaryRestrictionsAdapter
 import com.yesitlabs.mykaapp.basedata.BaseApplication
@@ -34,7 +35,7 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 @AndroidEntryPoint
-class IngredientDislikesFragment : Fragment(),OnItemClickListener {
+class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
 
     private var binding: FragmentIngredientDislikesBinding? = null
     private var dietaryRestrictionsModelData = mutableListOf<DietaryRestrictionsModelData>()
@@ -42,6 +43,7 @@ class IngredientDislikesFragment : Fragment(),OnItemClickListener {
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue:Int=0
     private var status:String?=""
+    private var dislikeSelectedId = mutableListOf<String>()
     private lateinit var dislikeIngredientsViewModel: DislikeIngredientsViewModel
 
 
@@ -106,6 +108,7 @@ class IngredientDislikesFragment : Fragment(),OnItemClickListener {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
+                sessionManagement.setDislikeIngredientList(dislikeSelectedId)
                 findNavController().navigate(R.id.allergensIngredientsFragment)
             }
         }
@@ -129,7 +132,6 @@ class IngredientDislikesFragment : Fragment(),OnItemClickListener {
                     is NetworkResult.Success -> {
                         val gson = Gson()
                         val dietaryModel = gson.fromJson(it.data, DietaryRestrictionsModel::class.java)
-                        Log.d("@@@ Response profile", "message :- ${it.data}")
                         if (dietaryModel.code == 200 && dietaryModel.success) {
                             showDataInUi(dietaryModel.data)
                         } else {
@@ -192,13 +194,16 @@ class IngredientDislikesFragment : Fragment(),OnItemClickListener {
         }
 
         tvDialogSkipBtn.setOnClickListener {
+            sessionManagement.setDislikeIngredientList(null)
+
             dialogStillSkip.dismiss()
             findNavController().navigate(R.id.allergensIngredientsFragment)
         }
     }
 
 
-    override fun itemClick(position: Int?, status1: String?, type: String?) {
+
+    override fun itemClicked(position: Int?, list: MutableList<String>, status1: String?, type: String?) {
         if (status1 == "1") {
             status=""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
@@ -206,6 +211,7 @@ class IngredientDislikesFragment : Fragment(),OnItemClickListener {
             status="2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            dislikeSelectedId=list
 
         }
     }

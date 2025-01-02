@@ -74,27 +74,38 @@
     <fragment
         android:id="@+id/forgotPasswordFragment"
         android:name="com.yesitlabs.mykaapp.fragment.authfragment.forgotpassword.ForgotPasswordFragment"
-        android:label="ForgotPasswordFragment" />
+        android:label="ForgotPasswordFragment"
+        tools:layout="@layout/fragment_forgot_password"/>
+
     <fragment
         android:id="@+id/verificationFragment"
-        android:name="com.yesitlabs.mykaapp.fragment.authfragment.VerificationFragment"
-        android:label="VerificationFragment" />
+        android:name="com.yesitlabs.mykaapp.fragment.authfragment.verification.VerificationFragment"
+        android:label="VerificationFragment"
+        tools:layout="@layout/fragment_verification"/>
+
     <fragment
         android:id="@+id/resetPasswordFragment"
         android:name="com.yesitlabs.mykaapp.fragment.authfragment.resetpassword.ResetPasswordFragment"
-        android:label="ResetPasswordFragment" />
+        android:label="ResetPasswordFragment"
+        tools:layout="@layout/fragment_reset_password"/>
+
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.yesitlabs.mykaapp.fragment.authfragment.signup.SignUpFragment"
-        android:label="SignUpFragment" />
+        android:label="SignUpFragment"
+        tools:layout="@layout/fragment_sign_up"/>
+
     <fragment
         android:id="@+id/turnOnLocationFragment"
-        android:name="com.yesitlabs.mykaapp.fragment.authfragment.TurnOnLocationFragment"
-        android:label="TurnOnLocationFragment" />
+        android:name="com.yesitlabs.mykaapp.fragment.authfragment.locationfragment.TurnOnLocationFragment"
+        android:label="TurnOnLocationFragment"
+        tools:layout="@layout/fragment_turn_on_location"/>
     <fragment
         android:id="@+id/turnOnNotificationsFragment"
-        android:name="com.yesitlabs.mykaapp.fragment.authfragment.TurnOnNotificationsFragment"
-        android:label="TurnOnNotificationsFragment" />
+        android:name="com.yesitlabs.mykaapp.fragment.authfragment.notificationmodel.TurnOnNotificationsFragment"
+        android:label="TurnOnNotificationsFragment"
+        tools:layout="@layout/fragment_turn_on_notifications"/>
+
     <fragment
         android:id="@+id/familyMembersFragment"
         android:name="com.yesitlabs.mykaapp.fragment.FamilyMembersFragment"
@@ -105,11 +116,12 @@
         android:name="com.yesitlabs.mykaapp.fragment.mainfragment.hometab.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
+
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.searchtab.SearchFragment"
-        android:label="fragment_search"
-        tools:layout="@layout/fragment_search" />
+        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.searchtab.searchscreen.SearchFragment"
+        android:label="SearchFragment"
+        tools:layout="@layout/fragment_search"/>
     <fragment
         android:id="@+id/addRecipeFragment"
         android:name="com.yesitlabs.mykaapp.fragment.mainfragment.addrecipetab.AddRecipeFragment"
@@ -155,16 +167,18 @@
         android:name="com.yesitlabs.mykaapp.fragment.mainfragment.profilesetting.NotificationFragment"
         android:label="fragment_notification"
         tools:layout="@layout/fragment_notification" />
+
     <fragment
         android:id="@+id/privacyPolicyFragment"
-        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.profilesetting.PrivacyPolicyFragment"
-        android:label="fragment_privacy_policy"
-        tools:layout="@layout/fragment_privacy_policy" />
+        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.profilesetting.privacypolicy.PrivacyPolicyFragment"
+        android:label="PrivacyPolicyFragment"
+        tools:layout="@layout/fragment_privacy_policy"/>
     <fragment
         android:id="@+id/termsConditionFragment"
-        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.profilesetting.TermsConditionFragment"
-        android:label="fragment_terms_condition"
-        tools:layout="@layout/fragment_terms_condition" />
+        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.profilesetting.terms_condition.TermsConditionFragment"
+        android:label="TermsConditionFragment"
+        tools:layout="@layout/fragment_terms_condition"/>
+
     <fragment
         android:id="@+id/createCookBookFragment"
         android:name="com.yesitlabs.mykaapp.fragment.mainfragment.hometab.CreateCookBookFragment"
@@ -175,21 +189,25 @@
         android:name="com.yesitlabs.mykaapp.fragment.mainfragment.hometab.RecipeDetailsFragment"
         android:label="fragment_recipe_details"
         tools:layout="@layout/fragment_recipe_details" />
+
     <fragment
         android:id="@+id/filterSearchFragment"
-        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.searchtab.FilterSearchFragment"
-        android:label="fragment_filter_search"
-        tools:layout="@layout/fragment_filter_search" />
+        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.searchtab.filtersearch.FilterSearchFragment"
+        android:label="FilterSearchFragment"
+        tools:layout="@layout/fragment_filter_search"/>
+
     <fragment
         android:id="@+id/createRecipeFragment"
         android:name="com.yesitlabs.mykaapp.fragment.mainfragment.addrecipetab.CreateRecipeFragment"
         android:label="fragment_create_recipe"
         tools:layout="@layout/fragment_create_recipe" />
+
     <fragment
         android:id="@+id/feedbackFragment"
-        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.profilesetting.FeedbackFragment"
-        android:label="fragment_feedback"
-        tools:layout="@layout/fragment_feedback" />
+        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.profilesetting.feedbackscreen.FeedbackFragment"
+        android:label="FeedbackFragment"
+        tools:layout="@layout/fragment_feedback"/>
+
     <fragment
         android:id="@+id/directionSteps1RecipeDetailsFragment"
         android:name="com.yesitlabs.mykaapp.fragment.mainfragment.hometab.DirectionSteps1RecipeDetailsFragment"
@@ -240,11 +258,13 @@
         android:name="com.yesitlabs.mykaapp.fragment.mainfragment.cookedtab.AddMealCookedFragment"
         android:label="fragment_add_meal_cooked"
         tools:layout="@layout/fragment_add_meal_cooked" />
+
     <fragment
         android:id="@+id/allIngredientsFragment"
-        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.searchtab.AllIngredientsFragment"
-        android:label="fragment_all_ingredients"
-        tools:layout="@layout/fragment_all_ingredients" />
+        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.searchtab.allingredient.AllIngredientsFragment"
+        android:label="AllIngredientsFragment"
+        tools:layout="@layout/fragment_all_ingredients"/>
+
     <fragment
         android:id="@+id/cookBookFragment"
         android:name="com.yesitlabs.mykaapp.fragment.mainfragment.commonscreen.CookBookFragment"
@@ -270,11 +290,13 @@
         android:name="com.yesitlabs.mykaapp.fragment.mainfragment.commonscreen.InvitationsScreenFragment"
         android:label="fragment_invitations_screen"
         tools:layout="@layout/fragment_invitations_screen" />
+
     <fragment
         android:id="@+id/searchedRecipeBreakfastFragment"
-        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.searchtab.SearchedRecipeBreakfastFragment"
-        android:label="fragment_searched_recipe_breakfast"
-        tools:layout="@layout/fragment_searched_recipe_breakfast" />
+        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.searchtab.searchedresipebreakfast.SearchedRecipeBreakfastFragment"
+        android:label="SearchedRecipeBreakfastFragment"
+        tools:layout="@layout/fragment_searched_recipe_breakfast"/>
+
     <fragment
         android:id="@+id/nutritionGoalFragment"
         android:name="com.yesitlabs.mykaapp.fragment.mainfragment.profilesetting.NutritionGoalFragment"
@@ -325,5 +347,7 @@
         android:name="com.yesitlabs.mykaapp.fragment.mainfragment.commonscreen.PaymentMethodFragment"
         android:label="fragment_payment_method"
         tools:layout="@layout/fragment_payment_method" />
+
+
 
 </navigation>

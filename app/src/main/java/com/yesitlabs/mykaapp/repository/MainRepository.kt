@@ -4,7 +4,6 @@ import com.yesitlabs.mykaapp.basedata.NetworkResult
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
-
 interface MainRepository {
 
     suspend fun bogyGoal(successCallback: (response: NetworkResult<String>) -> Unit)
@@ -22,9 +21,10 @@ interface MainRepository {
     suspend fun otpVerify(successCallback: (response: NetworkResult<String>) -> Unit,userid: String?, otp: String?,userName:String?,userGender:String?,bodyGoal:String?,cookingFrequency:String?,
                           takeAway:String?,cookingForType:String?,partnerName:String?,partnerGender:String?,familyMemberName:String?,
                           familyMemberAge:String?,childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?,
-                          dietaryid:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?)
+                          dietaryid:List<String>?,favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?)
 
     suspend fun forgotPassword(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String)
+    suspend fun resendSignUpModel(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String)
 
     suspend fun forgotOtpVerify(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String,otp:String)
 
@@ -34,11 +34,20 @@ interface MainRepository {
 
     suspend fun userLogin(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String,password: String,deviceType:String,fcmToken:String)
 
-    suspend fun socialLogin(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String,socialId: String,deviceType:String,fcmToken:String)
-
+    suspend fun socialLogin(successCallback: (response: NetworkResult<String>) -> Unit,  emailOrPhone: String?, socialID: String?,userName:String?,
+                            userGender:String?,bodyGoal:String?,cookingFrequency:String?,takeAway:String?,cookingForType:String?,
+                            partnerName:String?,partnerGender:String?,familyMemberName:String?, familyMemberAge:String?,
+                            childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?, dietaryid:List<String>?,
+                            favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?)
     suspend fun updateLocation(successCallback: (response: NetworkResult<String>) -> Unit,locationStatus: String)
 
     suspend fun updateNotification(successCallback: (response: NetworkResult<String>) -> Unit,notificationStatus: String)
+
+    suspend fun privacyPolicy(successCallback: (response: NetworkResult<String>) -> Unit)
+
+    suspend fun termCondition(successCallback: (response: NetworkResult<String>) -> Unit)
+
+    suspend fun saveFeedback(successCallback: (response: NetworkResult<String>) -> Unit,email: String,message: String)
 
 
     suspend fun userProfileDataApi(successCallback: (response: NetworkResult<String>) -> Unit)

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,6 +39,7 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue: Int = 0
     private var status: String? = null
+    private var bodySelect: String? = ""
     private lateinit var bodyGoalViewModel:BodyGoalViewModel
 
     override fun onCreateView(
@@ -53,6 +53,7 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
 
         sessionManagement = SessionManagement(requireContext())
 
+        /// checked session value cooking for
         if (sessionManagement.getCookingFor().equals("Myself")) {
 
             binding!!.tvYourBodyGoals.text = "What are your body goals?"
@@ -79,6 +80,7 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
             updateProgress(2)
         }
 
+        ///handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
             object : OnBackPressedCallback(true) {
@@ -94,6 +96,7 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
                 }
             })
 
+        ///checking the device of mobile data in online and offline(show network error message)
         if (BaseApplication.isOnline(requireActivity())) {
             bodyGoalApi()
         } else {
@@ -114,7 +117,6 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
                     is NetworkResult.Success -> {
                         val gson = Gson()
                         val bodyModel = gson.fromJson(it.data, BodyGoalModel::class.java)
-                        Log.d("@@@ Response profile", "message :- ${it.data}")
                         if (bodyModel.code == 200 && bodyModel.success) {
                             showDataInUi(bodyModel.data)
                         } else {
@@ -142,7 +144,6 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
             bodyGoalAdapter = BodyGoalAdapter(bodyModelData, requireActivity(), this)
             binding!!.rcyBodyGoals.adapter = bodyGoalAdapter
         }
-
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {
@@ -161,6 +162,7 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
                 val intent = Intent(requireActivity(), CookingForMyselfActivity::class.java)
                 startActivity(intent)
             } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
+//                NavAnimations.navigateBack(findNavController())
                 findNavController().navigateUp()
             } else {
                 findNavController().navigateUp()
@@ -173,11 +175,11 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
 
         binding!!.tvNextBtn.setOnClickListener {
             if (status=="2"){
+                sessionManagement.setBodyGoal(bodySelect.toString())
+//                NavAnimations.navigateForward(findNavController(), R.id.dietaryRestrictionsFragment)
                 findNavController().navigate(R.id.dietaryRestrictionsFragment)
             }
         }
-
-
     }
 
     private fun stillSkipDialog() {
@@ -194,13 +196,14 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
         }
 
         tvDialogSkipBtn.setOnClickListener {
+            sessionManagement.setBodyGoal(bodySelect.toString())
             dialogStillSkip.dismiss()
             findNavController().navigate(R.id.dietaryRestrictionsFragment)
         }
     }
 
 
-    override fun itemClick(position: Int?, status1: String?, type: String?) {
+    override fun itemClick(selectItem: Int?, status1: String?, type: String?) {
         if (status1 == "1") {
             status=""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
@@ -208,7 +211,7 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
             status="2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-
+            bodySelect=selectItem.toString()
         }
     }
 

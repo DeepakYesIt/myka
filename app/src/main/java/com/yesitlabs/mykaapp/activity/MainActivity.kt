@@ -27,7 +27,6 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     var binding: ActivityMainBinding? = null
     private lateinit var commonWorkUtils: CommonWorkUtils
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this))
@@ -60,9 +59,8 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         binding!!.relAddRecipeWeb.setOnClickListener(this)
         binding!!.relCreateNewRecipe.setOnClickListener(this)
 
+        /// using function for find destination graph
         startDestination()
-
-
     }
 
     private fun startDestination() {
@@ -70,17 +68,16 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             .findFragmentById(R.id.frameContainerMain) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // Inflate the navigation graph
         val navGraph = navController.navInflater.inflate(R.navigation.main_graph)
 
-//        navGraph.setStartDestination(R.id.searchFragment)
         navGraph.setStartDestination(R.id.homeFragment)
-        // Set the modified graph to the NavController
         navController.graph = navGraph
     }
 
+    /// this function using set custom bottom navigation
     fun changeBottom(status: String) {
         if (status.equals("home", true)) {
+
             binding!!.cardViewAddRecipe.visibility = View.GONE
             binding!!.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
             binding!!.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
@@ -176,6 +173,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         }
     }
 
+    /// add recipe screen
     private fun addRecipeFromWeb() {
         val dialogWeb: Dialog = this.let { Dialog(it) }
         dialogWeb.setContentView(R.layout.alert_dialog_add_recipe_form_web)
@@ -198,6 +196,8 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         }
     }
 
+
+    /// use switch case to redirection or handle click event
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.llHome -> {

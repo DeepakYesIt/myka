@@ -44,6 +44,7 @@ class ForgotPasswordFragment : Fragment() {
 
         forgotPasswordViewModel = ViewModelProvider(this)[ForgotPasswordViewModel::class.java]
 
+        /// handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
             object : OnBackPressedCallback(true) {
@@ -52,6 +53,7 @@ class ForgotPasswordFragment : Fragment() {
                 }
             })
 
+        ///main function using all triggered of this screen
         initialize()
 
         return binding!!.root
@@ -59,10 +61,14 @@ class ForgotPasswordFragment : Fragment() {
 
     private fun initialize() {
 
+        /// handle on back pressed
         binding!!.imagesBackForgot.setOnClickListener {
             findNavController().navigateUp()
         }
 
+        /// Add validation on the entered email or phone
+        ///checking the device of mobile data in online and offline(show network error message)
+        /// implement forgot password api
         binding!!.rlSubmit.setOnClickListener {
             if (validate()) {
                 if (BaseApplication.isOnline(requireActivity())) {
@@ -74,6 +80,7 @@ class ForgotPasswordFragment : Fragment() {
         }
     }
 
+    /// Forgot password api & implement redirection
     private fun forgotPasswordApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
@@ -83,7 +90,6 @@ class ForgotPasswordFragment : Fragment() {
                     is NetworkResult.Success -> {
                         val gson = Gson()
                         val forgotModel = gson.fromJson(it.data, ForgotPasswordModel::class.java)
-                        Log.d("@@@ Response profile", "message :- ${it.data}")
                         if (forgotModel.code == 200 && forgotModel.success) {
                             val bundle = Bundle()
                             bundle.putString("screenType", "forgot")
@@ -114,10 +120,12 @@ class ForgotPasswordFragment : Fragment() {
         }
     }
 
+    /// show error message
     private fun showAlertFunction(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)
     }
 
+    /// validation on valid email or phone
     private fun validate(): Boolean {
         val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]"
         val emaPattern = Pattern.compile(emailPattern)
@@ -133,6 +141,7 @@ class ForgotPasswordFragment : Fragment() {
         return true
     }
 
+    /// validation on valid phone number
     private fun validNumber(): Boolean {
         val phone: String = binding!!.etRegEmailPhone.text.toString().trim()
         if (phone.length != 10) {

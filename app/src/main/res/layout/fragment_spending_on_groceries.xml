@@ -80,7 +80,7 @@
                 android:background="@drawable/circular_edittext_bg">
 
                 <EditText
-                    android:id="@+id/etSignEmailPhone"
+                    android:id="@+id/etSpendingAmount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"

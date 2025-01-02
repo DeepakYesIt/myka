@@ -187,16 +187,15 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
         }
     }
 
-
     override suspend fun otpVerify(
         successCallback: (response: NetworkResult<String>) -> Unit,
         userid: String?, otp: String?,userName:String?,userGender:String?,bodyGoal:String?,cookingFrequency:String?,
         takeAway:String?,cookingForType:String?,partnerName:String?,partnerGender:String?,familyMemberName:String?,
         familyMemberAge:String?,childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?,
-        dietaryid:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?) {
+        dietaryid:List<String>?,favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?) {
         try {
             api.otpVerify(userid, otp,userName,userGender,bodyGoal,cookingFrequency,takeAway,cookingForType,partnerName,partnerGender,
-                familyMemberName,familyMemberAge,childFriendlyMeals,mealRoutineId,spendingAmount,duration,dietaryid,dislikeIngredients,
+                familyMemberName,familyMemberAge,childFriendlyMeals,mealRoutineId,spendingAmount,duration,dietaryid,favourite,allergies,dislikeIngredients,
                 deviceType,fcmToken).apply {
                 if (isSuccessful) {
                     body()?.let {
@@ -212,12 +211,33 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
         }
     }
 
+
     override suspend fun forgotPassword(
         successCallback: (response: NetworkResult<String>) -> Unit,
         emailOrPhone: String
     ) {
         try {
             api.forgotPassword(emailOrPhone).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun resendSignUpModel(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        emailOrPhone: String
+    ) {
+        try {
+            api.resendOtp(emailOrPhone).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -324,13 +344,14 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
 
     override suspend fun socialLogin(
         successCallback: (response: NetworkResult<String>) -> Unit,
-        emailOrPhone: String,
-        socialId: String,
-        deviceType: String,
-        fcmToken: String
-    ) {
+        emailOrPhone: String?, socialID: String?,userName:String?,userGender:String?,bodyGoal:String?,cookingFrequency:String?,
+        takeAway:String?,cookingForType:String?,partnerName:String?,partnerGender:String?,familyMemberName:String?,
+        familyMemberAge:String?,childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?,
+        dietaryid:List<String>?,favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?) {
         try {
-            api.socialLogin(emailOrPhone,socialId,deviceType,fcmToken).apply {
+            api.socialLogin(emailOrPhone, socialID,userName,userGender,bodyGoal,cookingFrequency,takeAway,cookingForType,partnerName,partnerGender,
+                familyMemberName,familyMemberAge,childFriendlyMeals,mealRoutineId,spendingAmount,duration,dietaryid,favourite,allergies,dislikeIngredients,
+                deviceType,fcmToken).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -344,7 +365,6 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
             successCallback(NetworkResult.Error(e.message()))
         }
     }
-
     override suspend fun updateLocation(
         successCallback: (response: NetworkResult<String>) -> Unit,
         locationStatus: String
@@ -371,6 +391,63 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
     ) {
         try {
             api.updateNotification(notificationStatus).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun privacyPolicy(successCallback: (response: NetworkResult<String>) -> Unit) {
+        try {
+            api.getPrivacyPolicy().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+
+    override suspend fun termCondition(successCallback: (response: NetworkResult<String>) -> Unit) {
+        try {
+            api.getTermsCondition().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+
+    override suspend fun saveFeedback(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        email: String,
+        message: String
+    ) {
+        try {
+            api.saveFeedback(email,message).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

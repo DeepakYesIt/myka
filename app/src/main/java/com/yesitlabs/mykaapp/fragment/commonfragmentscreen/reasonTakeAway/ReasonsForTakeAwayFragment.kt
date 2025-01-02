@@ -37,10 +37,10 @@ import kotlinx.coroutines.launch
 class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
 
     private var binding: FragmentReasonsForTakeAwayBinding? = null
-    private val dataList = ArrayList<DataModel>()
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue: Int = 0
     private var status: String? = ""
+    private var reasonSelect: String? = ""
     private lateinit var reasonTakeAwayViewModel: ReasonTakeAwayViewModel
     private var bodyGoalAdapter: BodyGoalAdapter? = null
 
@@ -102,6 +102,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
 
         binding!!.tvNextBtn.setOnClickListener {
             if (status == "2") {
+                sessionManagement.setReasonTakeAway(reasonSelect.toString())
                 val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
                 startActivity(intent)
             }
@@ -118,7 +119,6 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                     is NetworkResult.Success -> {
                         val gson = Gson()
                         val bodyModel = gson.fromJson(it.data, BodyGoalModel::class.java)
-                        Log.d("@@@ Response profile", "message :- ${it.data}")
                         if (bodyModel.code == 200 && bodyModel.success) {
                             showDataInUi(bodyModel.data)
                         } else {
@@ -165,6 +165,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         }
 
         tvDialogSkipBtn.setOnClickListener {
+            sessionManagement.setReasonTakeAway("")
             dialogStillSkip.dismiss()
             val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
             startActivity(intent)
@@ -208,7 +209,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
 //        binding!!.rcyEatingOut.adapter = dietaryRestrictionsAdapter
 //    }
 
-    override fun itemClick(position: Int?, status1: String?, type: String?) {
+    override fun itemClick(selectItem: Int?, status1: String?, type: String?) {
         if (status1 == "1") {
             status = ""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
@@ -216,6 +217,8 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
             status = "2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            reasonSelect=selectItem.toString()
+
 
         }
     }

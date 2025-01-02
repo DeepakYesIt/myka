@@ -1,4 +1,4 @@
-package com.yesitlabs.mykaapp.fragment.mainfragment.searchtab
+package com.yesitlabs.mykaapp.fragment.mainfragment.searchtab.searchscreen
 
 import android.app.Dialog
 import android.graphics.Color

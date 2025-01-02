@@ -22,11 +22,13 @@ class CookingForScreenActivity : AppCompatActivity() {
         sessionManagement = SessionManagement(this@CookingForScreenActivity)
         sessionManagement.setCookingFor(clickStatus!!)
 
+        ///main function using all triggered of this screen
         initialize()
     }
 
     private fun initialize() {
 
+        //handle click event for Myself
         binding!!.relMySelf.setOnClickListener{
             clickStatus="Myself"
             binding!!.relMySelf.setBackgroundResource(R.drawable.orange_box_bg)
@@ -38,6 +40,7 @@ class CookingForScreenActivity : AppCompatActivity() {
             binding!!.imageMyFamily.visibility= View.GONE
         }
 
+        //handle click event for MyPartner
         binding!!.relMySelfPartner.setOnClickListener{
             clickStatus="MyPartner"
             binding!!.relMySelf.setBackgroundResource(R.drawable.gray_box_border_bg)
@@ -49,6 +52,7 @@ class CookingForScreenActivity : AppCompatActivity() {
             binding!!.imageMyFamily.visibility= View.GONE
         }
 
+        //handle click event for MyFamily
         binding!!.relMyFamily.setOnClickListener{
             clickStatus="MyFamily"
             binding!!.relMySelf.setBackgroundResource(R.drawable.gray_box_border_bg)
@@ -60,6 +64,7 @@ class CookingForScreenActivity : AppCompatActivity() {
             binding!!.imageMyFamily.visibility= View.VISIBLE
         }
 
+        ///handle click event for next screen MYSelf, MyPartner or MyFamily
         binding!!.rlNextCooking.setOnClickListener{
             sessionManagement.setCookingFor(clickStatus!!)
             val intent = Intent(this@CookingForScreenActivity, CookingForMyselfActivity::class.java)

@@ -76,11 +76,13 @@ class SpendingOnGroceriesFragment : Fragment() {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
+                sessionManagement.setSpendingAmount(binding!!.etSpendingAmount.text.toString().trim())
+                sessionManagement.setSpendingDuration(binding!!.tvChooseDuration.text.toString().trim().toLowerCase())
                 findNavController().navigate(R.id.eatingOutFragment)
             }
         }
 
-        binding!!.etSignEmailPhone.addTextChangedListener(object :
+        binding!!.etSpendingAmount.addTextChangedListener(object :
             TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
@@ -128,11 +130,17 @@ class SpendingOnGroceriesFragment : Fragment() {
     }
 
     private fun searchable() {
-        if (binding!!.etSignEmailPhone.text.isNotEmpty()){
+        if (binding!!.etSpendingAmount.text.isNotEmpty()){
             if (binding!!.tvChooseDuration.text.isNotEmpty()){
                 status="2"
                 binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            }else{
+                status="1"
+                binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             }
+        }else{
+            status="1"
+            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
 
     }
@@ -151,6 +159,8 @@ class SpendingOnGroceriesFragment : Fragment() {
         }
 
         tvDialogSkipBtn.setOnClickListener {
+            sessionManagement.setSpendingAmount("")
+            sessionManagement.setSpendingDuration("")
             dialogStillSkip.dismiss()
             findNavController().navigate(R.id.eatingOutFragment)
         }

@@ -32,19 +32,25 @@ class OnBoardingActivity : AppCompatActivity() {
         adapters = OnboardingAdapter(datalist)
         binding!!.viewpager.adapter = adapters
         binding!!.viewpager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+
+        ///main function using all triggered of this screen
         initialize()
 
+        /// set indicator for onboarding
         setUpOnBoardingIndicator()
+        /// set current indicator position
         currentOnBoardingIndicator(0)
 
-       binding!!.rlNextBtn.setOnClickListener{
-           if (binding!!.viewpager.currentItem == 0) {
-               binding!!.viewpager.currentItem =+1
-           } else {
-               binding!!.viewpager.currentItem =adapters!!.itemCount+1
-           }
-       }
+        /// handle click event to set viewpager position
+        binding!!.rlNextBtn.setOnClickListener{
+            if (binding!!.viewpager.currentItem == 0) {
+                binding!!.viewpager.currentItem =+1
+            } else {
+                binding!!.viewpager.currentItem =adapters!!.itemCount+1
+            }
+        }
 
+        // handle click event to set next screen
         binding!!.relLetsGetStarted.setOnClickListener{
             val intent = Intent(this@OnBoardingActivity, EnterYourNameActivity::class.java)
             startActivity(intent)
@@ -52,6 +58,7 @@ class OnBoardingActivity : AppCompatActivity() {
         }
 
 
+        /// set view pager position and value
         binding!!.viewpager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             @SuppressLint("SetTextI18n")
 

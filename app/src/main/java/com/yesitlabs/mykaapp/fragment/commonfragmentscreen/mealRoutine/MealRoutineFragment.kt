@@ -18,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.yesitlabs.mykaapp.basedata.SessionManagement
 import com.yesitlabs.mykaapp.OnItemClickListener
+import com.yesitlabs.mykaapp.OnItemClickedListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.adapter.MealRoutineAdapter
 import com.yesitlabs.mykaapp.basedata.BaseApplication
@@ -31,7 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickListener {
+class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListener {
 
     private var binding: FragmentMealRoutineBinding? = null
 
@@ -39,6 +40,7 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickListener
     private var mealRoutineAdapter: MealRoutineAdapter? = null
     private var totalProgressValue:Int=0
     private var status:String?=""
+    private var mealRoutineSelectedId = mutableListOf<String>()
     private lateinit var mealRoutineViewModel: MealRoutineViewModel
 
 
@@ -127,6 +129,8 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickListener
         }
 
         tvDialogSkipBtn.setOnClickListener {
+            sessionManagement.setMealRoutineList(null)
+
             dialogStillSkip.dismiss()
             findNavController().navigate(R.id.cookingFrequencyFragment)
         }
@@ -141,7 +145,6 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickListener
                     is NetworkResult.Success -> {
                         val gson = Gson()
                         val mealRoutineModel = gson.fromJson(it.data, MealRoutineModel::class.java)
-                        Log.d("@@@ Response profile", "message :- ${it.data}")
                         if (mealRoutineModel.code == 200 && mealRoutineModel.success) {
                             showDataInUi(mealRoutineModel.data)
                         } else {
@@ -186,6 +189,7 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickListener
 
             R.id.tvNextBtn ->{
                 if (status=="2"){
+                    sessionManagement.setMealRoutineList(mealRoutineSelectedId)
                     findNavController().navigate(R.id.cookingFrequencyFragment)
                 }
             }
@@ -321,7 +325,13 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickListener
 //        }
 //    }
 
-    override fun itemClick(position: Int?, status1: String?, type: String?) {
+
+    override fun itemClicked(
+        position: Int?,
+        list: MutableList<String>,
+        status1: String?,
+        type: String?
+    ) {
         if (status1 == "1") {
             status = ""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
@@ -329,7 +339,7 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickListener
             status = "2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-
+            mealRoutineSelectedId=list
         }
     }
 

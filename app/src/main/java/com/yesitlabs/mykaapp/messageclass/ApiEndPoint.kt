@@ -21,6 +21,11 @@ object ApiEndPoint {
     const val socialLogin="social_login"
     const val updateLocation="update-Location"
     const val updateNotification="toggle-notification"
+
+    const val saveFeedback="save-feedback"
+    const val termsCondition="terms-and-condation"
+    const val privacyPolicy="privacy-policy"
+
     const val userProfileUrl="get-user-profile"
     const val userProfileUpdateUrl="user-profile-update"
     const val userImageUpdateUrl="profile-img-update"

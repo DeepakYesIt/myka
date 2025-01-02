@@ -37,10 +37,9 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
 
     private var binding: FragmentEatingOutBinding? = null
     private var dietaryRestrictionsAdapter: AdapterCookingSchedule? = null
-    private val dataList = ArrayList<DataModel>()
     private var status:String=""
+    private var eatingOutSelect: String? = ""
     private var bodyGoalAdapter: BodyGoalAdapter? = null
-    private var dropDownstatus:Boolean=true
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue:Int=0
     private lateinit var eatingOutViewModel: EatingOutViewModel
@@ -115,10 +114,9 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
         }
 
         tvDialogSkipBtn.setOnClickListener {
+            sessionManagement.setEatingOut(eatingOutSelect.toString())
             dialogStillSkip.dismiss()
             findNavController().navigate(R.id.reasonsForTakeAwayFragment)
-//            val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
-//            startActivity(intent)
         }
     }
 
@@ -131,7 +129,6 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
                     is NetworkResult.Success -> {
                         val gson = Gson()
                         val bodyModel = gson.fromJson(it.data, BodyGoalModel::class.java)
-                        Log.d("@@@ Response profile", "message :- ${it.data}")
                         if (bodyModel.code == 200 && bodyModel.success) {
                             showDataInUi(bodyModel.data)
                         } else {
@@ -155,7 +152,7 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
 
     private fun showDataInUi(bodyModelData: List<BodyGoalModelData>) {
 
-        if (bodyModelData!=null && bodyModelData.size>0){
+        if (bodyModelData!=null && bodyModelData.isNotEmpty()){
             bodyGoalAdapter = BodyGoalAdapter(bodyModelData, requireActivity(), this)
             binding!!.rcyEatingOut.adapter = bodyGoalAdapter
         }
@@ -214,6 +211,7 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
 
             R.id.tvNextBtn->{
                 if (status=="2"){
+                    sessionManagement.setEatingOut(eatingOutSelect.toString())
                     findNavController().navigate(R.id.reasonsForTakeAwayFragment)
 //                    val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
 //                    startActivity(intent)
@@ -299,11 +297,12 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
         }
     }
 
-    override fun itemClick(position: Int?, status1: String?, type: String?) {
+    override fun itemClick(selectItem: Int?, status1: String?, type: String?) {
         if (status1 == "1") {
             status()
         } else {
             status="2"
+            eatingOutSelect=selectItem.toString()
             status()
         }
     }

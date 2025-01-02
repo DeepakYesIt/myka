@@ -7,6 +7,7 @@ object ErrorMessage {
      const val apiKey:String="AIzaSyC9NuN_f-wESHh3kihTvpbvdrmKlTQurxw"
      const val emailPhone:String="Please Enter Email/Phone"
      const val postCode:String="Please Enter Post Code"
+     const val selectGender:String="Please select gender"
      const val pasteUrl:String="Please Paste Url"
      const val registeredEmailPhone:String="Please Enter Registered Email/Phone"
      const val emailAddress="Please Enter your Address"

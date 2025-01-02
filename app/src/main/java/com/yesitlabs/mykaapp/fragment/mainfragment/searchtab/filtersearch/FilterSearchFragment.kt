@@ -1,4 +1,4 @@
-package com.yesitlabs.mykaapp.fragment.mainfragment.searchtab
+package com.yesitlabs.mykaapp.fragment.mainfragment.searchtab.filtersearch
 
 import android.os.Bundle
 import android.view.LayoutInflater
