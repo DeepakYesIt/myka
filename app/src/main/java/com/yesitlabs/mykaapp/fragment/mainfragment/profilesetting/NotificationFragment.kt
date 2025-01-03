@@ -51,16 +51,6 @@ class NotificationFragment : Fragment(),View.OnClickListener {
             }
         })
 
-
-
-
-
-
-
-
-
-
-
         binding!!.imgBackNotification.setOnClickListener(this)
         binding!!.textEnableNotification.setOnClickListener(this)
         binding!!.textPushNotification.setOnClickListener(this)
