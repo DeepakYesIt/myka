@@ -107,6 +107,7 @@
     <string name="you_have_invited_12_friends_to_use_myka">You have invited 12 friends to use<b> MYKA</b></string>
     <string name="choose_a_file">Choose a file</string>
     <string name="upload">Upload</string>
+    <string name="enable_all_notification">Enable all notification</string>
 
 
 </resources>

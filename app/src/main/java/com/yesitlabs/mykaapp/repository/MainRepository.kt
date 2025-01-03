@@ -52,18 +52,29 @@ interface MainRepository {
 
     suspend fun userProfileDataApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
+    suspend fun userLogOutDataApi(successCallback: (response: NetworkResult<String>) -> Unit)
+
+    suspend fun userDeleteDataApi(successCallback: (response: NetworkResult<String>) -> Unit)
+
     suspend fun upDateProfileRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,name:String,bio:String, genderType: String,dob:String,height:String
                                         ,heightType:String,activityLevel:String,heightProtein:String,calories:String,fat:String,carbs:String,protien:String)
 
  suspend fun upDateImageNameRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, Image: MultipartBody.Part?, name: RequestBody)
 
  suspend fun addCardRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, token: String)
+ suspend fun notificationRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, pushNotification: String,recipeRecommendations: String,productUpdates: String,promotionalUpdates: String)
 
  suspend fun getCardAndBankRequestApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
+ suspend fun getWalletRequestApi(successCallback: (response: NetworkResult<String>) -> Unit)
+
  suspend fun deleteCardRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,cardId: String,customerId: String)
 
+ suspend fun deleteBankRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,stripeAccountId: String)
+
  suspend fun countryRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,url: String)
+
+ suspend fun transferAmountRequest(successCallback: (response: NetworkResult<String>) -> Unit,amount: String,destination: String)
 
 
  suspend fun addBankRequestApi(

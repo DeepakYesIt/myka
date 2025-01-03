@@ -168,7 +168,7 @@ class HealthDataFragment : Fragment() {
             requireContext(),
             { _, selectedYear, selectedMonth, selectedDay ->
                 // Update the TextView with the selected date
-                binding.etDateOfBirth.text = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                binding.etDateOfBirth.text = BaseApplication.changeDateFormatHealth("$selectedMonth + 1/${selectedDay}/$selectedYear")
             },
             year,
             month,

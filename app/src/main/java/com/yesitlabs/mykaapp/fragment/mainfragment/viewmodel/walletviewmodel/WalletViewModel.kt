@@ -18,18 +18,21 @@ class WalletViewModel @Inject constructor(private val repository: MainRepository
     suspend fun getCardAndBankRequest(successCallback: (response: NetworkResult<String>) -> Unit){
         repository.getCardAndBankRequestApi { successCallback(it) }
     }
+    suspend fun getWalletRequest(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.getWalletRequestApi { successCallback(it) }
+    }
 
     suspend fun deleteCardRequest(successCallback: (response: NetworkResult<String>) -> Unit,cardId: String,customerId: String){
         repository.deleteCardRequestApi ({ successCallback(it) },cardId,customerId)
     }
 
+    suspend fun deleteBankRequest(successCallback: (response: NetworkResult<String>) -> Unit,stripeAccountId: String){
+        repository.deleteBankRequestApi ({ successCallback(it) },stripeAccountId)
+    }
+
     suspend fun countryStateCityRequest(successCallback: (response: NetworkResult<String>) -> Unit,url: String){
         repository.countryRequestApi ({ successCallback(it) },url)
     }
-
-
-
-
 
 
     suspend fun addBankRequest(
@@ -64,6 +67,11 @@ class WalletViewModel @Inject constructor(private val repository: MainRepository
             ,personalIdentificationNobody,idTypeBody,ssnBody,addressBody,countryBody,shortStateNameBody
             ,cityBody,postalCodeBody,bankDocumentTypeBody,deviceTypeBody,tokenTypeBody,stripeTokenBody
             ,saveCardBody,amountBody,paymentTypeBody,bankIdBody)
+    }
+
+
+    suspend fun transferAmountRequest(successCallback: (response: NetworkResult<String>) -> Unit,amount: String,destination: String){
+        repository.transferAmountRequest ({ successCallback(it) },amount,destination)
     }
 
 

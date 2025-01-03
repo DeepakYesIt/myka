@@ -18,6 +18,14 @@ class SettingViewModel @Inject constructor(private val repository: MainRepositor
     suspend fun userProfileData(successCallback: (response: NetworkResult<String>) -> Unit){
         repository.userProfileDataApi { successCallback(it) }
     }
+    suspend fun userLogOutData(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.userLogOutDataApi { successCallback(it) }
+    }
+
+    suspend fun userDeleteData(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.userDeleteDataApi { successCallback(it) }
+    }
+
 
 
     fun setProfileData(data: Data) {

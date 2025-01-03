@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     tools:context=".fragment.mainfragment.commonscreen.SettingProfileFragment">
 
     <ScrollView
@@ -51,14 +52,14 @@
 
             </RelativeLayout>
 
-            <androidx.cardview.widget.CardView
+           <!-- <androidx.cardview.widget.CardView
                 android:id="@+id/cardViewMenuPopUp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="@dimen/_22sdp"
                 android:layout_marginEnd="@dimen/_16sdp"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="@dimen/_15sdp">
 
@@ -118,7 +119,7 @@
 
                 </RelativeLayout>
 
-            </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>-->
 
             <RelativeLayout
                 android:id="@+id/relProfileNameImage"

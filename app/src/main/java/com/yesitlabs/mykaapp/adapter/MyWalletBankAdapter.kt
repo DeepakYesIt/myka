@@ -17,24 +17,22 @@ import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.api
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.apiresponsecard.Data
 import com.yesitlabs.mykaapp.listener.CardBankListener
 
-class MyWalletAdapter(var context: Context, var itemList: MutableList<CardData>, var type:String, var onCardBankListener: CardBankListener) : RecyclerView.Adapter<MyWalletAdapter.ViewHolder>() {
+class MyWalletBankAdapter(var context: Context, var itemList: MutableList<CardData>, var type:String, var onCardBankListener: CardBankListener) : RecyclerView.Adapter<MyWalletBankAdapter.ViewHolder>() {
 
     inner class ViewHolder(private val binding: AdapterBankNameLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n")
         fun bind(item: CardData, position: Int) {
 
-                if (item.name!=null){
-                    binding.textName.text = item.name
-                }
+            if (item.name!=null){
+                binding.textName.text = item.name
+            }
 
-                if (item.last4!=null){
-                    binding.textDes.text = "**** **** **** "+item.last4
-                }
+            if (item.last4!=null){
+                binding.textDes.text = item.last4
+            }
 
-                binding.imageIcon.setImageResource(R.drawable.ic_card_number_icon)
-
-
+            binding.imageIcon.setImageResource(R.drawable.ic_bank_orange_icon)
 
             binding.select.setOnClickListener {
                 onCardBankListener.itemSelect(position,type,type)

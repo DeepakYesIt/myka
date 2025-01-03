@@ -21,11 +21,14 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.RelativeLayout
 import android.widget.TextView
-import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.activity.AuthActivity
+import java.text.DateFormat
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Date
 
 object BaseApplication {
 
@@ -119,6 +122,38 @@ object BaseApplication {
         }
     }
 
+
+    fun changeDateFormat(dt: String?): String {
+        var outputDateStr = ""
+        val inputFormat: DateFormat = SimpleDateFormat("MM/dd/yyyy")
+        //        DateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy");
+        val outputFormat: DateFormat = SimpleDateFormat("MM/dd/yyyy")
+        // String inputDateStr="2013-06-24";
+        var date: Date? = null
+        try {
+            date = inputFormat.parse(dt)
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        }
+        outputDateStr = outputFormat.format(date)
+        return outputDateStr
+    }
+
+    fun changeDateFormatHealth(dt: String?): String {
+        var outputDateStr = ""
+        val inputFormat: DateFormat = SimpleDateFormat("MM/dd/yyyy")
+        //        DateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy");
+        val outputFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy")
+        // String inputDateStr="2013-06-24";
+        var date: Date? = null
+        try {
+            date = inputFormat.parse(dt)
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        }
+        outputDateStr = outputFormat.format(date)
+        return outputDateStr
+    }
 
 
 

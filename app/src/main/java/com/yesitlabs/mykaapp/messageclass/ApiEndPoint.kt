@@ -30,10 +30,15 @@ object ApiEndPoint {
     const val userProfileUpdateUrl="user-profile-update"
     const val userImageUpdateUrl="profile-img-update"
     const val addCardUrl="add-Card"
-    const val getCardBankUrl="get-card-details"
+    const val getCardBankUrl="user-bank-and-card-list"
     const val deleteCardUrl="delete_card"
+    const val deleteBankUrl="delete-Bank-Account"
     const val countriesUrl="get-countries"
+    const val transferToAccountUrl="transfer-To-Account"
     const val bankAddUrl="add-bank-details"
+    const val walletAmountUrl="get-wallet"
+    const val logOutUrl="user-Logout"
+    const val deleteUrl="user-Logout"
 
 
 

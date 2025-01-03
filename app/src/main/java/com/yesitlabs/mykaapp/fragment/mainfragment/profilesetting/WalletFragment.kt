@@ -34,6 +34,8 @@ import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.databinding.FragmentWalletBinding
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.WalletViewModel
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.apiresponsecard.CradApiResponse
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.apiresponsetransfer.TransferModel
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
 import com.yesitlabs.mykaapp.model.DataModel
 import kotlinx.coroutines.launch
@@ -56,14 +58,80 @@ class WalletFragment : Fragment() {
 
         setupBackNavigation()
         setupUI()
-//        setupAdapters()
-        setupSpinners()
 
-
-
+        // When screen load then api call
+        fetchWalletLoad()
 
 
         return binding.root
+    }
+
+    private fun fetchWalletLoad() {
+        if (BaseApplication.isOnline(requireActivity())) {
+            fetchWalletData()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
+    private fun fetchWalletData() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.getWalletRequest { result ->
+                BaseApplication.dismissMe()
+                handleApiResponse(result)
+            }
+        }
+    }
+
+    private fun handleApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> processSuccessResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun processSuccessResponse(response: String) {
+        try {
+            val apiModel = Gson().fromJson(response, TransferModel::class.java)
+            Log.d("@@@ Response wallet ", "message :- $response")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data!=null){
+
+                    binding.textCurrentBalance.text="$ "+apiModel.data.walletbalance
+
+
+                    if (apiModel.data.name!=null){
+                        binding.textWalletHolderName.text=apiModel.data.name
+                    }
+
+
+                    if (apiModel.data.date!=null){
+                        binding.textOnDateMonthYear.text="On "+apiModel.data.date
+                    }
+
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+
+    }
+
+
+
+
+    private fun showAlert(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
     }
 
 
@@ -78,92 +146,20 @@ class WalletFragment : Fragment() {
     private fun setupUI() {
 
 
-
         binding.imgWallet.setOnClickListener {
             findNavController().navigateUp()
         }
 
         binding.rlWithdrawAmountButton.setOnClickListener {
-            findNavController().navigate(R.id.paymentMethodFragment)
+            if (binding.textCurrentBalance.text.toString().equals("$ 0",true)){
+                BaseApplication.alertError(requireContext(), ErrorMessage.amountNoError, false)
+            }else{
+                val bundle=Bundle()
+                bundle.putString("amount",binding.textCurrentBalance.text.toString())
+                findNavController().navigate(R.id.paymentMethodFragment,bundle)
+            }
         }
 
-        binding.textAddBank.setOnClickListener {
-            toggleAddDetailsVisibility(true)
-        }
-
-        /*binding.textAddCardDebitCard.setOnClickListener {
-            toggleAddDetailsVisibility(true)
-        }*/
-
-        binding.textBankAccountToggle.setOnClickListener {
-            toggleBankAndCardView(true)
-        }
-
-        binding.textDebitCardToggle.setOnClickListener {
-            toggleBankAndCardView(false)
-        }
     }
-
-
-    /*private fun setupAdapters() {
-        val dataList = generateSampleData()
-        adapterBank = MyWalletAdapter(requireActivity(), dataList)
-        binding.rcvBankAccounts.adapter = adapterBank
-
-        adapterCard = MyWalletAdapter(requireContext(), dataList)
-        binding.rcvCardNumber.adapter = adapterCard
-    }*/
-
-
-
-    private fun setupSpinners() {
-        setupSpinner(binding.spinnerSelectIDType, listOf("Driver license", "Passport"))
-        setupSpinner(binding.spinnerSelectCountry, listOf("USA", "UK", "INDIA", "BRAZIL", "RUSSIA", "CHINA"))
-        setupSpinner(binding.spinnerSelectState, listOf("UP", "MP", "HARYANA", "PUNJAB", "ODISHA"))
-        setupSpinner(binding.spinnerSelectCity, listOf("NEW DELHI", "MUMBAI", "KANPUR", "NOIDA"))
-       /* setupSpinner(binding.spinnermonth, listOf("January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"))*/
-
-       /* // Generate a list of years (e.g., 1900 to the current year)
-        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-        val years = (1900..currentYear).toList().map { it.toString() }
-
-        setupSpinner(binding.spinneryear, years)*/
-        setupSpinner(binding.spinnerSelectOption, listOf("Bank account statement", "Voided cheque", "Bank letterhead"))
-
-    }
-
-    private fun setupSpinner(spinner: PowerSpinnerView, items: List<String>) {
-        spinner.setItems(items)
-        spinner.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) spinner.show() else spinner.dismiss()
-        }
-        spinner.setIsFocusable(true)
-    }
-
-    private fun toggleAddDetailsVisibility(showDetails: Boolean) {
-        binding.cvBankAccount2.visibility = if (showDetails) View.GONE else View.VISIBLE
-        binding.cvDebitCard3.visibility = if (showDetails) View.GONE else View.VISIBLE
-        binding.llBankAccount.visibility = if (showDetails) View.GONE else View.VISIBLE
-        binding.llSavedBankAccountDetails4.visibility = if (showDetails) View.VISIBLE else View.GONE
-    }
-
-    private fun toggleBankAndCardView(showBank: Boolean) {
-        binding.textBankAccountToggle.setBackgroundResource(
-            if (showBank) R.drawable.selected_green_toogle_bg else 0
-        )
-        binding.textDebitCardToggle.setBackgroundResource(
-            if (!showBank) R.drawable.selected_green_toogle_bg else 0
-        )
-        binding.textBankAccountToggle.setTextColor(
-            Color.parseColor(if (showBank) "#FFFFFF" else "#06C169")
-        )
-        binding.textDebitCardToggle.setTextColor(
-            Color.parseColor(if (!showBank) "#FFFFFF" else "#06C169")
-        )
-        binding.cvBankAccount2.visibility = if (showBank) View.VISIBLE else View.GONE
-        binding.cvDebitCard3.visibility = if (showBank) View.GONE else View.VISIBLE
-    }
-
 
 }

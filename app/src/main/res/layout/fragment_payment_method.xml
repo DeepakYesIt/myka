@@ -13,7 +13,6 @@
         android:layout_marginTop="@dimen/_15sdp"
         android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent">
-
         <ImageView
             android:id="@+id/imgWallet"
             android:layout_width="@dimen/_18sdp"
@@ -22,7 +21,6 @@
             android:padding="@dimen/_4sdp"
             android:src="@drawable/back_icon"
             app:tint="@color/black" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -33,7 +31,6 @@
             android:textColor="@color/black"
             android:textSize="@dimen/_13ssp"
             android:textStyle="bold" />
-
     </RelativeLayout>
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
@@ -50,7 +47,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 tools:context=".dec10_2024.MyWalletFragment">
-
                 <LinearLayout
                     android:id="@+id/llBankAccount"
                     android:layout_width="match_parent"
@@ -70,7 +66,6 @@
                         android:fontFamily="@font/montserrat_semibold"
                         android:text="Select payment method"
                         android:textColor="@color/black" />
-
 
                     <LinearLayout
                         android:id="@+id/llToggleSelectBankOrDebit"
@@ -1263,7 +1258,6 @@
 
                     </androidx.cardview.widget.CardView>
 
-
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cvDebitCard3"
                         android:layout_width="match_parent"
@@ -1525,27 +1519,28 @@
 
                             </RelativeLayout>
 
+
+                            <TextView
+                                android:id="@+id/textAddCardDebitCard"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="@dimen/_5sdp"
+                                android:layout_marginBottom="@dimen/_20sdp"
+                                android:background="@drawable/button_bg"
+                                android:fontFamily="@font/poppins"
+                                android:layout_marginTop="@dimen/_10sdp"
+                                android:paddingVertical="@dimen/_10sdp"
+                                android:text="Add Card"
+                                android:visibility="visible"
+                                android:textAlignment="center"
+                                android:textColor="@color/white" />
+
+
                         </LinearLayout>
 
                     </androidx.cardview.widget.CardView>
 
-                    <TextView
-                        android:id="@+id/textAddCardDebitCard"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/_5sdp"
-                        android:layout_marginBottom="@dimen/_20sdp"
-                        android:background="@drawable/button_bg"
-                        android:fontFamily="@font/poppins"
-                        android:paddingVertical="@dimen/_10sdp"
-                        android:text="Add Card"
-                        android:visibility="visible"
-                        android:textAlignment="center"
-                        android:textColor="@color/white" />
-
-
                 </LinearLayout>
-
                 <LinearLayout
                     android:id="@+id/llSavedBankAccountDetails4"
                     android:layout_width="match_parent"
@@ -1632,7 +1627,6 @@
                         android:textColor="@color/white" />
 
                 </LinearLayout>
-
             </LinearLayout>
         </ScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

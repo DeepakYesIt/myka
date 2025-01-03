@@ -2,21 +2,23 @@ package com.yesitlabs.mykaapp.fragment.mainfragment.commonscreen
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context.LAYOUT_INFLATER_SERVICE
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
+import android.widget.PopupWindow
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
@@ -29,8 +31,6 @@ import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.basedata.SessionManagement
 import com.yesitlabs.mykaapp.commonworkutils.CommonWorkUtils
 import com.yesitlabs.mykaapp.databinding.FragmentSettingProfileBinding
-import com.yesitlabs.mykaapp.fragment.authfragment.login.model.LoginModel
-import com.yesitlabs.mykaapp.fragment.authfragment.login.viewmodel.LoginViewModel
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.settingviewmodel.SettingViewModel
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.Data
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.ProfileRootResponse
@@ -79,6 +79,26 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
     }
+    private fun  userDeleteData(dialog: Dialog) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.userDeleteData { result ->
+                BaseApplication.dismissMe()
+                handleApiLogOutResponse(result,dialog)
+            }
+        }
+    }
+
+
+    private fun  userLogOutData(dialog: Dialog) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.userLogOutData { result ->
+                BaseApplication.dismissMe()
+                handleApiLogOutResponse(result,dialog)
+            }
+        }
+    }
 
     private fun fetchUserProfileData() {
         BaseApplication.showMe(requireContext())
@@ -93,6 +113,14 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     private fun handleApiResponse(result: NetworkResult<String>) {
         when (result) {
             is NetworkResult.Success -> processSuccessResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    private fun handleApiLogOutResponse(result: NetworkResult<String>, dialog: Dialog) {
+        when (result) {
+            is NetworkResult.Success -> processSuccessLogOutResponse(result.data.toString(),dialog)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
@@ -117,6 +145,30 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
         }
 
     }
+
+    private fun processSuccessLogOutResponse(response: String, dialog: Dialog) {
+        try {
+            val apiModel = Gson().fromJson(response, ProfileRootResponse::class.java)
+            Log.d("@@@ Response profile", "message :- $response")
+            if (apiModel.code == 200 && apiModel.success) {
+                dialog.dismiss()
+                startActivity(Intent(requireActivity(), AuthActivity::class.java).apply {
+                    putExtra("type", "login")
+                })
+                requireActivity().finish()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+
+    }
+
 
     @SuppressLint("SetTextI18n")
     private fun updateUI(data: Data) {
@@ -196,10 +248,8 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
         binding?.apply {
             arrayOf(
                 imageEditProfile, relMyWallet, relHealthData, relPreferences, imageNameEditable,
-                imageEditTargets, imageProfile, imgBackProfileSetting, imgThreeDotIcon,
-                relLogout, relDeleteAccount, relNotifications, relPrivacyTerms, relAboutApp,
-                relPostalCode, rlSubmitBtn, relFeedbackSupport, relPrivacyPolicy, relSubscriptionPlan,
-                relMainLayoutS
+                imageEditTargets, imageProfile, imgBackProfileSetting, imgThreeDotIcon,relNotifications, relPrivacyTerms, relAboutApp,
+                relPostalCode, rlSubmitBtn, relFeedbackSupport, relPrivacyPolicy, relSubscriptionPlan
             ).forEach { it.setOnClickListener(this@SettingProfileFragment) }
         }
     }
@@ -208,7 +258,6 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
         when (item.id) {
             R.id.imgBackProfileSetting -> backButton()
             R.id.imgThreeDotIcon -> toggleMenuVisibility()
-            R.id.relMainLayoutS -> closeMenu()
             R.id.relAboutApp -> toggleAboutAppVisibility()
             R.id.relPostalCode -> togglePostalCodeVisibility()
             R.id.rlSubmitBtn -> handlePostalCodeSubmit()
@@ -219,8 +268,6 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
             R.id.relHealthData -> navigateToFragment(R.id.healthDataFragment)
             R.id.relFeedbackSupport -> navigateToFragment(R.id.feedbackFragment)
             R.id.imageProfile -> navigateToFragment(R.id.editProfileFragment)
-            R.id.relLogout -> showLogoutDialog()
-            R.id.relDeleteAccount -> showRemoveAccountDialog()
             R.id.relPreferences -> navigateToFragment(R.id.preferencesFragment)
             R.id.relNotifications -> navigateToFragment(R.id.notificationFragment)
             R.id.relPrivacyTerms -> navigateToFragment(R.id.termsConditionFragment)
@@ -240,13 +287,24 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     }
 
     private fun toggleMenuVisibility() {
-        isMenuOpened = !isMenuOpened
-        binding?.cardViewMenuPopUp?.visibility = if (isMenuOpened) View.VISIBLE else View.GONE
-    }
+        val inflater = requireContext().getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater?
+        val popupView: View? = inflater?.inflate(R.layout.item_profile, null)
+        val popupWindow = PopupWindow(popupView, 500, RelativeLayout.LayoutParams.WRAP_CONTENT, true)
+        popupWindow.showAsDropDown(binding?.imgThreeDotIcon,  0, 0, Gravity.END)
+        // Access views inside the inflated layout using findViewById
+        val relLogout = popupView?.findViewById<RelativeLayout>(R.id.relLogout)
+        val relDeleteAccount = popupView?.findViewById<RelativeLayout>(R.id.relDeleteAccount)
 
-    private fun closeMenu() {
-        isMenuOpened = false
-        binding?.cardViewMenuPopUp?.visibility = View.GONE
+        relLogout?.setOnClickListener {
+            popupWindow.dismiss()
+            showLogoutDialog()
+        }
+
+        relDeleteAccount?.setOnClickListener {
+            popupWindow.dismiss()
+            showRemoveAccountDialog()
+        }
+
     }
 
     private fun toggleAboutAppVisibility() {
@@ -369,42 +427,36 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     }
 
     private fun showLogoutDialog() {
-        createDialog(
-            R.layout.alert_dialog_logout_popup,
-            onConfirm = {
-                sessionManagement.sessionClear()
-                navigateToAuthActivity("login")
+        val dialog=Dialog(requireContext())
+        dialog.setContentView(R.layout.alert_dialog_logout_popup)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.findViewById<TextView>(R.id.tvDialogCancelBtn).setOnClickListener { dialog.dismiss() }
+
+        dialog.findViewById<TextView>(R.id.tvDialogLogoutBtn)?.setOnClickListener {
+            if (BaseApplication.isOnline(requireActivity())) {
+                userLogOutData(dialog)
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        )
+        }
+        dialog.show()
+
     }
 
     private fun showRemoveAccountDialog() {
-        createDialog(
-            R.layout.alert_dialog_delete_account,
-            onConfirm = { navigateToAuthActivity("login") }
-        )
-    }
+        val dialog=Dialog(requireContext())
+        dialog.setContentView(R.layout.alert_dialog_delete_account)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.findViewById<TextView>(R.id.tvDialogCancelBtn).setOnClickListener { dialog.dismiss() }
 
-    private fun createDialog(layoutId: Int, onConfirm: () -> Unit) {
-        Dialog(requireContext()).apply {
-            setContentView(layoutId)
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            findViewById<TextView>(R.id.tvDialogCancelBtn).setOnClickListener { dismiss() }
-            findViewById<TextView>(R.id.tvDialogLogoutBtn)?.setOnClickListener {
-                dismiss()
-                onConfirm()
+        dialog.findViewById<TextView>(R.id.tvDialogRemoveBtn)?.setOnClickListener {
+            if (BaseApplication.isOnline(requireActivity())) {
+                userDeleteData(dialog)
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-            findViewById<TextView>(R.id.tvDialogRemoveBtn)?.setOnClickListener {
-                dismiss()
-                onConfirm()
-            }
-            show()
         }
+        dialog.show()
     }
 
-    private fun navigateToAuthActivity(type: String) {
-        startActivity(Intent(requireActivity(), AuthActivity::class.java).apply {
-            putExtra("type", type)
-        })
-    }
 }

@@ -169,6 +169,12 @@ interface ApiInterface {
     @POST(ApiEndPoint.userProfileUrl)
     suspend fun userProfileDataApi():Response<JsonObject>
 
+    @POST(ApiEndPoint.logOutUrl)
+    suspend fun userLogOutDataApi():Response<JsonObject>
+
+    @POST(ApiEndPoint.deleteUrl)
+    suspend fun userDeleteDataApi():Response<JsonObject>
+
     @FormUrlEncoded
     @POST(ApiEndPoint.userProfileUpdateUrl)
     suspend fun userProfileUpdateApi(@Field("name") name:String,
@@ -198,6 +204,9 @@ interface ApiInterface {
     @POST(ApiEndPoint.getCardBankUrl)
     suspend fun getCardAndBankRequestApi():Response<JsonObject>
 
+    @POST(ApiEndPoint.walletAmountUrl)
+    suspend fun getWalletRequestApi():Response<JsonObject>
+
 
     @FormUrlEncoded
     @POST(ApiEndPoint.deleteCardUrl)
@@ -205,8 +214,17 @@ interface ApiInterface {
                                      @Field("customer_id") customerId:String):Response<JsonObject>
 
     @FormUrlEncoded
+    @POST(ApiEndPoint.deleteBankUrl)
+    suspend fun deleteBankRequestApi(@Field("stripe_account_id") stripeAccountId:String):Response<JsonObject>
+
+    @FormUrlEncoded
     @POST(ApiEndPoint.countriesUrl)
     suspend fun countryRequestApi(@Field("url") url:String):Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.transferToAccountUrl)
+    suspend fun transferAmountRequest(@Field("amount") amount:String
+                                      ,@Field("account_id") destination:String):Response<JsonObject>
 
     @Multipart
     @POST(ApiEndPoint.bankAddUrl)

@@ -2,6 +2,12 @@ package com.yesitlabs.mykaapp.messageclass
 
 object ErrorMessage {
      const val networkError:String="Please check your internet connection"
+     const val apiError:String="Something went wrong"
+     const val amountNoError:String="Your wallet is empty."
+     const val amounthightError:String="Please enter it under Available Balance."
+     const val amountlowError:String="Please enter valid Balance."
+     const val amountError:String="Invalid amount entered."
+     const val amountEmptyError:String="Amount can't be empty."
      const val code: Int=206
 
      const val apiKey:String="AIzaSyC9NuN_f-wESHh3kihTvpbvdrmKlTQurxw"
@@ -28,6 +34,7 @@ object ErrorMessage {
      const val cvvValidError="Please Enter Valid CVV."
      const val monthError="Please Select Month."
      const val yearError="Please Select Year."
+     const val bankVerifyError="Your account is pending. Please contact the administrator or select another account."
      const val name:String="Please Enter Full Name"
      const val emailRegulerExpression="[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]"
 

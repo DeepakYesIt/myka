@@ -2,6 +2,7 @@ package com.yesitlabs.mykaapp.repository
 
 import com.yesitlabs.mykaapp.apiInterface.ApiInterface
 import com.yesitlabs.mykaapp.basedata.NetworkResult
+import com.yesitlabs.mykaapp.messageclass.ErrorMessage
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.HttpException
@@ -15,7 +16,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -32,7 +33,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -49,7 +50,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -66,7 +67,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -83,7 +84,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -100,7 +101,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -117,7 +118,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -136,7 +137,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -154,7 +155,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -176,7 +177,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -200,7 +201,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -221,7 +222,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -263,7 +264,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -284,7 +285,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -306,7 +307,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -330,7 +331,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -355,7 +356,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -374,7 +375,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -394,7 +395,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -468,7 +469,41 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun userLogOutDataApi(successCallback: (response: NetworkResult<String>) -> Unit) {
+        try {
+            api.userLogOutDataApi().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun userDeleteDataApi(successCallback: (response: NetworkResult<String>) -> Unit) {
+        try {
+            api.userDeleteDataApi().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -500,7 +535,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -521,7 +556,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -541,7 +576,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -558,7 +593,24 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun getWalletRequestApi(successCallback: (response: NetworkResult<String>) -> Unit) {
+        try {
+            api.getWalletRequestApi().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -579,7 +631,27 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun deleteBankRequestApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        stripeAccountId: String
+    ) {
+        try {
+            api.deleteBankRequestApi(stripeAccountId).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -599,7 +671,28 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun transferAmountRequest(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        amount: String,
+        destination: String
+    ) {
+        try {
+            api.transferAmountRequest(amount,destination).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -646,7 +739,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
