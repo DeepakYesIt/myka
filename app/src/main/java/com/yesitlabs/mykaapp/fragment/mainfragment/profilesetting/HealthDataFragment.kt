@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -19,7 +18,6 @@ import com.yesitlabs.mykaapp.activity.MainActivity
 import com.yesitlabs.mykaapp.basedata.BaseApplication
 import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.databinding.FragmentHealthDataBinding
-import com.yesitlabs.mykaapp.fragment.authfragment.login.model.LoginModel
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.settingviewmodel.SettingViewModel
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.Data
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.ProfileRootResponse
@@ -34,7 +32,7 @@ class HealthDataFragment : Fragment() {
     private var _binding: FragmentHealthDataBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: SettingViewModel
-    private var genderType:String=""
+    private var genderType: String = ""
 
 
     override fun onCreateView(
@@ -49,9 +47,9 @@ class HealthDataFragment : Fragment() {
 
         setupBackNavigation()
 
-        if (viewModel.getProfileData()!=null){
+        if (viewModel.getProfileData() != null) {
             showDataInUi(viewModel.getProfileData()!!)
-        }else{
+        } else {
             // This condition is true when network condition is enable and call the api if condition is true
             if (BaseApplication.isOnline(requireActivity())) {
                 getUserProfileData()
@@ -98,7 +96,7 @@ class HealthDataFragment : Fragment() {
 
         binding.layBottom.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
-                if (isValidation()){
+                if (isValidation()) {
                     upDateProfile()
                 }
             } else {
@@ -111,14 +109,22 @@ class HealthDataFragment : Fragment() {
     private fun upDateProfile() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            viewModel.upDateProfileRequest({
-                BaseApplication.dismissMe()
-                handleApiUpdateResponse(it)
-            }, viewModel.getProfileData()?.name.toString(),viewModel.getProfileData()?.bio.toString(),genderType,binding.etDateOfBirth.text.toString(),binding.etHeight.text.toString(),
+            viewModel.upDateProfileRequest(
+                {
+                    BaseApplication.dismissMe()
+                    handleApiUpdateResponse(it)
+                },
+                viewModel.getProfileData()?.name.toString(),
+                viewModel.getProfileData()?.bio.toString(),
+                genderType,
+                binding.etDateOfBirth.text.toString(),
+                binding.etHeight.text.toString(),
                 binding.spinnerHeight.text.toString().trim(),
                 binding.spinnerActivityLevel.text.toString().trim(),
-                viewModel.getProfileData()?.height_protein.toString(),viewModel.getProfileData()?.calories.toString(),
-                viewModel.getProfileData()?.fat.toString(), viewModel.getProfileData()?.carbs.toString(),
+                viewModel.getProfileData()?.height_protein.toString(),
+                viewModel.getProfileData()?.calories.toString(),
+                viewModel.getProfileData()?.fat.toString(),
+                viewModel.getProfileData()?.carbs.toString(),
                 viewModel.getProfileData()?.protien.toString()
             )
         }
@@ -134,16 +140,18 @@ class HealthDataFragment : Fragment() {
 
     private fun isValidation(): Boolean {
 
-        if (binding.etDateOfBirth.text.toString().equals("dd/mm/yyyy",true)) {
+        if (binding.etDateOfBirth.text.toString().equals("dd/mm/yyyy", true)) {
             BaseApplication.alertError(requireContext(), ErrorMessage.dobError, false)
             return false
-        }else if (binding.etHeight.text.toString().trim().isEmpty()) {
+        } else if (binding.etHeight.text.toString().trim().isEmpty()) {
             BaseApplication.alertError(requireContext(), ErrorMessage.heightError, false)
             return false
-        }else if (binding.spinnerHeight.text.toString().equals("Type",true)) {
+        } else if (binding.spinnerHeight.text.toString().equals("Type", true)) {
             BaseApplication.alertError(requireContext(), ErrorMessage.typeError, false)
             return false
-        }else if (binding.spinnerActivityLevel.text.toString().equals("Select Your Activity Level",true)) {
+        } else if (binding.spinnerActivityLevel.text.toString()
+                .equals("Select Your Activity Level", true)
+        ) {
             BaseApplication.alertError(requireContext(), ErrorMessage.activityTypeError, false)
             return false
         }
@@ -167,8 +175,12 @@ class HealthDataFragment : Fragment() {
         val datePickerDialog = DatePickerDialog(
             requireContext(),
             { _, selectedYear, selectedMonth, selectedDay ->
+
+
                 // Update the TextView with the selected date
-                binding.etDateOfBirth.text = BaseApplication.changeDateFormatHealth("$selectedMonth + 1/${selectedDay}/$selectedYear")
+                val date = "${selectedMonth + 1}/$selectedDay/$selectedYear"
+                Log.d("******", "" + date)
+                binding.etDateOfBirth.text = BaseApplication.changeDateFormatHealth(date)
             },
             year,
             month,
@@ -262,21 +274,21 @@ class HealthDataFragment : Fragment() {
             else -> resetGenderSelection()
         }
 
-        if (data.height!=null){
+        if (data.height != null) {
             binding.etHeight.setText(data.height)
         }
 
 
-        if (data.height_type!=null){
-            binding.spinnerHeight.text=data.height_type
+        if (data.height_type != null) {
+            binding.spinnerHeight.text = data.height_type
         }
 
-        if (data.dob!=null){
-            binding.etDateOfBirth.text=data.dob
+        if (data.dob != null) {
+            binding.etDateOfBirth.text = data.dob
         }
 
-        if (data.activity_level!=null){
-            binding.spinnerActivityLevel.text=data.activity_level
+        if (data.activity_level != null) {
+            binding.spinnerActivityLevel.text = data.activity_level
         }
 
 
@@ -284,7 +296,9 @@ class HealthDataFragment : Fragment() {
             binding.spinnerActivityLevel.text = data.activity_level
         }
 
-        if ((data.calories ?: 0) == 0 && (data.carbs ?: 0) == 0 && (data.fat ?: 0) == 0 && (data.protien ?: 0) == 0) {
+        if ((data.calories ?: 0) == 0 && (data.carbs ?: 0) == 0 && (data.fat
+                ?: 0) == 0 && (data.protien ?: 0) == 0
+        ) {
             // Corrected "protien" to "protein" if needed
             binding.llCalculateBMR.visibility = View.GONE
             binding.rlAddMoreGoals.visibility = View.VISIBLE
@@ -296,28 +310,28 @@ class HealthDataFragment : Fragment() {
             binding.layBottom.visibility = View.VISIBLE
             binding.imageEditTargets.visibility = View.VISIBLE
 
-            if ((data.calories ?: 0) == 0 ) {
-                binding.tvCalories.text=""+0
+            if ((data.calories ?: 0) == 0) {
+                binding.tvCalories.text = "" + 0
             } else {
-                binding.tvCalories.text=""+data.calories!!.toInt()
+                binding.tvCalories.text = "" + data.calories!!.toInt()
             }
 
-            if ( (data.carbs ?: 0) == 0) {
-                binding.tvCarbs.text=""+0
+            if ((data.carbs ?: 0) == 0) {
+                binding.tvCarbs.text = "" + 0
             } else {
-                binding.tvCarbs.text=""+data.carbs!!.toInt()
+                binding.tvCarbs.text = "" + data.carbs!!.toInt()
             }
 
             if ((data.fat ?: 0) == 0) {
-                binding.tvFat.text=""+0
+                binding.tvFat.text = "" + 0
             } else {
-                binding.tvFat.text=""+data.fat!!.toInt()
+                binding.tvFat.text = "" + data.fat!!.toInt()
             }
 
-            if ( (data.protien ?: 0) == 0) {
-                binding.tvProtein.text=""+0
+            if ((data.protien ?: 0) == 0) {
+                binding.tvProtein.text = "" + 0
             } else {
-                binding.tvProtein.text=""+data.protien!!.toInt()
+                binding.tvProtein.text = "" + data.protien!!.toInt()
             }
 
         }
@@ -329,9 +343,9 @@ class HealthDataFragment : Fragment() {
         val selectedIcon = R.drawable.radio_select_icon
         val unselectedIcon = R.drawable.radio_unselect_icon
 
-        genderType = if (isMale){
+        genderType = if (isMale) {
             "male"
-        }else{
+        } else {
             "female"
         }
 

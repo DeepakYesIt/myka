@@ -17,52 +17,60 @@ import com.yesitlabs.mykaapp.basedata.BaseApplication
 import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.databinding.FragmentNotificationBinding
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.notificationviewmodel.NotificationViewModel
-import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.settingviewmodel.SettingViewModel
-import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.ProfileRootResponse
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.notificationviewmodel.apiresponse.NotificationApiResponse
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-class NotificationFragment : Fragment(),View.OnClickListener {
+@AndroidEntryPoint
+class NotificationFragment : Fragment(), View.OnClickListener {
 
-    private var binding:FragmentNotificationBinding?=null
-    private var onAllNotification:Boolean?=false
-    private var pushNotification:Boolean?=false
-    private var recipeRecommendation:Boolean?=false
-    private var productUpdates:Boolean?=false
-    private var promotionalUpdates:Boolean?=false
+    private var binding: FragmentNotificationBinding? = null
     private lateinit var viewModel: NotificationViewModel
 
+    private var pushNotification: Int = 0
+    private var recipeRecommendations: Int = 0
+    private var productUpdates: Int = 0
+    private var promotionalUpdates: Int = 0
+    private var allNotifications: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        // Inflate the layout for this fragment
-        binding=FragmentNotificationBinding.inflate(layoutInflater,container,false)
-
-
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
-
-
-        viewModel = ViewModelProvider(requireActivity())[NotificationViewModel::class.java]
-
-
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
-
-        binding!!.imgBackNotification.setOnClickListener(this)
-        binding!!.textEnableNotification.setOnClickListener(this)
-        binding!!.textPushNotification.setOnClickListener(this)
-        binding!!.textRecipeRecommendations.setOnClickListener(this)
-        binding!!.textProductUpdates.setOnClickListener(this)
-        binding!!.textPromotionalUpdates.setOnClickListener(this)
-
-
-        // When screen load then api call
+        binding = FragmentNotificationBinding.inflate(layoutInflater, container, false)
+        setupUI()
+        setupViewModel()
+        setupBackButtonHandler()
         fetchNotificationList()
 
         return binding!!.root
+    }
+
+    private fun setupUI() {
+        val activity = activity as MainActivity
+        activity.binding!!.llIndicator.visibility = View.GONE
+        activity.binding!!.llBottomNavigation.visibility = View.GONE
+
+        binding!!.apply {
+            imgBackNotification.setOnClickListener(this@NotificationFragment)
+            textEnableNotification.setOnClickListener(this@NotificationFragment)
+            textPushNotification.setOnClickListener(this@NotificationFragment)
+            textRecipeRecommendations.setOnClickListener(this@NotificationFragment)
+            textProductUpdates.setOnClickListener(this@NotificationFragment)
+            textPromotionalUpdates.setOnClickListener(this@NotificationFragment)
+        }
+    }
+
+    private fun setupViewModel() {
+        viewModel = ViewModelProvider(requireActivity())[NotificationViewModel::class.java]
+    }
+
+    private fun setupBackButtonHandler() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            requireActivity(), object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            }
+        )
     }
 
     private fun fetchNotificationList() {
@@ -76,13 +84,10 @@ class NotificationFragment : Fragment(),View.OnClickListener {
     private fun fetchNotificationData() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            lifecycleScope.launch {
-                viewModel.notificationRequest({
-                    BaseApplication.dismissMe()
-                    handleApiResponse(it)
-                }, "","","",""
-                )
-            }
+            viewModel.notificationRequest({ result ->
+                BaseApplication.dismissMe()
+                handleApiResponse(result)
+            }, "", "", "", "")
         }
     }
 
@@ -96,10 +101,12 @@ class NotificationFragment : Fragment(),View.OnClickListener {
 
     private fun handleSuccessResponse(data: String) {
         try {
-            val apiModel = Gson().fromJson(data, ProfileRootResponse::class.java)
-            Log.d("@@@ Health profile", "message :- $data")
+            val apiModel = Gson().fromJson(data, NotificationApiResponse::class.java)
+            Log.d("@@@ notification profile", "message :- $data")
+
             if (apiModel.code == 200 && apiModel.success) {
-                
+                updateNotificationStates(apiModel)
+                updateUI()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -110,93 +117,80 @@ class NotificationFragment : Fragment(),View.OnClickListener {
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
+    }
 
+    private fun updateNotificationStates(apiModel: NotificationApiResponse) {
+        pushNotification = apiModel.data.push_notification!!
+        recipeRecommendations = apiModel.data.recipe_recommendations!!
+        productUpdates = apiModel.data.product_updates!!
+        promotionalUpdates = apiModel.data.promotional_updates!!
+
+        allNotifications = if (pushNotification == 0 && recipeRecommendations == 0 && productUpdates == 0 && promotionalUpdates == 0) 0 else 1
+
+    }
+
+    private fun updateUI() {
+        binding!!.apply {
+            textPushNotification.setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.push_notification_icon, 0,
+                if (pushNotification == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon, 0
+            )
+            textRecipeRecommendations.setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.recipe_recommendation_icon, 0,
+                if (recipeRecommendations == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon, 0
+            )
+            textProductUpdates.setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.product_updates_icon, 0,
+                if (productUpdates == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon, 0
+            )
+            textPromotionalUpdates.setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.promotional_icon, 0,
+                if (promotionalUpdates == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon, 0
+            )
+            textEnableNotification.setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.notification_icons, 0,
+                if (allNotifications == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon, 0
+            )
+        }
     }
 
     private fun showAlert(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)
     }
 
-    override fun onClick(item: View?) {
-        when (item!!.id) {
+    override fun onClick(view: View?) {
+        when (view?.id) {
+            R.id.imgBackNotification -> findNavController().navigateUp()
+            R.id.textEnableNotification -> toggleAllNotifications()
+            R.id.textPushNotification -> toggleNotificationState(pushNotification, "push")
+            R.id.textRecipeRecommendations -> toggleNotificationState(recipeRecommendations, "recipe")
+            R.id.textProductUpdates -> toggleNotificationState(productUpdates, "product")
+            R.id.textPromotionalUpdates -> toggleNotificationState(promotionalUpdates, "promo")
+        }
+    }
 
-            R.id.imgBackNotification->{
-                findNavController().navigateUp()
-            }
+    private fun toggleAllNotifications() {
+        val state = if (allNotifications == 0) "1" else "0"
+        makeNotificationRequest(state, state, state, state)
+    }
 
-            R.id.textEnableNotification->{
-                if (onAllNotification==true){
-                    onAllNotification=false
-                    binding!!.textEnableNotification.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_on_icon,0 )
-                    pushNotification=false
-                    binding!!.textPushNotification.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_on_icon,0 )
-                    recipeRecommendation=false
-                    binding!!.textRecipeRecommendations.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_on_icon,0 )
-                    productUpdates=false
-                    binding!!.textProductUpdates.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_on_icon,0 )
-                    promotionalUpdates=false
-                    binding!!.textPromotionalUpdates.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_on_icon,0 )
-                }else{
-                    onAllNotification=true
-                    binding!!.textEnableNotification.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_gray_off_icon,0 )
-                    pushNotification=true
-                    binding!!.textPushNotification.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_gray_off_icon,0 )
-                    recipeRecommendation=true
-                    binding!!.textRecipeRecommendations.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_gray_off_icon,0 )
-                    productUpdates=true
-                    binding!!.textProductUpdates.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_gray_off_icon,0 )
-                    promotionalUpdates=true
-                    binding!!.textPromotionalUpdates.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_gray_off_icon,0 )
-                }
-            }
+    private fun toggleNotificationState(currentState: Int, type: String) {
+        val state = if (currentState == 0) "1" else "0"
+        when (type) {
+            "push" -> makeNotificationRequest(state, recipeRecommendations.toString(), productUpdates.toString(), promotionalUpdates.toString())
+            "recipe" -> makeNotificationRequest(pushNotification.toString(), state, productUpdates.toString(), promotionalUpdates.toString())
+            "product" -> makeNotificationRequest(pushNotification.toString(), recipeRecommendations.toString(), state, promotionalUpdates.toString())
+            "promo" -> makeNotificationRequest(pushNotification.toString(), recipeRecommendations.toString(), productUpdates.toString(), state)
+        }
+    }
 
-            R.id.textPushNotification->{
-                if (pushNotification==true){
-                    pushNotification=false
-                    binding!!.textPushNotification.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_on_icon,0 )
-                }else{
-                    pushNotification=true
-                    binding!!.textPushNotification.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_gray_off_icon,0 )
-                    onAllNotification=true
-                    binding!!.textEnableNotification.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_gray_off_icon,0 )
-                }
-            }
-
-            R.id.textRecipeRecommendations->{
-                if (recipeRecommendation==true){
-                    recipeRecommendation=false
-                    binding!!.textRecipeRecommendations.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_on_icon,0 )
-                }else{
-                    recipeRecommendation=true
-                    binding!!.textRecipeRecommendations.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_gray_off_icon,0 )
-                    onAllNotification=true
-                    binding!!.textEnableNotification.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_gray_off_icon,0 )
-                }
-            }
-
-            R.id.textProductUpdates->{
-                if (productUpdates==true){
-                    productUpdates=false
-                    binding!!.textProductUpdates.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_on_icon,0 )
-                }else{
-                    productUpdates=true
-                    binding!!.textProductUpdates.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_gray_off_icon,0 )
-                    onAllNotification=true
-                    binding!!.textEnableNotification.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_gray_off_icon,0 )
-                }
-            }
-
-            R.id.textPromotionalUpdates->{
-                if (promotionalUpdates==true){
-                    promotionalUpdates=false
-                    binding!!.textPromotionalUpdates.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_on_icon,0 )
-                }else{
-                    promotionalUpdates=true
-                    binding!!.textPromotionalUpdates.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_gray_off_icon,0 )
-                    onAllNotification=true
-                    binding!!.textEnableNotification.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.toggle_gray_off_icon,0 )
-                }
-            }
+    private fun makeNotificationRequest(push: String, recipe: String, product: String, promo: String) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.notificationRequest({ result ->
+                BaseApplication.dismissMe()
+                handleApiResponse(result)
+            }, push, recipe, product, promo)
         }
     }
 }

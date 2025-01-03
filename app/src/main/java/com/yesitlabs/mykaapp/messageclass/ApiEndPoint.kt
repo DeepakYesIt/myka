@@ -39,6 +39,7 @@ object ApiEndPoint {
     const val walletAmountUrl="get-wallet"
     const val logOutUrl="user-Logout"
     const val deleteUrl="user-Logout"
+    const val updateNotificationUrl="update-notification"
 
 
 

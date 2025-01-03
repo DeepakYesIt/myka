@@ -74,29 +74,35 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
     private lateinit var binding: FragmentPaymentMethodBinding
     private lateinit var viewModel: WalletViewModel
     private var stripe: Stripe? = null
-    private var month:Int=0
-    private var year:Int=0
+    private var month: Int = 0
+    private var year: Int = 0
     private lateinit var adapterCard: MyWalletAdapter
     private lateinit var adapterCardBank: MyWalletBankAdapter
     private var dataLocal: MutableList<CardData> = mutableListOf()
     private var bankDataLocal: MutableList<CardData> = mutableListOf()
-    private var storage_permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)
+    private var storage_permissions = arrayOf(
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.CAMERA,
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    )
+
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    private var storage_permissions_33 = arrayOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.CAMERA)
-    private val mediaFiles: ArrayList<MediaFile?> = ArrayList<MediaFile?>()
+    private var storage_permissions_33 =
+        arrayOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.CAMERA)
+    private val mediaFiles: ArrayList<MediaFile?> = ArrayList()
     private val REQUEST_Folder = 2
-    private var imgtype:String=""
-    private var filefrontid:String="No"
-    private var filebackid:String="No"
-    private var filebankid:String="No"
-    private var filefront: File? =null
-    private var fileback: File? =null
-    private var bankuploadfile: File? =null
+    private var imgtype: String = ""
+    private var filefrontid: String = "No"
+    private var filebackid: String = "No"
+    private var filebankid: String = "No"
+    private var filefront: File? = null
+    private var fileback: File? = null
+    private var bankuploadfile: File? = null
     private val REQUEST_CODE_STORAGE_PERMISSION = 1
-    private var country:String=""
-    private var states:String=""
-    private var currency:String=""
-    private var amount:String?=""
+    private var country: String = ""
+    private var states: String = ""
+    private var currency: String = ""
+    private var amount: String? = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -104,17 +110,21 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
     ): View {
         binding = FragmentPaymentMethodBinding.inflate(layoutInflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[WalletViewModel::class.java]
-        stripe = Stripe(requireContext(),getString(R.string.publish_key))
+        stripe = Stripe(requireContext(), getString(R.string.publish_key))
         (activity as MainActivity).binding?.apply {
             llIndicator.visibility = View.VISIBLE
             llBottomNavigation.visibility = View.VISIBLE
         }
 
-        if (arguments!=null){
-            amount= requireArguments().getString("amount","$ 0").toString()
+        if (arguments != null) {
+            amount = requireArguments().getString("amount", "$ 0").toString()
         }
 
-        ActivityCompat.requestPermissions(requireActivity(), permissions(), REQUEST_CODE_STORAGE_PERMISSION)
+        ActivityCompat.requestPermissions(
+            requireActivity(),
+            permissions(),
+            REQUEST_CODE_STORAGE_PERMISSION
+        )
 
 
         setupBackNavigation()
@@ -150,7 +160,7 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
             lifecycleScope.launch {
                 viewModel.countryStateCityRequest({
                     BaseApplication.dismissMe()
-                    handleApiStatesResponse(it,value)
+                    handleApiStatesResponse(it, value)
                 }, "https://api.countrystatecity.in/v1/countries/$value/states/")
             }
         } else {
@@ -164,7 +174,7 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
             lifecycleScope.launch {
                 viewModel.countryStateCityRequest({
                     BaseApplication.dismissMe()
-                    handleApiCitiesResponse(it, value)
+                    handleApiCitiesResponse(it)
                 }, "https://api.countrystatecity.in/v1/countries/$value/states/$iso2/cities/")
             }
         } else {
@@ -174,24 +184,23 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
 
     private fun handleApiStatesResponse(result: NetworkResult<String>, value: String) {
         when (result) {
-            is NetworkResult.Success -> handleStatesSuccessResponse(result.data.toString(),value)
+            is NetworkResult.Success -> handleStatesSuccessResponse(result.data.toString(), value)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
-    private fun handleApiCitiesResponse(result: NetworkResult<String>, value: String) {
+    private fun handleApiCitiesResponse(result: NetworkResult<String>) {
         when (result) {
-            is NetworkResult.Success -> handleCitiesSuccessResponse(result.data.toString(),value)
+            is NetworkResult.Success -> handleCitiesSuccessResponse(result.data.toString())
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
 
-    private fun fetchCountry(){
+    private fun fetchCountry() {
         if (BaseApplication.isOnline(requireActivity())) {
-//            BaseApplication.showMe(requireContext())
             lifecycleScope.launch {
                 viewModel.countryStateCityRequest({
                     BaseApplication.dismissMe()
@@ -206,7 +215,10 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
 
     private fun setupSpinners() {
         setupSpinner(binding.spinnerSelectIDType, listOf("Driver license", "Passport"))
-        setupSpinner(binding.spinnerSelectOption, listOf("Bank account statement", "Voided cheque", "Bank letterhead"))
+        setupSpinner(
+            binding.spinnerSelectOption,
+            listOf("Bank account statement", "Voided cheque", "Bank letterhead")
+        )
     }
 
     private fun setupSpinner(spinner: PowerSpinnerView, items: List<String>) {
@@ -218,11 +230,11 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
     }
 
 
-    private fun setUpBankEvent(){
+    private fun setUpBankEvent() {
         binding.textAddBank.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
-                if (isValidation()){
-                   addBankApi()
+                if (isValidation()) {
+                    addBankApi()
                 }
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
@@ -230,109 +242,133 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
         }
     }
 
-    private fun addBankApi(){
+    private fun addBankApi() {
         BaseApplication.showMe(requireContext())
-        val bankAccountTokenParams = BankAccountTokenParams(country, currency,
-            binding.etBankAccountNumber.text?.toString()?.trim() ?: throw IllegalArgumentException("Bank number is required"),
+        val bankAccountTokenParams = BankAccountTokenParams(
+            country, currency,
+            binding.etBankAccountNumber.text?.toString()?.trim()
+                ?: throw IllegalArgumentException("Bank number is required"),
             BankAccountTokenParams.Type.Individual,
             binding.etAccountHolderName.text.toString(),
-            binding.etRoutingNumber.text?.toString()?.trim() ?: throw IllegalArgumentException("Routing number is required"))
+            binding.etRoutingNumber.text?.toString()?.trim()
+                ?: throw IllegalArgumentException("Routing number is required")
+        )
 
 
-            stripe?.createBankAccountToken(bankAccountTokenParams ,null,null, object : ApiResultCallback<Token> {
-            override fun onSuccess(token: Token) {
-                lifecycleScope.launch {
-                    addCard(token)
+        stripe?.createBankAccountToken(
+            bankAccountTokenParams,
+            null,
+            null,
+            object : ApiResultCallback<Token> {
+                override fun onSuccess(token: Token) {
+                    lifecycleScope.launch {
+                        addCard(token)
+                    }
                 }
-            }
-            override fun onError(e: Exception) {
-                BaseApplication.dismissMe()
-                showAlert(e.message, false)
-            }
-             })
 
+                override fun onError(e: Exception) {
+                    BaseApplication.dismissMe()
+                    showAlert(e.message, false)
+                }
+            })
 
 
     }
 
-    private suspend fun addCard(token:Token){
+    private suspend fun addCard(token: Token) {
 
         try {
             val filePartFront: MultipartBody.Part? = if (filefront != null) {
-                val requestBody = filefront?.asRequestBody(filefront!!.extension.toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("document_front", filefront?.name,requestBody!!)
-            }else{
+                val requestBody =
+                    filefront?.asRequestBody(filefront!!.extension.toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("document_front", filefront?.name, requestBody!!)
+            } else {
                 null
             }
             val filePartBack: MultipartBody.Part? = if (fileback != null) {
                 val requestBody = fileback?.asRequestBody(fileback!!.extension.toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("document_back", fileback?.name,requestBody!!)
-            }else{
+                MultipartBody.Part.createFormData("document_back", fileback?.name, requestBody!!)
+            } else {
                 null
             }
 
             val filePart: MultipartBody.Part? = if (bankuploadfile != null) {
-                val requestBody = bankuploadfile?.asRequestBody(bankuploadfile!!.extension.toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("bank_proof", bankuploadfile?.name,requestBody!!)
-            }else{
+                val requestBody =
+                    bankuploadfile?.asRequestBody(bankuploadfile!!.extension.toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("bank_proof", bankuploadfile?.name, requestBody!!)
+            } else {
                 null
             }
 
-            val firstNameBody= binding.etFirstName.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val lastNameBody= binding.etLastName.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val emailBody= binding.etEmail.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val phoneBody= binding.etPhoneNumber.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val dobBody= binding.etDOB.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val idTypeBody = binding.spinnerSelectIDType.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val personalIdentificationNobody= binding.etPersonalIdentificationNumber.text.toString().trim().toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val ssnBody= binding.etSSN.text.toString().trim().toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val addressBody= binding.etAddress.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val countryBody= country.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val shortStateNameBody= states.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val cityBody= binding.spinnerSelectCity.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val postalCodeBody= binding.etPostalCode.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val firstNameBody = binding.etFirstName.text.toString()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val lastNameBody = binding.etLastName.text.toString()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val emailBody = binding.etEmail.text.toString()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val phoneBody = binding.etPhoneNumber.text.toString()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val dobBody = binding.etDOB.text.toString()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val idTypeBody = binding.spinnerSelectIDType.text.toString()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val personalIdentificationNobody =
+                binding.etPersonalIdentificationNumber.text.toString().trim()
+                    .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val ssnBody = binding.etSSN.text.toString().trim()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val addressBody = binding.etAddress.text.toString()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val countryBody = country.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val shortStateNameBody = states.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val cityBody = binding.spinnerSelectCity.text.toString()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val postalCodeBody = binding.etPostalCode.text.toString()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
             val bankDocumentTypeBody = when (binding.spinnerSelectOption.getText().toString()) {
                 "Bank account statement" -> "statement".toRequestBody("multipart/form-data".toMediaTypeOrNull())
                 "Voided cheque" -> "cheque".toRequestBody("multipart/form-data".toMediaTypeOrNull())
                 else -> "letterhead".toRequestBody("multipart/form-data".toMediaTypeOrNull())
             }
-            val deviceTypeBody= "Android".toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val tokenTypeBody= "bank_account".toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val stripeTokenBody= token.id.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val saveCardBody= "".toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val amountBody= "".toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val paymentTypeBody= "".toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val bankIdBody= "".toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val deviceTypeBody = "Android".toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val tokenTypeBody =
+                "bank_account".toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val stripeTokenBody = token.id.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val saveCardBody = "".toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val amountBody = "".toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val paymentTypeBody = "".toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val bankIdBody = "".toRequestBody("multipart/form-data".toMediaTypeOrNull())
 
-            viewModel.addBankRequest ({
+            viewModel.addBankRequest({
                 BaseApplication.dismissMe()
                 handleApiBankResponse(it)
-            }   ,filePartFront
-                ,filePartBack
-                ,filePart
-                ,firstNameBody
-                ,lastNameBody
-                ,emailBody
-                ,phoneBody
-                ,dobBody
-                ,personalIdentificationNobody
-                ,idTypeBody
-                ,ssnBody
-                ,addressBody
-                ,countryBody
-                ,shortStateNameBody
-                ,cityBody
-                ,postalCodeBody
-                ,bankDocumentTypeBody
-                ,deviceTypeBody
-                ,tokenTypeBody
-                ,stripeTokenBody
-                ,saveCardBody
-                ,amountBody
-                ,paymentTypeBody
-                ,bankIdBody)
+            },
+                filePartFront,
+                filePartBack,
+                filePart,
+                firstNameBody,
+                lastNameBody,
+                emailBody,
+                phoneBody,
+                dobBody,
+                personalIdentificationNobody,
+                idTypeBody,
+                ssnBody,
+                addressBody,
+                countryBody,
+                shortStateNameBody,
+                cityBody,
+                postalCodeBody,
+                bankDocumentTypeBody,
+                deviceTypeBody,
+                tokenTypeBody,
+                stripeTokenBody,
+                saveCardBody,
+                amountBody,
+                paymentTypeBody,
+                bankIdBody)
 
-        }catch (e:Exception){
+        } catch (e: Exception) {
             BaseApplication.dismissMe()
             showAlert(e.message, false)
         }
@@ -363,22 +399,22 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
         } else if (binding.etPhoneNumber.text?.trim().toString().trim().isEmpty()) {
             BaseApplication.alertError(requireContext(), ErrorMessage.phoneError, false)
             return false
-        }else if (binding.etPhoneNumber.text?.trim().toString().length!=10) {
+        } else if (binding.etPhoneNumber.text?.trim().toString().length != 10) {
             BaseApplication.alertError(requireContext(), ErrorMessage.validPhoneNumber, false)
             return false
-        }else if (binding.etDOB.text?.toString().equals("MM/DD/YYYY")) {
+        } else if (binding.etDOB.text?.toString().equals("MM/DD/YYYY")) {
             BaseApplication.alertError(requireContext(), ErrorMessage.dobError, false)
             return false
-        }else if (binding.spinnerSelectIDType.text?.toString().equals("Select ID type")) {
+        } else if (binding.spinnerSelectIDType.text?.toString().equals("Select ID type")) {
             BaseApplication.alertError(requireContext(), ErrorMessage.selectIdTypeError, false)
             return false
         } else if (binding.etPersonalIdentificationNumber.text?.trim().toString().isEmpty()) {
             BaseApplication.alertError(requireContext(), ErrorMessage.pINError, false)
             return false
-        }  else if (binding.etSSN.text?.trim().toString().isEmpty()) {
+        } else if (binding.etSSN.text?.trim().toString().isEmpty()) {
             BaseApplication.alertError(requireContext(), ErrorMessage.SNNError, false)
             return false
-        } else if (binding.etSSN.text?.trim().toString().length!=4) {
+        } else if (binding.etSSN.text?.trim().toString().length != 4) {
             BaseApplication.alertError(requireContext(), ErrorMessage.SNNValidError, false)
             return false
         } else if (binding.etAddress.text?.trim().toString().isEmpty()) {
@@ -387,37 +423,37 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
         } else if (binding.spinnerSelectCountry.text?.toString().equals("Select Country")) {
             BaseApplication.alertError(requireContext(), ErrorMessage.countryError, false)
             return false
-        }  else if (binding.spinnerSelectState.text?.toString().equals("Select State")) {
+        } else if (binding.spinnerSelectState.text?.toString().equals("Select State")) {
             BaseApplication.alertError(requireContext(), ErrorMessage.stateError, false)
             return false
-        }  else if (binding.spinnerSelectCity.text?.toString().equals("Select City")) {
+        } else if (binding.spinnerSelectCity.text?.toString().equals("Select City")) {
             BaseApplication.alertError(requireContext(), ErrorMessage.cityError, false)
             return false
-        }   else if (binding.etPostalCode.text?.trim().toString().isEmpty()) {
+        } else if (binding.etPostalCode.text?.trim().toString().isEmpty()) {
             BaseApplication.alertError(requireContext(), ErrorMessage.postalCodeError, false)
             return false
-        }  else if (binding.etBankName.text?.trim().toString().isEmpty()) {
+        } else if (binding.etBankName.text?.trim().toString().isEmpty()) {
             BaseApplication.alertError(requireContext(), ErrorMessage.bankNameError, false)
             return false
-        }   else if (binding.etAccountHolderName.text?.trim().toString().isEmpty()) {
+        } else if (binding.etAccountHolderName.text?.trim().toString().isEmpty()) {
             BaseApplication.alertError(requireContext(), ErrorMessage.cardholderError, false)
             return false
-        }  else if (binding.etBankAccountNumber.text?.trim().toString().isEmpty()) {
+        } else if (binding.etBankAccountNumber.text?.trim().toString().isEmpty()) {
             BaseApplication.alertError(requireContext(), ErrorMessage.accountNumberError, false)
             return false
-        }  else if (binding.etConfirmAccountNumber.text?.trim().toString().isEmpty()) {
+        } else if (binding.etConfirmAccountNumber.text?.trim().toString().isEmpty()) {
             BaseApplication.alertError(requireContext(), ErrorMessage.cAccountNumberError, false)
             return false
         } else if (binding.etRoutingNumber.text.toString().trim().isEmpty()) {
             BaseApplication.alertError(requireContext(), ErrorMessage.routingNumberError, false)
             return false
-        }else if (filebankid.equals("No",true)) {
+        } else if (filebankid.equals("No", true)) {
             BaseApplication.alertError(requireContext(), ErrorMessage.proofofbanError, false)
             return false
-        }else if (filefrontid.equals("No",true)) {
+        } else if (filefrontid.equals("No", true)) {
             BaseApplication.alertError(requireContext(), ErrorMessage.frontimageError, false)
             return false
-        }else if (filebackid.equals("No",true)) {
+        } else if (filebackid.equals("No", true)) {
             BaseApplication.alertError(requireContext(), ErrorMessage.backimageError, false)
             return false
         }
@@ -460,10 +496,10 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
             val apiModel = Gson().fromJson(response, CradApiResponse::class.java)
             Log.d("@@@ Response cardBank ", "message :- $response")
             if (apiModel.code == 200) {
-                apiModel.data?.let { updateUI(it) }?: run {
+                apiModel.data?.let { updateUI(it) } ?: run {
                     // Code for the else condition
-                    binding.llBankAccount.visibility=View.VISIBLE
-                    binding.llSavedBankAccountDetails4.visibility=View.GONE
+                    binding.llBankAccount.visibility = View.VISIBLE
+                    binding.llSavedBankAccountDetails4.visibility = View.GONE
                 }
             } else {
                 if (apiModel.code == ErrorMessage.code) {
@@ -482,35 +518,44 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
 
         dataLocal.clear()
         bankDataLocal.clear()
-        if (data.card_details!=null){
+        if (data.card_details != null) {
             dataLocal.addAll(data.card_details)
         }
-        if (data.bank_details!=null){
-            for ( dataLoop in data.bank_details ) {
+        if (data.bank_details != null) {
+            for (dataLoop in data.bank_details) {
                 // Change value cardId to currency
-                bankDataLocal.add(CardData(dataLoop.verification_status.toString(),dataLoop.bank_account[0].currency.uppercase(),0,0,dataLoop.bank_account[0].account_holder_name+","+dataLoop.bank_account[0].last4+"("+dataLoop.bank_account[0].currency.uppercase()+")",dataLoop.bank_account[0].bank_name,dataLoop.bank_account[0].account.toString()))
+                bankDataLocal.add(
+                    CardData(
+                        dataLoop.verification_status.toString(),
+                        dataLoop.bank_account[0].currency.uppercase(),
+                        0,
+                        0,
+                        dataLoop.bank_account[0].account_holder_name + "," + dataLoop.bank_account[0].last4 + "(" + dataLoop.bank_account[0].currency.uppercase() + ")",
+                        dataLoop.bank_account[0].bank_name,
+                        dataLoop.bank_account[0].account.toString()
+                    )
+                )
             }
         }
 
-        if (dataLocal.size>0 || bankDataLocal.size>0 ){
-            binding.llBankAccount.visibility=View.GONE
-            binding.llSavedBankAccountDetails4.visibility=View.VISIBLE
+        if (dataLocal.size > 0 || bankDataLocal.size > 0) {
+            binding.llBankAccount.visibility = View.GONE
+            binding.llSavedBankAccountDetails4.visibility = View.VISIBLE
 
-            if (dataLocal.size>0){
-                adapterCard = MyWalletAdapter(requireContext(), dataLocal,"card",this)
+            if (dataLocal.size > 0) {
+                adapterCard = MyWalletAdapter(requireContext(), dataLocal, "card", this)
                 binding.rcvCardNumber.adapter = adapterCard
             }
 
-            if (bankDataLocal.size>0){
-                adapterCardBank = MyWalletBankAdapter(requireContext(), bankDataLocal,"bank",this)
+            if (bankDataLocal.size > 0) {
+                adapterCardBank = MyWalletBankAdapter(requireContext(), bankDataLocal, "bank", this)
                 binding.rcvBankAccounts.adapter = adapterCardBank
             }
 
 
-
-        }else{
-            binding.llBankAccount.visibility=View.VISIBLE
-            binding.llSavedBankAccountDetails4.visibility=View.GONE
+        } else {
+            binding.llBankAccount.visibility = View.VISIBLE
+            binding.llSavedBankAccountDetails4.visibility = View.GONE
 //            fetchDataOnLoad()
         }
 
@@ -526,8 +571,8 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
 
 
         binding.textAddCardNumber.setOnClickListener {
-            binding.llBankAccount.visibility=View.VISIBLE
-            binding.llSavedBankAccountDetails4.visibility=View.GONE
+            binding.llBankAccount.visibility = View.VISIBLE
+            binding.llSavedBankAccountDetails4.visibility = View.GONE
         }
 
         binding.etMonth.setOnClickListener {
@@ -588,7 +633,7 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
                         .start()
                 }
 
-                laypdf.setOnClickListener{
+                laypdf.setOnClickListener {
                     imgtype = "pdffile"
                     dialog.dismiss()
                     fileIntentMulti()
@@ -596,7 +641,11 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
 
                 dialog.show()
             } else {
-                Toast.makeText(requireContext(), "Please go to setting Enable Permission", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Please go to setting Enable Permission",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -611,7 +660,7 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
         }
 
         binding.layBack.setOnClickListener {
-            imgtype="back"
+            imgtype = "back"
             ImagePicker.with(this)
                 .crop()
                 .compress(1024)
@@ -620,62 +669,63 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
         }
 
 
-
     }
 
     private fun fileIntentMulti() {
         val intent = Intent(requireContext(), FilePickerActivity::class.java)
-        intent.putExtra(FilePickerActivity.CONFIGS, Configurations.Builder()
-            .setCheckPermission(true)
-            .setSelectedMediaFiles(mediaFiles)
-            .setShowFiles(true)
-            .setShowImages(false)
-            .setShowAudios(false)
-            .setShowVideos(false)
-            .setIgnoreNoMedia(false)
-            .enableVideoCapture(false)
-            .enableImageCapture(false)
-            .setIgnoreHiddenFile(false)
-            .setMaxSelection(1)
-            .build()
+        intent.putExtra(
+            FilePickerActivity.CONFIGS, Configurations.Builder()
+                .setCheckPermission(true)
+                .setSelectedMediaFiles(mediaFiles)
+                .setShowFiles(true)
+                .setShowImages(false)
+                .setShowAudios(false)
+                .setShowVideos(false)
+                .setIgnoreNoMedia(false)
+                .enableVideoCapture(false)
+                .enableImageCapture(false)
+                .setIgnoreHiddenFile(false)
+                .setMaxSelection(1)
+                .build()
         )
         startActivityForResult(intent, REQUEST_Folder)
     }
-
 
 
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == ImagePicker.REQUEST_CODE) {
-            if (data?.data!=null){
-                if (imgtype .equals( "front",true)){
+            if (data?.data != null) {
+                if (imgtype.equals("front", true)) {
                     val uri = data.data!!
                     filefront = BaseApplication.getPath(requireContext(), uri)?.let { File(it) }
-                    filefrontid="Yes"
-                    binding.textChooseVerificationDocument.text=filefront.toString()
+                    filefrontid = "Yes"
+                    binding.textChooseVerificationDocument.text = filefront.toString()
 
                 }
-                if (imgtype.equals("back",true)){
+                if (imgtype.equals("back", true)) {
                     val uri = data.data!!
                     fileback = BaseApplication.getPath(requireContext(), uri)?.let { File(it) }
-                    filebackid="Yes"
-                    binding.textChooseVerificationDocumentBack.text=fileback.toString()
+                    filebackid = "Yes"
+                    binding.textChooseVerificationDocumentBack.text = fileback.toString()
 
                 }
 
-                if (imgtype.equals("camera",true)){
+                if (imgtype.equals("camera", true)) {
                     val uri = data.data!!
-                    bankuploadfile = BaseApplication.getPath(requireContext(), uri)?.let { File(it) }
-                    binding.textChooseBankProof.text= bankuploadfile.toString()
-                    filebankid="Yes"
+                    bankuploadfile =
+                        BaseApplication.getPath(requireContext(), uri)?.let { File(it) }
+                    binding.textChooseBankProof.text = bankuploadfile.toString()
+                    filebankid = "Yes"
 
                 }
-                if (imgtype.equals("Gallery",true)){
+                if (imgtype.equals("Gallery", true)) {
                     val uri = data.data!!
-                    bankuploadfile = BaseApplication.getPath(requireContext(), uri)?.let { File(it) }
-                    filebankid="Yes"
-                    binding.textChooseBankProof.text= bankuploadfile.toString()
+                    bankuploadfile =
+                        BaseApplication.getPath(requireContext(), uri)?.let { File(it) }
+                    filebankid = "Yes"
+                    binding.textChooseBankProof.text = bankuploadfile.toString()
 
                 }
             }
@@ -688,16 +738,17 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
     private fun onSelectFromFolderResult(data: Intent?) {
         if (data != null) {
             try {
-                val files = data.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)
+                val files =
+                    data.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)
                 Log.v("pdf", files!![0].uri.toString())
                 Log.v("pdf", files[0].name.toString())
                 bankuploadfile = CompressImage.from(requireContext(), files[0].uri)
-                filebankid="Yes"
-                binding.textChooseBankProof.text= bankuploadfile.toString()
+                filebankid = "Yes"
+                binding.textChooseBankProof.text = bankuploadfile.toString()
 
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
-                Log.d("pdf not found","no data :-"+e.message.toString())
+                Log.d("pdf not found", "no data :-" + e.message.toString())
             }
         }
     }
@@ -712,10 +763,10 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
     }
 
 
-
-    private fun hasPermissions(context: Context, vararg permissions: String): Boolean = permissions.all {
-        ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-    }
+    private fun hasPermissions(context: Context, vararg permissions: String): Boolean =
+        permissions.all {
+            ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+        }
 
 
     // This function is use for open the Calendar
@@ -730,10 +781,11 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
         // Create a DatePickerDialog with the current date and minimum date set to today
-        val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
+        val datePickerDialog = DatePickerDialog(
+            requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
                 // Update the TextView with the selected date
-                val date:String=""+(selectedMonth+1)+"/"+selectedDay+"/"+selectedYear
-                Log.d("date :- ","******"+date)
+                val date = "${selectedMonth + 1}/$selectedDay/$selectedYear"
+                Log.d("******", "" + date)
                 binding.etDOB.text = BaseApplication.changeDateFormat(date)
             },
             year,
@@ -787,9 +839,9 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
             .setPositiveButton("OK") { _, _ ->
                 // Get selected month and year
                 val selectedMonth = monthPicker.value
-                year=monthPicker.value
+                year = monthPicker.value
                 // Update the TextView with the selected month name and year
-                binding.etYear.text = ""+selectedMonth
+                binding.etYear.text = "" + selectedMonth
             }
             .setNegativeButton("Cancel", null)
         // Show the dialog
@@ -821,10 +873,14 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
             .setPositiveButton("OK") { _, _ ->
 
                 val selectedMonth = monthPicker.value
-                month=monthPicker.value+1
+                month = monthPicker.value + 1
                 // Update the TextView with the selected month name and year
                 binding.etMonth.text = monthNames[selectedMonth]
-                Toast.makeText(requireContext(), "selectedMonth :- $selectedMonth", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    "selectedMonth :- $selectedMonth",
+                    Toast.LENGTH_LONG
+                ).show()
             }
             .setNegativeButton("Cancel", null)
 
@@ -837,7 +893,7 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
 
         binding.textAddCardDebitCard.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
-                if (isValidationCard()){
+                if (isValidationCard()) {
                     paymentApi()
                 }
             } else {
@@ -848,10 +904,13 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
 
     private fun paymentApi() {
         BaseApplication.showMe(requireContext())
-        val cardNumber: String = Objects.requireNonNull(binding.etCardNumber.text.toString()).toString()
-        val cvvNumber: String = Objects.requireNonNull(binding.etCVVNumber.text.toString()).toString()
+        val cardNumber: String =
+            Objects.requireNonNull(binding.etCardNumber.text.toString()).toString()
+        val cvvNumber: String =
+            Objects.requireNonNull(binding.etCVVNumber.text.toString()).toString()
         val name: String = binding.etName.text.toString()
-        val card = CardParams(cardNumber, Integer.valueOf(month), Integer.valueOf(year), cvvNumber, name)
+        val card =
+            CardParams(cardNumber, Integer.valueOf(month), Integer.valueOf(year), cvvNumber, name)
         stripe!!.createCardToken(card, null, null, object : ApiResultCallback<Token> {
             override fun onError(e: Exception) {
                 BaseApplication.dismissMe()
@@ -894,7 +953,11 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
 
     private fun handleApiTransferResponse(result: NetworkResult<String>, dialog: Dialog?) {
         when (result) {
-            is NetworkResult.Success -> handleTransferSuccessResponse(result.data.toString(),dialog)
+            is NetworkResult.Success -> handleTransferSuccessResponse(
+                result.data.toString(),
+                dialog
+            )
+
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
@@ -907,7 +970,12 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
         type: String
     ) {
         when (result) {
-            is NetworkResult.Success -> handleDeleteCardSuccessResponse(result.data.toString(),position,type)
+            is NetworkResult.Success -> handleDeleteCardSuccessResponse(
+                result.data.toString(),
+                position,
+                type
+            )
+
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
@@ -924,15 +992,15 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
             Log.d("@@@ Add Card", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
 
-                month=0
-                year=0
+                month = 0
+                year = 0
                 binding.etName.text.clear()
                 binding.etCardNumber.text.clear()
                 binding.etCVVNumber.text.clear()
-                binding.etMonth.text="Month"
-                binding.etYear.text="Year"
+                binding.etMonth.text = "Month"
+                binding.etYear.text = "Year"
 
-                Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
 
                 // When screen load then api call
                 fetchDataOnLoad()
@@ -956,18 +1024,17 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
             val apiModelCountry = Gson().fromJson(data, CountryResponseModel::class.java)
             Log.d("@@@ Add Card", "message :- $data")
             if (apiModelCountry.code == 200 && apiModelCountry.success) {
-                if (apiModelCountry.data!=null){
-                    val localList :MutableList<String> = mutableListOf()
+                if (apiModelCountry.data != null) {
+                    val localList: MutableList<String> = mutableListOf()
                     localList.clear()
-                    for (value in apiModelCountry.data ){
+                    for (value in apiModelCountry.data) {
                         localList.add(value.name)
                     }
                     binding.spinnerSelectCountry.setItems(localList)
                     binding.spinnerSelectCountry.setIsFocusable(true)
-                    binding.spinnerSelectCountry.setOnSpinnerItemSelectedListener<String> {
-                        oldIndex, oldItem, newIndex, newItem ->
+                    binding.spinnerSelectCountry.setOnSpinnerItemSelectedListener<String> { _, _, newIndex, _ ->
                         country = apiModelCountry.data[newIndex].iso2
-                        currency=apiModelCountry.data[newIndex].currency
+                        currency = apiModelCountry.data[newIndex].currency
                         // When screen load then api call
                         fetchStates(country)
                     }
@@ -993,7 +1060,7 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
             val apiModelCountry = Gson().fromJson(data, TransferModel::class.java)
             Log.d("@@@ Add Card", "message :- $data")
             if (apiModelCountry.code == 200 && apiModelCountry.success) {
-                if (apiModelCountry.data!=null){
+                if (apiModelCountry.data != null) {
                     dialog?.dismiss()
                     findNavController().navigateUp()
                 }
@@ -1016,19 +1083,18 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
             val apiModelCountry = Gson().fromJson(data, CountryResponseModel::class.java)
             Log.d("@@@ Add Card", "message :- $data")
             if (apiModelCountry.code == 200 && apiModelCountry.success) {
-                if (apiModelCountry.data!=null){
-                    val localList :MutableList<String> = mutableListOf()
+                if (apiModelCountry.data != null) {
+                    val localList: MutableList<String> = mutableListOf()
                     localList.clear()
-                    for (value in apiModelCountry.data ){
+                    for (value in apiModelCountry.data) {
                         localList.add(value.name)
                     }
                     binding.spinnerSelectState.setItems(localList)
                     binding.spinnerSelectState.setIsFocusable(true)
-                    binding.spinnerSelectState.setOnSpinnerItemSelectedListener<String> {
-                        oldIndex, oldItem, newIndex, newItem ->
+                    binding.spinnerSelectState.setOnSpinnerItemSelectedListener<String> { _, _, newIndex, _ ->
                         states = apiModelCountry.data[newIndex].iso2
                         // When screen load then api call
-                        fetchCity(value,states)
+                        fetchCity(value, states)
                     }
 
                 }
@@ -1046,15 +1112,15 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleCitiesSuccessResponse(data: String, value: String) {
+    private fun handleCitiesSuccessResponse(data: String) {
         try {
             val apiModelCountry = Gson().fromJson(data, CountryResponseModel::class.java)
             Log.d("@@@ Add Card", "message :- $data")
             if (apiModelCountry.code == 200 && apiModelCountry.success) {
-                if (apiModelCountry.data!=null){
-                    val localList :MutableList<String> = mutableListOf()
+                if (apiModelCountry.data != null) {
+                    val localList: MutableList<String> = mutableListOf()
                     localList.clear()
-                    for (value in apiModelCountry.data ){
+                    for (value in apiModelCountry.data) {
                         localList.add(value.name)
                     }
                     binding.spinnerSelectCity.setItems(localList)
@@ -1080,34 +1146,34 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
             Log.d("@@@ Add Card", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
 
-                Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
                 binding.etFirstName.text.clear()
                 binding.etLastName.text.clear()
                 binding.etEmail.text.clear()
                 binding.etPhoneNumber.text.clear()
-                binding.etDOB.text="MM/DD/YYYY"
-                binding.spinnerSelectIDType.text="Select ID type"
+                binding.etDOB.text = "MM/DD/YYYY"
+                binding.spinnerSelectIDType.text = "Select ID type"
                 binding.etPersonalIdentificationNumber.text.clear()
                 binding.etSSN.text.clear()
                 binding.etAddress.text.clear()
-                binding.spinnerSelectCountry.text="Select Country"
-                binding.spinnerSelectState.text="Select State"
-                binding.spinnerSelectCity.text="Select City"
+                binding.spinnerSelectCountry.text = "Select Country"
+                binding.spinnerSelectState.text = "Select State"
+                binding.spinnerSelectCity.text = "Select City"
                 binding.etPostalCode.text.clear()
                 binding.etBankName.text.clear()
                 binding.etAccountHolderName.text.clear()
                 binding.etBankAccountNumber.text.clear()
                 binding.etConfirmAccountNumber.text.clear()
                 binding.etRoutingNumber.text.clear()
-                binding.textChooseBankProof.text="Choose a file"
-                binding.textChooseVerificationDocument.text="Choose a file"
-                binding.textChooseVerificationDocumentBack.text="Choose a file"
-                filebankid="No"
-                filefrontid="No"
-                filebackid="No"
-                filefront =null
-                fileback=null
-                bankuploadfile =null
+                binding.textChooseBankProof.text = "Choose a file"
+                binding.textChooseVerificationDocument.text = "Choose a file"
+                binding.textChooseVerificationDocumentBack.text = "Choose a file"
+                filebankid = "No"
+                filefrontid = "No"
+                filebackid = "No"
+                filefront = null
+                fileback = null
+                bankuploadfile = null
                 // When screen load then api call
                 fetchDataOnLoad()
             } else {
@@ -1130,32 +1196,40 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
             Log.d("@@@ Add Card", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
 
-                if (type.equals("Bank",true)){
+                if (type.equals("Bank", true)) {
                     bankDataLocal.removeAt(position!!)
-                }else{
+                } else {
                     dataLocal.removeAt(position!!)
                 }
 
-                if (dataLocal.size>0 || bankDataLocal.size>0){
+                if (dataLocal.size > 0 || bankDataLocal.size > 0) {
 
 
-                    if (bankDataLocal.size>0){
-                        adapterCardBank.upDateList(bankDataLocal,"bank")
-                        binding.rcvBankAccounts.adapter=adapterCardBank
+                    if (bankDataLocal.size > 0) {
+                        adapterCardBank.upDateList(bankDataLocal, "bank")
+                        binding.rcvBankAccounts.adapter = adapterCardBank
+                        binding.rcvBankAccounts.visibility = View.VISIBLE
+                    } else {
+                        binding.rcvBankAccounts.visibility = View.GONE
                     }
 
-                    if (dataLocal.size>0){
-                        adapterCard.upDateList(dataLocal,"card")
-                        binding.rcvCardNumber.adapter=adapterCard
+                    if (dataLocal.size > 0) {
+                        adapterCard.upDateList(dataLocal, "card")
+                        binding.rcvCardNumber.adapter = adapterCard
+                        binding.rcvCardNumber.visibility = View.VISIBLE
+                    } else {
+                        binding.rcvCardNumber.visibility = View.GONE
                     }
 
-                    binding.llBankAccount.visibility=View.GONE
-                    binding.llSavedBankAccountDetails4.visibility=View.VISIBLE
-                }else{
-                    binding.llBankAccount.visibility=View.VISIBLE
-                    binding.llSavedBankAccountDetails4.visibility=View.GONE
+                    binding.llBankAccount.visibility = View.GONE
+                    binding.llSavedBankAccountDetails4.visibility = View.VISIBLE
+
+
+                } else {
+                    binding.llBankAccount.visibility = View.VISIBLE
+                    binding.llSavedBankAccountDetails4.visibility = View.GONE
                 }
-                Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -1170,22 +1244,22 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
     }
 
     private fun isValidationCard(): Boolean {
-        if (binding.etName.text.toString().trim().isEmpty()){
+        if (binding.etName.text.toString().trim().isEmpty()) {
             BaseApplication.alertError(requireContext(), ErrorMessage.cardholderError, false)
             return false
-        }else if (binding.etCardNumber.text.toString().trim().isEmpty()){
+        } else if (binding.etCardNumber.text.toString().trim().isEmpty()) {
             BaseApplication.alertError(requireContext(), ErrorMessage.cardNumberError, false)
             return false
-        }else if (binding.etCVVNumber.text.toString().trim().isEmpty()){
+        } else if (binding.etCVVNumber.text.toString().trim().isEmpty()) {
             BaseApplication.alertError(requireContext(), ErrorMessage.cvvError, false)
             return false
-        }else if (binding.etCVVNumber.text.toString().length ==1 || binding.etCVVNumber.text.toString().length ==2 ){
+        } else if (binding.etCVVNumber.text.toString().length == 1 || binding.etCVVNumber.text.toString().length == 2) {
             BaseApplication.alertError(requireContext(), ErrorMessage.cvvValidError, false)
             return false
-        }else if (binding.etMonth.text.toString().equals("Month",true)){
+        } else if (binding.etMonth.text.toString().equals("Month", true)) {
             BaseApplication.alertError(requireContext(), ErrorMessage.monthError, false)
             return false
-        }else if (binding.etYear.text.toString().equals("Year",true)){
+        } else if (binding.etYear.text.toString().equals("Year", true)) {
             BaseApplication.alertError(requireContext(), ErrorMessage.yearError, false)
             return false
         }
@@ -1195,38 +1269,40 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
 
 
     private fun setupBackNavigation() {
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(
+            requireActivity(),
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
     }
 
     override fun itemSelect(position: Int?, status: String?, type: String?) {
-         if (status!!.equals("card",true)){
-             if (type!!.equals("delete",true)){
-                 if (BaseApplication.isOnline(requireActivity())) {
-                     deleteApi(position,status)
-                 } else {
-                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                 }
-             }/*else{
-                 showWithdrawAmountDialog(position)
-             }*/
-
-         }
-
-        if (status.equals("Bank",true)){
-            if (type!!.equals("delete",true)){
+        if (status!!.equals("card", true)) {
+            if (type!!.equals("delete", true)) {
                 if (BaseApplication.isOnline(requireActivity())) {
-                    deleteBankApi(position,status)
+                    deleteApi(position, status)
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-            }else{
-                if (bankDataLocal[position!!].brand.toString().equals("true",true)){
+            }/*else{
+                 showWithdrawAmountDialog(position)
+             }*/
+
+        }
+
+        if (status.equals("Bank", true)) {
+            if (type!!.equals("delete", true)) {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    deleteBankApi(position, status)
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            } else {
+                if (bankDataLocal[position!!].brand.toString().equals("true", true)) {
                     showWithdrawAmountDialog(position)
-                }else{
+                } else {
                     showAlert(ErrorMessage.bankVerifyError, false)
                 }
             }
@@ -1236,26 +1312,25 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
     }
 
 
-    private fun deleteApi(position: Int?, type: String){
+    private fun deleteApi(position: Int?, type: String) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             viewModel.deleteCardRequest({
                 BaseApplication.dismissMe()
-                handleApiDeleteCardResponse(it,position,type)
-            }, dataLocal[position!!].card_id.toString(),dataLocal[position].customer_id.toString())
+                handleApiDeleteCardResponse(it, position, type)
+            }, dataLocal[position!!].card_id.toString(), dataLocal[position].customer_id.toString())
         }
     }
 
-    private fun deleteBankApi(position: Int?, type: String){
+    private fun deleteBankApi(position: Int?, type: String) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             viewModel.deleteBankRequest({
                 BaseApplication.dismissMe()
-                handleApiDeleteCardResponse(it,position,type)
+                handleApiDeleteCardResponse(it, position, type)
             }, bankDataLocal[position!!].customer_id!!)
         }
     }
-
 
 
     @SuppressLint("SetTextI18n")
@@ -1272,42 +1347,61 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
         }
 
 
-        val etWithdrawalAmount=dialog.findViewById<EditText>(R.id.etWithdrawalAmount)
+        val etWithdrawalAmount = dialog.findViewById<EditText>(R.id.etWithdrawalAmount)
 
         dialog.findViewById<ImageView>(R.id.imageCross).setOnClickListener {
             dialog.dismiss()
         }
 
-        if (amount!=null){
-            dialog.findViewById<TextView>(R.id.textAvailableBalance).text = "Available Balance :$amount"
+        if (amount != null) {
+            dialog.findViewById<TextView>(R.id.textAvailableBalance).text =
+                "Available Balance :$amount"
         }
 
 
         dialog.findViewById<RelativeLayout>(R.id.rlWithdrawAmountButton).setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
-                val localAmount = amount?.replace("$", "")?.trim()?.toString()?.toDouble()
+                val localAmount = amount?.replace("$", "")?.trim()?.toDouble()
                 val userEnteredAmount = etWithdrawalAmount.text.toString()
 
-                if (userEnteredAmount.trim().isEmpty()){
-                    BaseApplication.alertError(requireContext(), ErrorMessage.amountEmptyError, false)
-                }else{
+                if (userEnteredAmount.trim().isEmpty()) {
+                    BaseApplication.alertError(
+                        requireContext(),
+                        ErrorMessage.amountEmptyError,
+                        false
+                    )
+                } else {
                     if (localAmount != null) {
                         if (localAmount <= userEnteredAmount.toDouble()) {
-                            BaseApplication.alertError(requireContext(), ErrorMessage.amounthightError, false)
+                            BaseApplication.alertError(
+                                requireContext(),
+                                ErrorMessage.amounthightError,
+                                false
+                            )
                         } else if (userEnteredAmount.toDouble() == 0.0) {
                             // Handle the case where the local amount is lower than the entered amount
-                            BaseApplication.alertError(requireContext(), ErrorMessage.amountlowError, false)
+                            BaseApplication.alertError(
+                                requireContext(),
+                                ErrorMessage.amountlowError,
+                                false
+                            )
                         } else {
                             // Amounts are equal; proceed with the transfer
-                            transferAmount(dialog, bankDataLocal[position!!].customer_id, localAmount.toString())
+                            transferAmount(
+                                dialog,
+                                bankDataLocal[position!!].customer_id,
+                                localAmount.toString()
+                            )
                         }
                     } else {
                         // Handle the case where localAmount is null
-                        BaseApplication.alertError(requireContext(), ErrorMessage.amountError, false)
+                        BaseApplication.alertError(
+                            requireContext(),
+                            ErrorMessage.amountError,
+                            false
+                        )
                     }
                 }
-
-
 
 
             } else {
@@ -1318,19 +1412,19 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
         dialog.show()
     }
 
- private fun transferAmount(dialog: Dialog?, customerId: String?, amount: String?) {
-     if (BaseApplication.isOnline(requireActivity())) {
+    private fun transferAmount(dialog: Dialog?, customerId: String?, amount: String?) {
+        if (BaseApplication.isOnline(requireActivity())) {
             BaseApplication.showMe(requireContext())
-         lifecycleScope.launch {
-             viewModel.transferAmountRequest({
-                 BaseApplication.dismissMe()
-                 handleApiTransferResponse(it,dialog)
-             }, amount!!,customerId!!)
-         }
-     } else {
-         BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-     }
- }
+            lifecycleScope.launch {
+                viewModel.transferAmountRequest({
+                    BaseApplication.dismissMe()
+                    handleApiTransferResponse(it, dialog)
+                }, amount!!, customerId!!)
+            }
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
 
 
 }

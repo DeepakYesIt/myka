@@ -402,7 +402,6 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
                 binding?.apply {
                     tvBio.visibility = View.VISIBLE
                     tvBio.isEnabled = false
-//                imageProfile.isClickable = false
                     imageNameEditable.visibility = View.GONE
                     imageEditTargets.visibility = View.GONE
                     relProfileNameImage.setBackgroundResource(R.drawable.calendar_events_bg)

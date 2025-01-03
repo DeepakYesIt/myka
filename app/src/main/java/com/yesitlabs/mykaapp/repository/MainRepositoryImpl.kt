@@ -594,7 +594,20 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
         productUpdates: String,
         promotionalUpdates: String
     ) {
-        TODO("Not yet implemented")
+        try {
+            api.notificationRequestApi(pushNotification,recipeRecommendations,productUpdates,promotionalUpdates).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
     }
 
     override suspend fun getCardAndBankRequestApi(successCallback: (response: NetworkResult<String>) -> Unit) {

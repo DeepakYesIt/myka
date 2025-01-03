@@ -62,6 +62,8 @@ interface MainRepository {
  suspend fun upDateImageNameRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, Image: MultipartBody.Part?, name: RequestBody)
 
  suspend fun addCardRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, token: String)
+
+
  suspend fun notificationRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, pushNotification: String,recipeRecommendations: String,productUpdates: String,promotionalUpdates: String)
 
  suspend fun getCardAndBankRequestApi(successCallback: (response: NetworkResult<String>) -> Unit)

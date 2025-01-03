@@ -201,6 +201,14 @@ interface ApiInterface {
     suspend fun addCardRequestApi(@Field("stripe_token") stripeToken:String):Response<JsonObject>
 
 
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateNotificationUrl)
+    suspend fun notificationRequestApi(@Field("push_notification") pushNotification:String,
+                                       @Field("recipe_recommendations") recipeRecommendations:String,
+                                       @Field("product_updates") productUpdates:String,
+                                       @Field("promotional_updates") promotionalUpdates:String):Response<JsonObject>
+
+
     @POST(ApiEndPoint.getCardBankUrl)
     suspend fun getCardAndBankRequestApi():Response<JsonObject>
 

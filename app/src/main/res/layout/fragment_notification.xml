@@ -70,7 +70,7 @@
                    android:fontFamily="@font/montserrat_semibold"
                    android:text="@string/enable_all_notification"
                    android:textSize="@dimen/_13sdp"
-                   app:drawableEndCompat="@drawable/toggle_on_icon" />
+                   app:drawableEndCompat="@drawable/toggle_gray_off_icon" />
 
            </RelativeLayout>
 
@@ -94,7 +94,7 @@
                    android:drawablePadding="@dimen/_10sdp"
                    android:text="Push notification"
                    android:textSize="@dimen/_13sdp"
-                   app:drawableEndCompat="@drawable/toggle_on_icon" />
+                   app:drawableEndCompat="@drawable/toggle_gray_off_icon" />
 
            </RelativeLayout>
 
@@ -139,7 +139,7 @@
                    android:drawablePadding="@dimen/_10sdp"
                    android:text="Product Updates"
                    android:textSize="@dimen/_13sdp"
-                   app:drawableEndCompat="@drawable/toggle_on_icon" />
+                   app:drawableEndCompat="@drawable/toggle_gray_off_icon" />
            </RelativeLayout>
 
            <RelativeLayout
@@ -156,11 +156,11 @@
                    android:layout_centerVertical="true"
                    android:fontFamily="@font/montserrat_semibold"
                    android:gravity="center|start"
-                   android:drawableStart="@drawable/promotional_icon"
                    android:drawablePadding="@dimen/_10sdp"
                    android:text="Promotional Updates"
                    android:textSize="@dimen/_13sdp"
-                   app:drawableEndCompat="@drawable/toggle_on_icon" />
+                   app:drawableEndCompat="@drawable/toggle_gray_off_icon"
+                   app:drawableStartCompat="@drawable/promotional_icon" />
            </RelativeLayout>
        </RelativeLayout>
    </ScrollView>
