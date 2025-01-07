@@ -67,6 +67,7 @@ class CookingForScreenActivity : AppCompatActivity() {
         ///handle click event for next screen MYSelf, MyPartner or MyFamily
         binding!!.rlNextCooking.setOnClickListener{
             sessionManagement.setCookingFor(clickStatus!!)
+            sessionManagement.setCookingScreen("")
             val intent = Intent(this@CookingForScreenActivity, CookingForMyselfActivity::class.java)
             startActivity(intent)
         }

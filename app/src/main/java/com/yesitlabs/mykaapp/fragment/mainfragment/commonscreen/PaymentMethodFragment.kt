@@ -33,9 +33,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.gson.Gson
-import com.jaiselrahman.filepicker.activity.FilePickerActivity
-import com.jaiselrahman.filepicker.config.Configurations
-import com.jaiselrahman.filepicker.model.MediaFile
 import com.skydoves.powerspinner.PowerSpinnerView
 import com.stripe.android.ApiResultCallback
 import com.stripe.android.Stripe
@@ -59,6 +56,7 @@ import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.api
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.apiresponsetransfer.TransferModel
 import com.yesitlabs.mykaapp.listener.CardBankListener
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -68,7 +66,7 @@ import java.io.File
 import java.util.Calendar
 import java.util.Objects
 
-
+@AndroidEntryPoint
 class PaymentMethodFragment : Fragment(), CardBankListener {
 
     private lateinit var binding: FragmentPaymentMethodBinding
@@ -120,11 +118,7 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
             amount = requireArguments().getString("amount", "$ 0").toString()
         }
 
-        ActivityCompat.requestPermissions(
-            requireActivity(),
-            permissions(),
-            REQUEST_CODE_STORAGE_PERMISSION
-        )
+        ActivityCompat.requestPermissions(requireActivity(), permissions(), REQUEST_CODE_STORAGE_PERMISSION)
 
 
         setupBackNavigation()
@@ -667,8 +661,6 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
                 .maxResultSize(1080, 1080)
                 .start()
         }
-
-
     }
 
     private fun fileIntentMulti() {

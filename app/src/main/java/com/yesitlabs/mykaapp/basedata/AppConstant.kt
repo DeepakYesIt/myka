@@ -9,6 +9,7 @@ class AppConstant {
         const val checkTypeSession: String="CheckType"
         const val jobId: String="JobId"
         const val cookingFor: String="CookingFor"
+        const val cookingScreen: String="CookingScreen"
         const val authToken: String="Token"
         const val LOGIN_SESSION:String="login_session"
         val Id: String?="ID"

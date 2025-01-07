@@ -305,6 +305,15 @@ class SessionManagement(var context: Context) {
         return pref?.getString(AppConstant.cookingFor, "")
     }
 
+    fun setCookingScreen(cookingFor: String) {
+        editor!!.putString(AppConstant.cookingScreen, cookingFor)
+        editor!!.commit()
+    }
+
+    fun getCookingScreen(): String? {
+        return pref?.getString(AppConstant.cookingScreen, "")
+    }
+
     fun sessionClear(){
         editor?.apply()
         editor?.clear()

@@ -85,12 +85,16 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
             requireActivity(),
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (sessionManagement.getCookingFor().equals("Myself")) {
-                        val intent = Intent(requireActivity(), CookingForMyselfActivity::class.java)
-                        startActivity(intent)
-                    } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-                        findNavController().navigateUp()
-                    } else {
+                    if (sessionManagement.getCookingScreen().equals("")){
+                        if (sessionManagement.getCookingFor().equals("Myself")) {
+                            val intent = Intent(requireActivity(), CookingForMyselfActivity::class.java)
+                            startActivity(intent)
+                        } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
+                            findNavController().navigateUp()
+                        } else {
+                            findNavController().navigateUp()
+                        }
+                    }else{
                         findNavController().navigateUp()
                     }
                 }
@@ -158,13 +162,16 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
     private fun initialize() {
 
         binding!!.imageBackBodyGoals.setOnClickListener {
-            if (sessionManagement.getCookingFor().equals("Myself")) {
-                val intent = Intent(requireActivity(), CookingForMyselfActivity::class.java)
-                startActivity(intent)
-            } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-//                NavAnimations.navigateBack(findNavController())
-                findNavController().navigateUp()
-            } else {
+            if (sessionManagement.getCookingScreen().equals("")){
+                if (sessionManagement.getCookingFor().equals("Myself")) {
+                    val intent = Intent(requireActivity(), CookingForMyselfActivity::class.java)
+                    startActivity(intent)
+                } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
+                    findNavController().navigateUp()
+                } else {
+                    findNavController().navigateUp()
+                }
+            }else{
                 findNavController().navigateUp()
             }
         }

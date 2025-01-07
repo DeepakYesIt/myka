@@ -159,7 +159,7 @@
         tools:layout="@layout/fragment_edit_profile" />
     <fragment
         android:id="@+id/preferencesFragment"
-        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.profilesetting.PreferencesFragment"
+        android:name="com.yesitlabs.mykaapp.fragment.mainfragment.profilesetting.preferencesScreen.PreferencesFragment"
         android:label="fragment_preferences"
         tools:layout="@layout/fragment_preferences" />
     <fragment

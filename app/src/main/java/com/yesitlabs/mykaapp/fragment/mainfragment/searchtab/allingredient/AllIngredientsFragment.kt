@@ -18,6 +18,7 @@ import com.yesitlabs.mykaapp.model.DataModel
 import java.util.Locale
 
 class AllIngredientsFragment : Fragment(),View.OnClickListener {
+
     private var binding:FragmentAllIngredientsBinding?=null
     private var adapterAllIngItem: AdapterAllIngredientsItem? = null
     private val dataList = ArrayList<DataModel>()
