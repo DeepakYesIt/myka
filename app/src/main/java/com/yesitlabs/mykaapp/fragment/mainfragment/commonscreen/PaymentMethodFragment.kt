@@ -66,6 +66,7 @@ import java.io.File
 import java.util.Calendar
 import java.util.Objects
 
+
 @AndroidEntryPoint
 class PaymentMethodFragment : Fragment(), CardBankListener {
 
@@ -74,6 +75,9 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
     private var stripe: Stripe? = null
     private var month: Int = 0
     private var year: Int = 0
+
+
+
     private lateinit var adapterCard: MyWalletAdapter
     private lateinit var adapterCardBank: MyWalletBankAdapter
     private var dataLocal: MutableList<CardData> = mutableListOf()

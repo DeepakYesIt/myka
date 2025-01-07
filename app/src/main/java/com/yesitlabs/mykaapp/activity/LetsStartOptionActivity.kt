@@ -11,6 +11,7 @@ import com.yesitlabs.mykaapp.databinding.ActivityLetsStartOptionBinding
 class LetsStartOptionActivity : AppCompatActivity() {
     private var binding: ActivityLetsStartOptionBinding? = null
 
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLetsStartOptionBinding.inflate(LayoutInflater.from(this))

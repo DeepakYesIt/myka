@@ -40,6 +40,10 @@ object ApiEndPoint {
     const val logOutUrl="user-Logout"
     const val deleteUrl="user-Logout"
     const val updateNotificationUrl="update-notification"
+    const val recipeDetailsUrl="get-recipe"
+    const val allRecipeUrl="all-recipe"
+    const val likeUnlikeUrl="add-to-favorite"
+    const val addBasketeUrl="add-to-basket"
 
 
 

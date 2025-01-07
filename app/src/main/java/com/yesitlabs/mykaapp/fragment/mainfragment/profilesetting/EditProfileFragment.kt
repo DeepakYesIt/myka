@@ -30,6 +30,7 @@ import com.yesitlabs.mykaapp.activity.MainActivity
 import com.yesitlabs.mykaapp.apiInterface.BaseUrl
 import com.yesitlabs.mykaapp.basedata.BaseApplication
 import com.yesitlabs.mykaapp.basedata.NetworkResult
+import com.yesitlabs.mykaapp.basedata.SessionManagement
 import com.yesitlabs.mykaapp.databinding.FragmentEditProfileBinding
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.settingviewmodel.SettingViewModel
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.ProfileRootResponse
@@ -47,6 +48,7 @@ class EditProfileFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: SettingViewModel
     private var file: File? = null
+    private lateinit var sessionManagement: SessionManagement
 
     private val pickImageLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -145,7 +147,7 @@ class EditProfileFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentEditProfileBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[SettingViewModel::class.java]
-
+        sessionManagement = SessionManagement(requireContext())
 
 
         setupUI()
@@ -240,6 +242,8 @@ class EditProfileFragment : Fragment() {
             val apiModel = Gson().fromJson(data, ProfileRootResponse::class.java)
             Log.d("@@@ Health profile", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
+                apiModel.data.profile_img?.let { sessionManagement.setImage(it) }
+                apiModel.data.name?.let { sessionManagement.setUserName(it) }
                  findNavController().navigateUp()
             } else {
                 if (apiModel.code == ErrorMessage.code) {

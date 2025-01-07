@@ -1,10 +1,13 @@
 package com.yesitlabs.mykaapp.fragment.mainfragment.hometab
 
 import android.R.attr.value
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,21 +19,39 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
+import com.google.gson.Gson
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.activity.MainActivity
 import com.yesitlabs.mykaapp.adapter.AdapterRecipeItem
 import com.yesitlabs.mykaapp.adapter.ChooseDayAdapter
 import com.yesitlabs.mykaapp.adapter.CookWareAdapter
 import com.yesitlabs.mykaapp.adapter.IngredientsRecipeAdapter
+import com.yesitlabs.mykaapp.basedata.BaseApplication
+import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.databinding.FragmentRecipeDetailsBinding
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.recipedetails.RecipeDetailsViewModel
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.recipedetails.apiresponse.Data
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.recipedetails.apiresponse.RecipeDetailsApiResponse
+import com.yesitlabs.mykaapp.messageclass.ErrorMessage
 import com.yesitlabs.mykaapp.model.DataModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.Objects
 
 
+@AndroidEntryPoint
 class RecipeDetailsFragment : Fragment() {
 
     private var binding: FragmentRecipeDetailsBinding? = null
@@ -47,17 +68,154 @@ class RecipeDetailsFragment : Fragment() {
     private var selectAll:Boolean?=false
     private var quantity:Int=1
     private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+    private lateinit var viewModel: RecipeDetailsViewModel
+    private var uri:String=""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentRecipeDetailsBinding.inflate(layoutInflater, container, false)
+        viewModel = ViewModelProvider(requireActivity())[RecipeDetailsViewModel::class.java]
+
+        uri=arguments?.getString("uri","").toString()
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
 
+        setupBackNavigation()
+
+
+        ingredientsModel()
+        initialize()
+
+        // When screen load then api call
+        fetchDataOnLoad()
+
+        return binding!!.root
+    }
+
+    private fun fetchDataOnLoad() {
+        if (BaseApplication.isOnline(requireActivity())) {
+            fetchRecipeDetailsData()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
+
+
+    private fun fetchRecipeDetailsData() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.recipeDetailsRequest({
+                BaseApplication.dismissMe()
+                handleApiResponse(it)
+            }, uri)
+        }
+    }
+
+    private fun handleApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, RecipeDetailsApiResponse::class.java)
+            Log.d("@@@ Recipe Details ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data!=null && apiModel.data.size>0){
+                    showData(apiModel.data)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showData(data: MutableList<Data>) {
+
+        if (data[0].recipe?.images?.THUMBNAIL?.url!=null){
+            Glide.with(requireContext())
+                .load(data[0].recipe?.images?.THUMBNAIL?.url)
+                .error(R.drawable.no_image)
+                .placeholder(R.drawable.no_image)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        binding!!.layProgess.root.visibility=View.GONE
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        binding!!.layProgess.root.visibility=View.GONE
+                        return false
+                    }
+                })
+                .into(binding!!.imageData)
+        }else{
+            binding!!.layProgess.root.visibility=View.GONE
+        }
+
+        if (data[0].recipe?.label!=null){
+            binding!!.tvTitle.text = ""+data[0].recipe?.label
+        }
+
+        if (data[0].recipe?.calories!=null){
+            binding!!.tvCalories.text = ""+data[0].recipe?.calories?.toInt()
+        }
+
+        if (data[0].recipe?.totalNutrients?.FAT?.quantity!=null){
+            binding!!.tvFat.text = ""+data[0].recipe?.totalNutrients?.FAT?.quantity?.toInt()
+        }
+
+        if (data[0].recipe?.totalNutrients?.PROCNT?.quantity!=null){
+            binding!!.tvProtein.text = ""+data[0].recipe?.totalNutrients?.PROCNT?.quantity?.toInt()
+        }
+
+        if (data[0].recipe?.totalNutrients?.CHOCDF?.quantity!=null){
+            binding!!.tvCarbs.text = ""+data[0].recipe?.totalNutrients?.CHOCDF?.quantity?.toInt()
+        }
+
+
+        if (data[0].recipe?.totalTime!=null){
+            binding!!.tvTotaltime.text = ""+data[0].recipe?.totalTime+" min "
+        }
+
+
+    }
+
+    private fun showAlert(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
+    }
+
+
+
+    private fun setupBackNavigation() {
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
             object : OnBackPressedCallback(true) {
@@ -65,12 +223,8 @@ class RecipeDetailsFragment : Fragment() {
                     findNavController().navigateUp()
                 }
             })
-
-        ingredientsModel()
-        initialize()
-
-        return binding!!.root
     }
+
 
     private fun initialize() {
 
@@ -403,6 +557,8 @@ class RecipeDetailsFragment : Fragment() {
         dataList.add(data3)
         dataList.add(data4)
         dataList.add(data5)
+
+
 
         ingredientsRecipeAdapter = IngredientsRecipeAdapter(dataList, requireActivity())
         binding!!.rcyIngCookWareRecipe.adapter = ingredientsRecipeAdapter

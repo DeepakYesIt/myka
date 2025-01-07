@@ -51,8 +51,8 @@
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardViewRecipeDetails"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_130sdp"
-                android:layout_marginHorizontal="@dimen/_15sdp"
+                android:layout_height="@dimen/_160sdp"
+                android:layout_marginHorizontal="@dimen/_12sdp"
                 app:cardCornerRadius="@dimen/_12sdp">
 
                 <RelativeLayout
@@ -60,12 +60,20 @@
                     android:layout_height="wrap_content">
 
                     <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/imageData"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/_130sdp"
+                        android:layout_height="match_parent"
                         android:adjustViewBounds="true"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/dummy_img"
+                        android:src="@drawable/no_image"
                         app:shapeAppearanceOverlay="@style/CornerCut" />
+
+                    <include
+                        android:id="@+id/lay_progess"
+                        layout="@layout/progess_loader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -83,11 +91,12 @@
                             android:paddingStart="@dimen/_10sdp">
 
                             <TextView
+                                android:id="@+id/tv_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/_5sdp"
                                 android:fontFamily="@font/poppins_medium"
-                                android:text="Instant Pot Lentil Gumbo"
+                                android:text=""
                                 android:textColor="#FFFFFF"
                                 android:textSize="@dimen/_13sdp" />
 
@@ -128,7 +137,7 @@
                 android:id="@+id/cardViewNutrition"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_15sdp"
+                android:layout_marginHorizontal="@dimen/_12sdp"
                 android:layout_marginTop="@dimen/_15sdp"
                 android:layout_below="@+id/cardViewRecipeDetails"
                 android:layout_marginBottom="@dimen/_2sdp"
@@ -203,11 +212,12 @@
                                     android:src="@drawable/calories_icon_svg" />
 
                                 <TextView
+                                    android:id="@+id/tv_Calories"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
-                                    android:text="25"
+                                    android:text="0"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
@@ -243,11 +253,12 @@
                                     android:src="@drawable/fat_icon" />
 
                                 <TextView
+                                    android:id="@+id/tv_Fat"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
-                                    android:text="25"
+                                    android:text="0"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
@@ -283,11 +294,12 @@
                                     android:src="@drawable/carbs_icon_svg" />
 
                                 <TextView
+                                    android:id="@+id/tv_Carbs"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
-                                    android:text="35"
+                                    android:text="0"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
@@ -323,11 +335,12 @@
                                     android:src="@drawable/protin_icon" />
 
                                 <TextView
+                                    android:id="@+id/tv_Protein"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
-                                    android:text="45"
+                                    android:text="0"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
@@ -378,11 +391,12 @@
                                 </LinearLayout>
 
                                 <TextView
+                                    android:id="@+id/tv_totaltime"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="@dimen/_5sdp"
                                     android:fontFamily="@font/poppins_medium"
-                                    android:text="25 min"
+                                    android:text="0 min"
                                     android:textColor="#FE9F45"
                                     android:textSize="@dimen/_12sdp" />
                             </LinearLayout>
@@ -427,7 +441,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="@dimen/_5sdp"
                                     android:fontFamily="@font/poppins_medium"
-                                    android:text="20 min"
+                                    android:text="0 min"
                                     android:textColor="#FE9F45"
                                     android:textSize="@dimen/_12sdp" />
                             </LinearLayout>
@@ -441,7 +455,7 @@
                 android:id="@+id/materialIngCookRecipe"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_15sdp"
+                android:layout_marginHorizontal="@dimen/_12sdp"
                 android:layout_marginTop="@dimen/_15sdp"
                 android:layout_below="@+id/cardViewNutrition"
                 android:layout_marginBottom="@dimen/_2sdp"
@@ -681,6 +695,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/relServingsPeople"
                 android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginHorizontal="@dimen/_12sdp"
                 android:orientation="vertical"
                 android:nestedScrollingEnabled="false"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
@@ -698,6 +713,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/_10sdp"
+                android:layout_marginHorizontal="@dimen/_12sdp"
                 android:layout_below="@+id/rcyIngCookWareRecipe">
 
                 <TextView

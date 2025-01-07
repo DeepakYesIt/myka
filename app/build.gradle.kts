@@ -82,10 +82,10 @@ dependencies {
     //image picker
     implementation("com.github.Dhaval2404:ImagePicker:v2.1")
 
-    //glide
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    implementation("com.github.bumptech.glide:glide:4.9.0")
-    implementation("com.github.bumptech.glide:compiler:4.9.0")
+
+    // Glide
+    implementation ("com.github.bumptech.glide:glide:4.15.1")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
 
     //google Firebase
     implementation("com.google.android.libraries.places:places:3.2.0")

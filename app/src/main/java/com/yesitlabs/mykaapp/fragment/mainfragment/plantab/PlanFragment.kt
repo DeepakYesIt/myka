@@ -1,9 +1,13 @@
 package com.yesitlabs.mykaapp.fragment.mainfragment.plantab
 
+import PlanApiResponse
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Html
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,11 +17,16 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
+import com.google.gson.Gson
 import com.yesitlabs.mykaapp.OnItemClickListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.activity.MainActivity
@@ -25,9 +34,20 @@ import com.yesitlabs.mykaapp.adapter.AdapterPlanBreakFast
 import com.yesitlabs.mykaapp.adapter.CalendarDayAdapter
 import com.yesitlabs.mykaapp.adapter.ChooseDayAdapter
 import com.yesitlabs.mykaapp.adapter.ImageViewPagerAdapter
+import com.yesitlabs.mykaapp.apiInterface.BaseUrl
+import com.yesitlabs.mykaapp.basedata.BaseApplication
+import com.yesitlabs.mykaapp.basedata.NetworkResult
+import com.yesitlabs.mykaapp.basedata.SessionManagement
 import com.yesitlabs.mykaapp.databinding.FragmentPlanBinding
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.PlanViewModel
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.Data
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.RecipesModel
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
+import com.yesitlabs.mykaapp.messageclass.ErrorMessage
 import com.yesitlabs.mykaapp.model.CalendarDataModel
 import com.yesitlabs.mykaapp.model.DataModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Arrays
 import java.util.Calendar
@@ -46,36 +66,230 @@ class PlanFragment : Fragment(), OnItemClickListener {
     private var rcyChooseDaySch: RecyclerView? = null
     private var tvWeekRange: TextView? = null
     private var planBreakFastAdapter: AdapterPlanBreakFast? = null
-    private var status:Boolean=true
-    private var clickable:String?=""
+    private var status: Boolean = true
+    private var clickable: String? = ""
+    private lateinit var viewModel: PlanViewModel
+    private var recipesModel: RecipesModel? = null
 
-    lateinit var  adapter : ImageViewPagerAdapter
+    // Separate adapter instances for each RecyclerView
+    var breakfastAdapter: AdapterPlanBreakFast? = null
+    var lunchAdapter: AdapterPlanBreakFast? = null
+    var dinnerAdapter: AdapterPlanBreakFast? = null
+    private lateinit var sessionManagement: SessionManagement
 
-    private lateinit var layonboarding_indicator : LinearLayout
+    lateinit var adapter: ImageViewPagerAdapter
+
+    private lateinit var layonboarding_indicator: LinearLayout
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentPlanBinding.inflate(inflater, container, false)
-
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
-
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
+        viewModel = ViewModelProvider(requireActivity())[PlanViewModel::class.java]
+        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
+        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
+        sessionManagement = SessionManagement(requireContext())
+        requireActivity().onBackPressedDispatcher.addCallback(
+            requireActivity(),
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
 
         (activity as MainActivity?)?.changeBottom("plan")
+
+
+
+        if (sessionManagement.getImage()!=null){
+            Glide.with(requireContext())
+                .load(BaseUrl.imageBaseUrl+sessionManagement.getImage())
+                .placeholder(R.drawable.mask_group_icon)
+                .error(R.drawable.mask_group_icon)
+                .into(binding!!.imageProfile)
+        }
+
+
+        if (sessionManagement.getUserName()!=null){
+            binding?.tvName?.text =sessionManagement.getUserName()+"’s week"
+        }
 
         planBreakFastModel()
         planLunchModel()
         planDinnerModel()
 
-        binding!!.tvAddAnotherMealBtn.setOnClickListener{
+        setUpListener()
+
+        // When screen load then api call
+        fetchDataOnLoad()
+
+        val imageList = Arrays.asList<Int>(
+            R.drawable.ic_food_image,
+            R.drawable.ic_food_image,
+            R.drawable.ic_food_image
+        )
+        adapter = ImageViewPagerAdapter(requireContext(), imageList)
+
+        updateWeek()
+
+        return binding!!.root
+    }
+
+    private fun fetchDataOnLoad() {
+        if (BaseApplication.isOnline(requireActivity())) {
+            fetchRecipeDetailsData()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
+    private fun fetchRecipeDetailsData() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.planRequest({
+                BaseApplication.dismissMe()
+                handleApiResponse(it)
+            }, "q")
+        }
+    }
+
+    private fun handleApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, PlanApiResponse::class.java)
+            Log.d("@@@ Plan List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data != null) {
+                    showData(apiModel.data)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleLikeAndUnlikeSuccessResponse(
+        data: String,
+        item: BreakfastModel,
+        adapter: AdapterPlanBreakFast?,
+        type: String,
+        mealList: MutableList<BreakfastModel>,
+        position: Int?
+    ) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ Plan List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                // Toggle the is_like value
+                item.is_like = if (item.is_like == 0) 1 else 0
+                mealList[position!!] = item
+                // Update the adapter
+                adapter?.updateList(mealList, type)
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleBasketSuccessResponse(
+        data: String
+    ) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ Plan List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+
+
+    private fun showData(data: Data) {
+
+        recipesModel = data.recipes
+
+        if (recipesModel != null) {
+            fun setupMealAdapter(
+                mealRecipes: MutableList<BreakfastModel>?,
+                recyclerView: RecyclerView,
+                type: String
+            ): AdapterPlanBreakFast? {
+                return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
+                    val adapter = AdapterPlanBreakFast(mealRecipes, requireActivity(), this, type)
+                    recyclerView.adapter = adapter
+                    adapter
+                } else {
+                    null
+                }
+            }
+
+            // Breakfast
+            if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
+                breakfastAdapter = setupMealAdapter(data.recipes?.Breakfast, binding!!.rcyBreakFast, "BreakFastPlan")
+                binding!!.linearBreakfast.visibility = View.VISIBLE
+            } else {
+                binding!!.linearBreakfast.visibility = View.GONE
+            }
+
+            // Lunch
+            if (recipesModel?.Lunch != null && recipesModel?.Lunch?.size!! > 0) {
+                lunchAdapter = setupMealAdapter(data.recipes?.Lunch, binding!!.rcyLunch, "BreakFastLunch")
+                binding!!.linearLunch.visibility = View.VISIBLE
+            } else {
+                binding!!.linearLunch.visibility = View.GONE
+            }
+
+            // Dinner
+            if (recipesModel?.Dinner != null && recipesModel?.Dinner?.size!! > 0) {
+                dinnerAdapter = setupMealAdapter(data.recipes?.Dinner, binding!!.rcyDinner, "BreakFastDinner")
+                binding!!.linearDinner.visibility = View.VISIBLE
+            } else {
+                binding!!.linearDinner.visibility = View.GONE
+            }
+
+        }
+
+    }
+
+    private fun showAlert(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
+    }
+
+    private fun setUpListener() {
+        binding!!.tvAddAnotherMealBtn.setOnClickListener {
             addAnotherMealDialog()
         }
 
@@ -87,47 +301,36 @@ class PlanFragment : Fragment(), OnItemClickListener {
             dialogDailyInspiration()
         }
 
-        binding!!.imageProfile.setOnClickListener{
+        binding!!.imageProfile.setOnClickListener {
             findNavController().navigate(R.id.settingProfileFragment)
         }
 
-        binding!!.imgHearRedIcons.setOnClickListener{
+        binding!!.imgHearRedIcons.setOnClickListener {
             findNavController().navigate(R.id.cookBookFragment)
         }
 
-        binding!!.imgBasketIcon.setOnClickListener{
+        binding!!.imgBasketIcon.setOnClickListener {
             findNavController().navigate(R.id.basketScreenFragment)
         }
 
-        binding!!.rlAddDayToBasket.setOnClickListener{
-            if (clickable==""){
+        binding!!.rlAddDayToBasket.setOnClickListener {
+            if (clickable == "") {
 
-            }else{
+            } else {
                 findNavController().navigate(R.id.basketScreenFragment)
             }
         }
 
         binding!!.tvConfirmBtn.setOnClickListener {
-            binding!!.llCalculateBmr.visibility=View.VISIBLE
-            binding!!.relBreakFastsss.visibility=View.VISIBLE
-            binding!!.relBreakFastsLunch.visibility=View.VISIBLE
-            binding!!.rcyBreakFast.visibility=View.GONE
-            binding!!.rcyLunch.visibility=View.GONE
+            binding!!.llCalculateBmr.visibility = View.VISIBLE
+            binding!!.relBreakFastsss.visibility = View.VISIBLE
+            binding!!.relBreakFastsLunch.visibility = View.VISIBLE
+            binding!!.rcyBreakFast.visibility = View.GONE
+            binding!!.rcyLunch.visibility = View.GONE
         }
-
-        val imageList = Arrays.asList<Int>(
-            R.drawable.ic_food_image,
-            R.drawable.ic_food_image,
-            R.drawable.ic_food_image
-        )
-        adapter =ImageViewPagerAdapter(requireContext(), imageList)
-
-        updateWeek()
-
-        return binding!!.root
     }
 
-    private fun dialogDailyInspiration(){
+    private fun dialogDailyInspiration() {
         val dialog = Dialog(requireContext(), R.style.BottomSheetDialog)
         dialog?.apply {
             setCancelable(false)
@@ -159,27 +362,27 @@ class PlanFragment : Fragment(), OnItemClickListener {
                 viewLunch.visibility = View.GONE
                 viewDinner.visibility = View.GONE
 
-                textBreakfast.setTextColor(ContextCompat.getColor(requireContext(),R.color.orange))
-                textDinner.setTextColor(ContextCompat.getColor(requireContext(),R.color.grey))
-                textLunch.setTextColor(ContextCompat.getColor(requireContext(),R.color.grey))
+                textBreakfast.setTextColor(ContextCompat.getColor(requireContext(), R.color.orange))
+                textDinner.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+                textLunch.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
             }
 
             llLunch.setOnClickListener {
                 viewBreakfast.visibility = View.GONE
                 viewLunch.visibility = View.VISIBLE
                 viewDinner.visibility = View.GONE
-                textBreakfast.setTextColor(ContextCompat.getColor(requireContext(),R.color.grey))
-                textLunch.setTextColor(ContextCompat.getColor(requireContext(),R.color.orange))
-                textDinner.setTextColor(ContextCompat.getColor(requireContext(),R.color.grey))
+                textBreakfast.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+                textLunch.setTextColor(ContextCompat.getColor(requireContext(), R.color.orange))
+                textDinner.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
             }
 
             llDinner.setOnClickListener {
                 viewBreakfast.visibility = View.GONE
                 viewLunch.visibility = View.GONE
                 viewDinner.visibility = View.VISIBLE
-                textBreakfast.setTextColor(ContextCompat.getColor(requireContext(),R.color.grey))
-                textLunch.setTextColor(ContextCompat.getColor(requireContext(),R.color.grey))
-                textDinner.setTextColor(ContextCompat.getColor(requireContext(),R.color.orange))
+                textBreakfast.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+                textLunch.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+                textDinner.setTextColor(ContextCompat.getColor(requireContext(), R.color.orange))
             }
 
             rlAddPlanButton.setOnClickListener {
@@ -210,7 +413,8 @@ class PlanFragment : Fragment(), OnItemClickListener {
             window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
             show()
-        }}
+        }
+    }
 
     private fun updateWeek() {
         val startOfWeek = calendar.apply {
@@ -237,7 +441,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
 
         layoutParams.setMargins(10, 0, 10, 0)
         for (i in indicator.indices) {
-            indicator[i] = ImageView( requireActivity())
+            indicator[i] = ImageView(requireActivity())
             indicator[i]!!.setImageDrawable(
                 ContextCompat.getDrawable(
                     requireActivity(),
@@ -298,22 +502,22 @@ class PlanFragment : Fragment(), OnItemClickListener {
 
         data1.title = "Bread"
         data1.isOpen = false
-        data1.rating="4.1(121)"
-        data1.price="3.2"
+        data1.rating = "4.1(121)"
+        data1.price = "3.2"
         data1.type = "BreakFastPlan"
         data1.image = R.drawable.bread_breakfast_image
 
         data2.title = "Juice"
         data2.isOpen = false
-        data2.rating="4.4(128)"
-        data2.price="3.4"
+        data2.rating = "4.4(128)"
+        data2.price = "3.4"
         data2.type = "BreakFastPlan"
         data2.image = R.drawable.fresh_juice_glass_image
 
         data3.title = "Bar-B-Q"
         data3.isOpen = false
-        data3.rating="4.3(125)"
-        data3.price="3.5"
+        data3.rating = "4.3(125)"
+        data3.price = "3.5"
         data3.type = "BreakFastPlan"
         data3.image = R.drawable.bar_b_q_breakfast_image
 
@@ -321,8 +525,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
         dataList1.add(data2)
         dataList1.add(data3)
 
-        planBreakFastAdapter = AdapterPlanBreakFast(dataList1, requireActivity(),this)
-        binding!!.rcyBreakFast.adapter = planBreakFastAdapter
+
     }
 
     private fun planLunchModel() {
@@ -332,22 +535,22 @@ class PlanFragment : Fragment(), OnItemClickListener {
 
         data1.title = "Bread"
         data1.isOpen = false
-        data1.rating="4.1(121)"
-        data1.price="3.2"
+        data1.rating = "4.1(121)"
+        data1.price = "3.2"
         data1.type = "BreakFastPlan"
         data1.image = R.drawable.bread_lunch_image
 
         data2.title = "Juice"
         data2.isOpen = false
-        data2.rating="4.4(128)"
-        data2.price="3.4"
+        data2.rating = "4.4(128)"
+        data2.price = "3.4"
         data2.type = "BreakFastPlan"
         data2.image = R.drawable.bar_b_q_breakfast_image
 
         data3.title = "Bar-B-Q"
         data3.isOpen = false
-        data3.rating="4.3(125)"
-        data3.price="3.5"
+        data3.rating = "4.3(125)"
+        data3.price = "3.5"
         data3.type = "BreakFastPlan"
         data3.image = R.drawable.bar_b_q_breakfast_image
 
@@ -355,8 +558,8 @@ class PlanFragment : Fragment(), OnItemClickListener {
         dataList2.add(data2)
         dataList2.add(data3)
 
-        planBreakFastAdapter = AdapterPlanBreakFast(dataList2, requireActivity(),this)
-        binding!!.rcyLunch.adapter = planBreakFastAdapter
+//        planBreakFastAdapter = AdapterPlanBreakFast(dataList2, requireActivity(),this)
+//        binding!!.rcyLunch.adapter = planBreakFastAdapter
     }
 
     private fun planDinnerModel() {
@@ -366,22 +569,22 @@ class PlanFragment : Fragment(), OnItemClickListener {
 
         data1.title = "Bread"
         data1.isOpen = false
-        data1.rating="4.1(121)"
-        data1.price="3.4"
+        data1.rating = "4.1(121)"
+        data1.price = "3.4"
         data1.type = "BreakFastPlan"
         data1.image = R.drawable.bread_dinner_image
 
         data2.title = "Juice"
         data2.isOpen = false
-        data2.rating="4.4(128)"
-        data2.price="3.5"
+        data2.rating = "4.4(128)"
+        data2.price = "3.5"
         data2.type = "BreakFastPlan"
         data2.image = R.drawable.fresh_juice_glass_image
 
         data3.title = "Bar-B-Q"
         data3.isOpen = false
-        data3.rating="4.3(125)"
-        data3.price="3.2"
+        data3.rating = "4.3(125)"
+        data3.price = "3.2"
         data3.type = "BreakFastPlan"
         data3.image = R.drawable.bar_b_q_breakfast_image
 
@@ -389,8 +592,8 @@ class PlanFragment : Fragment(), OnItemClickListener {
         dataList3.add(data2)
         dataList3.add(data3)
 
-        planBreakFastAdapter = AdapterPlanBreakFast(dataList3, requireActivity(),this)
-        binding!!.rcyDinner.adapter = planBreakFastAdapter
+//        planBreakFastAdapter = AdapterPlanBreakFast(dataList3, requireActivity(),this)
+//        binding!!.rcyDinner.adapter = planBreakFastAdapter
     }
 
     private fun chooseDayDialog() {
@@ -423,6 +626,8 @@ class PlanFragment : Fragment(), OnItemClickListener {
         btnNext.setOnClickListener {
             changeWeek(1)
         }
+
+
     }
 
     private fun changeWeek(weeks: Int) {
@@ -538,7 +743,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
             imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
         }
 
-        imageSnacksRadio.setOnClickListener{
+        imageSnacksRadio.setOnClickListener {
             imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
             imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
             imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
@@ -546,7 +751,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
             imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
         }
 
-        imageBrunchRadio.setOnClickListener{
+        imageBrunchRadio.setOnClickListener {
             imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
             imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
             imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
@@ -555,9 +760,9 @@ class PlanFragment : Fragment(), OnItemClickListener {
         }
 
         rlDoneBtn.setOnClickListener {
-            clickable="clicked"
+            clickable = "clicked"
             binding!!.rlAddDayToBasket.setBackgroundResource(R.drawable.green_btn_background)
-            binding!!.rlAddDayToBasket.isClickable=true
+            binding!!.rlAddDayToBasket.isClickable = true
             dialogChooseMealDay.dismiss()
         }
 
@@ -575,7 +780,10 @@ class PlanFragment : Fragment(), OnItemClickListener {
         val dialogAddItem: Dialog = context?.let { Dialog(it) }!!
         dialogAddItem.setContentView(R.layout.alert_dialog_add_another_meal)
         dialogAddItem.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialogAddItem.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialogAddItem.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
         val rlAddToPlan = dialogAddItem.findViewById<RelativeLayout>(R.id.rlAddToPlan)
         val tvChooseDessert = dialogAddItem.findViewById<TextView>(R.id.tvChooseDessert)
         val rlSelectDessert = dialogAddItem.findViewById<RelativeLayout>(R.id.rlSelectDessert)
@@ -589,50 +797,163 @@ class PlanFragment : Fragment(), OnItemClickListener {
             dialogAddItem.dismiss()
         }
 
-        rlSelectDessert.setOnClickListener{
-            if (status){
-                status=false
-                val drawableEnd = ContextCompat.getDrawable(requireActivity(), R.drawable.drop_up_icon)
-                drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
+        rlSelectDessert.setOnClickListener {
+            if (status) {
+                status = false
+                val drawableEnd =
+                    ContextCompat.getDrawable(requireActivity(), R.drawable.drop_up_icon)
+                drawableEnd!!.setBounds(
+                    0,
+                    0,
+                    drawableEnd.intrinsicWidth,
+                    drawableEnd.intrinsicHeight
+                )
                 tvChooseDessert.setCompoundDrawables(null, null, drawableEnd, null)
-                relSelectedSnack.visibility=View.VISIBLE
-            }else{
-                status=true
-                val drawableEnd = ContextCompat.getDrawable(requireActivity(), R.drawable.drop_down_icon)
-                drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
+                relSelectedSnack.visibility = View.VISIBLE
+            } else {
+                status = true
+                val drawableEnd =
+                    ContextCompat.getDrawable(requireActivity(), R.drawable.drop_down_icon)
+                drawableEnd!!.setBounds(
+                    0,
+                    0,
+                    drawableEnd.intrinsicWidth,
+                    drawableEnd.intrinsicHeight
+                )
                 tvChooseDessert.setCompoundDrawables(null, null, drawableEnd, null)
-                relSelectedSnack.visibility=View.GONE
+                relSelectedSnack.visibility = View.GONE
             }
         }
 
-        rlSelectSnack.setOnClickListener{
-            tvChooseDessert.text="Snack"
-            val drawableEnd = ContextCompat.getDrawable(requireActivity(), R.drawable.drop_down_icon)
+        rlSelectSnack.setOnClickListener {
+            tvChooseDessert.text = "Snack"
+            val drawableEnd =
+                ContextCompat.getDrawable(requireActivity(), R.drawable.drop_down_icon)
             drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
             tvChooseDessert.setCompoundDrawables(null, null, drawableEnd, null)
-            relSelectedSnack.visibility=View.GONE
-            status=true
+            relSelectedSnack.visibility = View.GONE
+            status = true
         }
 
-        rlSelectBrunch.setOnClickListener{
-            tvChooseDessert.text="Brunch"
-            val drawableEnd = ContextCompat.getDrawable(requireActivity(), R.drawable.drop_down_icon)
+        rlSelectBrunch.setOnClickListener {
+            tvChooseDessert.text = "Brunch"
+            val drawableEnd =
+                ContextCompat.getDrawable(requireActivity(), R.drawable.drop_down_icon)
             val drawableStart = ContextCompat.getDrawable(requireActivity(), R.drawable.gender_icon)
             drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
-            drawableStart!!.setBounds(0, 0, drawableStart.intrinsicWidth, drawableStart.intrinsicHeight)
+            drawableStart!!.setBounds(
+                0,
+                0,
+                drawableStart.intrinsicWidth,
+                drawableStart.intrinsicHeight
+            )
             tvChooseDessert.setCompoundDrawables(null, null, drawableEnd, null)
-            relSelectedSnack.visibility=View.GONE
-            status=true
+            relSelectedSnack.visibility = View.GONE
+            status = true
         }
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
-        if (status=="1"){
-            chooseDayDialog()
-        }else if (status=="2"){
-            findNavController().navigate(R.id.basketScreenFragment)
-        }else{
-            findNavController().navigate(R.id.recipeDetailsFragment)
+        when (status) {
+            "1" -> {
+                chooseDayDialog()
+            }
+            "2" -> {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    toggleIsLike(type!!,position,"basket")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
+            "3" -> {
+                val bundle = Bundle()
+                bundle.putString("uri", type)
+                findNavController().navigate(R.id.recipeDetailsFragment, bundle)
+            }
+            "4" -> {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    toggleIsLike(type!!,position,"like")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
         }
     }
+
+    private fun toggleIsLike(type: String, position: Int?, apiType: String) {
+        // Map the type to the corresponding list and adapter
+        val (mealList, adapter) = when (type) {
+            "BreakFastPlan" -> recipesModel?.Breakfast to breakfastAdapter
+            "BreakFastLunch" -> recipesModel?.Lunch to lunchAdapter
+            "BreakFastDinner" -> recipesModel?.Dinner to dinnerAdapter
+            else -> null to null
+        }
+        // Safely get the item and position
+        val item = mealList?.get(position!!)
+        if (item != null) {
+            if (item.recipe?.uri!=null){
+                if (apiType.equals("basket",true)){
+                    addBasketData(item.recipe.uri)
+                }else{
+                    val newLikeStatus = if (item.is_like == 0) "1" else "0"
+                    recipeLikeAndUnlikeData(item, adapter, type, mealList, position, newLikeStatus)
+                }
+            }
+        }
+    }
+
+
+
+    private fun recipeLikeAndUnlikeData(
+        item: BreakfastModel,
+        adapter: AdapterPlanBreakFast?,
+        type: String,
+        mealList: MutableList<BreakfastModel>,
+        position: Int?,
+        likeType: String
+    ) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.likeUnlikeRequest({
+                BaseApplication.dismissMe()
+                handleLikeAndUnlikeApiResponse(it,item,adapter,type,mealList,position)
+            }, item.recipe?.uri!!,likeType)
+        }
+    }
+
+    private fun addBasketData(uri: String) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.addBasketRequest({
+                BaseApplication.dismissMe()
+                handleBasketApiResponse(it)
+            }, uri,"")
+        }
+    }
+
+    private fun handleLikeAndUnlikeApiResponse(
+        result: NetworkResult<String>,
+        item: BreakfastModel,
+        adapter: AdapterPlanBreakFast?,
+        type: String,
+        mealList: MutableList<BreakfastModel>,
+        position: Int?
+    ) {
+        when (result) {
+            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(result.data.toString(),item,adapter,type,mealList,position)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    private fun handleBasketApiResponse(
+        result: NetworkResult<String>
+    ) {
+        when (result) {
+            is NetworkResult.Success -> handleBasketSuccessResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
 }
