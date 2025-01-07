@@ -35,7 +35,7 @@ object BaseApplication {
     private var dialog: Dialog? = null
 
     fun getColoredSpanned(text: String, color: String): String {
-        return "<font color=$color>$text</font>"
+        return "<font color=" + color.toString() + ">" + text.toString() + "</font>"
     }
 
     fun  alertError(context: Context?, msg:String?,status:Boolean){
@@ -106,6 +106,8 @@ object BaseApplication {
         val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
         return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
+
+
 
     fun showMe(context: Context?) {
         dialog = Dialog(context!!,R.style.CustomDialog)

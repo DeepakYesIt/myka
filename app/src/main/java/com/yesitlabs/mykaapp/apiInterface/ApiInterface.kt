@@ -209,8 +209,30 @@ interface ApiInterface {
                                        @Field("promotional_updates") promotionalUpdates:String):Response<JsonObject>
 
 
+    @FormUrlEncoded
+    @POST(ApiEndPoint.recipeDetailsUrl)
+    suspend fun recipeDetailsRequestApi(@Field("uri") url:String):Response<JsonObject>
+
+
     @POST(ApiEndPoint.getCardBankUrl)
     suspend fun getCardAndBankRequestApi():Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.allRecipeUrl)
+    suspend fun planRequestApi(@Field("q") q:String):Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.likeUnlikeUrl)
+    suspend fun likeUnlikeRequestApi(@Field("uri") uri:String
+                                     ,@Field("type") type:String):Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.addBasketeUrl)
+    suspend fun addBasketRequestApi(@Field("uri") uri:String
+                                     ,@Field("quantity") quantity:String):Response<JsonObject>
 
     @POST(ApiEndPoint.walletAmountUrl)
     suspend fun getWalletRequestApi():Response<JsonObject>

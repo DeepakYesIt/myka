@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Html
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -16,12 +17,16 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.yesitlabs.mykaapp.OnItemClickListener
 import com.yesitlabs.mykaapp.OnItemLongClickListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.activity.MainActivity
 import com.yesitlabs.mykaapp.adapter.AdapterSuperMarket
 import com.yesitlabs.mykaapp.adapter.IngredientsDinnerAdapter
+import com.yesitlabs.mykaapp.apiInterface.BaseUrl
+import com.yesitlabs.mykaapp.basedata.BaseApplication
+import com.yesitlabs.mykaapp.basedata.SessionManagement
 import com.yesitlabs.mykaapp.databinding.FragmentHomeBinding
 import com.yesitlabs.mykaapp.databinding.FragmentLoginBinding
 import com.yesitlabs.mykaapp.model.DataModel
@@ -35,14 +40,14 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private var statuses:String?=""
     private var checkStatus:Boolean?=false
     private var recySuperMarket:RecyclerView?=null
-
+    private lateinit var sessionManagement: SessionManagement
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-
+        sessionManagement = SessionManagement(requireContext())
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
 
@@ -166,6 +171,23 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     }
 
     private fun initialize() {
+
+
+        if (sessionManagement.getImage()!=null){
+            Glide.with(requireContext())
+                .load(BaseUrl.imageBaseUrl+sessionManagement.getImage())
+                .placeholder(R.drawable.mask_group_icon)
+                .error(R.drawable.mask_group_icon)
+                .into(binding!!.imageProfile)
+        }
+
+
+        if (sessionManagement.getUserName()!=null){
+            val name=BaseApplication.getColoredSpanned("Hello","#06C169") + BaseApplication.getColoredSpanned(" ,"+sessionManagement.getUserName(),"#000000")
+            binding?.tvName?.text =  Html.fromHtml(name)
+        }
+
+
         binding!!.rlSeeAllBtn.setOnClickListener(this)
         binding!!.textSeeAll.setOnClickListener(this)
 
@@ -180,6 +202,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         binding!!.imageRecipeSeeAll.setOnClickListener(this)
         binding!!.relMonthlySavings.setOnClickListener(this)
         binding!!.imageCheckSav.setOnClickListener(this)
+
 
     }
 

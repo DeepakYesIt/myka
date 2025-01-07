@@ -104,8 +104,8 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
         dataList3.add(data2)
         dataList3.add(data3)
 
-        planBreakFastAdapter = AdapterPlanBreakFast(dataList3, requireActivity(),this)
-        binding!!.rcySearchedItem.adapter = planBreakFastAdapter
+//        planBreakFastAdapter = AdapterPlanBreakFast(dataList3, requireActivity(),this)
+//        binding!!.rcySearchedItem.adapter = planBreakFastAdapter
     }
 
     private fun chooseDayDialog() {

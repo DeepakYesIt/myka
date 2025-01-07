@@ -1,8 +1,14 @@
 package com.yesitlabs.mykaapp.adapter
 
+import android.annotation.SuppressLint
+import android.content.Context.LAYOUT_INFLATER_SERVICE
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupWindow
+import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.yesitlabs.mykaapp.OnItemClickListener
@@ -10,7 +16,7 @@ import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.databinding.AdapterCookbookDetailsItemBinding
 import com.yesitlabs.mykaapp.model.DataModel
 
-class AdapterCookBookDetailsItem(private var datalist: List<DataModel>, private var requireActivity: FragmentActivity,private var onItemClickListener: OnItemClickListener)
+class AdapterCookBookDetailsItem(private var datalist: List<DataModel>, var requireActivity: FragmentActivity,private var onItemClickListener: OnItemClickListener)
     : RecyclerView.Adapter<AdapterCookBookDetailsItem.ViewHolder>() {
 
     private var isOpened:Boolean?=false
@@ -22,6 +28,7 @@ class AdapterCookBookDetailsItem(private var datalist: List<DataModel>, private 
         return ViewHolder(binding)
     }
 
+    @SuppressLint("MissingInflatedId", "SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         if (datalist[position].type=="ChristmasCollection"){
@@ -32,7 +39,6 @@ class AdapterCookBookDetailsItem(private var datalist: List<DataModel>, private 
         }
 
         holder.binding.tvBreakfast.text = datalist[position].title
-        holder.binding.relBreakfast.setBackgroundResource(datalist[position].image)
 
         holder.binding.imgThreeDot.setOnClickListener{
             if (isOpened==true){
@@ -53,8 +59,10 @@ class AdapterCookBookDetailsItem(private var datalist: List<DataModel>, private 
 
         }
 
-        holder.binding.tvAddToPlan.setOnClickListener{
 
+
+
+        holder.binding.tvAddToPlan.setOnClickListener{
             onItemClickListener.itemClick(position,"","plan")
         }
 

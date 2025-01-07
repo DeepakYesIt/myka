@@ -1,15 +1,23 @@
 package com.yesitlabs.mykaapp.adapter
 
+import android.annotation.SuppressLint
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.yesitlabs.mykaapp.OnItemClickListener
-import com.yesitlabs.mykaapp.databinding.AdapterIngredientsRecipeBinding
+import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.databinding.AdapterMealTypeItemBinding
-import com.yesitlabs.mykaapp.model.DataModel
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
 
-class AdapterPlanBreakFast(private var datalist: List<DataModel>, private var requireActivity: FragmentActivity,private var onItemClickListener: OnItemClickListener): RecyclerView.Adapter<AdapterPlanBreakFast.ViewHolder>() {
+class AdapterPlanBreakFast(var datalist: MutableList<BreakfastModel>?, private var requireActivity: FragmentActivity, private var onItemClickListener: OnItemClickListener, var type:String): RecyclerView.Adapter<AdapterPlanBreakFast.ViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -18,31 +26,87 @@ class AdapterPlanBreakFast(private var datalist: List<DataModel>, private var re
         return ViewHolder(binding)
     }
 
+    fun updateList(updateList: MutableList<BreakfastModel>,type:String){
+        datalist=updateList
+        this.type=type
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.tvBreakfast.text=datalist[position].title
-        holder.binding.tvRatingReviews.text=datalist[position].rating
-        holder.binding.textAmounts.text="$"+datalist[position].price+"* per /s"
-        holder.binding.relBreakfast.setBackgroundResource(datalist[position].image)
+
+        val item= datalist?.get(position)
+
+        if (item?.recipe?.label!=null){
+            holder.binding.tvBreakfast.text = item.recipe.label
+        }
+        if (item?.recipe?.totalTime!=null){
+            holder.binding.tvTime.text = ""+ item.recipe.totalTime +" min "
+        }
+
+        if (item?.is_like ==0 ){
+            holder.binding.imgHeartRed.setImageResource(R.drawable.heart_white_icon)
+        }else{
+            holder.binding.imgHeartRed.setImageResource(R.drawable.heart_red_icon)
+        }
+
+
+        if (item?.recipe?.images?.THUMBNAIL?.url!=null){
+            Glide.with(requireActivity)
+                .load(item.recipe.images.THUMBNAIL.url)
+                .error(R.drawable.no_image)
+                .placeholder(R.drawable.no_image)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        holder.binding.layProgess.root.visibility= View.GONE
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        holder.binding.layProgess.root.visibility= View.GONE
+                        return false
+                    }
+                })
+                .into(holder.binding.imageData)
+        }else{
+            holder.binding.layProgess.root.visibility= View.GONE
+        }
 
         holder.binding.tvAddToPlan.setOnClickListener{
-            onItemClickListener.itemClick(position,"1",datalist[position].type)
+            onItemClickListener.itemClick(position,"1",type)
         }
 
         holder.binding.imgBasket.setOnClickListener{
-            onItemClickListener.itemClick(position,"2",datalist[position].type)
+            onItemClickListener.itemClick(position,"2",type)
         }
 
-        holder.binding.relBreakfast.setOnClickListener{
-            onItemClickListener.itemClick(position,"3",datalist[position].type)
+        holder.binding.imgHeartRed.setOnClickListener {
+            onItemClickListener.itemClick(position,"4", type)
+        }
 
+        holder.itemView.setOnClickListener{
+            if (item?.recipe?.uri!=null){
+                onItemClickListener.itemClick(position,"3", item.recipe.uri)
+            }
         }
 
     }
 
 
     override fun getItemCount(): Int {
-        return datalist.size
+        return datalist!!.size
     }
 
 

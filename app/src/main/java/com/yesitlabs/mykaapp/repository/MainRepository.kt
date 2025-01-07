@@ -66,6 +66,14 @@ interface MainRepository {
 
  suspend fun notificationRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, pushNotification: String,recipeRecommendations: String,productUpdates: String,promotionalUpdates: String)
 
+ suspend fun recipeDetailsRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, url: String)
+
+ suspend fun planRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, q: String)
+
+ suspend fun likeUnlikeRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,  uri: String,likeType: String)
+
+ suspend fun addBasketRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,  uri: String,quantity: String)
+
  suspend fun getCardAndBankRequestApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
  suspend fun getWalletRequestApi(successCallback: (response: NetworkResult<String>) -> Unit)

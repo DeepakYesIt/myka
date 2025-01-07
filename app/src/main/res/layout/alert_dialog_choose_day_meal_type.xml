@@ -30,6 +30,7 @@
             android:layout_below="@+id/tvPasswordChanges"
             android:orientation="horizontal"
             android:gravity="center"
+            android:visibility="gone"
             android:padding="@dimen/_10sdp">
 
             <ImageView

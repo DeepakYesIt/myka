@@ -2,11 +2,11 @@ package com.yesitlabs.mykaapp.fragment.mainfragment.profilesetting
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -120,12 +120,13 @@ class NotificationFragment : Fragment(), View.OnClickListener {
     }
 
     private fun updateNotificationStates(apiModel: NotificationApiResponse) {
+
         pushNotification = apiModel.data.push_notification!!
         recipeRecommendations = apiModel.data.recipe_recommendations!!
         productUpdates = apiModel.data.product_updates!!
         promotionalUpdates = apiModel.data.promotional_updates!!
 
-        allNotifications = if (pushNotification == 0 && recipeRecommendations == 0 && productUpdates == 0 && promotionalUpdates == 0) 0 else 1
+        allNotifications = if ((pushNotification == 1 && recipeRecommendations == 1 && productUpdates == 1 && promotionalUpdates == 1)) 1 else 0
 
     }
 

@@ -38,7 +38,7 @@ class CalendarDayAdapter(private val days: List<CalendarDataModel.Day>, private 
             holder.binding.tvDayDate.setTextColor(Color.parseColor("#ffffff"))
         } else {
             holder.binding.llMainLayouts.setBackgroundResource(R.drawable.calendar_unselect_bg)
-            holder.binding.tvDayName.setTextColor(Color.parseColor("#3C4541"))
+            holder.binding.tvDayName.setTextColor(Color.parseColor("#999999"))
             holder.binding.tvDayDate.setTextColor(Color.parseColor("#3C4541"))
         }
 

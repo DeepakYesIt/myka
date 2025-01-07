@@ -23,6 +23,7 @@ import org.w3c.dom.Text
 
 class AddMoreItemsFragment : Fragment(), OnItemClickListener {
 
+
     private lateinit var binding: FragmentAddMoreItemsBinding
     private lateinit var addMoreItemsAdapter: AddMoreItemsAdapter
     private var dataList1: MutableList<DataModel> = mutableListOf()

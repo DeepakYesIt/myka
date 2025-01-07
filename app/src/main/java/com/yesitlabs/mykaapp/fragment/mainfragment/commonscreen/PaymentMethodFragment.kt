@@ -59,6 +59,7 @@ import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.api
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.apiresponsetransfer.TransferModel
 import com.yesitlabs.mykaapp.listener.CardBankListener
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -69,6 +70,7 @@ import java.util.Calendar
 import java.util.Objects
 
 
+@AndroidEntryPoint
 class PaymentMethodFragment : Fragment(), CardBankListener {
 
     private lateinit var binding: FragmentPaymentMethodBinding
@@ -76,6 +78,9 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
     private var stripe: Stripe? = null
     private var month: Int = 0
     private var year: Int = 0
+
+
+
     private lateinit var adapterCard: MyWalletAdapter
     private lateinit var adapterCardBank: MyWalletBankAdapter
     private var dataLocal: MutableList<CardData> = mutableListOf()

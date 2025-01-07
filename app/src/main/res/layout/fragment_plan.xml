@@ -22,15 +22,15 @@
                 android:id="@+id/relMainLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_20sdp">
+                android:layout_marginHorizontal="@dimen/_12sdp">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/imageProfile"
                     android:layout_width="@dimen/_38sdp"
                     android:layout_height="@dimen/_38sdp"
-                    android:src="@drawable/user_profile_image"
-                    app:civ_border_color="@color/white"
-                    app:civ_border_width="@dimen/_1sdp" />
+                    android:src="@drawable/mask_group_icon"
+                    app:civ_border_color="@color/light_green"
+                    app:civ_border_width="@dimen/_2sdp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -67,17 +67,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/relMainLayout"
-                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:layout_marginHorizontal="@dimen/_12sdp"
                 android:layout_marginTop="@dimen/_15sdp">
 
                 <TextView
                     android:id="@+id/tvName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:fontFamily="@font/montserrat_bold"
                     android:text="Danny’s week"
-                    android:textSize="@dimen/_13sdp" />
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:layout_toStartOf="@id/relMonthYear"
+                    android:textSize="@dimen/_12sdp" />
 
                 <RelativeLayout
                     android:id="@+id/relMonthYear"
@@ -94,7 +96,7 @@
                         android:fontFamily="@font/poppins_semibold"
                         android:padding="@dimen/_7sdp"
                         android:text="June,2024"
-                        android:textSize="@dimen/_13sdp"
+                        android:textSize="@dimen/_12sdp"
                         app:drawableEndCompat="@drawable/drop_down_icon" />
 
                 </RelativeLayout>
@@ -105,7 +107,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/relWeekDate"
-                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:layout_marginHorizontal="@dimen/_12sdp"
                 android:layout_marginTop="@dimen/_15sdp"
                 android:background="@drawable/calendar_events_bg"
                 android:orientation="vertical"
@@ -134,7 +136,8 @@
                         android:layout_marginHorizontal="@dimen/_12sdp"
                         android:fontFamily="@font/poppins_semibold"
                         android:text="12 Sept - 18 Sept"
-                        android:textSize="@dimen/_13sdp" />
+                        android:textStyle="bold"
+                        android:textSize="@dimen/_10sdp" />
 
                     <ImageView
                         android:id="@+id/imageNext"
@@ -185,7 +188,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/llCalendarViewEvents"
-                android:layout_marginTop="@dimen/_18sdp">
+                android:layout_marginTop="@dimen/_15sdp">
 
                 <LinearLayout
                     android:id="@+id/llCalculateBmr"
@@ -405,7 +408,7 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/_20sdp">
+                        android:layout_marginHorizontal="@dimen/_12sdp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -428,7 +431,7 @@
                         android:id="@+id/rcyBreakFast"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/_15sdp"
+                        android:layout_marginStart="@dimen/_12sdp"
                         android:layout_marginTop="@dimen/_10sdp"
                         android:orientation="horizontal"
                         android:visibility="visible"
@@ -795,14 +798,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/llBreakfastBmr"
-                android:layout_marginTop="@dimen/_18sdp"
+                android:layout_marginTop="@dimen/_15sdp"
                 android:visibility="visible"
                 android:orientation="vertical">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/_20sdp">
+                    android:layout_marginHorizontal="@dimen/_12sdp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -825,7 +828,7 @@
                     android:id="@+id/rcyLunch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_marginStart="@dimen/_12sdp"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
@@ -1189,7 +1192,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/linearLunch"
-                android:layout_marginTop="@dimen/_18sdp"
+                android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginBottom="@dimen/_25sdp"
                 android:orientation="vertical"
                 android:visibility="visible">
@@ -1197,7 +1200,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/_20sdp">
+                    android:layout_marginHorizontal="@dimen/_12sdp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -1220,7 +1223,7 @@
                     android:id="@+id/rcyDinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_marginStart="@dimen/_12sdp"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
@@ -1232,7 +1235,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_40sdp"
                 android:layout_below="@+id/linearDinner"
-                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:layout_marginHorizontal="@dimen/_12sdp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:visibility="visible"
                 android:layout_marginBottom="@dimen/_30sdp"
