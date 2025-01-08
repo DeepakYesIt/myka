@@ -1,4 +1,4 @@
-package com.yesitlabs.mykaapp.fragment.mainfragment.profilesetting
+package com.yesitlabs.mykaapp.fragment.mainfragment.profilesetting.preferencesScreen
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

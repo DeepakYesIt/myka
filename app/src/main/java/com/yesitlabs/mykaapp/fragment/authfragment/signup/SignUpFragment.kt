@@ -391,6 +391,7 @@ class SignUpFragment : Fragment() {
                 userGender,
                 bodyGoals,
                 cookingFrequency,
+                eatingOut,
                 reasonTakeAway,
                 cookingFor,
                 partnerName,

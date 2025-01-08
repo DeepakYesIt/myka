@@ -191,12 +191,12 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
 
     override suspend fun otpVerify(
         successCallback: (response: NetworkResult<String>) -> Unit,
-        userid: String?, otp: String?,userName:String?,userGender:String?,bodyGoal:String?,cookingFrequency:String?,
+        userid: String?, otp: String?,userName:String?,userGender:String?,bodyGoal:String?,cookingFrequency:String?,eatingOut:String?,
         takeAway:String?,cookingForType:String?,partnerName:String?,partnerGender:String?,familyMemberName:String?,
         familyMemberAge:String?,childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?,
         dietaryid:List<String>?,favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?) {
         try {
-            api.otpVerify(userid, otp,userName,userGender,bodyGoal,cookingFrequency,takeAway,cookingForType,partnerName,partnerGender,
+            api.otpVerify(userid, otp,userName,userGender,bodyGoal,cookingFrequency,eatingOut,takeAway,cookingForType,partnerName,partnerGender,
                 familyMemberName,familyMemberAge,childFriendlyMeals,mealRoutineId,spendingAmount,duration,dietaryid,favourite,allergies,dislikeIngredients,
                 deviceType,fcmToken).apply {
                 if (isSuccessful) {
@@ -346,12 +346,12 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
 
     override suspend fun socialLogin(
         successCallback: (response: NetworkResult<String>) -> Unit,
-        emailOrPhone: String?, socialID: String?,userName:String?,userGender:String?,bodyGoal:String?,cookingFrequency:String?,
+        emailOrPhone: String?, socialID: String?,userName:String?,userGender:String?,bodyGoal:String?,cookingFrequency:String?,eatingOut:String?,
         takeAway:String?,cookingForType:String?,partnerName:String?,partnerGender:String?,familyMemberName:String?,
         familyMemberAge:String?,childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?,
         dietaryid:List<String>?,favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?) {
         try {
-            api.socialLogin(emailOrPhone, socialID,userName,userGender,bodyGoal,cookingFrequency,takeAway,cookingForType,partnerName,partnerGender,
+            api.socialLogin(emailOrPhone, socialID,userName,userGender,bodyGoal,cookingFrequency,eatingOut,takeAway,cookingForType,partnerName,partnerGender,
                 familyMemberName,familyMemberAge,childFriendlyMeals,mealRoutineId,spendingAmount,duration,dietaryid,favourite,allergies,dislikeIngredients,
                 deviceType,fcmToken).apply {
                 if (isSuccessful) {

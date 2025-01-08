@@ -360,7 +360,7 @@ class VerificationFragment : Fragment() {
                         showAlertFunction(it.message, false)
                     }
                 }
-            }, userID, binding!!.otpView.otp.toString(),userName,userGender,bodyGoals,cookingFrequency,reasonTakeAway,cookingFor,
+            }, userID, binding!!.otpView.otp.toString(),userName,userGender,bodyGoals,cookingFrequency,eatingOut,reasonTakeAway,cookingFor,
                 partnerName,partnerGender, familyMemName,familyMemAge,familyMemStatus,
                 mealRoutineSelectedId,spendingAmount,
                 spendingDuration,dietarySelectedId,favouriteSelectedId,
