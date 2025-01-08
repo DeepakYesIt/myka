@@ -38,10 +38,12 @@ import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.api
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.apiresponsetransfer.TransferModel
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
 import com.yesitlabs.mykaapp.model.DataModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.util.Calendar
-import java.util.Objects
 
+
+
+@AndroidEntryPoint
 class WalletFragment : Fragment() {
 
     private lateinit var binding: FragmentWalletBinding

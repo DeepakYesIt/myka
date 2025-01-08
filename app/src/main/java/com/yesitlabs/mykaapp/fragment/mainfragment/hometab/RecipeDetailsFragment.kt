@@ -1,6 +1,5 @@
 package com.yesitlabs.mykaapp.fragment.mainfragment.hometab
 
-import android.R.attr.value
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
@@ -12,12 +11,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.webkit.WebSettings
+import android.webkit.WebViewClient
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -29,6 +29,9 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.yesitlabs.mykaapp.OnItemSelectListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.activity.MainActivity
 import com.yesitlabs.mykaapp.adapter.AdapterRecipeItem
@@ -41,6 +44,7 @@ import com.yesitlabs.mykaapp.databinding.FragmentRecipeDetailsBinding
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.recipedetails.RecipeDetailsViewModel
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.recipedetails.apiresponse.Data
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.recipedetails.apiresponse.RecipeDetailsApiResponse
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
 import com.yesitlabs.mykaapp.model.DataModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,11 +52,10 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import java.util.Objects
 
 
 @AndroidEntryPoint
-class RecipeDetailsFragment : Fragment() {
+class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
 
     private var binding: FragmentRecipeDetailsBinding? = null
     private var ingredientsRecipeAdapter: IngredientsRecipeAdapter? = null
@@ -65,11 +68,12 @@ class RecipeDetailsFragment : Fragment() {
     private var tvWeekRange: TextView? = null
     private var chooseDayAdapter: ChooseDayAdapter? = null
     private val calendar = Calendar.getInstance()
-    private var selectAll:Boolean?=false
-    private var quantity:Int=1
+    private var selectAll: Boolean = false
+    private var quantity: Int = 1
     private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
     private lateinit var viewModel: RecipeDetailsViewModel
-    private var uri:String=""
+    private var uri: String = ""
+    private var localData: MutableList<Data> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -79,7 +83,7 @@ class RecipeDetailsFragment : Fragment() {
         binding = FragmentRecipeDetailsBinding.inflate(layoutInflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[RecipeDetailsViewModel::class.java]
 
-        uri=arguments?.getString("uri","").toString()
+        uri = arguments?.getString("uri", "").toString()
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
@@ -104,8 +108,6 @@ class RecipeDetailsFragment : Fragment() {
         }
     }
 
-
-
     private fun fetchRecipeDetailsData() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
@@ -124,6 +126,32 @@ class RecipeDetailsFragment : Fragment() {
         }
     }
 
+    private fun handleBasketApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessBasketResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessBasketResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ Recipe Details ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                 Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
 
     @SuppressLint("SetTextI18n")
     private fun handleSuccessResponse(data: String) {
@@ -131,8 +159,11 @@ class RecipeDetailsFragment : Fragment() {
             val apiModel = Gson().fromJson(data, RecipeDetailsApiResponse::class.java)
             Log.d("@@@ Recipe Details ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                if (apiModel.data!=null && apiModel.data.size>0){
+                if (apiModel.data != null && apiModel.data.size > 0) {
                     showData(apiModel.data)
+                }else{
+                    binding!!.layBottom.visibility = View.GONE
+                    binding!!.webView.visibility = View.GONE
                 }
             } else {
                 if (apiModel.code == ErrorMessage.code) {
@@ -148,10 +179,12 @@ class RecipeDetailsFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun showData(data: MutableList<Data>) {
+        localData.clear()
+        localData.addAll(data)
 
-        if (data[0].recipe?.images?.THUMBNAIL?.url!=null){
+        if (localData[0].recipe?.images?.THUMBNAIL?.url != null) {
             Glide.with(requireContext())
-                .load(data[0].recipe?.images?.THUMBNAIL?.url)
+                .load(localData[0].recipe?.images?.THUMBNAIL?.url)
                 .error(R.drawable.no_image)
                 .placeholder(R.drawable.no_image)
                 .listener(object : RequestListener<Drawable> {
@@ -161,7 +194,7 @@ class RecipeDetailsFragment : Fragment() {
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding!!.layProgess.root.visibility=View.GONE
+                        binding!!.layProgess.root.visibility = View.GONE
                         return false
                     }
 
@@ -172,38 +205,49 @@ class RecipeDetailsFragment : Fragment() {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding!!.layProgess.root.visibility=View.GONE
+                        binding!!.layProgess.root.visibility = View.GONE
                         return false
                     }
                 })
                 .into(binding!!.imageData)
+        } else {
+            binding!!.layProgess.root.visibility = View.GONE
+        }
+
+        if (localData[0].recipe?.label != null) {
+            binding!!.tvTitle.text = "" + localData[0].recipe?.label
+        }
+
+        if (localData[0].recipe?.calories != null) {
+            binding!!.tvCalories.text = "" + localData[0].recipe?.calories?.toInt()
+        }
+
+        if (localData[0].recipe?.totalNutrients?.FAT?.quantity != null) {
+            binding!!.tvFat.text = "" + localData[0].recipe?.totalNutrients?.FAT?.quantity?.toInt()
+        }
+
+        if (localData[0].recipe?.totalNutrients?.PROCNT?.quantity != null) {
+            binding!!.tvProtein.text =
+                "" + localData[0].recipe?.totalNutrients?.PROCNT?.quantity?.toInt()
+        }
+
+        if (localData[0].recipe?.totalNutrients?.CHOCDF?.quantity != null) {
+            binding!!.tvCarbs.text =
+                "" + localData[0].recipe?.totalNutrients?.CHOCDF?.quantity?.toInt()
+        }
+
+
+        if (localData[0].recipe?.totalTime != null) {
+            binding!!.tvTotaltime.text = "" + localData[0].recipe?.totalTime + " min "
+        }
+
+        if (localData[0].recipe?.ingredients != null && localData[0].recipe?.ingredients!!.size > 0) {
+            ingredientsRecipeAdapter =
+                IngredientsRecipeAdapter(localData[0].recipe?.ingredients, requireActivity(), this)
+            binding!!.rcyIngCookWareRecipe.adapter = ingredientsRecipeAdapter
+            binding!!.layBottom.visibility = View.VISIBLE
         }else{
-            binding!!.layProgess.root.visibility=View.GONE
-        }
-
-        if (data[0].recipe?.label!=null){
-            binding!!.tvTitle.text = ""+data[0].recipe?.label
-        }
-
-        if (data[0].recipe?.calories!=null){
-            binding!!.tvCalories.text = ""+data[0].recipe?.calories?.toInt()
-        }
-
-        if (data[0].recipe?.totalNutrients?.FAT?.quantity!=null){
-            binding!!.tvFat.text = ""+data[0].recipe?.totalNutrients?.FAT?.quantity?.toInt()
-        }
-
-        if (data[0].recipe?.totalNutrients?.PROCNT?.quantity!=null){
-            binding!!.tvProtein.text = ""+data[0].recipe?.totalNutrients?.PROCNT?.quantity?.toInt()
-        }
-
-        if (data[0].recipe?.totalNutrients?.CHOCDF?.quantity!=null){
-            binding!!.tvCarbs.text = ""+data[0].recipe?.totalNutrients?.CHOCDF?.quantity?.toInt()
-        }
-
-
-        if (data[0].recipe?.totalTime!=null){
-            binding!!.tvTotaltime.text = ""+data[0].recipe?.totalTime+" min "
+            binding!!.layBottom.visibility = View.GONE
         }
 
 
@@ -212,7 +256,6 @@ class RecipeDetailsFragment : Fragment() {
     private fun showAlert(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)
     }
-
 
 
     private fun setupBackNavigation() {
@@ -228,19 +271,23 @@ class RecipeDetailsFragment : Fragment() {
 
     private fun initialize() {
 
-        binding!!.imgPlusValue.setOnClickListener{
+        binding!!.imgPlusValue.setOnClickListener {
             if (quantity < 99) {
                 quantity++
                 updateValue()
             }
         }
 
-        binding!!.imgMinusValue.setOnClickListener{
+        binding!!.imgMinusValue.setOnClickListener {
             if (quantity > 1) {
                 quantity--
                 updateValue()
-            }else{
-                Toast.makeText(requireActivity(),"Minimum serving atleast value is one",Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(
+                    requireActivity(),
+                    "Minimum serving atleast value is one",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
 
@@ -261,14 +308,28 @@ class RecipeDetailsFragment : Fragment() {
             binding!!.textCookWare.setTextColor(Color.parseColor("#3C4541"))
             binding!!.textRecipe.setTextColor(Color.parseColor("#3C4541"))
 
-            binding!!.relServingsPeople.visibility = View.VISIBLE
+            /*binding!!.relServingsPeople.visibility = View.VISIBLE
             binding!!.layBottomPlanBasket.visibility = View.VISIBLE
-            binding!!.relIngSelectAll.visibility = View.VISIBLE
-            binding!!.relCookware.visibility = View.GONE
-            binding!!.relRecipe.visibility = View.GONE
-            binding!!.textStepInstructions.visibility = View.GONE
-            ingredientsModel()
-
+            binding!!.relIngSelectAll.visibility = View.VISIBLE*/
+            /* binding!!.relCookware.visibility = View.GONE
+             binding!!.relRecipe.visibility = View.GONE
+             binding!!.textStepInstructions.visibility = View.GONE*/
+            binding!!.layBottom.visibility = View.VISIBLE
+            binding!!.webView.visibility = View.GONE
+            if (localData.size > 0) {
+                // Update the drawable based on the selectAll state
+                val drawableRes =
+                    if (selectAll) R.drawable.orange_checkbox_images else R.drawable.orange_uncheck_box_images
+                binding?.tvSelectAllBtn?.setCompoundDrawablesWithIntrinsicBounds(
+                    0,
+                    0,
+                    drawableRes,
+                    0
+                )
+                // Notify adapter with updated data
+                ingredientsRecipeAdapter?.updateList(localData[0].recipe?.ingredients!!)
+                binding!!.rcyIngCookWareRecipe.adapter = ingredientsRecipeAdapter
+            }
         }
 
         binding!!.llCookWare.setOnClickListener {
@@ -280,14 +341,16 @@ class RecipeDetailsFragment : Fragment() {
             binding!!.textCookWare.setTextColor(Color.parseColor("#FFFFFF"))
             binding!!.textRecipe.setTextColor(Color.parseColor("#3C4541"))
 
-            binding!!.relServingsPeople.visibility = View.GONE
+            /*binding!!.relServingsPeople.visibility = View.GONE
             binding!!.layBottomPlanBasket.visibility = View.GONE
-            binding!!.relIngSelectAll.visibility = View.GONE
-            binding!!.relCookware.visibility = View.VISIBLE
-            binding!!.relRecipe.visibility = View.GONE
-            binding!!.textStepInstructions.visibility = View.GONE
+            binding!!.relIngSelectAll.visibility = View.GONE*/
+            /* binding!!.relCookware.visibility = View.VISIBLE
+             binding!!.relRecipe.visibility = View.GONE
+             binding!!.textStepInstructions.visibility = View.GONE*/
+            binding!!.layBottom.visibility = View.GONE
 
-            cookWareModel()
+            loadUrl()
+//            cookWareModel()
 
         }
 
@@ -300,39 +363,127 @@ class RecipeDetailsFragment : Fragment() {
             binding!!.textCookWare.setTextColor(Color.parseColor("#3C4541"))
             binding!!.textRecipe.setTextColor(Color.parseColor("#FFFFFF"))
 
-            binding!!.relServingsPeople.visibility = View.GONE
-            binding!!.layBottomPlanBasket.visibility = View.GONE
-            binding!!.relIngSelectAll.visibility = View.GONE
-            binding!!.relCookware.visibility = View.GONE
-            binding!!.relRecipe.visibility = View.VISIBLE
-            binding!!.textStepInstructions.visibility = View.VISIBLE
+            /*  binding!!.relServingsPeople.visibility = View.GONE
+              binding!!.layBottomPlanBasket.visibility = View.GONE
+              binding!!.relIngSelectAll.visibility = View.GONE*/
+            /* binding!!.relCookware.visibility = View.GONE
+             binding!!.relRecipe.visibility = View.VISIBLE
+             binding!!.textStepInstructions.visibility = View.VISIBLE*/
 
-            recipeModel()
+            binding!!.layBottom.visibility = View.GONE
+            loadUrl()
+//            recipeModel()
 
         }
+
+
 
         binding!!.textStepInstructions.setOnClickListener {
             findNavController().navigate(R.id.directionSteps1RecipeDetailsFragment)
         }
 
         binding!!.tvSelectAllBtn.setOnClickListener {
-            if (selectAll==true){
-                ingredientsRecipeAdapter?.setCheckEnabled(false)
-                val drawableEnd = ContextCompat.getDrawable(requireActivity(), R.drawable.orange_uncheck_box_images)
-                drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
-                binding!!.tvSelectAllBtn.setCompoundDrawables(null, null, drawableEnd, null)
-                selectAll=false
-            }else{
-                val drawableEnd = ContextCompat.getDrawable(requireActivity(), R.drawable.orange_checkbox_images)
-                drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
-                binding!!.tvSelectAllBtn.setCompoundDrawables(null, null, drawableEnd, null)
-                selectAll=true
-                ingredientsRecipeAdapter?.setCheckEnabled(true)
+            if (localData.size > 0) {
+                selectAll = !selectAll // Toggle the selectAll value
+                // Update the drawable based on the selectAll state
+                val drawableRes =
+                    if (selectAll) R.drawable.orange_checkbox_images else R.drawable.orange_uncheck_box_images
+                binding?.tvSelectAllBtn?.setCompoundDrawablesWithIntrinsicBounds(
+                    0,
+                    0,
+                    drawableRes,
+                    0
+                )
+
+                // Update the status of each ingredient dynamically
+                localData[0].recipe?.ingredients?.forEach { ingredient ->
+                    ingredient.status = selectAll
+                }
+                // Notify adapter with updated data
+                ingredientsRecipeAdapter?.updateList(localData[0].recipe?.ingredients!!)
             }
         }
 
+
+        binding!!.layBasket.setOnClickListener {
+
+            if (BaseApplication.isOnline(requireActivity())) {
+                if (localData.size>0){
+                    try {
+                        // Create a JsonObject for the main JSON structure
+                        val jsonObject = JsonObject()
+                        jsonObject.addProperty("serving", binding!!.tvValues.text.toString())
+                        // Create a JsonArray for ingredients
+                        val jsonArray = JsonArray()
+                        // Iterate through the ingredients and add them to the array if status is true
+                        localData[0].recipe?.ingredients?.forEach { ingredientsModel ->
+                            if (ingredientsModel.status) {
+                                // Create a JsonObject for each ingredient
+                                val ingredientObject = JsonObject()
+                                ingredientObject.addProperty("name", ingredientsModel.text)
+                                ingredientObject.addProperty("image", ingredientsModel.image)
+                                ingredientObject.addProperty("food", ingredientsModel.food)
+                                ingredientObject.addProperty("quantity", ingredientsModel.quantity)
+                                ingredientObject.addProperty("foodCategory", ingredientsModel.foodCategory)
+                                ingredientObject.addProperty("measure", ingredientsModel.measure)
+                                // Add the ingredient object to the array
+                                jsonArray.add(ingredientObject)
+                            }
+                        }
+                        // Add the ingredients array to the main JSON object
+                        jsonObject.add("ingredients", jsonArray)
+                        // Log the final JSON data
+                        Log.d("final data", "******$jsonObject")
+                        addBasketDetailsApi(jsonObject)
+                    }catch (e:Exception){
+                        BaseApplication.alertError(requireContext(), e.message, false)
+                    }
+                }
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
     }
 
+    private fun addBasketDetailsApi(jsonObject: JsonObject) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.recipeAddBasketRequest({
+                BaseApplication.dismissMe()
+                handleBasketApiResponse(it)
+            }, jsonObject)
+        }
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun loadUrl() {
+        binding!!.webView.visibility = View.VISIBLE
+        if (localData.size > 0) {
+            val webSettings: WebSettings = binding!!.webView.settings
+            webSettings.javaScriptEnabled = true
+            webSettings.domStorageEnabled = true
+            webSettings.loadsImagesAutomatically = true
+            webSettings.javaScriptCanOpenWindowsAutomatically = true
+            webSettings.allowContentAccess = true
+            webSettings.allowFileAccess = true
+            webSettings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+
+            // Set WebViewClient to handle page loading within the WebView
+            binding!!.webView.webViewClient = WebViewClient()
+
+           // Load the URL if it is not null or empty
+            val url = localData[0].recipe?.url?.replace("http:", "https:")
+            Log.d("url", "****$url")
+            if (!url.isNullOrEmpty()) {
+                binding!!.webView.loadUrl(url)
+            } else {
+                Log.e("WebViewError", "URL is null or empty")
+            }
+
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
     private fun updateValue() {
         binding!!.tvValues.text = String.format("%02d", quantity)
     }
@@ -422,8 +573,10 @@ class RecipeDetailsFragment : Fragment() {
 
         chooseDayAdapter = ChooseDayAdapter(dataList, requireActivity())
         rcyChooseDaySch!!.adapter = chooseDayAdapter
+
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateWeekRange() {
         val startOfWeek = calendar.apply {
             set(Calendar.DAY_OF_WEEK, firstDayOfWeek)
@@ -482,7 +635,7 @@ class RecipeDetailsFragment : Fragment() {
             imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
         }
 
-        imageSnacksRadio.setOnClickListener{
+        imageSnacksRadio.setOnClickListener {
             imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
             imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
             imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
@@ -490,7 +643,7 @@ class RecipeDetailsFragment : Fragment() {
             imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
         }
 
-        imageBrunchRadio.setOnClickListener{
+        imageBrunchRadio.setOnClickListener {
             imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
             imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
             imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
@@ -513,9 +666,7 @@ class RecipeDetailsFragment : Fragment() {
     }
 
     private fun ingredientsModel() {
-        if (dataList != null) {
-            dataList.clear()
-        }
+        dataList.clear()
         val data1 = DataModel()
         val data2 = DataModel()
         val data3 = DataModel()
@@ -559,9 +710,8 @@ class RecipeDetailsFragment : Fragment() {
         dataList.add(data5)
 
 
-
-        ingredientsRecipeAdapter = IngredientsRecipeAdapter(dataList, requireActivity())
-        binding!!.rcyIngCookWareRecipe.adapter = ingredientsRecipeAdapter
+        /*ingredientsRecipeAdapter = IngredientsRecipeAdapter(dataList, requireActivity())
+        binding!!.rcyIngCookWareRecipe.adapter = ingredientsRecipeAdapter*/
     }
 
     private fun cookWareModel() {
@@ -642,6 +792,25 @@ class RecipeDetailsFragment : Fragment() {
 
         adapterRecipeItem = AdapterRecipeItem(dataList2, requireActivity())
         binding!!.rcyIngCookWareRecipe.adapter = adapterRecipeItem
+    }
+
+    override fun itemSelect(position: Int?, status: String?, type: String?) {
+
+        localData[0].recipe?.ingredients?.forEachIndexed { index, ingredient ->
+            if (index == position) {
+                ingredient.status = localData[0].recipe?.ingredients?.get(position)?.status != true
+            }
+        }
+        // Notify adapter with updated data
+        ingredientsRecipeAdapter?.updateList(localData[0].recipe?.ingredients!!)
+
+        selectAll = localData[0].recipe?.ingredients?.all { it.status } == true
+
+        // Update the drawable based on the selectAll state
+        val drawableRes =
+            if (selectAll) R.drawable.orange_checkbox_images else R.drawable.orange_uncheck_box_images
+        binding?.tvSelectAllBtn?.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableRes, 0)
+
     }
 
 }

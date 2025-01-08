@@ -1,5 +1,6 @@
 package com.yesitlabs.mykaapp.repository
 
+import com.google.gson.JsonObject
 import com.yesitlabs.mykaapp.apiInterface.ApiInterface
 import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
@@ -616,6 +617,26 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
     ) {
         try {
             api.recipeDetailsRequestApi(url).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun recipeAddBasketRequestApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        jsonObject: JsonObject
+    ) {
+        try {
+            api.recipeAddBasketRequestApi(jsonObject).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

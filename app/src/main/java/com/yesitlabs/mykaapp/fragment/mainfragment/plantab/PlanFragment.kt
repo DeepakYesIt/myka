@@ -47,12 +47,15 @@ import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.api
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
 import com.yesitlabs.mykaapp.model.CalendarDataModel
 import com.yesitlabs.mykaapp.model.DataModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Arrays
 import java.util.Calendar
 import java.util.Locale
 
+
+@AndroidEntryPoint
 class PlanFragment : Fragment(), OnItemClickListener {
 
     private var binding: FragmentPlanBinding? = null

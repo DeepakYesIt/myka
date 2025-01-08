@@ -9,9 +9,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.findNavController
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.activity.MainActivity
-import com.yesitlabs.mykaapp.adapter.BodyGoalsAdapter
 import com.yesitlabs.mykaapp.adapter.IngredientsRecipeAdapter
-import com.yesitlabs.mykaapp.databinding.FragmentFullCookedScheduleBinding
 import com.yesitlabs.mykaapp.databinding.FragmentMissingIngredientsBinding
 import com.yesitlabs.mykaapp.model.DataModel
 
@@ -83,8 +81,8 @@ class MissingIngredientsFragment : Fragment() {
         dataList.add(data1)
         dataList.add(data2)
 
-        ingredientsRecipeAdapter = IngredientsRecipeAdapter(dataList, requireActivity())
-        binding!!.rcyAddedIngredientsRecipes.adapter = ingredientsRecipeAdapter
+        /*ingredientsRecipeAdapter = IngredientsRecipeAdapter(dataList, requireActivity())
+        binding!!.rcyAddedIngredientsRecipes.adapter = ingredientsRecipeAdapter*/
     }
 
     private fun missingIngredientsModel() {
@@ -123,8 +121,8 @@ class MissingIngredientsFragment : Fragment() {
         dataList.add(data3)
         dataList.add(data4)
 
-        ingredientsRecipeAdapter = IngredientsRecipeAdapter(dataList, requireActivity())
-        binding!!.rcyIngredientsRecipe.adapter = ingredientsRecipeAdapter
+      /*  ingredientsRecipeAdapter = IngredientsRecipeAdapter(dataList, requireActivity())
+        binding!!.rcyIngredientsRecipe.adapter = ingredientsRecipeAdapter*/
     }
 
 

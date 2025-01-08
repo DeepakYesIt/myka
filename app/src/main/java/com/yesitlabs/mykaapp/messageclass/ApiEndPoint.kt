@@ -44,6 +44,7 @@ object ApiEndPoint {
     const val allRecipeUrl="all-recipe"
     const val likeUnlikeUrl="add-to-favorite"
     const val addBasketeUrl="add-to-basket"
+    const val addBasketeDetailsUrl="ingredient-basket"
 
 
 

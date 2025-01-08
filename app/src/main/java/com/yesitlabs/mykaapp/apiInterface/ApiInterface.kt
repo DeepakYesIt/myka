@@ -213,6 +213,10 @@ interface ApiInterface {
     @POST(ApiEndPoint.recipeDetailsUrl)
     suspend fun recipeDetailsRequestApi(@Field("uri") url:String):Response<JsonObject>
 
+    @FormUrlEncoded
+    @POST(ApiEndPoint.addBasketeDetailsUrl)
+    suspend fun recipeAddBasketRequestApi(@Body jsonObject: JsonObject):Response<JsonObject>
+
 
     @POST(ApiEndPoint.getCardBankUrl)
     suspend fun getCardAndBankRequestApi():Response<JsonObject>

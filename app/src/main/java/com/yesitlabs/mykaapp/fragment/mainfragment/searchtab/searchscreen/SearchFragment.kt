@@ -14,10 +14,13 @@ import android.widget.RelativeLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.activity.MainActivity
 import com.yesitlabs.mykaapp.adapter.SearchMealAdapter
 import com.yesitlabs.mykaapp.adapter.SearchRecipeAdapter
+import com.yesitlabs.mykaapp.apiInterface.BaseUrl
+import com.yesitlabs.mykaapp.basedata.SessionManagement
 import com.yesitlabs.mykaapp.commonworkutils.CommonWorkUtils
 import com.yesitlabs.mykaapp.databinding.FragmentSearchBinding
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
@@ -30,12 +33,12 @@ class SearchFragment : Fragment(),View.OnClickListener {
     private var searchMealAdapter: SearchMealAdapter? = null
     private var status:String?="RecipeSearch"
     private lateinit var commonWorkUtils: CommonWorkUtils
-
+    private lateinit var sessionManagement: SessionManagement
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentSearchBinding.inflate(inflater, container, false)
 
@@ -44,7 +47,7 @@ class SearchFragment : Fragment(),View.OnClickListener {
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
-
+        sessionManagement = SessionManagement(requireContext())
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
@@ -63,6 +66,18 @@ class SearchFragment : Fragment(),View.OnClickListener {
     }
 
     private fun initialize() {
+
+
+
+        if (sessionManagement.getImage()!=null){
+            Glide.with(requireContext())
+                .load(BaseUrl.imageBaseUrl+sessionManagement.getImage())
+                .placeholder(R.drawable.mask_group_icon)
+                .error(R.drawable.mask_group_icon)
+                .into(binding!!.imageProfile)
+        }
+
+
         binding!!.relViewAll.setOnClickListener(this)
         binding!!.imgHeartRed.setOnClickListener(this)
         binding!!.imageProfile.setOnClickListener(this)

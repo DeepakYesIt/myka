@@ -15,99 +15,105 @@
         android:layout_above="@+id/llBottomNavigation"
         app:defaultNavHost="true"/>
 
-
-    <androidx.cardview.widget.CardView
+    <RelativeLayout
         android:id="@+id/cardViewAddRecipe"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         android:layout_above="@+id/llIndicator"
         android:layout_centerHorizontal="true"
         android:visibility="gone"
-        app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="@dimen/_15sdp">
-
-        <RelativeLayout
+        android:background="#90FFFFFF"
+        android:layout_height="match_parent">
+        <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/_20sdp">
-
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:layout_alignParentBottom="true"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="@dimen/_15sdp">
             <RelativeLayout
-                android:id="@+id/relAddRecipeWeb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/imgAddRecipes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/region_icon" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_10sdp"
-                    android:layout_toEndOf="@+id/imgAddRecipes"
-                    android:fontFamily="@font/poppins"
-                    android:text="Add a recipe from web"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_13sdp" />
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/relCreateNewRecipe"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/relAddRecipeWeb"
-                android:layout_marginTop="@dimen/_10sdp">
+                android:padding="@dimen/_20sdp">
 
-                <ImageView
-                    android:id="@+id/imageCreateNewRecipe"
+                <RelativeLayout
+                    android:id="@+id/relAddRecipeWeb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/imgAddRecipes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/region_icon" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_10sdp"
+                        android:layout_toEndOf="@+id/imgAddRecipes"
+                        android:fontFamily="@font/poppins"
+                        android:text="Add a recipe from web"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_13sdp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/relCreateNewRecipe"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/delete_account_icon" />
+                    android:layout_below="@id/relAddRecipeWeb"
+                    android:layout_marginTop="@dimen/_10sdp">
 
-                <TextView
+                    <ImageView
+                        android:id="@+id/imageCreateNewRecipe"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/delete_account_icon" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_10sdp"
+                        android:layout_toEndOf="@+id/imageCreateNewRecipe"
+                        android:fontFamily="@font/poppins"
+                        android:text="Create New Recipe"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_13sdp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/relRecipeImage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_10sdp"
-                    android:layout_toEndOf="@+id/imageCreateNewRecipe"
-                    android:fontFamily="@font/poppins"
-                    android:text="Create New Recipe"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_13sdp" />
+                    android:layout_below="@+id/relCreateNewRecipe"
+                    android:layout_marginTop="@dimen/_10sdp">
+
+                    <ImageView
+                        android:id="@+id/imageRecipeImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/logout_icon" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_10sdp"
+                        android:layout_toEndOf="@+id/imageRecipeImage"
+                        android:fontFamily="@font/poppins"
+                        android:text="Add Recipe From Image"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_13sdp" />
+
+                </RelativeLayout>
+
 
             </RelativeLayout>
 
-            <RelativeLayout
-                android:id="@+id/relRecipeImage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/relCreateNewRecipe"
-                android:layout_marginTop="@dimen/_10sdp">
-
-                <ImageView
-                    android:id="@+id/imageRecipeImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/logout_icon" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_10sdp"
-                    android:layout_toEndOf="@+id/imageRecipeImage"
-                    android:fontFamily="@font/poppins"
-                    android:text="Add Recipe From Image"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_13sdp" />
-
-            </RelativeLayout>
-
-
-        </RelativeLayout>
-
-    </androidx.cardview.widget.CardView>
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/llIndicator"

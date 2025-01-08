@@ -2,9 +2,12 @@ package com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.recipedetails.apir
 
 data class RecipeModel(
     val label: String?,
+    val url: String?,
     val images: ImagesModel?,
     val totalNutrients: TotalNutrientsModel?,
     val calories: Double?,
-    val totalTime: Int?
+    val totalTime: Int?,
+    val statusInGredients: Boolean=false,
+    val ingredients: MutableList<IngredientsModel>?
 
 )

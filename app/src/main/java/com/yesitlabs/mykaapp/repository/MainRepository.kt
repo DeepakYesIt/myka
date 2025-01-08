@@ -1,5 +1,6 @@
 package com.yesitlabs.mykaapp.repository
 
+import com.google.gson.JsonObject
 import com.yesitlabs.mykaapp.basedata.NetworkResult
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -67,6 +68,8 @@ interface MainRepository {
  suspend fun notificationRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, pushNotification: String,recipeRecommendations: String,productUpdates: String,promotionalUpdates: String)
 
  suspend fun recipeDetailsRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, url: String)
+
+ suspend fun recipeAddBasketRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)
 
  suspend fun planRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, q: String)
 

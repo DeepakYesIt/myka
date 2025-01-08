@@ -3,6 +3,7 @@ package com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.recipedetails
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.gson.JsonObject
 import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +17,12 @@ class RecipeDetailsViewModel @Inject constructor(private val repository: MainRep
     suspend fun recipeDetailsRequest(successCallback: (response: NetworkResult<String>) -> Unit,
                                     url: String){
         repository.recipeDetailsRequestApi({ successCallback(it) },url)
+    }
+
+
+    suspend fun recipeAddBasketRequest(successCallback: (response: NetworkResult<String>) -> Unit, jsonObject: JsonObject
+    ){
+        repository.recipeAddBasketRequestApi({ successCallback(it) },jsonObject)
     }
 
 

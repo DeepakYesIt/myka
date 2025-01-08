@@ -7,66 +7,70 @@
     android:background="@color/white"
     tools:context=".fragment.mainfragment.plantab.PlanFragment">
 
+
+    <RelativeLayout
+        android:id="@+id/relMainLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_marginHorizontal="@dimen/_12sdp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imageProfile"
+            android:layout_width="@dimen/_38sdp"
+            android:layout_height="@dimen/_38sdp"
+            android:src="@drawable/mask_group_icon"
+            app:civ_border_color="@color/light_green"
+            app:civ_border_width="@dimen/_2sdp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_toEndOf="@id/imageProfile"
+            android:fontFamily="@font/montserrat_semibold"
+            android:text="@string/let_s_plan_your_week"
+            android:textFontWeight="600"
+            android:textSize="@dimen/_12sdp" />
+
+        <ImageView
+            android:id="@+id/imgHearRedIcons"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_toStartOf="@+id/imgBasketIcon"
+            android:src="@drawable/heart_red_icon" />
+
+        <ImageView
+            android:id="@+id/imgBasketIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/yellow_basket_icon" />
+
+    </RelativeLayout>
+
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/relMainLayout"
         android:fillViewport="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_20sdp"
             android:orientation="vertical">
 
-            <RelativeLayout
-                android:id="@+id/relMainLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_12sdp">
 
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/imageProfile"
-                    android:layout_width="@dimen/_38sdp"
-                    android:layout_height="@dimen/_38sdp"
-                    android:src="@drawable/mask_group_icon"
-                    app:civ_border_color="@color/light_green"
-                    app:civ_border_width="@dimen/_2sdp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="@dimen/_10sdp"
-                    android:layout_toEndOf="@id/imageProfile"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:text="@string/let_s_plan_your_week"
-                    android:textFontWeight="600"
-                    android:textSize="@dimen/_12sdp" />
-
-                <ImageView
-                    android:id="@+id/imgHearRedIcons"
-                    android:layout_width="@dimen/_30sdp"
-                    android:layout_height="@dimen/_30sdp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="@dimen/_10sdp"
-                    android:layout_toStartOf="@+id/imgBasketIcon"
-                    android:src="@drawable/heart_red_icon" />
-
-                <ImageView
-                    android:id="@+id/imgBasketIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/yellow_basket_icon" />
-
-            </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/relWeekDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/relMainLayout"
                 android:layout_marginHorizontal="@dimen/_12sdp"
                 android:layout_marginTop="@dimen/_15sdp">
 
