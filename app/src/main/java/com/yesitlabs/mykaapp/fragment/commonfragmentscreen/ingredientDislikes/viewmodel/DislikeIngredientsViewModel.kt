@@ -12,4 +12,12 @@ class DislikeIngredientsViewModel @Inject constructor(private val repository: Ma
         repository.getDislikeIngredients { successCallback(it) }
     }
 
+    suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.userPreferencesApi{ successCallback(it) }
+    }
+
+    suspend fun updateDislikedIngredientsApi(successCallback: (response: NetworkResult<String>) -> Unit,dislikeId: List<String>?){
+        repository.updateDislikedIngredientsApi ({ successCallback(it) },dislikeId)
+    }
+
 }

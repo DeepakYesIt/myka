@@ -13,4 +13,13 @@ class CookingFrequencyViewModel @Inject constructor(private val repository: Main
         repository.getCookingFrequency { successCallback(it) }
     }
 
+    suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.userPreferencesApi{ successCallback(it) }
+    }
+
+
+    suspend fun updateCookingFrequencyApi(successCallback: (response: NetworkResult<String>) -> Unit,bodyGoal: String){
+        repository.updateCookingFrequencyApi ({ successCallback(it) },bodyGoal)
+    }
+
 }

@@ -8,9 +8,8 @@ data class MealRoutineModel(
 )
 
 data class MealRoutineModelData(
-    val created_at: String,
-    val deleted_at: Any,
     val id: Int,
     val name: String,
-    val updated_at: String
+    var selected:Boolean
+
 )

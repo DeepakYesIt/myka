@@ -114,6 +114,14 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
         binding!!.rcyMealType.layoutManager = gridLayoutManager
         binding!!.rcyMealType.adapter = adapterFilterSearchItem
 
+//        // FlexboxLayoutManager
+//        val flexboxLayoutManager = FlexboxLayoutManager(this).apply {
+//            flexWrap = FlexWrap.WRAP // Allow wrapping to the next line
+//            justifyContent = JustifyContent.FLEX_START // Align items to the start
+//        }
+//
+//        recyclerView.layoutManager = flexboxLayoutManager
+
 
     }
     private fun dietModel() {
@@ -184,6 +192,7 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
         val data7 = DataModel()
         val data8 = DataModel()
         val data9 = DataModel()
+        val data10 = DataModel()
 
         data1.title = "Breakfast"
         data1.isOpen = false
@@ -212,6 +221,9 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
         data9.title = "Cocktails"
         data9.isOpen = false
 
+        data10.title = "More"
+        data10.isOpen = true
+
         dataList.add(data1)
         dataList.add(data2)
         dataList.add(data3)
@@ -221,6 +233,7 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
         dataList.add(data7)
         dataList.add(data8)
         dataList.add(data9)
+        dataList.add(data10)
 
         val gridLayoutManager = GridLayoutManager(requireActivity(), 3) // Default: 2 items per row
         adapterFilterSearchItem = AdapterFilterSearchItem(dataList, requireActivity(),this)

@@ -27,6 +27,8 @@ import com.yesitlabs.mykaapp.basedata.BaseApplication
 import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.databinding.FragmentAllergensIngredientsBinding
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.allergensIngredients.viewmodel.AllergenIngredientViewModel
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.GetUserPreference
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModel
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
@@ -56,24 +58,34 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         allergenIngredientViewModel = ViewModelProvider(this)[AllergenIngredientViewModel::class.java]
         sessionManagement = SessionManagement(requireContext())
 
-        /// checked session value cooking for
-        if (sessionManagement.getCookingFor().equals("Myself")) {
-            binding!!.tvAllergensDesc.text = getString(R.string.allergens_ingredients_desc)
-            binding!!.progressBar5.max = 10
-            totalProgressValue = 10
-            updateProgress(5)
-        } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-            binding!!.tvAllergensDesc.text = "Pick ingredients you and your partner are allergic to"
-            binding!!.progressBar5.max = 11
-            totalProgressValue = 11
-            updateProgress(5)
-        } else {
-            binding!!.tvAllergensDesc.text =
-                "Which ingredients are you and your family allergic to?"
-            binding!!.progressBar5.max = 11
-            totalProgressValue = 11
-            updateProgress(5)
+            /// checked session value cooking for
+            if (sessionManagement.getCookingFor().equals("Myself")) {
+                binding!!.tvAllergensDesc.text = getString(R.string.allergens_ingredients_desc)
+                binding!!.progressBar5.max = 10
+                totalProgressValue = 10
+                updateProgress(5)
+            } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
+                binding!!.tvAllergensDesc.text =
+                    "Pick ingredients you and your partner are allergic to"
+                binding!!.progressBar5.max = 11
+                totalProgressValue = 11
+                updateProgress(5)
+            } else {
+                binding!!.tvAllergensDesc.text =
+                    "Which ingredients are you and your family allergic to?"
+                binding!!.progressBar5.max = 11
+                totalProgressValue = 11
+                updateProgress(5)
+            }
+
+        if (sessionManagement.getCookingScreen().equals("Profile")){
+            binding!!.llBottomBtn.visibility=View.GONE
+            binding!!.rlUpdateAllergens.visibility=View.VISIBLE
+        }else{
+            binding!!.llBottomBtn.visibility=View.VISIBLE
+            binding!!.rlUpdateAllergens.visibility=View.GONE
         }
+
 
         //// handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -84,18 +96,60 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 }
             })
 
-        ///checking the device of mobile data in online and offline(show network error message)
-        /// allergies api implement 
-        if (BaseApplication.isOnline(requireContext())) {
-            allergenIngredientApi()
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+
+
+        if (sessionManagement.getCookingScreen()!="Profile"){
+            ///checking the device of mobile data in online and offline(show network error message)
+            ///checking the device of mobile data in online and offline(show network error message)
+            /// allergies api implement
+            if (BaseApplication.isOnline(requireContext())) {
+                allergenIngredientApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }else{
+            if (BaseApplication.isOnline(requireActivity())) {
+                allergenIngredientSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
         ///main function using all triggered of this screen
         initialize()
 
         return binding!!.root
+    }
+
+    private fun allergenIngredientSelectApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            allergenIngredientViewModel.userPreferencesApi{
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                        if (bodyModel.code == 200 && bodyModel.success) {
+                            showDataInUi(bodyModel.data.allergesingredient)
+                        } else {
+                            if (bodyModel.code == ErrorMessage.code) {
+                                showAlertFunction(bodyModel.message, true)
+                            }else{
+                                showAlertFunction(bodyModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            }
+        }
+
     }
 
     /// update progressbar value and progress
@@ -139,6 +193,45 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                     findNavController().navigate(R.id.favouriteCuisinesFragment)
                 }
             }
+        }
+
+        binding!!.rlUpdateAllergens.setOnClickListener{
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireActivity())) {
+                updateAllergensApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+    }
+
+    private fun updateAllergensApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            allergenIngredientViewModel.updateAllergiesApi({
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                        if (updateModel.code == 200 && updateModel.success) {
+                            findNavController().navigateUp()
+                        } else {
+                            if (updateModel.code == ErrorMessage.code) {
+                                showAlertFunction(updateModel.message, true)
+                            }else{
+                                showAlertFunction(updateModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            }, allergensSelectedId)
         }
     }
 

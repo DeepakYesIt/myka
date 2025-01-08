@@ -5,12 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.yesitlabs.mykaapp.OnItemClickListener
 import com.yesitlabs.mykaapp.OnItemClickedListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.databinding.AdapterBodyGoalsBinding
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
-import com.yesitlabs.mykaapp.model.DataModel
 
 class DietaryRestrictionsAdapter(private var datalist: List<DietaryRestrictionsModelData>, private var requireActivity: FragmentActivity,
                                  private var onItemClickListener: OnItemClickedListener
@@ -28,44 +26,57 @@ class DietaryRestrictionsAdapter(private var datalist: List<DietaryRestrictionsM
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.binding.tvTitleName.text=datalist[position].name
 
-
-        // Handle selection UI and ID addition
-        if (position in selectedPositions) {
-            if (!dietaryId.contains(datalist[position].id.toString())) {
-                dietaryId.add(datalist[position].id.toString())
-            }
-            holder.binding.imageRightTick.visibility = View.VISIBLE
-            holder.binding.relMainLayout.setBackgroundResource(R.drawable.orange_box_bg)
-        } else {
-            dietaryId.remove(datalist[position].id.toString())
-            holder.binding.imageRightTick.visibility = View.GONE
-            holder.binding.relMainLayout.setBackgroundResource(R.drawable.gray_box_border_bg)
-        }
-
-        // Handle item click
-        holder.binding.relMainLayout.setOnClickListener {
-            if (position == 0) {
-                selectedPositions.clear()
-                selectedPositions.add(0)
-                dietaryId.clear()
-                dietaryId.add(datalist[position].id.toString())
-            } else {
-                if (0 in selectedPositions) {
-                    selectedPositions.remove(0)
-                    dietaryId.clear()
-                }
-                if (position in selectedPositions) {
-                    selectedPositions.remove(position)
-                    dietaryId.remove(datalist[position].id.toString())
-                } else {
-                    selectedPositions.add(position)
+        // Inside your adapter's onBindViewHolder method
+        holder.binding.apply {
+            // Handle selection UI based on the data model's 'selected' property
+            if (datalist[position].selected) {
+                imageRightTick.visibility = View.VISIBLE
+                relMainLayout.setBackgroundResource(R.drawable.orange_box_bg)
+                if (!dietaryId.contains(datalist[position].id.toString())) {
                     dietaryId.add(datalist[position].id.toString())
                 }
-            }
-            notifyDataSetChanged()
-            onItemClickListener.itemClicked(position, dietaryId, "2", "")
-        }
+                onItemClickListener.itemClicked(position, dietaryId, "2", "")
 
+            } else {
+                imageRightTick.visibility = View.GONE
+                relMainLayout.setBackgroundResource(R.drawable.gray_box_border_bg)
+                dietaryId.remove(datalist[position].id.toString())
+            }
+
+            // Handle item click
+            relMainLayout.setOnClickListener {
+                if (position == 0) {
+                    // Handle "select all" or first item case
+                    selectedPositions.clear()
+                    datalist.forEach { it.selected = false } // Reset all selections
+                    dietaryId.clear()
+                    datalist[position].selected = true // Mark the first item as selected
+                    selectedPositions.add(0)
+                    dietaryId.add(datalist[position].id.toString())
+                } else {
+                    // Remove "select all" if another item is clicked
+                    if (0 in selectedPositions) {
+                        selectedPositions.remove(0)
+                        datalist[0].selected = false
+                        dietaryId.clear()
+                    }
+
+                    // Toggle selection state for the clicked item
+                    if (position in selectedPositions) {
+                        selectedPositions.remove(position)
+                        datalist[position].selected = false
+                        dietaryId.remove(datalist[position].id.toString())
+                    } else {
+                        selectedPositions.add(position)
+                        datalist[position].selected = true
+                        dietaryId.add(datalist[position].id.toString())
+                    }
+                }
+
+                notifyDataSetChanged() // Refresh the UI
+                onItemClickListener.itemClicked(position, dietaryId, "2", "")
+            }
+        }
 
     }
 

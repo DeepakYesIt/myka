@@ -14,11 +14,22 @@ import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.gson.Gson
 import com.yesitlabs.mykaapp.basedata.SessionManagement
 import com.yesitlabs.mykaapp.R
+import com.yesitlabs.mykaapp.basedata.BaseApplication
+import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.databinding.FragmentSpendingOnGroceriesBinding
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.GetUserPreference
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.GrocereisExpenses
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.spendingOnGroceries.viewmodel.SpendingGroceriesViewModel
+import com.yesitlabs.mykaapp.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SpendingOnGroceriesFragment : Fragment() {
@@ -28,6 +39,7 @@ class SpendingOnGroceriesFragment : Fragment() {
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue:Int=0
     private var status:String=""
+    private lateinit var spendingGroceriesViewModel: SpendingGroceriesViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +47,8 @@ class SpendingOnGroceriesFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentSpendingOnGroceriesBinding.inflate(inflater, container, false)
+
+        spendingGroceriesViewModel = ViewModelProvider(this)[SpendingGroceriesViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
         if (sessionManagement.getCookingFor().equals("Myself")){
@@ -49,6 +63,23 @@ class SpendingOnGroceriesFragment : Fragment() {
             updateProgress(9)
         }
 
+        if (sessionManagement.getCookingScreen().equals("Profile")){
+            binding!!.llBottomBtn.visibility=View.GONE
+            binding!!.rlUpdateSpendingGroc.visibility=View.VISIBLE
+        }else{
+            binding!!.llBottomBtn.visibility=View.VISIBLE
+            binding!!.rlUpdateSpendingGroc.visibility=View.GONE
+        }
+
+        if (sessionManagement.getCookingScreen()=="Profile"){
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireContext())) {
+                spendingGroceriesApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
@@ -57,6 +88,55 @@ class SpendingOnGroceriesFragment : Fragment() {
 
         initialize()
         return binding!!.root
+    }
+
+    private fun spendingGroceriesApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            spendingGroceriesViewModel.userPreferencesApi {
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                        if (bodyModel.code == 200 && bodyModel.success) {
+                            showDataInUi(bodyModel.data.grocereisExpenses)
+                        } else {
+                            if (bodyModel.code == ErrorMessage.code) {
+                                showAlertFunction(bodyModel.message, true)
+                            }else{
+                                showAlertFunction(bodyModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showDataInUi(groceriesExercise: GrocereisExpenses) {
+
+        if (groceriesExercise!=null){
+
+            if (groceriesExercise.amount!=null){
+                binding!!.etSpendingAmount.setText(groceriesExercise.amount.toString())
+            }
+
+            if (groceriesExercise.duration!=null){
+                binding!!.tvChooseDuration.text = groceriesExercise.duration.toString()
+            }
+
+        }
+    }
+
+    private fun showAlertFunction(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
     }
 
     private fun updateProgress(progress: Int) {
@@ -126,6 +206,44 @@ class SpendingOnGroceriesFragment : Fragment() {
             binding!!.tvChooseDuration.setCompoundDrawables(null, null, drawableEnd, null)
             isOpen=true
             searchable()
+        }
+
+        binding!!.rlUpdateSpendingGroc.setOnClickListener{
+            if (BaseApplication.isOnline(requireContext())) {
+                updateSpendingGrocApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+    }
+
+    private fun updateSpendingGrocApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            spendingGroceriesViewModel.updateSpendingGroceriesApi({
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                        if (updateModel.code == 200 && updateModel.success) {
+                            findNavController().navigateUp()
+                        } else {
+                            if (updateModel.code == ErrorMessage.code) {
+                                showAlertFunction(updateModel.message, true)
+                            }else{
+                                showAlertFunction(updateModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            },binding!!.etSpendingAmount.text.toString().trim(),binding!!.tvChooseDuration.text.toString().trim())
         }
     }
 

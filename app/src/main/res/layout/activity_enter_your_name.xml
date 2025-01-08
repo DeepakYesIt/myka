@@ -145,7 +145,7 @@
                         android:gravity="center_vertical"
                         android:padding="@dimen/_10sdp"
                         android:singleLine="true"
-                        android:text="@string/select_gender"
+                        android:hint="@string/select_gender"
                         android:textColor="@color/light_black"
                         android:textColorHint="@color/light_black"
                         android:textSize="@dimen/_13sdp" />

@@ -25,6 +25,8 @@ import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.databinding.FragmentCookingFrequencyBinding
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModel
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModelData
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.GetUserPreference
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.cookingFrequency.viewmodel.CookingFrequencyViewModel
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
 import com.yesitlabs.mykaapp.model.DataModel
@@ -69,16 +71,34 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
             updateProgress(8)
         }
 
+        if (sessionManagement.getCookingScreen().equals("Profile")){
+            binding!!.llBottomBtn.visibility=View.GONE
+            binding!!.rlUpdateCookingFrequency.visibility=View.VISIBLE
+        }else{
+            binding!!.llBottomBtn.visibility=View.VISIBLE
+            binding!!.rlUpdateCookingFrequency.visibility=View.GONE
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
         })
 
-        if (BaseApplication.isOnline(requireContext())) {
-            cookingFrequencyApi()
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+
+        if (sessionManagement.getCookingScreen()!="Profile"){
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireActivity())) {
+                cookingFrequencyApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }else{
+            if (BaseApplication.isOnline(requireActivity())) {
+                cookingFrequencySelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
         initialize()
@@ -115,6 +135,45 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
                 }
             }
         }
+
+        binding!!.rlUpdateCookingFrequency.setOnClickListener{
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireActivity())) {
+                updateCookFrequencyApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+    }
+
+    private fun updateCookFrequencyApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            cookingFrequencyViewModel.updateCookingFrequencyApi({
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                        if (updateModel.code == 200 && updateModel.success) {
+                            findNavController().navigateUp()
+                        } else {
+                            if (updateModel.code == ErrorMessage.code) {
+                                showAlertFunction(updateModel.message, true)
+                            }else{
+                                showAlertFunction(updateModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            }, cookingSelect.toString())
+        }
     }
 
     private fun stillSkipDialog() {
@@ -139,6 +198,36 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
                 findNavController().navigate(R.id.spendingOnGroceriesFragment)
             } else {
                 findNavController().navigate(R.id.cookingScheduleFragment)
+            }
+        }
+    }
+
+    private fun cookingFrequencySelectApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            cookingFrequencyViewModel.userPreferencesApi {
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                        if (bodyModel.code == 200 && bodyModel.success) {
+                            showDataInUi(bodyModel.data.cookingfrequency)
+                        } else {
+                            if (bodyModel.code == ErrorMessage.code) {
+                                showAlertFunction(bodyModel.message, true)
+                            }else{
+                                showAlertFunction(bodyModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
             }
         }
     }

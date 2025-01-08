@@ -27,9 +27,9 @@ import com.yesitlabs.mykaapp.databinding.FragmentLoginBinding
 import com.yesitlabs.mykaapp.commonworkutils.CommonWorkUtils
 import com.yesitlabs.mykaapp.fragment.authfragment.login.model.LoginModel
 import com.yesitlabs.mykaapp.fragment.authfragment.login.model.LoginModelData
+import com.yesitlabs.mykaapp.fragment.authfragment.login.model.SocialLoginModel
+import com.yesitlabs.mykaapp.fragment.authfragment.login.model.SocialLoginModelData
 import com.yesitlabs.mykaapp.fragment.authfragment.login.viewmodel.LoginViewModel
-import com.yesitlabs.mykaapp.fragment.authfragment.verification.model.SignUpVerificationModel
-import com.yesitlabs.mykaapp.fragment.authfragment.verification.model.SignUpVerificationModelData
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -297,7 +297,10 @@ class LoginFragment : Fragment() {
     private fun showDataInUi(loginModelData: LoginModelData) {
 
         sessionManagement.setLoginSession(true)
-        sessionManagement.setEmail(binding!!.etSignEmailPhone.text.toString().trim())
+
+        if (loginModelData.email!=null){
+            sessionManagement.setEmail(loginModelData.email)
+        }
 
         if (loginModelData.name != null) {
             sessionManagement.setUserName(loginModelData.name)
@@ -418,9 +421,9 @@ class LoginFragment : Fragment() {
                         is NetworkResult.Success -> {
                             val gson = Gson()
                             val signUpVerificationModel =
-                                gson.fromJson(it.data, SignUpVerificationModel::class.java)
+                                gson.fromJson(it.data, SocialLoginModel::class.java)
                             if (signUpVerificationModel.code == 200 && signUpVerificationModel.success) {
-                                showDataInSession(signUpVerificationModel.data, personEmail)
+                                showDataInSession(signUpVerificationModel.data)
                             } else {
                                 if (signUpVerificationModel.code == ErrorMessage.code) {
                                     showAlertFunction(signUpVerificationModel.message, true)
@@ -449,6 +452,7 @@ class LoginFragment : Fragment() {
                 reasonTakeAway,
                 cookingFor,
                 partnerName,
+                partnerAge,
                 partnerGender,
                 familyMemName,
                 familyMemAge,
@@ -467,26 +471,29 @@ class LoginFragment : Fragment() {
     }
 
     private fun showDataInSession(
-        signUpVerificationModelData: SignUpVerificationModelData,
-        personEmail: String?
+        signUpVerificationModelData: SocialLoginModelData
     ) {
 
         sessionManagement.setLoginSession(true)
-        sessionManagement.setEmail(personEmail!!)
+
+        if (signUpVerificationModelData.email!=null){
+            sessionManagement.setEmail(signUpVerificationModelData.email.toString())
+
+        }
 
         if (signUpVerificationModelData.name != null) {
             sessionManagement.setUserName(signUpVerificationModelData.name)
         }
 
-        if (signUpVerificationModelData.user_type == 1) {
+        if (signUpVerificationModelData.cooking_for_type == 1) {
             sessionManagement.setCookingFor("Myself")
         }
 
-        if (signUpVerificationModelData.user_type == 2) {
+        if (signUpVerificationModelData.cooking_for_type == 2) {
             sessionManagement.setCookingFor("MyPartner")
         }
 
-        if (signUpVerificationModelData.user_type == 3) {
+        if (signUpVerificationModelData.cooking_for_type == 3) {
             sessionManagement.setCookingFor("MyFamily")
         }
 

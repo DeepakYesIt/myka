@@ -48,8 +48,8 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
     private var dataList2: MutableList<DataModel> = mutableListOf()
     private var dataList3: MutableList<DataModel> = mutableListOf()
     private var calendarDayAdapter: CalendarDayAdapter? = null
-    private var statuses:String?=""
-    private var checkStatus:Boolean?=false
+    private var statuses: String? = ""
+    private var checkStatus: Boolean? = false
 
     private val calendar = Calendar.getInstance()
     private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
@@ -61,14 +61,16 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
         // Inflate the layout for this fragment
         binding = FragmentFullCookedScheduleBinding.inflate(inflater, container, false)
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
+        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
+        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(
+            requireActivity(),
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
 
         onClickFalseEnabled()
         fullCookSchBreakFastModel()
@@ -81,7 +83,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
 
     private fun initialize() {
 
-        binding!!.relCalendarView.setOnClickListener{
+        binding!!.relCalendarView.setOnClickListener {
             openDialog()
         }
 
@@ -108,13 +110,13 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
             onClickFalseEnabled()
         }
 
-        binding!!.imgBackCookingSchedule.setOnClickListener{
+        binding!!.imgBackCookingSchedule.setOnClickListener {
             findNavController().navigateUp()
         }
 
     }
 
-    private fun openDialog(){
+    private fun openDialog() {
 
         val dialog = Dialog(requireActivity())
 
@@ -127,16 +129,16 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
 
         calendarView.setOnDateChangeListener { view: CalendarView?, year: Int, month: Int, dayOfMonth: Int ->
             // Month is zero-based (January = 0), so add 1 for human-readable format
-            val selectedDate = dayOfMonth.toString() + "-"+(month + 1)+"-" + year
+            val selectedDate = dayOfMonth.toString() + "-" + (month + 1) + "-" + year
             val list = WeekDaysCalculator.getWeekDays(selectedDate);
-            val resultList = mutableListOf<Pair<String,String>>()
-            list.forEach{
+            val resultList = mutableListOf<Pair<String, String>>()
+            list.forEach {
                 Log.d("TESTING_LAWCO", it.toString())
                 val arr = it.split("-")
-                resultList.add(Pair<String,String>(arr[0],arr[1]))
+                resultList.add(Pair<String, String>(arr[0], arr[1]))
             }
             resultList.forEach {
-                Log.d("TESTING_LAWCO", it.first+" "+it.second)
+                Log.d("TESTING_LAWCO", it.first + " " + it.second)
             }
         }
 
@@ -149,18 +151,33 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
     }
 
     private fun updateWeek() {
+        val today = Calendar.getInstance()
+
+        // Set the start of the week to Monday
         val startOfWeek = calendar.apply {
             set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
         }.time
 
+        // Set the end of the week (Sunday)
         val endOfWeek = calendar.apply {
             add(Calendar.DAY_OF_WEEK, 6)
         }.time
 
+        // Update the week range text
         binding!!.textWeekRange.text =
             "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
-        binding!!.recyclerViewWeekDays.adapter = calendarDayAdapter
+
+        // Hide the "Previous" button if today is within the current week range
+        binding!!.imagePrevious.visibility =
+            if (today.time.after(startOfWeek) && today.time.before(endOfWeek) || today.time == startOfWeek) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+
+        // Update the RecyclerView
         binding!!.recyclerViewWeekDays.adapter = CalendarDayAdapter(getDaysOfWeek()) {
+            // Handle item click if needed
         }
     }
 
@@ -185,7 +202,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
     }
 
     private fun fullCookSchBreakFastModel() {
-        if (dataList1!=null){
+        if (dataList1 != null) {
             dataList1.clear()
         }
         val data1 = DataModel()
@@ -204,12 +221,13 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
         dataList1.add(data1)
         dataList1.add(data2)
 
-        ingredientBreakFastAdapter = IngredientsBreakFastAdapter(dataList1, requireActivity(), this, this)
+        ingredientBreakFastAdapter =
+            IngredientsBreakFastAdapter(dataList1, requireActivity(), this, this)
         binding!!.rcySearchBreakFast.adapter = ingredientBreakFastAdapter
     }
 
     private fun fullCookSchLunchModel() {
-        if (dataList2!=null){
+        if (dataList2 != null) {
             dataList2.clear()
         }
         val data1 = DataModel()
@@ -232,7 +250,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
     }
 
     private fun fullCookSchDinnerModel() {
-        if (dataList3!=null){
+        if (dataList3 != null) {
             dataList3.clear()
         }
         val data1 = DataModel()
@@ -284,9 +302,9 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
             if (status == "1") {
                 removeDayDialog(position, type)
             }
-        } else if (type=="missingIng") {
+        } else if (type == "missingIng") {
             findNavController().navigate(R.id.missingIngredientsFragment)
-        }else{
+        } else {
             findNavController().navigate(R.id.recipeDetailsFragment)
         }
     }
@@ -295,52 +313,60 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
 
         val dialogAddRecipe: Dialog = context?.let { Dialog(it) }!!
         dialogAddRecipe.setContentView(R.layout.alert_dialog_add_recipe)
-        dialogAddRecipe.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialogAddRecipe.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
         dialogAddRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val rlDoneBtn = dialogAddRecipe.findViewById<RelativeLayout>(R.id.rlDoneBtn)
-        val relCreateNewCookBook = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
+        val relCreateNewCookBook =
+            dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
         val relFavourites = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relFavourites)
         val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
 
         dialogAddRecipe.show()
         dialogAddRecipe.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
-        relCreateNewCookBook.setOnClickListener{
-            statuses="newCook"
+        relCreateNewCookBook.setOnClickListener {
+            statuses = "newCook"
             relCreateNewCookBook.setBackgroundResource(R.drawable.light_green_rectangular_bg)
             imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
             relFavourites.setBackgroundResource(0)
-            checkStatus=false
+            checkStatus = false
         }
 
-        imgCheckBoxOrange.setOnClickListener{
-            if (checkStatus==true){
-                statuses=""
+        imgCheckBoxOrange.setOnClickListener {
+            if (checkStatus == true) {
+                statuses = ""
                 imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
                 relFavourites.setBackgroundResource(0)
                 relCreateNewCookBook.setBackgroundResource(0)
-                relCreateNewCookBook.background=null
-                checkStatus=false
-            }else{
+                relCreateNewCookBook.background = null
+                checkStatus = false
+            } else {
                 relFavourites.setBackgroundResource(R.drawable.light_green_rectangular_bg)
                 relCreateNewCookBook.setBackgroundResource(0)
-                statuses="favourites"
+                statuses = "favourites"
                 imgCheckBoxOrange.setImageResource(R.drawable.orange_checkbox_images)
-                checkStatus=true
+                checkStatus = true
             }
         }
 
 
-        rlDoneBtn.setOnClickListener{
-            if (statuses==""){
-                Toast.makeText(requireActivity(),"Please select atleast one of them",Toast.LENGTH_LONG).show()
-            }else if (statuses=="favourites"){
+        rlDoneBtn.setOnClickListener {
+            if (statuses == "") {
+                Toast.makeText(
+                    requireActivity(),
+                    "Please select atleast one of them",
+                    Toast.LENGTH_LONG
+                ).show()
+            } else if (statuses == "favourites") {
                 dialogAddRecipe.dismiss()
-            }else{
+            } else {
                 dialogAddRecipe.dismiss()
-                val bundle=Bundle()
-                bundle.putString("value","New")
-                findNavController().navigate(R.id.createCookBookFragment,bundle)
+                val bundle = Bundle()
+                bundle.putString("value", "New")
+                findNavController().navigate(R.id.createCookBookFragment, bundle)
             }
         }
     }
@@ -370,9 +396,9 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
             } else {
                 dataList3.removeAt(position!!)
             }
-/*
-            chooseDayDialog()
-*/
+            /*
+                        chooseDayDialog()
+            */
             dialogRemoveDay.dismiss()
         }
     }

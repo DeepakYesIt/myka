@@ -24,6 +24,8 @@ import com.yesitlabs.mykaapp.adapter.MealRoutineAdapter
 import com.yesitlabs.mykaapp.basedata.BaseApplication
 import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.databinding.FragmentMealRoutineBinding
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.GetUserPreference
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModel
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModelData
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.mealRoutine.viewmodel.MealRoutineViewModel
@@ -80,6 +82,29 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListen
             updateProgress(7)
         }
 
+        if (sessionManagement.getCookingScreen().equals("Profile")){
+            binding!!.llBottomBtn.visibility=View.GONE
+            binding!!.rlUpdateMealRoutine.visibility=View.VISIBLE
+        }else{
+            binding!!.llBottomBtn.visibility=View.VISIBLE
+            binding!!.rlUpdateMealRoutine.visibility=View.GONE
+        }
+
+        if (sessionManagement.getCookingScreen()!="Profile"){
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireContext())) {
+                mealRoutineApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }else{
+            if (BaseApplication.isOnline(requireContext())) {
+                mealRoutineSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
@@ -101,17 +126,7 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListen
         binding!!.tvSkipBtn.setOnClickListener(this)
         binding!!.imgBackMealRoutine.setOnClickListener(this)
         binding!!.tvNextBtn.setOnClickListener(this)
-//        binding!!.relSelectAll.setOnClickListener(this)
-//        binding!!.relBreakFast.setOnClickListener(this)
-//        binding!!.relLunch.setOnClickListener(this)
-//        binding!!.relDinner.setOnClickListener(this)
-//        binding!!.relSnacks.setOnClickListener(this)
-
-        if (BaseApplication.isOnline(requireContext())) {
-            mealRoutineApi()
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
+        binding!!.rlUpdateMealRoutine.setOnClickListener(this)
 
     }
 
@@ -166,6 +181,37 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListen
         }
     }
 
+
+    private fun mealRoutineSelectApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            mealRoutineViewModel.userPreferencesApi {
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                        if (bodyModel.code == 200 && bodyModel.success) {
+                            showDataInUi(bodyModel.data.mealroutine)
+                        } else {
+                            if (bodyModel.code == ErrorMessage.code) {
+                                showAlertFunction(bodyModel.message, true)
+                            }else{
+                                showAlertFunction(bodyModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            }
+        }
+    }
+
     private fun showDataInUi(dietaryModelData: List<MealRoutineModelData>) {
         if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
             mealRoutineAdapter = MealRoutineAdapter(dietaryModelData, requireActivity(), this)
@@ -194,137 +240,46 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListen
                 }
             }
 
-//            R.id.relSelectAll ->{
-//                if (isOpenSelectAll){
-//                    status=""
-//                    isOpenSelectAll=false
-//                    binding!!.relSelectAll.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                    binding!!.imageSelectAll.visibility=View.GONE
-//
-//                    binding!!.relBreakFast.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                    binding!!.imageBreakFast.visibility=View.GONE
-//
-//                    binding!!.relLunch.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                    binding!!.imageLunch.visibility=View.GONE
-//
-//                    binding!!.relDinner.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                    binding!!.imageDinner.visibility=View.GONE
-//
-//                    binding!!.relSnacks.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                    binding!!.imageSnacks.visibility=View.GONE
-//                    status()
-//                }else{
-//                    status="2"
-//                    binding!!.relSelectAll.setBackgroundResource(R.drawable.green_box_bg)
-//                    binding!!.imageSelectAll.visibility=View.VISIBLE
-//
-//                    binding!!.relBreakFast.setBackgroundResource(R.drawable.orange_box_bg)
-//                    binding!!.imageBreakFast.visibility=View.VISIBLE
-//
-//                    binding!!.relLunch.setBackgroundResource(R.drawable.orange_box_bg)
-//                    binding!!.imageLunch.visibility=View.VISIBLE
-//
-//                    binding!!.relDinner.setBackgroundResource(R.drawable.orange_box_bg)
-//                    binding!!.imageDinner.visibility=View.VISIBLE
-//
-//                    binding!!.relSnacks.setBackgroundResource(R.drawable.orange_box_bg)
-//                    binding!!.imageSnacks.visibility=View.VISIBLE
-//                    isOpenSelectAll=true
-//                    status()
-//                }
-//
-//            }
-
-//            R.id.relBreakFast->{
-//                status="2"
-//                binding!!.relSelectAll.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageSelectAll.visibility=View.GONE
-//
-//                binding!!.relBreakFast.setBackgroundResource(R.drawable.orange_box_bg)
-//                binding!!.imageBreakFast.visibility=View.VISIBLE
-//
-//                binding!!.relLunch.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageLunch.visibility=View.GONE
-//
-//                binding!!.relDinner.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageDinner.visibility=View.GONE
-//
-//                binding!!.relSnacks.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageSnacks.visibility=View.GONE
-//                status()
-//            }
-//
-//            R.id.relLunch->{
-//                status="2"
-//                binding!!.relSelectAll.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageSelectAll.visibility=View.GONE
-//
-//                binding!!.relBreakFast.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageBreakFast.visibility=View.GONE
-//
-//                binding!!.relLunch.setBackgroundResource(R.drawable.orange_box_bg)
-//                binding!!.imageLunch.visibility=View.VISIBLE
-//
-//                binding!!.relDinner.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageDinner.visibility=View.GONE
-//
-//                binding!!.relSnacks.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageSnacks.visibility=View.GONE
-//                status()
-//            }
-//
-//            R.id.relDinner->{
-//                status="2"
-//                binding!!.relSelectAll.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageSelectAll.visibility=View.GONE
-//
-//                binding!!.relBreakFast.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageBreakFast.visibility=View.GONE
-//
-//                binding!!.relLunch.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageLunch.visibility=View.GONE
-//
-//                binding!!.relDinner.setBackgroundResource(R.drawable.orange_box_bg)
-//                binding!!.imageDinner.visibility=View.VISIBLE
-//
-//                binding!!.relSnacks.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageSnacks.visibility=View.GONE
-//                status()
-//
-//            }
-//
-//            R.id.relSnacks->{
-//                status="2"
-//                binding!!.relSelectAll.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageSelectAll.visibility=View.GONE
-//
-//                binding!!.relBreakFast.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageBreakFast.visibility=View.GONE
-//
-//                binding!!.relLunch.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageLunch.visibility=View.GONE
-//
-//                binding!!.relDinner.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageDinner.visibility=View.GONE
-//
-//                binding!!.relSnacks.setBackgroundResource(R.drawable.orange_box_bg)
-//                binding!!.imageSnacks.visibility=View.VISIBLE
-//                status()
-//
-//            }
+            R.id.rlUpdateMealRoutine->{
+                if (BaseApplication.isOnline(requireContext())) {
+                    updateMealRoutineApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
 
         }
     }
 
-//    private fun status(){
-//        if (status != "2") {
-//            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
-//        } else {
-//            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-//
-//        }
-//    }
-
+    private fun updateMealRoutineApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            mealRoutineViewModel.updateMealRoutineApi({
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                        if (updateModel.code == 200 && updateModel.success) {
+                            findNavController().navigateUp()
+                        } else {
+                            if (updateModel.code == ErrorMessage.code) {
+                                showAlertFunction(updateModel.message, true)
+                            }else{
+                                showAlertFunction(updateModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            },mealRoutineSelectedId)
+        }
+    }
 
     override fun itemClicked(
         position: Int?,

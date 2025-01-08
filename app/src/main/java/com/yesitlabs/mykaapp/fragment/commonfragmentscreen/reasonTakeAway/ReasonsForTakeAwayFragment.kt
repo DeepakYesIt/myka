@@ -27,6 +27,8 @@ import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.databinding.FragmentReasonsForTakeAwayBinding
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModel
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModelData
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.GetUserPreference
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.reasonTakeAway.viewmodel.ReasonTakeAwayViewModel
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
 import com.yesitlabs.mykaapp.model.DataModel
@@ -64,6 +66,29 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
             updateProgress(11)
         }
 
+        if (sessionManagement.getCookingScreen().equals("Profile")){
+            binding!!.llBottomBtn.visibility=View.GONE
+            binding!!.rlUpdateReasonTakeAway.visibility=View.VISIBLE
+        }else{
+            binding!!.llBottomBtn.visibility=View.VISIBLE
+            binding!!.rlUpdateReasonTakeAway.visibility=View.GONE
+        }
+
+        if (sessionManagement.getCookingScreen()!="Profile"){
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireContext())) {
+                reasonTakeAwayApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }else{
+            if (BaseApplication.isOnline(requireContext())) {
+                reasonTakeAwaySelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
             object : OnBackPressedCallback(true) {
@@ -72,17 +97,40 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 }
             })
 
-        if (BaseApplication.isOnline(requireContext())) {
-            reasonTakeAwayApi()
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
 
-
-//        eatingOutModel()
         initialize()
 
         return binding!!.root
+    }
+
+    private fun reasonTakeAwaySelectApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            reasonTakeAwayViewModel.userPreferencesApi {
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                        if (bodyModel.code == 200 && bodyModel.success) {
+                            showDataInUi(bodyModel.data.takeawayreason)
+                        } else {
+                            if (bodyModel.code == ErrorMessage.code) {
+                                showAlertFunction(bodyModel.message, true)
+                            }else{
+                                showAlertFunction(bodyModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            }
+        }
     }
 
     private fun updateProgress(progress: Int) {
@@ -106,6 +154,44 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
                 startActivity(intent)
             }
+        }
+
+        binding!!.rlUpdateReasonTakeAway.setOnClickListener{
+            if (BaseApplication.isOnline(requireContext())) {
+                updateReasonTakeAwayApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+    }
+
+    private fun updateReasonTakeAwayApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            reasonTakeAwayViewModel.updateReasonTakeAwayApi({
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                        if (updateModel.code == 200 && updateModel.success) {
+                            findNavController().navigateUp()
+                        } else {
+                            if (updateModel.code == ErrorMessage.code) {
+                                showAlertFunction(updateModel.message, true)
+                            }else{
+                                showAlertFunction(updateModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            },reasonSelect.toString())
         }
     }
 
@@ -171,43 +257,6 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
             startActivity(intent)
         }
     }
-
-//    private fun eatingOutModel() {
-//        val data1 = DataModel()
-//        val data2 = DataModel()
-//        val data3 = DataModel()
-//        val data4 = DataModel()
-//        val data5 = DataModel()
-//
-//        data1.title = "No food prepared"
-//        data1.isOpen= false
-//        data1.type = "TakeAway"
-//
-//        data2.title = "Convenience"
-//        data2.isOpen= false
-//        data2.type = "TakeAway"
-//
-//        data3.title = "Cravings"
-//        data3.isOpen= false
-//        data3.type = "TakeAway"
-//
-//        data4.title = "Social Occasions"
-//        data4.isOpen= false
-//        data4.type = "TakeAway"
-//
-//        data5.title = "Add More"
-//        data5.isOpen= false
-//        data5.type = "TakeAway"
-//
-//        dataList.add(data1)
-//        dataList.add(data2)
-//        dataList.add(data3)
-//        dataList.add(data4)
-//        dataList.add(data5)
-//
-//        dietaryRestrictionsAdapter = AdapterCookingSchedule(dataList, requireActivity(),this)
-//        binding!!.rcyEatingOut.adapter = dietaryRestrictionsAdapter
-//    }
 
     override fun itemClick(selectItem: Int?, status1: String?, type: String?) {
         if (status1 == "1") {

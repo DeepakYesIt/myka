@@ -395,6 +395,7 @@ class SignUpFragment : Fragment() {
                 reasonTakeAway,
                 cookingFor,
                 partnerName,
+                partnerAge,
                 partnerGender,
                 familyMemName,
                 familyMemAge,
