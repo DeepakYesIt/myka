@@ -11,4 +11,12 @@ class MealRoutineViewModel @Inject constructor(private val repository: MainRepos
         repository.getMealRoutine { successCallback(it) }
     }
 
+    suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.userPreferencesApi{ successCallback(it) }
+    }
+
+    suspend fun updateMealRoutineApi(successCallback: (response: NetworkResult<String>) -> Unit,mealRoutineId: List<String>?){
+        repository.updateMealRoutineApi ({ successCallback(it) },mealRoutineId)
+    }
+
 }

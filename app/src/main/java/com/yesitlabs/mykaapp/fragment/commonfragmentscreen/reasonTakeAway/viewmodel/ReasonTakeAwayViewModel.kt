@@ -12,4 +12,12 @@ class ReasonTakeAwayViewModel @Inject constructor(private val repository: MainRe
         repository.getTakeAwayReason { successCallback(it) }
     }
 
+    suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.userPreferencesApi{ successCallback(it) }
+    }
+
+    suspend fun updateReasonTakeAwayApi(successCallback: (response: NetworkResult<String>) -> Unit,reasonTakeAway: String?){
+        repository.updateReasonTakeAwayApi ({ successCallback(it) },reasonTakeAway)
+    }
+
 }

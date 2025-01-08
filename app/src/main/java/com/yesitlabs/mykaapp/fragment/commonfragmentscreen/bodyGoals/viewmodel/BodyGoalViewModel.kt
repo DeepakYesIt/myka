@@ -13,4 +13,12 @@ class BodyGoalViewModel @Inject constructor(private val repository: MainReposito
         repository.bogyGoal { successCallback(it) }
     }
 
+    suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.userPreferencesApi{ successCallback(it) }
+    }
+
+    suspend fun updateBodyGoalApi(successCallback: (response: NetworkResult<String>) -> Unit,bodyGoal: String){
+        repository.updateBodyGoalApi ({ successCallback(it) },bodyGoal)
+    }
+
 }

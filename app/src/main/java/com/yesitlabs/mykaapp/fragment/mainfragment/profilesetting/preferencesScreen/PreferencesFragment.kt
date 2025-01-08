@@ -7,19 +7,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.findNavController
+import com.yesitlabs.mykaapp.OnItemClickListener
+import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.basedata.SessionManagement
 import com.yesitlabs.mykaapp.activity.MainActivity
 import com.yesitlabs.mykaapp.adapter.PreferencesAdapter
 import com.yesitlabs.mykaapp.databinding.FragmentPreferencesBinding
 import com.yesitlabs.mykaapp.model.DataModel
 
-class PreferencesFragment : Fragment() {
+class PreferencesFragment : Fragment(),OnItemClickListener {
 
     private var binding:FragmentPreferencesBinding?=null
     private lateinit var sessionManagement: SessionManagement
     private var preferenceAdapter: PreferencesAdapter? = null
     private var screenType:String?=null
-
     val dataList = ArrayList<DataModel>()
 
     override fun onCreateView(
@@ -74,6 +75,7 @@ class PreferencesFragment : Fragment() {
         val data7 = DataModel()
         val data8 = DataModel()
         val data9 = DataModel()
+        val data10 = DataModel()
 
         data1.title = "Body Goals"
         data1.isOpen = false
@@ -111,6 +113,10 @@ class PreferencesFragment : Fragment() {
         data9.isOpen = false
         data9.type = "Myself"
 
+        data10.title = "Reason Take Away"
+        data10.isOpen = false
+        data10.type = "Myself"
+
         dataList.add(data1)
         dataList.add(data2)
         dataList.add(data3)
@@ -120,8 +126,9 @@ class PreferencesFragment : Fragment() {
         dataList.add(data7)
         dataList.add(data8)
         dataList.add(data9)
+        dataList.add(data10)
 
-        preferenceAdapter = PreferencesAdapter(dataList, requireActivity())
+        preferenceAdapter = PreferencesAdapter(dataList, requireActivity(),this)
         binding!!.recyPreferences.adapter = preferenceAdapter
 
     }
@@ -137,6 +144,7 @@ class PreferencesFragment : Fragment() {
         val data8 = DataModel()
         val data9 = DataModel()
         val data10 = DataModel()
+        val data11 = DataModel()
 
         data1.title = "Partner Info"
         data1.isOpen = false
@@ -178,6 +186,10 @@ class PreferencesFragment : Fragment() {
         data10.isOpen = false
         data10.type = "MyPartner"
 
+        data11.title = "Reason Take Away"
+        data11.isOpen = false
+        data11.type = "MyPartner"
+
         dataList.add(data1)
         dataList.add(data2)
         dataList.add(data3)
@@ -188,8 +200,9 @@ class PreferencesFragment : Fragment() {
         dataList.add(data8)
         dataList.add(data9)
         dataList.add(data10)
+        dataList.add(data11)
 
-        preferenceAdapter = PreferencesAdapter(dataList, requireActivity())
+        preferenceAdapter = PreferencesAdapter(dataList, requireActivity(),this)
         binding!!.recyPreferences.adapter = preferenceAdapter
 
     }
@@ -205,6 +218,7 @@ class PreferencesFragment : Fragment() {
         val data8 = DataModel()
         val data9 = DataModel()
         val data10 = DataModel()
+        val data11 = DataModel()
 
         data1.title = "Family Members"
         data1.isOpen = false
@@ -246,6 +260,10 @@ class PreferencesFragment : Fragment() {
         data10.isOpen = false
         data10.type = "MyFamily"
 
+        data11.title = "Reason Take Away"
+        data11.isOpen = false
+        data11.type = "MyFamily"
+
         dataList.add(data1)
         dataList.add(data2)
         dataList.add(data3)
@@ -257,8 +275,147 @@ class PreferencesFragment : Fragment() {
         dataList.add(data9)
         dataList.add(data10)
 
-        preferenceAdapter = PreferencesAdapter(dataList, requireActivity())
+        preferenceAdapter = PreferencesAdapter(dataList, requireActivity(),this)
         binding!!.recyPreferences.adapter = preferenceAdapter
+    }
+
+    override fun itemClick(position: Int?, cookingType: String?, tittleName: String?) {
+        sessionManagement.setCookingScreen("Profile")
+        sessionManagement.setCookingFor(cookingType.toString())
+        if (cookingType=="Myself"){
+            if (tittleName=="Body Goals"){
+                findNavController().navigate(R.id.bodyGoalsFragment)
+            }
+
+            if (tittleName=="Dietary Restrictions"){
+                findNavController().navigate(R.id.dietaryRestrictionsFragment)
+            }
+
+            if (tittleName=="Favorite Cuisines"){
+                findNavController().navigate(R.id.favouriteCuisinesFragment)
+            }
+
+            if (tittleName=="Disliked Ingredient"){
+                findNavController().navigate(R.id.ingredientDislikesFragment)
+            }
+
+            if (tittleName=="Allergies"){
+                findNavController().navigate(R.id.allergensIngredientsFragment)
+            }
+
+            if (tittleName=="Meal Routine"){
+                findNavController().navigate(R.id.mealRoutineFragment)
+            }
+
+            if (tittleName=="Cooking Frequency"){
+                findNavController().navigate(R.id.cookingFrequencyFragment)
+            }
+
+            if (tittleName=="Spending on Groceries"){
+                findNavController().navigate(R.id.spendingOnGroceriesFragment)
+            }
+
+            if (tittleName=="Eating Out"){
+                findNavController().navigate(R.id.eatingOutFragment)
+            }
+
+            if (tittleName=="Reason Take Away"){
+                findNavController().navigate(R.id.reasonsForTakeAwayFragment)
+            }
+
+        }else if (cookingType=="MyPartner"){
+
+            if (tittleName=="Partner Info"){
+                findNavController().navigate(R.id.partnerInfoDetailsFragment)
+            }
+
+            if (tittleName=="Body Goals"){
+                findNavController().navigate(R.id.bodyGoalsFragment)
+            }
+
+            if (tittleName=="Dietary Restrictions"){
+                findNavController().navigate(R.id.dietaryRestrictionsFragment)
+            }
+
+            if (tittleName=="Disliked Ingredient"){
+                findNavController().navigate(R.id.ingredientDislikesFragment)
+            }
+
+            if (tittleName=="Allergies"){
+                findNavController().navigate(R.id.allergensIngredientsFragment)
+            }
+
+            if (tittleName=="Favorite Cuisines"){
+                findNavController().navigate(R.id.favouriteCuisinesFragment)
+            }
+
+            if (tittleName=="Meal Prep Days"){
+                findNavController().navigate(R.id.mealRoutineFragment)
+            }
+
+            if (tittleName=="Cooking Frequency"){
+                findNavController().navigate(R.id.cookingFrequencyFragment)
+            }
+
+            if (tittleName=="Spending on Groceries"){
+                findNavController().navigate(R.id.spendingOnGroceriesFragment)
+            }
+
+            if (tittleName=="Eating Out"){
+                findNavController().navigate(R.id.eatingOutFragment)
+            }
+
+            if (tittleName=="Reason Take Away"){
+                findNavController().navigate(R.id.reasonsForTakeAwayFragment)
+            }
+
+        }else{
+            if (tittleName=="Family Members"){
+                findNavController().navigate(R.id.familyMembersFragment)
+            }
+
+            if (tittleName=="Body Goals"){
+                findNavController().navigate(R.id.bodyGoalsFragment)
+            }
+
+            if (tittleName=="Dietary Restrictions"){
+                findNavController().navigate(R.id.dietaryRestrictionsFragment)
+            }
+
+            if (tittleName=="Disliked Ingredient"){
+                findNavController().navigate(R.id.ingredientDislikesFragment)
+            }
+
+            if (tittleName=="Allergies"){
+                findNavController().navigate(R.id.allergensIngredientsFragment)
+            }
+
+            if (tittleName=="Favorite Cuisines"){
+                findNavController().navigate(R.id.favouriteCuisinesFragment)
+            }
+
+            if (tittleName=="Family Meal Preferences"){
+                findNavController().navigate(R.id.mealRoutineFragment)
+            }
+
+            if (tittleName=="Cooking Frequency"){
+                findNavController().navigate(R.id.cookingFrequencyFragment)
+            }
+
+            if (tittleName=="Spending on Groceries"){
+                findNavController().navigate(R.id.spendingOnGroceriesFragment)
+            }
+
+            if (tittleName=="Eating Out"){
+                findNavController().navigate(R.id.eatingOutFragment)
+            }
+
+            if (tittleName=="Reason Take Away"){
+                findNavController().navigate(R.id.reasonsForTakeAwayFragment)
+            }
+        }
+
+
     }
 
 }

@@ -20,10 +20,10 @@ interface MainRepository {
     suspend fun signUpModel(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String, password: String)
 
     suspend fun otpVerify(successCallback: (response: NetworkResult<String>) -> Unit,userid: String?, otp: String?,userName:String?,userGender:String?,
-                          bodyGoal:String?,cookingFrequency:String?,eatingOut:String?,
-                          takeAway:String?,cookingForType:String?,partnerName:String?,partnerGender:String?,familyMemberName:String?,
-                          familyMemberAge:String?,childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?,
-                          dietaryId:List<String>?,favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?)
+                          bodyGoal:String?,cookingFrequency:String?,eatingOut: String?, takeAway:String?,cookingForType:String?,
+                          partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?, familyMemberAge:String?,
+                          childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?, dietaryid:List<String>?,
+                          favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?)
 
     suspend fun forgotPassword(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String)
     suspend fun resendSignUpModel(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String)
@@ -38,7 +38,7 @@ interface MainRepository {
 
     suspend fun socialLogin(successCallback: (response: NetworkResult<String>) -> Unit,  emailOrPhone: String?, socialID: String?,userName:String?,
                             userGender:String?,bodyGoal:String?,cookingFrequency:String?,eatingOut:String?,takeAway:String?,cookingForType:String?,
-                            partnerName:String?,partnerGender:String?,familyMemberName:String?, familyMemberAge:String?,
+                            partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?, familyMemberAge:String?,
                             childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?, dietaryid:List<String>?,
                             favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?)
     suspend fun updateLocation(successCallback: (response: NetworkResult<String>) -> Unit,locationStatus: String)
@@ -118,6 +118,27 @@ interface MainRepository {
      paymentTypeBody: RequestBody,
      bankIdBody: RequestBody,)
 
+
+    suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit)
+
+    suspend fun updateAllergiesApi(successCallback: (response: NetworkResult<String>) -> Unit, allergies:List<String>?)
+
+    suspend fun updateBodyGoalApi(successCallback: (response: NetworkResult<String>) -> Unit,bodyGoal: String?)
+    suspend fun updateCookingFrequencyApi(successCallback: (response: NetworkResult<String>) -> Unit,cookingFrequency: String?)
+    suspend fun updateReasonTakeAwayApi(successCallback: (response: NetworkResult<String>) -> Unit,takeAway: String?)
+    suspend fun updateEatingOutApi(successCallback: (response: NetworkResult<String>) -> Unit,eatingOut: String?)
+    suspend fun updatePartnerInfoApi(successCallback: (response: NetworkResult<String>) -> Unit,partnerName: String?,
+                                     partnerAge: String?,partnerGender: String?)
+    suspend fun updateFamilyInfoApi(successCallback: (response: NetworkResult<String>) -> Unit,familyName: String?,
+                                    familyAge: String?,status: String?)
+
+    suspend fun updateSpendingGroceriesApi(successCallback: (response: NetworkResult<String>) -> Unit,spendingAmount: String?,
+                                           duration: String?)
+
+    suspend fun updateMealRoutineApi(successCallback: (response: NetworkResult<String>) -> Unit, mealRoutineId:List<String>?)
+    suspend fun updateDietaryApi(successCallback: (response: NetworkResult<String>) -> Unit, dietaryId:List<String>?)
+    suspend fun updateFavouriteApi(successCallback: (response: NetworkResult<String>) -> Unit, favouriteId:List<String>?)
+    suspend fun updateDislikedIngredientsApi(successCallback: (response: NetworkResult<String>) -> Unit, dislikedId:List<String>?)
 
 
 }

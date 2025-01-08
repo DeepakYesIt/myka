@@ -10,7 +10,6 @@ import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.databinding.AdapterBodyGoalsBinding
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
 
-
 class AdapterCookingSchedule(private var dietaryRestrictionsModelData: List<DietaryRestrictionsModelData>, private var requireActivity: FragmentActivity, private var onItemClickListener: OnItemClickListener): RecyclerView.Adapter<AdapterCookingSchedule.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -23,20 +22,20 @@ class AdapterCookingSchedule(private var dietaryRestrictionsModelData: List<Diet
 
         holder.binding.tvTitleName.text=dietaryRestrictionsModelData[position].name
 
-        if (dietaryRestrictionsModelData[position].isOpen){
+        if (dietaryRestrictionsModelData[position].selected){
             holder.binding.imageRightTick.visibility= View.VISIBLE
             holder.binding.relMainLayout.setBackgroundResource(R.drawable.orange_box_bg)
-            onItemClickListener.itemClick(position,"2","")
+            onItemClickListener.itemClick(dietaryRestrictionsModelData[position].id,"2","")
         }else{
             holder.binding.imageRightTick.visibility= View.GONE
             holder.binding.relMainLayout.setBackgroundResource(R.drawable.gray_box_border_bg)
         }
 
         holder.binding.relMainLayout.setOnClickListener{
-            if (dietaryRestrictionsModelData[position].isOpen === false) {
-                dietaryRestrictionsModelData[position].isOpen=true
+            if (dietaryRestrictionsModelData[position].selected === false) {
+                dietaryRestrictionsModelData[position].selected=true
             } else {
-                dietaryRestrictionsModelData[position].isOpen=false
+                dietaryRestrictionsModelData[position].selected=false
             }
 
             notifyDataSetChanged()

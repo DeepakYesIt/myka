@@ -67,8 +67,6 @@ class SearchFragment : Fragment(),View.OnClickListener {
 
     private fun initialize() {
 
-
-
         if (sessionManagement.getImage()!=null){
             Glide.with(requireContext())
                 .load(BaseUrl.imageBaseUrl+sessionManagement.getImage())

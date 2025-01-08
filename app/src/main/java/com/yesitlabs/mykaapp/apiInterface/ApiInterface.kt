@@ -47,16 +47,17 @@ interface ApiInterface {
     @FormUrlEncoded
     @POST(ApiEndPoint.socialLogin)
     suspend fun socialLogin(
-        @Field("email_or_phone") email_or_phone:String?,
+        @Field("email_or_phone") emailOrPhone:String?,
         @Field("social_id") socialId:String?,
         @Field("username") username:String?,
         @Field("usergender") userGender:String?,
-        @Field("bodygoal") bodygoal:String?,
+        @Field("bodygoal") bodyGoal:String?,
         @Field("cooking_frequency") cookingFrequency:String?,
         @Field("eating_out") eatingOut:String?,
         @Field("take_way") takeWay:String?,
         @Field("cooking_for_type") cookingForType:String?,
         @Field("partner_name") partnerName:String?,
+        @Field("partner_age") partnerAge:String?,
         @Field("partner_gender") partnerGender:String?,
         @Field("family_member_name") familyMemberName:String?,
         @Field("family_member_age") familyMemberAge:String?,
@@ -79,12 +80,13 @@ interface ApiInterface {
         @Field("otp") otp:String?,
         @Field("username") username:String?,
         @Field("usergender") userGender:String?,
-        @Field("bodygoal") bodygoal:String?,
+        @Field("bodygoal") bodyGoal:String?,
         @Field("cooking_frequency") cookingFrequency:String?,
         @Field("eating_out") eatingOut:String?,
         @Field("take_way") takeWay:String?,
         @Field("cooking_for_type") cookingForType:String?,
         @Field("partner_name") partnerName:String?,
+        @Field("partner_age") partnerAge:String?,
         @Field("partner_gender") partnerGender:String?,
         @Field("family_member_name") familyMemberName:String?,
         @Field("family_member_age") familyMemberAge:String?,
@@ -289,6 +291,77 @@ interface ApiInterface {
         @Part("amount") amountBody: RequestBody,
         @Part("payment_type") paymentTypeBody: RequestBody,
         @Part("bank_id") bankIdBody: RequestBody
+    ):Response<JsonObject>
+
+
+
+    @POST(ApiEndPoint.getUserPreferences)
+    suspend fun userPreferencesApi():Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateBodyGoalApi(@Field("bodygoal") bodyGoal:String?):Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateCookingFrequencyApi(@Field("cooking_frequency") cookingFrequency:String?):Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateReasonTakeAwayApi(@Field("take_way") takeWay:String?):Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateEatingOutApi(@Field("eating_out") eatingOut:String?):Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updatePartnerInfoApi(@Field("partner_name") partnerName:String?,
+                                     @Field("partner_age") partnerAge:String?,
+                                     @Field("partner_gender") partnerGender:String?,
+    ):Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateFamilyInfoApi(@Field("family_member_name") familyMemberName:String?,
+                                    @Field("family_member_age") familyMemberAge:String?,
+                                    @Field("child_friendly_meals") childFriendlyMeals:String?,
+    ):Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateMealRoutineApi(@Field("meal_routine_id[]") mealRoutineId:List<String>?
+    ):Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateSpendingGroceriesApi(@Field("spending_amount") spendingAmount:String?,
+                                           @Field("duration") duration:String?
+    ):Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateDietaryApi(@Field("dietary_id[]") mealRoutineId:List<String>?
+    ):Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateFavouriteApi(@Field("favourite[]") mealRoutineId:List<String>?
+    ):Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateAllergiesApi(@Field("allergies[]") mealRoutineId:List<String>?
+    ):Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateDislikedIngredientsApi(@Field("dislike_ingredients_id[]") mealRoutineId:List<String>?
     ):Response<JsonObject>
 
 

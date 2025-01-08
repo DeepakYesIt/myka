@@ -6,7 +6,6 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,13 +18,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.yesitlabs.mykaapp.basedata.SessionManagement
-import com.yesitlabs.mykaapp.OnItemClickListener
 import com.yesitlabs.mykaapp.OnItemClickedListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.adapter.DietaryRestrictionsAdapter
 import com.yesitlabs.mykaapp.basedata.BaseApplication
 import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.databinding.FragmentIngredientDislikesBinding
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.GetUserPreference
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModel
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.ingredientDislikes.viewmodel.DislikeIngredientsViewModel
@@ -74,21 +74,68 @@ class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
             updateProgress(4)
         }
 
+        if (sessionManagement.getCookingScreen().equals("Profile")){
+            binding!!.llBottomBtn.visibility=View.GONE
+            binding!!.rlUpdateIngDislike.visibility=View.VISIBLE
+        }else{
+            binding!!.llBottomBtn.visibility=View.VISIBLE
+            binding!!.rlUpdateIngDislike.visibility=View.GONE
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
         })
 
-        if (BaseApplication.isOnline(requireContext())) {
-            ingredientDislikeApi()
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        if (sessionManagement.getCookingScreen()!="Profile"){
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireContext())) {
+                ingredientDislikeApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }else{
+            if (BaseApplication.isOnline(requireContext())) {
+                ingredientDislikeSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
         initialize()
 
         return binding!!.root
+    }
+
+    private fun ingredientDislikeSelectApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            dislikeIngredientsViewModel.userPreferencesApi {
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                        if (bodyModel.code == 200 && bodyModel.success) {
+                            showDataInUi(bodyModel.data.ingredientdislike)
+                        } else {
+                            if (bodyModel.code == ErrorMessage.code) {
+                                showAlertFunction(bodyModel.message, true)
+                            }else{
+                                showAlertFunction(bodyModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            }
+        }
     }
 
     private fun updateProgress(progress: Int) {
@@ -121,6 +168,44 @@ class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
                 searchable(editable.toString())
             }
         })
+
+        binding!!.rlUpdateIngDislike.setOnClickListener{
+            if (BaseApplication.isOnline(requireContext())) {
+                updateIngDislikeApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+    }
+
+    private fun updateIngDislikeApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            dislikeIngredientsViewModel.updateDislikedIngredientsApi({
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                        if (updateModel.code == 200 && updateModel.success) {
+                            findNavController().navigateUp()
+                        } else {
+                            if (updateModel.code == ErrorMessage.code) {
+                                showAlertFunction(updateModel.message, true)
+                            }else{
+                                showAlertFunction(updateModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            },dislikeSelectedId)
+        }
     }
 
     private fun ingredientDislikeApi() {

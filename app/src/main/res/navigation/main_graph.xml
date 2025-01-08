@@ -61,11 +61,13 @@
         android:name="com.yesitlabs.mykaapp.fragment.commonfragmentscreen.reasonTakeAway.ReasonsForTakeAwayFragment"
         android:label="fragment_reasons_for_take_away"
         tools:layout="@layout/fragment_reasons_for_take_away" />
+
     <fragment
         android:id="@+id/partnerInfoDetailsFragment"
-        android:name="com.yesitlabs.mykaapp.fragment.PartnerInfoDetailsFragment"
+        android:name="com.yesitlabs.mykaapp.fragment.commonfragmentscreen.partnerinfoscreen.PartnerInfoDetailsFragment"
         android:label="fragment_partner_info_details"
         tools:layout="@layout/fragment_partner_info_details" />
+
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.yesitlabs.mykaapp.fragment.authfragment.login.LoginFragment"
@@ -105,10 +107,9 @@
         android:name="com.yesitlabs.mykaapp.fragment.authfragment.notificationmodel.TurnOnNotificationsFragment"
         android:label="TurnOnNotificationsFragment"
         tools:layout="@layout/fragment_turn_on_notifications"/>
-
     <fragment
         android:id="@+id/familyMembersFragment"
-        android:name="com.yesitlabs.mykaapp.fragment.FamilyMembersFragment"
+        android:name="com.yesitlabs.mykaapp.fragment.commonfragmentscreen.familyinfoscreen.FamilyMembersFragment"
         android:label="fragment_family_members"
         tools:layout="@layout/fragment_family_members" />
     <fragment
@@ -347,7 +348,6 @@
         android:name="com.yesitlabs.mykaapp.fragment.mainfragment.commonscreen.PaymentMethodFragment"
         android:label="fragment_payment_method"
         tools:layout="@layout/fragment_payment_method" />
-
 
 
 </navigation>

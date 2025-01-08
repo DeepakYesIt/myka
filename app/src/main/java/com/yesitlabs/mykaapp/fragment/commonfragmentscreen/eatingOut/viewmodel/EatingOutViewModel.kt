@@ -13,4 +13,12 @@ class EatingOutViewModel @Inject constructor(private val repository: MainReposit
         repository.getEatingOut { successCallback(it) }
     }
 
+    suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.userPreferencesApi{ successCallback(it) }
+    }
+
+    suspend fun updateEatingOutApi(successCallback: (response: NetworkResult<String>) -> Unit,eatingOut: String?){
+        repository.updateEatingOutApi ({ successCallback(it) },eatingOut)
+    }
+
 }

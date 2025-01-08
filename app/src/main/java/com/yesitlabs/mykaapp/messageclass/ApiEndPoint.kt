@@ -46,6 +46,9 @@ object ApiEndPoint {
     const val addBasketeUrl="add-to-basket"
     const val addBasketeDetailsUrl="ingredient-basket"
 
+    const val getUserPreferences="user-prefrence"
+
+    const val updateUserPreferences="update-user-prefrence"
 
 
 }

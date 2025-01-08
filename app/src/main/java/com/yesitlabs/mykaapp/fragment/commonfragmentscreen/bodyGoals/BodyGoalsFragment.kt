@@ -27,6 +27,8 @@ import com.yesitlabs.mykaapp.databinding.FragmentBodyGoalsBinding
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModel
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModelData
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.bodyGoals.viewmodel.BodyGoalViewModel
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.GetUserPreference
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -55,7 +57,6 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
 
         /// checked session value cooking for
         if (sessionManagement.getCookingFor().equals("Myself")) {
-
             binding!!.tvYourBodyGoals.text = "What are your body goals?"
             binding!!.textBodyGoals.visibility = View.VISIBLE
             binding!!.textBodyMembersGoals.visibility = View.GONE
@@ -80,12 +81,21 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
             updateProgress(2)
         }
 
+        if (sessionManagement.getCookingScreen().equals("Profile")){
+            binding!!.llBottomBtn.visibility=View.GONE
+            binding!!.rlUpdateBodyGoals.visibility=View.VISIBLE
+        }else{
+            binding!!.llBottomBtn.visibility=View.VISIBLE
+            binding!!.rlUpdateBodyGoals.visibility=View.GONE
+        }
+
+
         ///handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (sessionManagement.getCookingScreen().equals("")){
+                    if (sessionManagement.getCookingScreen()!="Profile") {
                         if (sessionManagement.getCookingFor().equals("Myself")) {
                             val intent = Intent(requireActivity(), CookingForMyselfActivity::class.java)
                             startActivity(intent)
@@ -100,16 +110,54 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
                 }
             })
 
-        ///checking the device of mobile data in online and offline(show network error message)
-        if (BaseApplication.isOnline(requireActivity())) {
-            bodyGoalApi()
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        if (sessionManagement.getCookingScreen()!="Profile"){
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireActivity())) {
+                bodyGoalApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }else{
+            if (BaseApplication.isOnline(requireActivity())) {
+                bodyGoalSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
         initialize()
 
         return binding!!.root
+    }
+
+    private fun bodyGoalSelectApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            bodyGoalViewModel.userPreferencesApi {
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                        if (bodyModel.code == 200 && bodyModel.success) {
+                            showDataInUi(bodyModel.data.bodygoal)
+                        } else {
+                            if (bodyModel.code == ErrorMessage.code) {
+                                showAlertFunction(bodyModel.message, true)
+                            }else{
+                                showAlertFunction(bodyModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            }
+        }
     }
 
     private fun bodyGoalApi() {
@@ -162,7 +210,7 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
     private fun initialize() {
 
         binding!!.imageBackBodyGoals.setOnClickListener {
-            if (sessionManagement.getCookingScreen().equals("")){
+            if (sessionManagement.getCookingScreen()!="Profile") {
                 if (sessionManagement.getCookingFor().equals("Myself")) {
                     val intent = Intent(requireActivity(), CookingForMyselfActivity::class.java)
                     startActivity(intent)
@@ -186,6 +234,45 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
 //                NavAnimations.navigateForward(findNavController(), R.id.dietaryRestrictionsFragment)
                 findNavController().navigate(R.id.dietaryRestrictionsFragment)
             }
+        }
+
+        binding!!.rlUpdateBodyGoals.setOnClickListener{
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireActivity())) {
+                updateBodyGoalApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+    }
+
+    private fun updateBodyGoalApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            bodyGoalViewModel.updateBodyGoalApi({
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                        if (updateModel.code == 200 && updateModel.success) {
+                            findNavController().navigateUp()
+                        } else {
+                            if (updateModel.code == ErrorMessage.code) {
+                                showAlertFunction(updateModel.message, true)
+                            }else{
+                                showAlertFunction(updateModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            }, bodySelect.toString())
         }
     }
 
@@ -211,6 +298,7 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
 
 
     override fun itemClick(selectItem: Int?, status1: String?, type: String?) {
+        bodySelect=""
         if (status1 == "1") {
             status=""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)

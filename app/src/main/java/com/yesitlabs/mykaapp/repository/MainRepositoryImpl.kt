@@ -192,17 +192,17 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
     override suspend fun otpVerify(
         successCallback: (response: NetworkResult<String>) -> Unit,
         userid: String?, otp: String?,userName:String?,userGender:String?,bodyGoal:String?,cookingFrequency:String?,eatingOut:String?,
-        takeAway:String?,cookingForType:String?,partnerName:String?,partnerGender:String?,familyMemberName:String?,
+        takeAway:String?,cookingForType:String?,partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?,
         familyMemberAge:String?,childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?,
         dietaryid:List<String>?,favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?) {
         try {
-            api.otpVerify(userid, otp,userName,userGender,bodyGoal,cookingFrequency,eatingOut,takeAway,cookingForType,partnerName,partnerGender,
+            api.otpVerify(userid, otp,userName,userGender,bodyGoal,cookingFrequency,eatingOut,takeAway,cookingForType,partnerName,partnerAge,partnerGender,
                 familyMemberName,familyMemberAge,childFriendlyMeals,mealRoutineId,spendingAmount,duration,dietaryid,favourite,allergies,dislikeIngredients,
                 deviceType,fcmToken).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -347,17 +347,17 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
     override suspend fun socialLogin(
         successCallback: (response: NetworkResult<String>) -> Unit,
         emailOrPhone: String?, socialID: String?,userName:String?,userGender:String?,bodyGoal:String?,cookingFrequency:String?,eatingOut:String?,
-        takeAway:String?,cookingForType:String?,partnerName:String?,partnerGender:String?,familyMemberName:String?,
+        takeAway:String?,cookingForType:String?,partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?,
         familyMemberAge:String?,childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?,
         dietaryid:List<String>?,favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?) {
         try {
-            api.socialLogin(emailOrPhone, socialID,userName,userGender,bodyGoal,cookingFrequency,eatingOut,takeAway,cookingForType,partnerName,partnerGender,
+            api.socialLogin(emailOrPhone, socialID,userName,userGender,bodyGoal,cookingFrequency,eatingOut,takeAway,cookingForType,partnerName,partnerAge,partnerGender,
                 familyMemberName,familyMemberAge,childFriendlyMeals,mealRoutineId,spendingAmount,duration,dietaryid,favourite,allergies,dislikeIngredients,
                 deviceType,fcmToken).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
-                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
@@ -367,6 +367,7 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
             successCallback(NetworkResult.Error(e.message()))
         }
     }
+
     override suspend fun updateLocation(
         successCallback: (response: NetworkResult<String>) -> Unit,
         locationStatus: String
@@ -863,6 +864,274 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
                     } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+
+    override suspend fun userPreferencesApi(
+        successCallback: (response: NetworkResult<String>) -> Unit
+    ) {
+        try {
+            api.userPreferencesApi().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+
+    override suspend fun updateBodyGoalApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        bodygoal:String?
+    ) {
+        try {
+            api.updateBodyGoalApi(bodygoal).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun updateCookingFrequencyApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        cookingFrequency:String?
+    ) {
+        try {
+            api.updateCookingFrequencyApi(cookingFrequency).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+
+
+    override suspend fun updateAllergiesApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        allergies:List<String>?
+    ) {
+        try {
+            api.updateAllergiesApi(allergies).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun updateReasonTakeAwayApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        takeway:String?
+    ) {
+        try {
+            api.updateReasonTakeAwayApi(takeway).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+
+    override suspend fun updateEatingOutApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        eatingOut:String?
+    ) {
+        try {
+            api.updateEatingOutApi(eatingOut).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun updatePartnerInfoApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        partnerName:String?,partnerAge:String?,partnerGender:String?
+    ) {
+        try {
+            api.updatePartnerInfoApi(partnerName,partnerAge,partnerGender).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+
+    override suspend fun updateFamilyInfoApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        familyName:String?,familyAge:String?,status:String?
+    ) {
+        try {
+            api.updateFamilyInfoApi(familyName,familyAge,status).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+
+    override suspend fun updateSpendingGroceriesApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        spendingAmount:String?,duration:String?) {
+        try {
+            api.updateSpendingGroceriesApi(spendingAmount,duration).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+
+    override suspend fun updateMealRoutineApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        mealRoutineId:List<String>?
+    ) {
+        try {
+            api.updateMealRoutineApi(mealRoutineId).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun updateDietaryApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        dietaryId:List<String>?
+    ) {
+        try {
+            api.updateDietaryApi(dietaryId).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+
+    override suspend fun updateFavouriteApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        favouriteId:List<String>?
+    ) {
+        try {
+            api.updateFavouriteApi(favouriteId).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+
+    override suspend fun updateDislikedIngredientsApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        dislikedId:List<String>?
+    ) {
+        try {
+            api.updateDislikedIngredientsApi(dislikedId).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
                 }else{
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }

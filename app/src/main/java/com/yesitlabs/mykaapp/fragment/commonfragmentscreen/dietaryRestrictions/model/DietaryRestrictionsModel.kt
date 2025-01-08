@@ -8,10 +8,7 @@ data class DietaryRestrictionsModel(
 )
 
 data class DietaryRestrictionsModelData(
-    val created_at: String,
-    val deleted_at: Any,
     val id: Int,
-    var isOpen:Boolean=false,
+    var selected:Boolean=false,
     val name: String,
-    val updated_at: String
 )

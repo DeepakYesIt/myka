@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -19,16 +18,16 @@ import com.google.gson.Gson
 import com.yesitlabs.mykaapp.basedata.SessionManagement
 import com.yesitlabs.mykaapp.OnItemClickListener
 import com.yesitlabs.mykaapp.R
-import com.yesitlabs.mykaapp.adapter.AdapterCookingSchedule
 import com.yesitlabs.mykaapp.adapter.BodyGoalAdapter
 import com.yesitlabs.mykaapp.basedata.BaseApplication
 import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.databinding.FragmentEatingOutBinding
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModel
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModelData
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.GetUserPreference
+import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.yesitlabs.mykaapp.fragment.commonfragmentscreen.eatingOut.viewmodel.EatingOutViewModel
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
-import com.yesitlabs.mykaapp.model.DataModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -36,7 +35,6 @@ import kotlinx.coroutines.launch
 class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
 
     private var binding: FragmentEatingOutBinding? = null
-    private var dietaryRestrictionsAdapter: AdapterCookingSchedule? = null
     private var status:String=""
     private var eatingOutSelect: String? = ""
     private var bodyGoalAdapter: BodyGoalAdapter? = null
@@ -65,21 +63,69 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
             updateProgress(10)
         }
 
+        if (sessionManagement.getCookingScreen().equals("Profile")){
+            binding!!.llBottomBtn.visibility=View.GONE
+            binding!!.rlUpdateEatingOut.visibility=View.VISIBLE
+        }else{
+            binding!!.llBottomBtn.visibility=View.VISIBLE
+            binding!!.rlUpdateEatingOut.visibility=View.GONE
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
         })
 
-        if (BaseApplication.isOnline(requireContext())) {
-            eatingOutApi()
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+
+        if (sessionManagement.getCookingScreen()!="Profile"){
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireContext())) {
+                eatingOutApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }else{
+            if (BaseApplication.isOnline(requireActivity())) {
+                eatingOutSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
         initialize()
 
         return binding!!.root
+    }
+
+    private fun eatingOutSelectApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            eatingOutViewModel.userPreferencesApi {
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                        if (bodyModel.code == 200 && bodyModel.success) {
+                            showDataInUi(bodyModel.data.eatingout)
+                        } else {
+                            if (bodyModel.code == ErrorMessage.code) {
+                                showAlertFunction(bodyModel.message, true)
+                            }else{
+                                showAlertFunction(bodyModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            }
+        }
     }
 
     private fun updateProgress(progress: Int) {
@@ -92,6 +138,7 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
         binding!!.imbBackEatingOut.setOnClickListener(this)
         binding!!.tvSkipBtn.setOnClickListener(this)
         binding!!.tvNextBtn.setOnClickListener(this)
+        binding!!.rlUpdateEatingOut.setOnClickListener(this)
 //        binding!!.rlEatingDropDown.setOnClickListener(this)
 //        binding!!.relDaily.setOnClickListener(this)
 //        binding!!.relAFewTimes.setOnClickListener(this)
@@ -162,43 +209,6 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
         BaseApplication.alertError(requireContext(), message, status)
     }
 
-//    private fun eatingOutModel() {
-//        val data1 = DataModel()
-//        val data2 = DataModel()
-//        val data3 = DataModel()
-//        val data4 = DataModel()
-//        val data5 = DataModel()
-//
-//        data1.title = "No food prepared"
-//        data1.isOpen= false
-//        data1.type = "EatingOut"
-//
-//        data2.title = "Convenience"
-//        data2.isOpen= false
-//        data2.type = "EatingOut"
-//
-//        data3.title = "Cravings"
-//        data3.isOpen= false
-//        data3.type = "EatingOut"
-//
-//        data4.title = "Social Occasions"
-//        data4.isOpen= false
-//        data4.type = "EatingOut"
-//
-//        data5.title = "Add More"
-//        data5.isOpen= false
-//        data5.type = "EatingOut"
-//
-//        dataList.add(data1)
-//        dataList.add(data2)
-//        dataList.add(data3)
-//        dataList.add(data4)
-//        dataList.add(data5)
-//
-//        dietaryRestrictionsAdapter = AdapterCookingSchedule(dataList, requireActivity(),this)
-//        binding!!.rcyEatingOut.adapter = dietaryRestrictionsAdapter
-//    }
-
     override fun onClick(item: View?) {
         when (item!!.id) {
             R.id.imbBackEatingOut -> {
@@ -218,73 +228,44 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
                 }
             }
 
-//            R.id.rlEatingDropDown->{
-//                if (dropDownstatus){
-//                    dropDownstatus=false
-//                    val drawableEnd = ContextCompat.getDrawable(requireContext(), R.drawable.drop_up_icon)
-//                    drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
-//                    binding!!.tvChooseDuration.setCompoundDrawables(null, null, drawableEnd, null)
-//                    binding!!.rcyEatingOut.visibility=View.VISIBLE
-//                }else{
-//                    dropDownstatus=true
-//                    val drawableEnd = ContextCompat.getDrawable(requireContext(), R.drawable.drop_down_icon)
-//                    drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
-//                    binding!!.tvChooseDuration.setCompoundDrawables(null, null, drawableEnd, null)
-//                    binding!!.rcyEatingOut.visibility=View.GONE
-//                }
-//            }
+            R.id.rlUpdateEatingOut->{
+                if (BaseApplication.isOnline(requireActivity())) {
+                    updateEatingOutApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
 
-//            R.id.relDaily -> {
-//                status="2"
-//                binding!!.relDaily.setBackgroundResource(R.drawable.orange_box_bg)
-//                binding!!.imageDaily.visibility=View.VISIBLE
-//                binding!!.relAFewTimes.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageAFewTimes.visibility=View.GONE
-//                binding!!.relOnceAWeek.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageOnceAWeek.visibility=View.GONE
-//                binding!!.relRarely.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageRarely.visibility=View.GONE
-//                status()
-//            }
-//
-//            R.id.relAFewTimes->{
-//                status="2"
-//                binding!!.relDaily.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageDaily.visibility=View.GONE
-//                binding!!.relAFewTimes.setBackgroundResource(R.drawable.orange_box_bg)
-//                binding!!.imageAFewTimes.visibility=View.VISIBLE
-//                binding!!.relOnceAWeek.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageOnceAWeek.visibility=View.GONE
-//                binding!!.relRarely.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageRarely.visibility=View.GONE
-//                status()
-//            }
-//
-//            R.id.relOnceAWeek->{
-//                status="2"
-//                binding!!.relDaily.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageDaily.visibility=View.GONE
-//                binding!!.relAFewTimes.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageAFewTimes.visibility=View.GONE
-//                binding!!.relOnceAWeek.setBackgroundResource(R.drawable.orange_box_bg)
-//                binding!!.imageOnceAWeek.visibility=View.VISIBLE
-//                binding!!.relRarely.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageRarely.visibility=View.GONE
-//                status()
-//            }
+        }
+    }
 
-//            R.id.relRarely->{
-//                status="2"
-//                binding!!.relDaily.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageDaily.visibility=View.GONE
-//                binding!!.relAFewTimes.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageAFewTimes.visibility=View.GONE
-//                binding!!.relOnceAWeek.setBackgroundResource(R.drawable.gray_box_border_bg)
-//                binding!!.imageOnceAWeek.visibility=View.GONE
-//                binding!!.relRarely.setBackgroundResource(R.drawable.orange_box_bg)
-//                binding!!.imageRarely.visibility=View.VISIBLE
-//                status()
-//            }
+    private fun updateEatingOutApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            eatingOutViewModel.updateEatingOutApi({
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                        if (updateModel.code == 200 && updateModel.success) {
+                            findNavController().navigateUp()
+                        } else {
+                            if (updateModel.code == ErrorMessage.code) {
+                                showAlertFunction(updateModel.message, true)
+                            }else{
+                                showAlertFunction(updateModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            }, eatingOutSelect)
         }
     }
 

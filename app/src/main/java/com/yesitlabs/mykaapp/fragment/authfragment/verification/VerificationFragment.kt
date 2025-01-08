@@ -361,7 +361,7 @@ class VerificationFragment : Fragment() {
                     }
                 }
             }, userID, binding!!.otpView.otp.toString(),userName,userGender,bodyGoals,cookingFrequency,eatingOut,reasonTakeAway,cookingFor,
-                partnerName,partnerGender, familyMemName,familyMemAge,familyMemStatus,
+                partnerName,partnerAge,partnerGender, familyMemName,familyMemAge,familyMemStatus,
                 mealRoutineSelectedId,spendingAmount,
                 spendingDuration,dietarySelectedId,favouriteSelectedId,
                 allergenSelectedId,dislikeSelectedId,"Android","")

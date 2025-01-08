@@ -5,12 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.yesitlabs.mykaapp.OnItemClickListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.databinding.AdapterBodyGoalsBinding
 import com.yesitlabs.mykaapp.databinding.AdapterPreferencesItemBinding
 import com.yesitlabs.mykaapp.model.DataModel
 
-class PreferencesAdapter(private var datalist: List<DataModel>, private var requireActivity: FragmentActivity): RecyclerView.Adapter<PreferencesAdapter.ViewHolder>() {
+class PreferencesAdapter(private var datalist: List<DataModel>, private var requireActivity: FragmentActivity,private var onItemClickListener: OnItemClickListener): RecyclerView.Adapter<PreferencesAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -24,7 +25,7 @@ class PreferencesAdapter(private var datalist: List<DataModel>, private var requ
         holder.binding.tvPreferencesName.text = datalist[position].title
 
         holder.binding.relMainLayout.setOnClickListener {
-
+            onItemClickListener.itemClick(position,datalist[position].type,datalist[position].title)
         }
     }
 

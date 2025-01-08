@@ -12,4 +12,12 @@ class AllergenIngredientViewModel @Inject constructor(private val repository: Ma
         repository.getAllergensIngredients { successCallback(it) }
     }
 
+    suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.userPreferencesApi{ successCallback(it) }
+    }
+
+    suspend fun updateAllergiesApi(successCallback: (response: NetworkResult<String>) -> Unit,allergies: List<String>?){
+        repository.updateAllergiesApi ({ successCallback(it) },allergies)
+    }
+
 }

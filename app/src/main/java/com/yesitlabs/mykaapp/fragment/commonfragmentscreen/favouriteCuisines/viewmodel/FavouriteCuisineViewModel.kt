@@ -11,4 +11,12 @@ class FavouriteCuisineViewModel @Inject constructor(private val repository: Main
         repository.getFavouriteCuisines { successCallback(it) }
     }
 
+    suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.userPreferencesApi{ successCallback(it) }
+    }
+
+    suspend fun updateFavouriteApi(successCallback: (response: NetworkResult<String>) -> Unit,favouriteId: List<String>?){
+        repository.updateFavouriteApi ({ successCallback(it) },favouriteId)
+    }
+
 }

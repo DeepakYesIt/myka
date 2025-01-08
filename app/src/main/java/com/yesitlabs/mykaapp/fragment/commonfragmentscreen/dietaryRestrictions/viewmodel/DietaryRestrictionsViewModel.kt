@@ -13,4 +13,12 @@ class DietaryRestrictionsViewModel @Inject constructor(private val repository: M
         repository.getDietaryRestrictions { successCallback(it) }
     }
 
+    suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.userPreferencesApi{ successCallback(it) }
+    }
+
+    suspend fun updateDietaryApi(successCallback: (response: NetworkResult<String>) -> Unit,dietaryId: List<String>?){
+        repository.updateDietaryApi ({ successCallback(it) },dietaryId)
+    }
+
 }

@@ -64,259 +64,96 @@
             android:text="@string/eating_out"
             android:textSize="@dimen/_18sdp" />
 
-        <ScrollView
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/llBottomBtn"
-            android:layout_below="@+id/textEatingOut"
-            android:fillViewport="true">
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/relBottomBtn"
+            android:layout_below="@+id/textEatingOut">
 
-            <RelativeLayout
+            <TextView
+                android:id="@+id/tvEatingOut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="How often do you eat out (restaurants or  takeaway)?"
+                android:textColor="@color/light_black"
+                android:textSize="@dimen/_13sdp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcyEatingOut"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvEatingOut"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:nestedScrollingEnabled="false"
+                android:visibility="visible"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relBottomBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:id="@+id/llBottomBtn"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:weightSum="2">
 
                 <TextView
-                    android:id="@+id/tvEatingOut"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_10sdp"
-                    android:text="How often do you eat out (restaurants or  takeaway)?"
-                    android:textColor="@color/light_black"
+                    android:id="@+id/tvSkipBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@drawable/outline_green_border_bg"
+                    android:gravity="center"
+                    android:padding="@dimen/_10sdp"
+                    android:text="Skip"
+                    android:textColor="@color/light_green"
                     android:textSize="@dimen/_13sdp" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rcyEatingOut"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tvNextBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:layout_weight="1"
+                    android:background="@drawable/gray_btn_unselect_background"
+                    android:gravity="center"
+                    android:padding="@dimen/_10sdp"
+                    android:text="Next"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_13sdp" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/rlUpdateEatingOut"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:background="@drawable/green_btn_background">
+
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvEatingOut"
-                    android:layout_marginTop="@dimen/_10sdp"
-                    android:nestedScrollingEnabled="false"
-                    android:visibility="visible"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-                <!--                <RelativeLayout-->
-                <!--                    android:id="@+id/relDaily"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:layout_below="@+id/tvEatingOut"-->
-                <!--                    android:layout_marginTop="@dimen/_10sdp"-->
-                <!--                    android:background="@drawable/gray_box_border_bg">-->
-
-                <!--                    <TextView-->
-                <!--                        android:id="@+id/tvDaily"-->
-                <!--                        android:layout_width="match_parent"-->
-                <!--                        android:layout_height="wrap_content"-->
-                <!--                        android:layout_centerVertical="true"-->
-                <!--                        android:fontFamily="@font/poppins"-->
-                <!--                        android:gravity="center_vertical"-->
-                <!--                        android:paddingHorizontal="@dimen/_15sdp"-->
-                <!--                        android:paddingVertical="@dimen/_10sdp"-->
-                <!--                        android:singleLine="true"-->
-                <!--                        android:text="Daily"-->
-                <!--                        android:textColor="@color/light_black"-->
-                <!--                        android:textSize="@dimen/_13sdp" />-->
-
-                <!--                    <ImageView-->
-                <!--                        android:id="@+id/imageDaily"-->
-                <!--                        android:layout_width="wrap_content"-->
-                <!--                        android:layout_height="wrap_content"-->
-                <!--                        android:layout_alignParentEnd="true"-->
-                <!--                        android:layout_centerVertical="true"-->
-                <!--                        android:layout_marginEnd="@dimen/_20sdp"-->
-                <!--                        android:src="@drawable/orange_tick_icon"-->
-                <!--                        android:visibility="gone" />-->
-
-                <!--                </RelativeLayout>-->
-
-                <!--                <RelativeLayout-->
-                <!--                    android:id="@+id/relAFewTimes"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:layout_below="@+id/relDaily"-->
-                <!--                    android:layout_marginTop="@dimen/_10sdp"-->
-                <!--                    android:background="@drawable/gray_box_border_bg">-->
-
-                <!--                    <TextView-->
-                <!--                        android:id="@+id/tvAFewTimes"-->
-                <!--                        android:layout_width="match_parent"-->
-                <!--                        android:layout_height="wrap_content"-->
-                <!--                        android:layout_centerVertical="true"-->
-                <!--                        android:fontFamily="@font/poppins"-->
-                <!--                        android:gravity="center_vertical"-->
-                <!--                        android:paddingHorizontal="@dimen/_15sdp"-->
-                <!--                        android:paddingVertical="@dimen/_10sdp"-->
-                <!--                        android:singleLine="true"-->
-                <!--                        android:text="A few times a week"-->
-                <!--                        android:textColor="@color/light_black"-->
-                <!--                        android:textSize="@dimen/_13sdp" />-->
-
-                <!--                    <ImageView-->
-                <!--                        android:id="@+id/imageAFewTimes"-->
-                <!--                        android:layout_width="wrap_content"-->
-                <!--                        android:layout_height="wrap_content"-->
-                <!--                        android:layout_alignParentEnd="true"-->
-                <!--                        android:layout_centerVertical="true"-->
-                <!--                        android:layout_marginEnd="@dimen/_20sdp"-->
-                <!--                        android:src="@drawable/orange_tick_icon"-->
-                <!--                        android:visibility="gone" />-->
-
-                <!--                </RelativeLayout>-->
-
-                <!--                <RelativeLayout-->
-                <!--                    android:id="@+id/relOnceAWeek"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:layout_below="@+id/relAFewTimes"-->
-                <!--                    android:layout_marginTop="@dimen/_10sdp"-->
-                <!--                    android:background="@drawable/gray_box_border_bg">-->
-
-                <!--                    <TextView-->
-                <!--                        android:id="@+id/tvOnceAWeek"-->
-                <!--                        android:layout_width="match_parent"-->
-                <!--                        android:layout_height="wrap_content"-->
-                <!--                        android:layout_centerVertical="true"-->
-                <!--                        android:fontFamily="@font/poppins"-->
-                <!--                        android:gravity="center_vertical"-->
-                <!--                        android:paddingHorizontal="@dimen/_15sdp"-->
-                <!--                        android:paddingVertical="@dimen/_10sdp"-->
-                <!--                        android:singleLine="true"-->
-                <!--                        android:text="Once a week"-->
-                <!--                        android:textColor="@color/light_black"-->
-                <!--                        android:textSize="@dimen/_13sdp" />-->
-
-                <!--                    <ImageView-->
-                <!--                        android:id="@+id/imageOnceAWeek"-->
-                <!--                        android:layout_width="wrap_content"-->
-                <!--                        android:layout_height="wrap_content"-->
-                <!--                        android:layout_alignParentEnd="true"-->
-                <!--                        android:layout_centerVertical="true"-->
-                <!--                        android:layout_marginEnd="@dimen/_20sdp"-->
-                <!--                        android:src="@drawable/orange_tick_icon"-->
-                <!--                        android:visibility="gone" />-->
-
-                <!--                </RelativeLayout>-->
-
-                <!--                <RelativeLayout-->
-                <!--                    android:id="@+id/relRarely"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:layout_below="@+id/relOnceAWeek"-->
-                <!--                    android:layout_marginTop="@dimen/_10sdp"-->
-                <!--                    android:background="@drawable/gray_box_border_bg">-->
-
-                <!--                    <TextView-->
-                <!--                        android:id="@+id/tvRarely"-->
-                <!--                        android:layout_width="match_parent"-->
-                <!--                        android:layout_height="wrap_content"-->
-                <!--                        android:layout_centerVertical="true"-->
-                <!--                        android:fontFamily="@font/poppins"-->
-                <!--                        android:gravity="center_vertical"-->
-                <!--                        android:paddingHorizontal="@dimen/_15sdp"-->
-                <!--                        android:paddingVertical="@dimen/_10sdp"-->
-                <!--                        android:singleLine="true"-->
-                <!--                        android:text="Rarely"-->
-                <!--                        android:textColor="@color/light_black"-->
-                <!--                        android:textSize="@dimen/_13sdp" />-->
-
-                <!--                    <ImageView-->
-                <!--                        android:id="@+id/imageRarely"-->
-                <!--                        android:layout_width="wrap_content"-->
-                <!--                        android:layout_height="wrap_content"-->
-                <!--                        android:layout_alignParentEnd="true"-->
-                <!--                        android:layout_centerVertical="true"-->
-                <!--                        android:layout_marginEnd="@dimen/_20sdp"-->
-                <!--                        android:src="@drawable/orange_tick_icon"-->
-                <!--                        android:visibility="gone" />-->
-
-                <!--                </RelativeLayout>-->
-
-                <!--                <TextView-->
-                <!--                    android:id="@+id/tvEatingReasons"-->
-                <!--                    android:layout_width="wrap_content"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:layout_below="@+id/relRarely"-->
-                <!--                    android:layout_marginTop="@dimen/_10sdp"-->
-                <!--                    android:text="What are your reasons for getting takeaway?"-->
-                <!--                    android:textColor="@color/light_black"-->
-                <!--                    android:textSize="@dimen/_13sdp" />-->
-
-                <!--                <RelativeLayout-->
-                <!--                    android:id="@+id/rlEatingDropDown"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:layout_below="@+id/tvEatingReasons"-->
-                <!--                    android:layout_marginTop="@dimen/_10sdp"-->
-                <!--                    android:background="@drawable/circular_edittext_bg">-->
-
-                <!--                    <TextView-->
-                <!--                        android:id="@+id/tvChooseDuration"-->
-                <!--                        android:layout_width="match_parent"-->
-                <!--                        android:layout_height="wrap_content"-->
-                <!--                        android:layout_centerVertical="true"-->
-                <!--                        android:background="@null"-->
-                <!--                        android:drawablePadding="@dimen/_12sdp"-->
-                <!--                        android:fontFamily="@font/poppins"-->
-                <!--                        android:gravity="center_vertical"-->
-                <!--                        android:hint="Weekly"-->
-                <!--                        android:padding="@dimen/_10sdp"-->
-                <!--                        android:singleLine="true"-->
-                <!--                        android:textColor="@color/light_black"-->
-                <!--                        android:textColorHint="@color/light_gray"-->
-                <!--                        android:textSize="@dimen/_13sdp"-->
-                <!--                        app:drawableEndCompat="@drawable/drop_down_icon" />-->
-
-                <!--                </RelativeLayout>-->
-
-                <!--                <androidx.recyclerview.widget.RecyclerView-->
-                <!--                    android:id="@+id/rcyEatingOut"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:layout_below="@+id/rlEatingDropDown"-->
-                <!--                    android:visibility="gone"-->
-                <!--                    android:nestedScrollingEnabled="false"-->
-                <!--                    android:layout_marginTop="@dimen/_2sdp"-->
-                <!--                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />-->
+                    android:layout_centerInParent="true"
+                    android:fontFamily="@font/poppins"
+                    android:paddingVertical="@dimen/_10sdp"
+                    android:text="Update"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_13sdp" />
 
             </RelativeLayout>
 
-        </ScrollView>
-
-        <LinearLayout
-            android:id="@+id/llBottomBtn"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_40sdp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:weightSum="2">
-
-            <TextView
-                android:id="@+id/tvSkipBtn"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:background="@drawable/outline_green_border_bg"
-                android:gravity="center"
-                android:padding="@dimen/_10sdp"
-                android:text="Skip"
-                android:textColor="@color/light_green"
-                android:textSize="@dimen/_13sdp" />
-
-            <TextView
-                android:id="@+id/tvNextBtn"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_marginStart="@dimen/_10sdp"
-                android:layout_weight="1"
-                android:background="@drawable/gray_btn_unselect_background"
-                android:gravity="center"
-                android:padding="@dimen/_10sdp"
-                android:text="Next"
-                android:textColor="@color/white"
-                android:textSize="@dimen/_13sdp" />
-
-        </LinearLayout>
+        </RelativeLayout>
 
     </RelativeLayout>
 
