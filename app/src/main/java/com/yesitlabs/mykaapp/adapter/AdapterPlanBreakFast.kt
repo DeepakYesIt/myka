@@ -52,9 +52,9 @@ class AdapterPlanBreakFast(var datalist: MutableList<BreakfastModel>?, private v
         }
 
 
-        if (item?.recipe?.images?.THUMBNAIL?.url!=null){
+        if (item?.recipe?.images?.SMALL?.url!=null){
             Glide.with(requireActivity)
-                .load(item.recipe.images.THUMBNAIL.url)
+                .load(item.recipe.images.SMALL.url)
                 .error(R.drawable.no_image)
                 .placeholder(R.drawable.no_image)
                 .listener(object : RequestListener<Drawable> {

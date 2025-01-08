@@ -3,7 +3,6 @@ package com.yesitlabs.mykaapp.model
 class DataModel {
 
     lateinit var title:String
-
     lateinit var description:String
     lateinit var price:String
     lateinit var distance:String

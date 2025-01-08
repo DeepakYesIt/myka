@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.navigateUp
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -141,6 +142,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             Log.d("@@@ Recipe Details ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                  Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
+                findNavController().navigateUp()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -182,9 +184,9 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         localData.clear()
         localData.addAll(data)
 
-        if (localData[0].recipe?.images?.THUMBNAIL?.url != null) {
+        if (localData[0].recipe?.images?.SMALL?.url != null) {
             Glide.with(requireContext())
-                .load(localData[0].recipe?.images?.THUMBNAIL?.url)
+                .load(localData[0].recipe?.images?.SMALL?.url)
                 .error(R.drawable.no_image)
                 .placeholder(R.drawable.no_image)
                 .listener(object : RequestListener<Drawable> {
@@ -601,54 +603,52 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         tvWeekRange = dialogChooseMealDay.findViewById(R.id.tvWeekRange)
         val rlDoneBtn = dialogChooseMealDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         val btnPrevious = dialogChooseMealDay.findViewById<ImageView>(R.id.btnPrevious)
-        val imgBreakfastRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imgBreakfastRadio)
-        val imageLunchRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imageLunchRadio)
-        val imageDinnerRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imageDinnerRadio)
-        val imageSnacksRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imageSnacksRadio)
-        val imageBrunchRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imageBrunchRadio)
         val btnNext = dialogChooseMealDay.findViewById<ImageView>(R.id.btnNext)
+        // button event listener
+        val tvBreakfast = dialogChooseMealDay.findViewById<TextView>(R.id.tvBreakfast)
+        val tvLunch = dialogChooseMealDay.findViewById<TextView>(R.id.tvLunch)
+        val tvDinner = dialogChooseMealDay.findViewById<TextView>(R.id.tvDinner)
+        val tvSnacks = dialogChooseMealDay.findViewById<TextView>(R.id.tvSnacks)
+        val tvTeatime = dialogChooseMealDay.findViewById<TextView>(R.id.tvTeatime)
+
+
+
+
+
         dialogChooseMealDay.show()
         updateWeekRange()
         dialogChooseMealDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
-        imgBreakfastRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_select_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
+        var type = ""
+
+        fun updateSelection(selectedType: String, selectedView: TextView, allViews: List<TextView>) {
+            type = selectedType
+            allViews.forEach { view ->
+                val drawable = if (view == selectedView) R.drawable.radio_select_icon else R.drawable.radio_unselect_icon
+                view.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0)
+            }
         }
 
-        imageLunchRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_select_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
+        val allViews = listOf(tvBreakfast, tvLunch, tvDinner, tvSnacks, tvTeatime)
+
+        tvBreakfast.setOnClickListener {
+            updateSelection("Breakfast", tvBreakfast, allViews)
         }
 
-        imageDinnerRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_select_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
+        tvLunch.setOnClickListener {
+            updateSelection("Lunch", tvLunch, allViews)
         }
 
-        imageSnacksRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_select_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
+        tvDinner.setOnClickListener {
+            updateSelection("Dinner", tvDinner, allViews)
         }
 
-        imageBrunchRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_select_icon)
+        tvSnacks.setOnClickListener {
+            updateSelection("Snacks", tvSnacks, allViews)
+        }
+
+        tvTeatime.setOnClickListener {
+            updateSelection("Teatime", tvTeatime, allViews)
         }
 
         rlDoneBtn.setOnClickListener {

@@ -79,7 +79,128 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
         return binding!!.root
     }
 
+
     private fun initialize() {
+
+        binding!!.relCalendarView.setOnClickListener {
+            openDialog()
+        }
+
+        updateWeek()
+
+        binding!!.rlChangeCookSchedule.setOnClickListener {
+//            chooseDayMealTypeDialog()
+        }
+
+        binding!!.imagePrevious.setOnClickListener {
+            changeWeekRange(-1)
+        }
+
+        binding!!.imageNext.setOnClickListener {
+            changeWeekRange(1)
+        }
+
+        binding!!.rlMainFullCooked.setOnLongClickListener {
+            onClickEnabled()
+            true
+        }
+
+        binding!!.rlMainFullCooked.setOnClickListener {
+            onClickFalseEnabled()
+        }
+
+        binding!!.imgBackCookingSchedule.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
+    }
+
+    private fun openDialog() {
+
+        val dialog = Dialog(requireActivity())
+
+        // Set custom layout
+        dialog.setContentView(R.layout.dialog_calendar)
+
+        dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val calendarView = dialog.findViewById<CalendarView>(R.id.calendar)
+
+        calendarView.setOnDateChangeListener { view: CalendarView?, year: Int, month: Int, dayOfMonth: Int ->
+            // Month is zero-based (January = 0), so add 1 for human-readable format
+            val selectedDate = dayOfMonth.toString() + "-" + (month + 1) + "-" + year
+            val list = WeekDaysCalculator.getWeekDays(selectedDate);
+            val resultList = mutableListOf<Pair<String, String>>()
+            list.forEach {
+                Log.d("TESTING_LAWCO", it.toString())
+                val arr = it.split("-")
+                resultList.add(Pair<String, String>(arr[0], arr[1]))
+            }
+            resultList.forEach {
+                Log.d("TESTING_LAWCO", it.first + " " + it.second)
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun changeWeekRange(weekRange: Int) {
+        calendar.add(Calendar.WEEK_OF_YEAR, weekRange)
+        updateWeek()
+    }
+
+    private fun updateWeek() {
+        val today = Calendar.getInstance()
+
+        // Set the start of the week to Monday
+        val startOfWeek = calendar.apply {
+            set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        }.time
+
+        // Set the end of the week (Sunday)
+        val endOfWeek = calendar.apply {
+            add(Calendar.DAY_OF_WEEK, 6)
+        }.time
+
+        // Update the week range text
+        binding!!.textWeekRange.text =
+            "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
+
+        // Hide the "Previous" button if today is within the current week range
+        binding!!.imagePrevious.visibility =
+            if (today.time.after(startOfWeek) && today.time.before(endOfWeek) || today.time == startOfWeek) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+
+        // Update the RecyclerView
+        binding!!.recyclerViewWeekDays.adapter = CalendarDayAdapter(getDaysOfWeek()) {
+            // Handle item click if needed
+        }
+    }
+
+    private fun getDaysOfWeek(): List<CalendarDataModel.Day> {
+
+        val days = mutableListOf<CalendarDataModel.Day>()
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+
+        for (i in 0..6) {
+            days.add(
+                CalendarDataModel.Day(
+                    dayName = SimpleDateFormat("E", Locale.getDefault()).format(calendar.time),
+                    date = calendar.get(Calendar.DAY_OF_MONTH)
+                )
+            )
+            calendar.add(Calendar.DAY_OF_WEEK, 1)
+        }
+
+        calendar.add(Calendar.DAY_OF_WEEK, -7) // Reset to start of week
+        return days
+
+    }
+
+  /*  private fun initialize() {
 
         binding!!.relCalendarView.setOnClickListener{
             openDialog()
@@ -182,7 +303,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
         calendar.add(Calendar.DAY_OF_WEEK, -7) // Reset to start of week
         return days
 
-    }
+    }*/
 
     private fun fullCookSchBreakFastModel() {
         if (dataList1!=null){

@@ -33,6 +33,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.gson.Gson
+import com.jaiselrahman.filepicker.activity.FilePickerActivity
+import com.jaiselrahman.filepicker.config.Configurations
+import com.jaiselrahman.filepicker.model.MediaFile
 import com.skydoves.powerspinner.PowerSpinnerView
 import com.stripe.android.ApiResultCallback
 import com.stripe.android.Stripe

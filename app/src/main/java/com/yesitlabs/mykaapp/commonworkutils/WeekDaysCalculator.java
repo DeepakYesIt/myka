@@ -10,7 +10,6 @@ public class WeekDaysCalculator {
 
     public static List<String> getWeekDays(String inputDate) {
         List<String> weekDays = new ArrayList<>();
-
         try {
             // Input date format
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
@@ -18,6 +17,8 @@ public class WeekDaysCalculator {
 
             // Initialize Calendar with the given date
             Calendar calendar = Calendar.getInstance();
+            // Set Monday as the first day of the week
+            calendar.setFirstDayOfWeek(Calendar.MONDAY);
             calendar.setTime(date);
 
             // Move to the first day of the week (e.g., Sunday or Monday depending on locale)
