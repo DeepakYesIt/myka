@@ -41,8 +41,6 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
     private var ingredientBreakFastAdapter: IngredientsBreakFastAdapter? = null
     private var ingredientLunchAdapter: IngredientsLunchAdapter? = null
     private var ingredientDinnerAdapter: IngredientsDinnerAdapter? = null
-    private var chooseDayAdapter: ChooseDayAdapter? = null
-    private var rcyChooseDaySch: RecyclerView? = null
     private var tvWeekRange: TextView? = null
     private var dataList1: MutableList<DataModel> = mutableListOf()
     private var dataList2: MutableList<DataModel> = mutableListOf()
