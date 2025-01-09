@@ -293,7 +293,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
             }
 
 
-            // Dinner
+            // Snacks
             if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
                 snackesAdapter = setupMealAdapter(data.recipes?.Snack, binding!!.rcySnacks, "Snacks")
                 binding!!.linearSnacks.visibility = View.VISIBLE
@@ -301,7 +301,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
                 binding!!.linearSnacks.visibility = View.GONE
             }
 
-            // Dinner
+            // TeaTime
             if (recipesModel?.Teatime != null && recipesModel?.Teatime?.size!! > 0) {
                 teaTimeAdapter = setupMealAdapter(data.recipes?.Teatime, binding!!.rcyTeatime, "TeaTime")
                 binding!!.linearTeatime.visibility = View.VISIBLE
@@ -492,8 +492,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
             add(Calendar.DAY_OF_WEEK, 6)
         }.time
 
-        binding!!.textWeekRange.text =
-            "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
+        binding!!.textWeekRange.text = "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
         binding!!.recyclerViewWeekDays.adapter = calendarDayAdapter
         binding!!.recyclerViewWeekDays.adapter = CalendarDayAdapter(getDaysOfWeek()) {
         }
