@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.CalendarView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -38,6 +39,7 @@ import com.yesitlabs.mykaapp.apiInterface.BaseUrl
 import com.yesitlabs.mykaapp.basedata.BaseApplication
 import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.basedata.SessionManagement
+import com.yesitlabs.mykaapp.commonworkutils.WeekDaysCalculator
 import com.yesitlabs.mykaapp.databinding.FragmentPlanBinding
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.PlanViewModel
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
@@ -62,11 +64,10 @@ class PlanFragment : Fragment(), OnItemClickListener {
     private val calendar = Calendar.getInstance()
     private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
     private var calendarDayAdapter: CalendarDayAdapter? = null
-    private var chooseDayAdapter: ChooseDayAdapter? = null
+
     private var dataList1: MutableList<DataModel> = mutableListOf()
     private var dataList2: MutableList<DataModel> = mutableListOf()
     private var dataList3: MutableList<DataModel> = mutableListOf()
-    private var rcyChooseDaySch: RecyclerView? = null
     private var tvWeekRange: TextView? = null
     private var planBreakFastAdapter: AdapterPlanBreakFast? = null
     private var status: Boolean = true
@@ -78,10 +79,12 @@ class PlanFragment : Fragment(), OnItemClickListener {
     var breakfastAdapter: AdapterPlanBreakFast? = null
     var lunchAdapter: AdapterPlanBreakFast? = null
     var dinnerAdapter: AdapterPlanBreakFast? = null
+    var snackesAdapter: AdapterPlanBreakFast? = null
+    var teaTimeAdapter: AdapterPlanBreakFast? = null
     private lateinit var sessionManagement: SessionManagement
 
     lateinit var adapter: ImageViewPagerAdapter
-
+    val dataList = arrayListOf<DataModel>()
     private lateinit var layonboarding_indicator: LinearLayout
 
     override fun onCreateView(
@@ -123,6 +126,8 @@ class PlanFragment : Fragment(), OnItemClickListener {
         planLunchModel()
         planDinnerModel()
 
+
+
         setUpListener()
 
         // When screen load then api call
@@ -136,6 +141,10 @@ class PlanFragment : Fragment(), OnItemClickListener {
         adapter = ImageViewPagerAdapter(requireContext(), imageList)
 
         updateWeek()
+
+
+
+
 
         return binding!!.root
     }
@@ -261,7 +270,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
 
             // Breakfast
             if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
-                breakfastAdapter = setupMealAdapter(data.recipes?.Breakfast, binding!!.rcyBreakFast, "BreakFastPlan")
+                breakfastAdapter = setupMealAdapter(data.recipes?.Breakfast, binding!!.rcyBreakFast, "BreakFast")
                 binding!!.linearBreakfast.visibility = View.VISIBLE
             } else {
                 binding!!.linearBreakfast.visibility = View.GONE
@@ -269,7 +278,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
 
             // Lunch
             if (recipesModel?.Lunch != null && recipesModel?.Lunch?.size!! > 0) {
-                lunchAdapter = setupMealAdapter(data.recipes?.Lunch, binding!!.rcyLunch, "BreakFastLunch")
+                lunchAdapter = setupMealAdapter(data.recipes?.Lunch, binding!!.rcyLunch, "Lunch")
                 binding!!.linearLunch.visibility = View.VISIBLE
             } else {
                 binding!!.linearLunch.visibility = View.GONE
@@ -277,10 +286,27 @@ class PlanFragment : Fragment(), OnItemClickListener {
 
             // Dinner
             if (recipesModel?.Dinner != null && recipesModel?.Dinner?.size!! > 0) {
-                dinnerAdapter = setupMealAdapter(data.recipes?.Dinner, binding!!.rcyDinner, "BreakFastDinner")
+                dinnerAdapter = setupMealAdapter(data.recipes?.Dinner, binding!!.rcyDinner, "Dinner")
                 binding!!.linearDinner.visibility = View.VISIBLE
             } else {
                 binding!!.linearDinner.visibility = View.GONE
+            }
+
+
+            // Snacks
+            if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
+                snackesAdapter = setupMealAdapter(data.recipes?.Snack, binding!!.rcySnacks, "Snacks")
+                binding!!.linearSnacks.visibility = View.VISIBLE
+            } else {
+                binding!!.linearSnacks.visibility = View.GONE
+            }
+
+            // TeaTime
+            if (recipesModel?.Teatime != null && recipesModel?.Teatime?.size!! > 0) {
+                teaTimeAdapter = setupMealAdapter(data.recipes?.Teatime, binding!!.rcyTeatime, "TeaTime")
+                binding!!.linearTeatime.visibility = View.VISIBLE
+            } else {
+                binding!!.linearTeatime.visibility = View.GONE
             }
 
         }
@@ -331,6 +357,44 @@ class PlanFragment : Fragment(), OnItemClickListener {
             binding!!.rcyBreakFast.visibility = View.GONE
             binding!!.rcyLunch.visibility = View.GONE
         }
+
+
+
+        binding!!.relMonthYear.setOnClickListener {
+            openDialog()
+        }
+
+
+
+    }
+
+    private fun openDialog(){
+
+        val dialog = Dialog(requireActivity())
+
+        // Set custom layout
+        dialog.setContentView(R.layout.dialog_calendar)
+
+        dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val calendarView = dialog.findViewById<CalendarView>(R.id.calendar)
+
+        calendarView.setOnDateChangeListener { view: CalendarView?, year: Int, month: Int, dayOfMonth: Int ->
+            val selectedDate = dayOfMonth.toString() + "-"+(month + 1)+"-" + year
+            val list = WeekDaysCalculator.getWeekDays(selectedDate)
+            val resultList = mutableListOf<Pair<String,String>>()
+            list.forEach{
+                Log.d("TESTING_LAWCO", it.toString())
+                val arr = it.split("-")
+                resultList.add(Pair(arr[0],arr[1]))
+            }
+            resultList.forEach {
+                Log.d("TESTING_LAWCO", it.first+" "+it.second)
+            }
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun dialogDailyInspiration() {
@@ -428,8 +492,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
             add(Calendar.DAY_OF_WEEK, 6)
         }.time
 
-        binding!!.textWeekRange.text =
-            "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
+        binding!!.textWeekRange.text = "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
         binding!!.recyclerViewWeekDays.adapter = calendarDayAdapter
         binding!!.recyclerViewWeekDays.adapter = CalendarDayAdapter(getDaysOfWeek()) {
         }
@@ -607,15 +670,29 @@ class PlanFragment : Fragment(), OnItemClickListener {
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         dialogChooseDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        rcyChooseDaySch = dialogChooseDay.findViewById(R.id.rcyChooseDaySch)
+        val rcyChooseDaySch = dialogChooseDay.findViewById<RecyclerView>(R.id.rcyChooseDaySch)
         tvWeekRange = dialogChooseDay.findViewById(R.id.tvWeekRange)
         val rlDoneBtn = dialogChooseDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         val btnPrevious = dialogChooseDay.findViewById<ImageView>(R.id.btnPrevious)
         val btnNext = dialogChooseDay.findViewById<ImageView>(R.id.btnNext)
         dialogChooseDay.show()
-        updateWeekRange()
         dialogChooseDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        cookingScheduleModel()
+
+        dataList.clear()
+
+        val daysOfWeek = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        for (day in daysOfWeek) {
+            val data = DataModel().apply {
+                title = day
+                isOpen = false
+                type = "CookingSchedule"
+                date = ""
+            }
+            dataList.add(data)
+        }
+        rcyChooseDaySch!!.adapter = ChooseDayAdapter(dataList, requireActivity())
+        updateWeekRange()
+
 
         rlDoneBtn.setOnClickListener {
             chooseDayMealTypeDialog()
@@ -639,53 +716,11 @@ class PlanFragment : Fragment(), OnItemClickListener {
     }
 
     private fun cookingScheduleModel() {
-        val dataList = ArrayList<DataModel>()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-        val data6 = DataModel()
-        val data7 = DataModel()
 
-        data1.title = "Monday"
-        data1.isOpen = false
-        data1.type = "CookingSchedule"
 
-        data2.title = "Tuesday"
-        data2.isOpen = false
-        data2.type = "CookingSchedule"
 
-        data3.title = "Wednesday"
-        data3.isOpen = false
-        data3.type = "CookingSchedule"
 
-        data4.title = "Thursday"
-        data4.isOpen = false
-        data4.type = "CookingSchedule"
 
-        data5.title = "Friday"
-        data5.isOpen = false
-        data5.type = "CookingSchedule"
-
-        data6.title = "Saturday"
-        data6.isOpen = false
-        data6.type = "CookingSchedule"
-
-        data7.title = "Sunday"
-        data7.isOpen = false
-        data7.type = "CookingSchedule"
-
-        dataList.add(data1)
-        dataList.add(data2)
-        dataList.add(data3)
-        dataList.add(data4)
-        dataList.add(data5)
-        dataList.add(data6)
-        dataList.add(data7)
-
-        chooseDayAdapter = ChooseDayAdapter(dataList, requireActivity())
-        rcyChooseDaySch!!.adapter = chooseDayAdapter
     }
 
     private fun updateWeekRange() {
@@ -697,8 +732,13 @@ class PlanFragment : Fragment(), OnItemClickListener {
             add(Calendar.DAY_OF_WEEK, 6)
         }.time
 
+
+        Log.d("start date ****$startOfWeek","End Date ******"+endOfWeek)
+
         tvWeekRange!!.text = "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
         calendar.add(Calendar.DAY_OF_WEEK, -6) // Reset endOfWeek calculation
+
+
     }
 
     private fun chooseDayMealTypeDialog() {
@@ -709,58 +749,54 @@ class PlanFragment : Fragment(), OnItemClickListener {
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         dialogChooseMealDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        tvWeekRange = dialogChooseMealDay.findViewById(R.id.tvWeekRange)
+//        tvWeekRange = dialogChooseMealDay.findViewById(R.id.tvWeekRange)
         val rlDoneBtn = dialogChooseMealDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         val btnPrevious = dialogChooseMealDay.findViewById<ImageView>(R.id.btnPrevious)
-        val imgBreakfastRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imgBreakfastRadio)
-        val imageLunchRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imageLunchRadio)
-        val imageDinnerRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imageDinnerRadio)
-        val imageSnacksRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imageSnacksRadio)
-        val imageBrunchRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imageBrunchRadio)
+
         val btnNext = dialogChooseMealDay.findViewById<ImageView>(R.id.btnNext)
+        // button event listener
+        val tvBreakfast = dialogChooseMealDay.findViewById<TextView>(R.id.tvBreakfast)
+        val tvLunch = dialogChooseMealDay.findViewById<TextView>(R.id.tvLunch)
+        val tvDinner = dialogChooseMealDay.findViewById<TextView>(R.id.tvDinner)
+        val tvSnacks = dialogChooseMealDay.findViewById<TextView>(R.id.tvSnacks)
+        val tvTeatime = dialogChooseMealDay.findViewById<TextView>(R.id.tvTeatime)
+
         dialogChooseMealDay.show()
-        updateWeekRange()
+//        updateWeekRange()
         dialogChooseMealDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
-        imgBreakfastRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_select_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
+        var type = ""
+
+        fun updateSelection(selectedType: String, selectedView: TextView, allViews: List<TextView>) {
+            type = selectedType
+            allViews.forEach { view ->
+                val drawable = if (view == selectedView) R.drawable.radio_select_icon else R.drawable.radio_unselect_icon
+                view.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0)
+            }
         }
 
-        imageLunchRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_select_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
+        val allViews = listOf(tvBreakfast, tvLunch, tvDinner, tvSnacks, tvTeatime)
+
+        tvBreakfast.setOnClickListener {
+            updateSelection("Breakfast", tvBreakfast, allViews)
         }
 
-        imageDinnerRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_select_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
+        tvLunch.setOnClickListener {
+            updateSelection("Lunch", tvLunch, allViews)
         }
 
-        imageSnacksRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_select_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
+        tvDinner.setOnClickListener {
+            updateSelection("Dinner", tvDinner, allViews)
         }
 
-        imageBrunchRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_select_icon)
+        tvSnacks.setOnClickListener {
+            updateSelection("Snacks", tvSnacks, allViews)
         }
+
+        tvTeatime.setOnClickListener {
+            updateSelection("Teatime", tvTeatime, allViews)
+        }
+
 
         rlDoneBtn.setOnClickListener {
             clickable = "clicked"
@@ -769,13 +805,13 @@ class PlanFragment : Fragment(), OnItemClickListener {
             dialogChooseMealDay.dismiss()
         }
 
-        btnPrevious.setOnClickListener {
+        /*btnPrevious.setOnClickListener {
             changeWeek(-1)
         }
 
         btnNext.setOnClickListener {
             changeWeek(1)
-        }
+        }*/
 
     }
 
@@ -886,9 +922,11 @@ class PlanFragment : Fragment(), OnItemClickListener {
     private fun toggleIsLike(type: String, position: Int?, apiType: String) {
         // Map the type to the corresponding list and adapter
         val (mealList, adapter) = when (type) {
-            "BreakFastPlan" -> recipesModel?.Breakfast to breakfastAdapter
-            "BreakFastLunch" -> recipesModel?.Lunch to lunchAdapter
-            "BreakFastDinner" -> recipesModel?.Dinner to dinnerAdapter
+            "BreakFast" -> recipesModel?.Breakfast to breakfastAdapter
+            "Lunch" -> recipesModel?.Lunch to lunchAdapter
+            "Dinner" -> recipesModel?.Dinner to dinnerAdapter
+            "Snacks" -> recipesModel?.Dinner to snackesAdapter
+            "TeaTime" -> recipesModel?.Dinner to teaTimeAdapter
             else -> null to null
         }
         // Safely get the item and position

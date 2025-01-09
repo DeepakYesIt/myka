@@ -23,6 +23,7 @@ class CalendarDayAdapter(private val days: List<CalendarDataModel.Day>, private 
         return ViewHolder(binding)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
 
         val day = days[position]

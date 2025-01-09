@@ -3,6 +3,8 @@ package com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apir
 data class RecipesModel(
     val Breakfast: MutableList<BreakfastModel>?,
     val Dinner: MutableList<BreakfastModel>?,
-    val Lunch: MutableList<BreakfastModel>?
+    val Lunch: MutableList<BreakfastModel>?,
+    val Snack: MutableList<BreakfastModel>?,
+    val Teatime: MutableList<BreakfastModel>?
 
 )

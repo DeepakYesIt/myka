@@ -284,54 +284,53 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         tvWeekRange = dialogChooseMealDay.findViewById(R.id.tvWeekRange)
         val rlDoneBtn = dialogChooseMealDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         val btnPrevious = dialogChooseMealDay.findViewById<ImageView>(R.id.btnPrevious)
-        val imgBreakfastRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imgBreakfastRadio)
-        val imageLunchRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imageLunchRadio)
-        val imageDinnerRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imageDinnerRadio)
-        val imageSnacksRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imageSnacksRadio)
-        val imageBrunchRadio = dialogChooseMealDay.findViewById<ImageView>(R.id.imageBrunchRadio)
+
         val btnNext = dialogChooseMealDay.findViewById<ImageView>(R.id.btnNext)
+        // button event listener
+        val tvBreakfast = dialogChooseMealDay.findViewById<TextView>(R.id.tvBreakfast)
+        val tvLunch = dialogChooseMealDay.findViewById<TextView>(R.id.tvLunch)
+        val tvDinner = dialogChooseMealDay.findViewById<TextView>(R.id.tvDinner)
+        val tvSnacks = dialogChooseMealDay.findViewById<TextView>(R.id.tvSnacks)
+        val tvTeatime = dialogChooseMealDay.findViewById<TextView>(R.id.tvTeatime)
+
+
+
+
+
         dialogChooseMealDay.show()
         updateWeekRange()
         dialogChooseMealDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
-        imgBreakfastRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_select_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
+        var type = ""
+
+        fun updateSelection(selectedType: String, selectedView: TextView, allViews: List<TextView>) {
+            type = selectedType
+            allViews.forEach { view ->
+                val drawable = if (view == selectedView) R.drawable.radio_select_icon else R.drawable.radio_unselect_icon
+                view.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0)
+            }
         }
 
-        imageLunchRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_select_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
+        val allViews = listOf(tvBreakfast, tvLunch, tvDinner, tvSnacks, tvTeatime)
+
+        tvBreakfast.setOnClickListener {
+            updateSelection("Breakfast", tvBreakfast, allViews)
         }
 
-        imageDinnerRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_select_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
+        tvLunch.setOnClickListener {
+            updateSelection("Lunch", tvLunch, allViews)
         }
 
-        imageSnacksRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_select_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_unselect_icon)
+        tvDinner.setOnClickListener {
+            updateSelection("Dinner", tvDinner, allViews)
         }
 
-        imageBrunchRadio.setOnClickListener {
-            imgBreakfastRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageLunchRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageDinnerRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageSnacksRadio.setImageResource(R.drawable.radio_unselect_icon)
-            imageBrunchRadio.setImageResource(R.drawable.radio_select_icon)
+        tvSnacks.setOnClickListener {
+            updateSelection("Snacks", tvSnacks, allViews)
+        }
+
+        tvTeatime.setOnClickListener {
+            updateSelection("Teatime", tvTeatime, allViews)
         }
 
         rlDoneBtn.setOnClickListener {

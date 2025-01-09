@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:firstDayOfWeek="2"
         android:dateTextAppearance="@style/CalendarDateTextStyle"
         tools:ignore="MissingConstraints">
     </CalendarView>
