@@ -42,6 +42,7 @@ object ApiEndPoint {
     const val updateNotificationUrl="update-notification"
     const val recipeDetailsUrl="get-recipe"
     const val allRecipeUrl="all-recipe"
+    const val getMealsUrl="get-meals"
     const val likeUnlikeUrl="add-to-favorite"
     const val addBasketeUrl="add-to-basket"
     const val addBasketeDetailsUrl="ingredient-basket"
@@ -49,6 +50,8 @@ object ApiEndPoint {
     const val getUserPreferences="user-prefrence"
 
     const val updateUserPreferences="update-user-prefrence"
+
+    const val addMealUrl="add-meal"
 
 
 }

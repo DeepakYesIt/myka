@@ -10,8 +10,9 @@ import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.databinding.AdapterBodyGoalsBinding
 import com.yesitlabs.mykaapp.databinding.AdapterPreferencesItemBinding
 import com.yesitlabs.mykaapp.model.DataModel
+import com.yesitlabs.mykaapp.model.DataPreferencesModel
 
-class PreferencesAdapter(private var datalist: List<DataModel>, private var requireActivity: FragmentActivity,private var onItemClickListener: OnItemClickListener): RecyclerView.Adapter<PreferencesAdapter.ViewHolder>() {
+class PreferencesAdapter(var datalist: List<DataPreferencesModel>, private var requireActivity: FragmentActivity, private var onItemClickListener: OnItemClickListener): RecyclerView.Adapter<PreferencesAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)

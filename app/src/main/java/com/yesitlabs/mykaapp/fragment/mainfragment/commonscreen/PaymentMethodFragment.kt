@@ -713,16 +713,14 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
 
                 if (imgtype.equals("camera", true)) {
                     val uri = data.data!!
-                    bankuploadfile =
-                        BaseApplication.getPath(requireContext(), uri)?.let { File(it) }
+                    bankuploadfile = BaseApplication.getPath(requireContext(), uri)?.let { File(it) }
                     binding.textChooseBankProof.text = bankuploadfile.toString()
                     filebankid = "Yes"
 
                 }
                 if (imgtype.equals("Gallery", true)) {
                     val uri = data.data!!
-                    bankuploadfile =
-                        BaseApplication.getPath(requireContext(), uri)?.let { File(it) }
+                    bankuploadfile = BaseApplication.getPath(requireContext(), uri)?.let { File(it) }
                     filebankid = "Yes"
                     binding.textChooseBankProof.text = bankuploadfile.toString()
 

@@ -222,6 +222,10 @@ interface ApiInterface {
     suspend fun recipeAddBasketRequestApi(@Body jsonObject: JsonObject):Response<JsonObject>
 
 
+    @POST(ApiEndPoint.addMealUrl)
+    suspend fun recipeAddToPlanRequestApi(@Body jsonObject: JsonObject):Response<JsonObject>
+
+
     @POST(ApiEndPoint.getCardBankUrl)
     suspend fun getCardAndBankRequestApi():Response<JsonObject>
 
@@ -229,6 +233,10 @@ interface ApiInterface {
     @FormUrlEncoded
     @POST(ApiEndPoint.allRecipeUrl)
     suspend fun planRequestApi(@Field("q") q:String):Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.getMealsUrl)
+    suspend fun planDateRequestApi(@Field("date") date:String):Response<JsonObject>
 
 
     @FormUrlEncoded

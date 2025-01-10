@@ -29,6 +29,7 @@ import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 object BaseApplication {
 
@@ -107,6 +108,28 @@ object BaseApplication {
         return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
+    fun formatOnlyDate(date: String): String {
+        try {
+            val inputDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // Define input format
+            val outputDateFormat = SimpleDateFormat("dd", Locale.getDefault()) // Define output format
+
+            val parsedDate = inputDateFormat.parse(date) // Parse the input string into a Date object
+            return outputDateFormat.format(parsedDate!!) // Format the Date object to "dd"
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return "" // Return an empty string in case of an error
+        }
+    }
+
+    fun formatonlyMonthYear(date: Date): String {
+        val dateFormat = SimpleDateFormat("MMM, yyyy", Locale.getDefault())
+        return dateFormat.format(date)
+    }
+
+
+    fun getFirstLetterOfDay(day: String): String {
+        return day.take(1)  // Get the first character of the string
+    }
 
 
     fun showMe(context: Context?) {

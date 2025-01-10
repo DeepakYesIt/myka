@@ -1,6 +1,6 @@
 package com.yesitlabs.mykaapp.model
 
-class DataModel {
+class DataModel() {
 
     lateinit var title:String
     lateinit var description:String

@@ -1,12 +1,12 @@
 package com.yesitlabs.mykaapp.fragment.mainfragment.plantab
 
 import PlanApiResponse
+import PlanByDateApiResponse
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.text.Html
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -28,43 +28,47 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.yesitlabs.mykaapp.OnItemClickListener
+import com.yesitlabs.mykaapp.OnItemSelectPlanTypeListener
 import com.yesitlabs.mykaapp.R
 import com.yesitlabs.mykaapp.activity.MainActivity
+import com.yesitlabs.mykaapp.adapter.AdapterPlanBreakByDateFast
 import com.yesitlabs.mykaapp.adapter.AdapterPlanBreakFast
-import com.yesitlabs.mykaapp.adapter.CalendarDayAdapter
+import com.yesitlabs.mykaapp.adapter.CalendarDayDateAdapter
 import com.yesitlabs.mykaapp.adapter.ChooseDayAdapter
 import com.yesitlabs.mykaapp.adapter.ImageViewPagerAdapter
 import com.yesitlabs.mykaapp.apiInterface.BaseUrl
 import com.yesitlabs.mykaapp.basedata.BaseApplication
 import com.yesitlabs.mykaapp.basedata.NetworkResult
 import com.yesitlabs.mykaapp.basedata.SessionManagement
-import com.yesitlabs.mykaapp.commonworkutils.WeekDaysCalculator
 import com.yesitlabs.mykaapp.databinding.FragmentPlanBinding
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.PlanViewModel
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.Data
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.RecipesModel
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.BreakfastModelPlanByDate
+import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.DataPlayByDate
 import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.yesitlabs.mykaapp.messageclass.ErrorMessage
 import com.yesitlabs.mykaapp.model.CalendarDataModel
 import com.yesitlabs.mykaapp.model.DataModel
+import com.yesitlabs.mykaapp.model.DateModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Arrays
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 
 @AndroidEntryPoint
-class PlanFragment : Fragment(), OnItemClickListener {
+class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListener {
 
     private var binding: FragmentPlanBinding? = null
     private val calendar = Calendar.getInstance()
-    private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
-    private var calendarDayAdapter: CalendarDayAdapter? = null
-
     private var dataList1: MutableList<DataModel> = mutableListOf()
     private var dataList2: MutableList<DataModel> = mutableListOf()
     private var dataList3: MutableList<DataModel> = mutableListOf()
@@ -74,19 +78,31 @@ class PlanFragment : Fragment(), OnItemClickListener {
     private var clickable: String? = ""
     private lateinit var viewModel: PlanViewModel
     private var recipesModel: RecipesModel? = null
+    private var recipesDateModel: DataPlayByDate? = null
 
     // Separate adapter instances for each RecyclerView
     var breakfastAdapter: AdapterPlanBreakFast? = null
+    var AdapterPlanBreakByDateFast: AdapterPlanBreakByDateFast? = null
     var lunchAdapter: AdapterPlanBreakFast? = null
+    var AdapterlunchByDateFast: AdapterPlanBreakByDateFast? = null
     var dinnerAdapter: AdapterPlanBreakFast? = null
+    var AdapterdinnerByDateFast: AdapterPlanBreakByDateFast? = null
     var snackesAdapter: AdapterPlanBreakFast? = null
+    var AdaptersnackesByDateFast: AdapterPlanBreakByDateFast? = null
     var teaTimeAdapter: AdapterPlanBreakFast? = null
+    var AdapterteaTimeByDateFast: AdapterPlanBreakByDateFast? = null
     private lateinit var sessionManagement: SessionManagement
 
     lateinit var adapter: ImageViewPagerAdapter
     val dataList = arrayListOf<DataModel>()
     private lateinit var layonboarding_indicator: LinearLayout
+    var currentDate = Date() // Current date
 
+    // Define global variables
+    private lateinit var startDate: Date
+    private lateinit var endDate: Date
+
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -122,6 +138,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
             binding?.tvName?.text =sessionManagement.getUserName()+"’s week"
         }
 
+
         planBreakFastModel()
         planLunchModel()
         planDinnerModel()
@@ -140,14 +157,86 @@ class PlanFragment : Fragment(), OnItemClickListener {
         )
         adapter = ImageViewPagerAdapter(requireContext(), imageList)
 
-        updateWeek()
 
 
-
+        // Display current week dates
+        showWeekDates()
 
 
         return binding!!.root
     }
+
+    @SuppressLint("SetTextI18n")
+    fun showWeekDates() {
+        Log.d("currentDate :- ", "******$currentDate")
+        val (startDate, endDate) = getWeekDates(currentDate)
+        this.startDate=startDate
+        this.endDate=endDate
+
+        println("Week Start Date: ${formatDate(startDate)}")
+        println("Week End Date: ${formatDate(endDate)}")
+
+        // Get all dates between startDate and endDate
+        val daysBetween = getDaysBetween(startDate, endDate)
+
+        // Print the dates
+        println("Days between ${startDate} and ${endDate}:")
+        daysBetween.forEach { println(it) }
+        binding!!.tvDate.text = BaseApplication.formatonlyMonthYear(startDate)
+        binding!!.textWeekRange.text = ""+formatDate(startDate)+"-"+formatDate(endDate)
+
+        tvWeekRange?.text = ""+formatDate(startDate)+"-"+formatDate(endDate)
+        // Update the RecyclerView
+        binding!!.recyclerViewWeekDays.adapter = CalendarDayDateAdapter(getDaysBetween(startDate, endDate)) {
+            // Handle item click if needed
+            if (BaseApplication.isOnline(requireActivity())) {
+                dataFatchByDate(it)
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+
+        }
+
+    }
+
+    private fun dataFatchByDate(date: String) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.planDateRequest({
+                BaseApplication.dismissMe()
+                handleApiPlanDateResponse(it)
+            }, date)
+        }
+    }
+
+
+    private fun getDaysBetween(startDate: Date, endDate: Date): MutableList<DateModel> {
+        val dateList = mutableListOf<DateModel>()
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // Format for the date
+        val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault()) // Format for the day name (e.g., Monday)
+
+        val calendar = Calendar.getInstance()
+        calendar.time = startDate
+
+        while (!calendar.time.after(endDate)) {
+            val date = dateFormat.format(calendar.time)  // Get the formatted date (yyyy-MM-dd)
+            val dayName = dayFormat.format(calendar.time)  // Get the day name (Monday, Tuesday, etc.)
+
+            val localDate= DateModel()
+            localDate.day=dayName
+            localDate.date=date
+            // Combine both the day name and the date
+//            dateList.add("$dayName, $date")
+            dateList.add(localDate)
+
+
+            // Move to the next day
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        return dateList
+    }
+
 
     private fun fetchDataOnLoad() {
         if (BaseApplication.isOnline(requireActivity())) {
@@ -167,6 +256,15 @@ class PlanFragment : Fragment(), OnItemClickListener {
         }
     }
 
+    private fun handleApiPlanDateResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessPlanDateResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+
     private fun handleApiResponse(result: NetworkResult<String>) {
         when (result) {
             is NetworkResult.Success -> handleSuccessResponse(result.data.toString())
@@ -174,6 +272,17 @@ class PlanFragment : Fragment(), OnItemClickListener {
             else -> showAlert(result.message, false)
         }
     }
+    private fun handleApiAddToPlanResponse(
+        result: NetworkResult<String>,
+        dialogChooseMealDay: Dialog
+    ) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessAddToPlanResponse(result.data.toString(),dialogChooseMealDay)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
 
     @SuppressLint("SetTextI18n")
     private fun handleSuccessResponse(data: String) {
@@ -184,6 +293,50 @@ class PlanFragment : Fragment(), OnItemClickListener {
                 if (apiModel.data != null) {
                     showData(apiModel.data)
                 }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessPlanDateResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, PlanByDateApiResponse::class.java)
+            Log.d("@@@ PlanDate List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data != null) {
+                    showDataAccordingDate(apiModel.data)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessAddToPlanResponse(data: String, dialogChooseMealDay: Dialog) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                 dataList.clear()
+                 dialogChooseMealDay.dismiss()
+                 Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -270,7 +423,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
 
             // Breakfast
             if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
-                breakfastAdapter = setupMealAdapter(data.recipes?.Breakfast, binding!!.rcyBreakFast, "BreakFast")
+                breakfastAdapter = setupMealAdapter(recipesModel?.Breakfast, binding!!.rcyBreakFast, "BreakFast")
                 binding!!.linearBreakfast.visibility = View.VISIBLE
             } else {
                 binding!!.linearBreakfast.visibility = View.GONE
@@ -278,7 +431,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
 
             // Lunch
             if (recipesModel?.Lunch != null && recipesModel?.Lunch?.size!! > 0) {
-                lunchAdapter = setupMealAdapter(data.recipes?.Lunch, binding!!.rcyLunch, "Lunch")
+                lunchAdapter = setupMealAdapter(recipesModel?.Lunch, binding!!.rcyLunch, "Lunch")
                 binding!!.linearLunch.visibility = View.VISIBLE
             } else {
                 binding!!.linearLunch.visibility = View.GONE
@@ -286,7 +439,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
 
             // Dinner
             if (recipesModel?.Dinner != null && recipesModel?.Dinner?.size!! > 0) {
-                dinnerAdapter = setupMealAdapter(data.recipes?.Dinner, binding!!.rcyDinner, "Dinner")
+                dinnerAdapter = setupMealAdapter(recipesModel?.Dinner, binding!!.rcyDinner, "Dinner")
                 binding!!.linearDinner.visibility = View.VISIBLE
             } else {
                 binding!!.linearDinner.visibility = View.GONE
@@ -295,7 +448,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
 
             // Snacks
             if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
-                snackesAdapter = setupMealAdapter(data.recipes?.Snack, binding!!.rcySnacks, "Snacks")
+                snackesAdapter = setupMealAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snacks")
                 binding!!.linearSnacks.visibility = View.VISIBLE
             } else {
                 binding!!.linearSnacks.visibility = View.GONE
@@ -303,10 +456,114 @@ class PlanFragment : Fragment(), OnItemClickListener {
 
             // TeaTime
             if (recipesModel?.Teatime != null && recipesModel?.Teatime?.size!! > 0) {
-                teaTimeAdapter = setupMealAdapter(data.recipes?.Teatime, binding!!.rcyTeatime, "TeaTime")
+                teaTimeAdapter = setupMealAdapter(recipesModel?.Teatime, binding!!.rcyTeatime, "TeaTime")
                 binding!!.linearTeatime.visibility = View.VISIBLE
             } else {
                 binding!!.linearTeatime.visibility = View.GONE
+            }
+
+        }
+
+    }
+
+
+    private fun showDataAccordingDate(data: DataPlayByDate?) {
+
+        recipesDateModel= null
+        recipesDateModel = data
+
+        if (recipesDateModel != null) {
+            fun setupMealAdapter(mealRecipes: MutableList<BreakfastModelPlanByDate>?, recyclerView: RecyclerView, type: String): AdapterPlanBreakByDateFast? {
+                return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
+                    val adapter = AdapterPlanBreakByDateFast(mealRecipes, requireActivity(), this, type)
+                    recyclerView.adapter = adapter
+                    adapter
+                } else {
+                    null
+                }
+            }
+
+            fun setupMealTopAdapter(
+                mealRecipes: MutableList<BreakfastModel>?,
+                recyclerView: RecyclerView,
+                type: String
+            ): AdapterPlanBreakFast? {
+                return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
+                    val adapter = AdapterPlanBreakFast(mealRecipes, requireActivity(), this, type)
+                    recyclerView.adapter = adapter
+                    adapter
+                } else {
+                    null
+                }
+            }
+
+            // Breakfast
+            if (recipesDateModel?.Breakfast != null && recipesDateModel?.Breakfast?.size!! > 0) {
+                AdapterPlanBreakByDateFast = setupMealAdapter(recipesDateModel!!.Breakfast!!, binding!!.rcyBreakFast, "BreakFast")
+                binding!!.linearBreakfast.visibility = View.VISIBLE
+            } else {
+                // Breakfast
+                if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
+                    breakfastAdapter = setupMealTopAdapter(recipesModel?.Breakfast, binding!!.rcyBreakFast, "BreakFast")
+                    binding!!.linearBreakfast.visibility = View.VISIBLE
+                } else {
+                    binding!!.linearBreakfast.visibility = View.GONE
+                }
+            }
+
+            // Lunch
+            if (recipesDateModel?.Lunch != null && recipesDateModel?.Lunch?.size!! > 0) {
+                AdapterlunchByDateFast = setupMealAdapter(data?.Lunch, binding!!.rcyLunch, "Lunch")
+                binding!!.linearLunch.visibility = View.VISIBLE
+            } else {
+                if (recipesModel?.Lunch != null && recipesModel?.Lunch?.size!! > 0) {
+                    lunchAdapter = setupMealTopAdapter(recipesModel?.Lunch, binding!!.rcyLunch, "Lunch")
+                    binding!!.linearLunch.visibility = View.VISIBLE
+                } else {
+                    binding!!.linearLunch.visibility = View.GONE
+                }
+            }
+
+            // Dinner
+            if (recipesDateModel?.Dinner != null && recipesDateModel?.Dinner?.size!! > 0) {
+                AdapterdinnerByDateFast = setupMealAdapter(data?.Dinner, binding!!.rcyDinner, "Dinner")
+                binding!!.linearDinner.visibility = View.VISIBLE
+            } else {
+                // Dinner
+                if (recipesModel?.Dinner != null && recipesModel?.Dinner?.size!! > 0) {
+                    dinnerAdapter = setupMealTopAdapter(recipesModel?.Dinner, binding!!.rcyDinner, "Dinner")
+                    binding!!.linearDinner.visibility = View.VISIBLE
+                } else {
+                    binding!!.linearDinner.visibility = View.GONE
+                }
+            }
+
+            // Snacks
+            if (recipesDateModel?.Snack != null && recipesDateModel?.Snack?.size!! > 0) {
+                AdaptersnackesByDateFast = setupMealAdapter(data?.Snack, binding!!.rcySnacks, "Snacks")
+                binding!!.linearSnacks.visibility = View.VISIBLE
+            } else {
+                // Snacks
+                if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
+                    snackesAdapter = setupMealTopAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snacks")
+                    binding!!.linearSnacks.visibility = View.VISIBLE
+                } else {
+                    binding!!.linearSnacks.visibility = View.GONE
+                }
+            }
+
+            // TeaTime
+            if (recipesDateModel?.Teatime != null && recipesDateModel?.Teatime?.size!! > 0) {
+                AdapterteaTimeByDateFast =setupMealAdapter(data?.Teatime, binding!!.rcyTeatime, "TeaTime")
+                binding!!.linearTeatime.visibility = View.VISIBLE
+            } else {
+                // TeaTime
+                if (recipesModel?.Teatime != null && recipesModel?.Teatime?.size!! > 0) {
+                    teaTimeAdapter = setupMealTopAdapter(recipesModel?.Teatime, binding!!.rcyTeatime, "TeaTime")
+                    binding!!.linearTeatime.visibility = View.VISIBLE
+                } else {
+                    binding!!.linearTeatime.visibility = View.GONE
+                }
             }
 
         }
@@ -351,11 +608,11 @@ class PlanFragment : Fragment(), OnItemClickListener {
         }
 
         binding!!.tvConfirmBtn.setOnClickListener {
-            binding!!.llCalculateBmr.visibility = View.VISIBLE
+           /* binding!!.llCalculateBmr.visibility = View.VISIBLE
             binding!!.relBreakFastsss.visibility = View.VISIBLE
             binding!!.relBreakFastsLunch.visibility = View.VISIBLE
             binding!!.rcyBreakFast.visibility = View.GONE
-            binding!!.rcyLunch.visibility = View.GONE
+            binding!!.rcyLunch.visibility = View.GONE*/
         }
 
 
@@ -364,43 +621,82 @@ class PlanFragment : Fragment(), OnItemClickListener {
             openDialog()
         }
 
+        binding!!.imagePrevious.setOnClickListener {
+//            changeWeekRange(-1)
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+            currentDate = calendar.time
 
+            // Display next week dates
+            println("\nAfter clicking 'Next':")
+            showWeekDates()
+        }
+
+        binding!!.imageNext.setOnClickListener {
+            /*changeWeekRange(1)*/
+            // Simulate clicking the "Next" button to move to the next week
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            calendar.add(Calendar.WEEK_OF_YEAR, 1) // Move to next week
+            currentDate = calendar.time
+
+            // Display next week dates
+            println("\nAfter clicking 'Next':")
+            showWeekDates()
+        }
 
     }
 
+
+    private fun getWeekDates(currentDate: Date): Pair<Date, Date> {
+        val calendar = Calendar.getInstance()
+        calendar.time = currentDate
+        // Set the calendar to the start of the week (Monday)
+        calendar.firstDayOfWeek = Calendar.MONDAY
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val startOfWeek = calendar.time
+
+        // Set the calendar to the end of the week (Saturday)
+        calendar.add(Calendar.DAY_OF_WEEK, 6)
+        val endOfWeek = calendar.time
+        return Pair(startOfWeek, endOfWeek)
+    }
+
+    fun formatDate(date: Date): String {
+        val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+        return dateFormat.format(date)
+    }
+
     private fun openDialog(){
-
         val dialog = Dialog(requireActivity())
-
         // Set custom layout
         dialog.setContentView(R.layout.dialog_calendar)
 
         dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
 
         val calendarView = dialog.findViewById<CalendarView>(R.id.calendar)
-
         calendarView.setOnDateChangeListener { view: CalendarView?, year: Int, month: Int, dayOfMonth: Int ->
             val selectedDate = dayOfMonth.toString() + "-"+(month + 1)+"-" + year
-            val list = WeekDaysCalculator.getWeekDays(selectedDate)
-            val resultList = mutableListOf<Pair<String,String>>()
-            list.forEach{
-                Log.d("TESTING_LAWCO", it.toString())
-                val arr = it.split("-")
-                resultList.add(Pair(arr[0],arr[1]))
-            }
-            resultList.forEach {
-                Log.d("TESTING_LAWCO", it.first+" "+it.second)
-            }
+            val calendar = Calendar.getInstance()
+            calendar.set(year, month, dayOfMonth)
+            val date = calendar.time  // This is the Date object
+            // Format the Date object to the desired string format
+            val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.getDefault())
+            val currentDateString = dateFormat.format(date)  // This is the formatted string
+            // To convert the string back to a Date object:
+            currentDate = dateFormat.parse(currentDateString)!!  // This is the Date object
+            // Display current week dates
+            showWeekDates()
             dialog.dismiss()
         }
-
         dialog.show()
     }
 
     private fun dialogDailyInspiration() {
         val dialog = Dialog(requireContext(), R.style.BottomSheetDialog)
-        dialog?.apply {
-            setCancelable(false)
+        dialog.apply {
+            setCancelable(true)
             setContentView(R.layout.alert_dialog_daily_inspiration)
             window?.attributes = WindowManager.LayoutParams().apply {
                 copyFrom(window?.attributes)
@@ -408,9 +704,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
                 height = WindowManager.LayoutParams.MATCH_PARENT
             }
 
-
             layonboarding_indicator = findViewById<LinearLayout>(R.id.layonboarding_indicator)
-//           var tabLayout = findViewById<TabLayout>(R.id.tabLayoutForIndicator)
             val viewPager = findViewById<ViewPager2>(R.id.viewPager)
             val llBreakfast = findViewById<LinearLayout>(R.id.llBreakfast)
             val llLunch = findViewById<LinearLayout>(R.id.llLunch)
@@ -453,7 +747,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
             }
 
             rlAddPlanButton.setOnClickListener {
-                chooseDayDialog()
+                chooseDayDialog(0, "")
                 dismiss()
             }
 
@@ -483,20 +777,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
         }
     }
 
-    private fun updateWeek() {
-        val startOfWeek = calendar.apply {
-            set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-        }.time
 
-        val endOfWeek = calendar.apply {
-            add(Calendar.DAY_OF_WEEK, 6)
-        }.time
-
-        binding!!.textWeekRange.text = "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
-        binding!!.recyclerViewWeekDays.adapter = calendarDayAdapter
-        binding!!.recyclerViewWeekDays.adapter = CalendarDayAdapter(getDaysOfWeek()) {
-        }
-    }
 
     private fun setUpOnBoardingIndicator() {
         val indicator = arrayOfNulls<ImageView>(adapter!!.getItemCount())
@@ -662,13 +943,11 @@ class PlanFragment : Fragment(), OnItemClickListener {
 //        binding!!.rcyDinner.adapter = planBreakFastAdapter
     }
 
-    private fun chooseDayDialog() {
+    @SuppressLint("SetTextI18n")
+    private fun chooseDayDialog(position: Int?, typeAdapter: String?) {
         val dialogChooseDay: Dialog = context?.let { Dialog(it) }!!
         dialogChooseDay.setContentView(R.layout.alert_dialog_choose_day)
-        dialogChooseDay.window!!.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
+        dialogChooseDay.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
         dialogChooseDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val rcyChooseDaySch = dialogChooseDay.findViewById<RecyclerView>(R.id.rcyChooseDaySch)
         tvWeekRange = dialogChooseDay.findViewById(R.id.tvWeekRange)
@@ -677,9 +956,8 @@ class PlanFragment : Fragment(), OnItemClickListener {
         val btnNext = dialogChooseDay.findViewById<ImageView>(R.id.btnNext)
         dialogChooseDay.show()
         dialogChooseDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-
+        showWeekDates()
         dataList.clear()
-
         val daysOfWeek = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
         for (day in daysOfWeek) {
             val data = DataModel().apply {
@@ -690,58 +968,49 @@ class PlanFragment : Fragment(), OnItemClickListener {
             }
             dataList.add(data)
         }
+
+
         rcyChooseDaySch!!.adapter = ChooseDayAdapter(dataList, requireActivity())
-        updateWeekRange()
 
 
         rlDoneBtn.setOnClickListener {
-            chooseDayMealTypeDialog()
+            chooseDayMealTypeDialog(position,typeAdapter)
             dialogChooseDay.dismiss()
         }
 
         btnPrevious.setOnClickListener {
-            changeWeek(-1)
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+            currentDate = calendar.time
+            // Display next week dates
+            println("\nAfter clicking 'Next':")
+            showWeekDates()
         }
 
         btnNext.setOnClickListener {
-            changeWeek(1)
+            // Simulate clicking the "Next" button to move to the next week
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            calendar.add(Calendar.WEEK_OF_YEAR, 1) // Move to next week
+            currentDate = calendar.time
+            // Display next week dates
+            println("\nAfter clicking 'Next':")
+            showWeekDates()
         }
 
 
     }
 
-    private fun changeWeek(weeks: Int) {
-        calendar.add(Calendar.WEEK_OF_YEAR, weeks)
-        updateWeekRange()
-    }
+
 
     private fun cookingScheduleModel() {
 
-
-
-
-
     }
 
-    private fun updateWeekRange() {
-        val startOfWeek = calendar.apply {
-            set(Calendar.DAY_OF_WEEK, firstDayOfWeek)
-        }.time
-
-        val endOfWeek = calendar.apply {
-            add(Calendar.DAY_OF_WEEK, 6)
-        }.time
 
 
-        Log.d("start date ****$startOfWeek","End Date ******"+endOfWeek)
-
-        tvWeekRange!!.text = "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
-        calendar.add(Calendar.DAY_OF_WEEK, -6) // Reset endOfWeek calculation
-
-
-    }
-
-    private fun chooseDayMealTypeDialog() {
+    private fun chooseDayMealTypeDialog(position: Int?, typeAdapter: String?) {
         val dialogChooseMealDay: Dialog = context?.let { Dialog(it) }!!
         dialogChooseMealDay.setContentView(R.layout.alert_dialog_choose_day_meal_type)
         dialogChooseMealDay.window!!.setLayout(
@@ -749,20 +1018,14 @@ class PlanFragment : Fragment(), OnItemClickListener {
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         dialogChooseMealDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//        tvWeekRange = dialogChooseMealDay.findViewById(R.id.tvWeekRange)
         val rlDoneBtn = dialogChooseMealDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
-        val btnPrevious = dialogChooseMealDay.findViewById<ImageView>(R.id.btnPrevious)
-
-        val btnNext = dialogChooseMealDay.findViewById<ImageView>(R.id.btnNext)
         // button event listener
         val tvBreakfast = dialogChooseMealDay.findViewById<TextView>(R.id.tvBreakfast)
         val tvLunch = dialogChooseMealDay.findViewById<TextView>(R.id.tvLunch)
         val tvDinner = dialogChooseMealDay.findViewById<TextView>(R.id.tvDinner)
         val tvSnacks = dialogChooseMealDay.findViewById<TextView>(R.id.tvSnacks)
         val tvTeatime = dialogChooseMealDay.findViewById<TextView>(R.id.tvTeatime)
-
         dialogChooseMealDay.show()
-//        updateWeekRange()
         dialogChooseMealDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
         var type = ""
@@ -799,20 +1062,72 @@ class PlanFragment : Fragment(), OnItemClickListener {
 
 
         rlDoneBtn.setOnClickListener {
-            clickable = "clicked"
-            binding!!.rlAddDayToBasket.setBackgroundResource(R.drawable.green_btn_background)
-            binding!!.rlAddDayToBasket.isClickable = true
-            dialogChooseMealDay.dismiss()
+            if (BaseApplication.isOnline(requireActivity())) {
+                addToPlan(dialogChooseMealDay,type,position,typeAdapter)
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
-        /*btnPrevious.setOnClickListener {
-            changeWeek(-1)
+    }
+
+    private fun addToPlan(dialogChooseMealDay: Dialog, selectType: String, position: Int?, typeAdapter: String?) {
+        // Map the type to the corresponding list and adapter
+        val (mealList, adapter) = when (typeAdapter) {
+            "BreakFast" -> recipesModel?.Breakfast to breakfastAdapter
+            "Lunch" -> recipesModel?.Lunch to lunchAdapter
+            "Dinner" -> recipesModel?.Dinner to dinnerAdapter
+            "Snacks" -> recipesModel?.Dinner to snackesAdapter
+            "TeaTime" -> recipesModel?.Dinner to teaTimeAdapter
+            else -> null to null
         }
 
-        btnNext.setOnClickListener {
-            changeWeek(1)
-        }*/
+        // Create a JsonObject for the main JSON structure
+        val jsonObject = JsonObject()
 
+        // Safely get the item and position
+        val item = mealList?.get(position!!)
+        if (item != null) {
+            if (item.recipe?.uri!=null){
+                jsonObject.addProperty("type", selectType)
+                jsonObject.addProperty("uri", item.recipe.uri)
+                // Create a JsonArray for ingredients
+                val jsonArray = JsonArray()
+                val latestList=getDaysBetween(startDate, endDate)
+                for (i in dataList.indices) {
+                    val data=DataModel()
+                    data.isOpen=dataList[i].isOpen
+                    data.title=dataList[i].title
+                    data.date=latestList[i].date
+                    dataList[i] = data
+                }
+                // Iterate through the ingredients and add them to the array if status is true
+                dataList.forEach { data ->
+                    if (data.isOpen) {
+                        // Create a JsonObject for each ingredient
+                        val ingredientObject = JsonObject()
+                        ingredientObject.addProperty("date", data.date)
+
+                        ingredientObject.addProperty("day", data.title)
+                        // Add the ingredient object to the array
+                        jsonArray.add(ingredientObject)
+                    }
+                }
+
+                // Add the ingredients array to the main JSON object
+                jsonObject.add("slot", jsonArray)
+            }
+        }
+
+        Log.d("json object ", "******$jsonObject")
+
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.recipeAddToPlanRequest({
+                BaseApplication.dismissMe()
+                handleApiAddToPlanResponse(it,dialogChooseMealDay)
+            }, jsonObject)
+        }
     }
 
     private fun addAnotherMealDialog() {
@@ -895,7 +1210,7 @@ class PlanFragment : Fragment(), OnItemClickListener {
     override fun itemClick(position: Int?, status: String?, type: String?) {
         when (status) {
             "1" -> {
-                chooseDayDialog()
+                chooseDayDialog(position,type)
             }
             "2" -> {
                 if (BaseApplication.isOnline(requireActivity())) {
@@ -994,6 +1309,15 @@ class PlanFragment : Fragment(), OnItemClickListener {
             is NetworkResult.Success -> handleBasketSuccessResponse(result.data.toString())
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
+        }
+    }
+
+    override fun itemSelectPlayByDate(position: Int?, status: String?, type: String?) {
+        dialogDailyInspiration()
+        when (status) {
+            "1" -> {
+                dialogDailyInspiration()
+            }
         }
     }
 

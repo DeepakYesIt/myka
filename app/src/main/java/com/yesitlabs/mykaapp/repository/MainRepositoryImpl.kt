@@ -652,9 +652,49 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
         }
     }
 
+    override suspend fun recipeAddToPlanRequestApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        jsonObject: JsonObject
+    ) {
+        try {
+            api.recipeAddToPlanRequestApi(jsonObject).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
     override suspend fun planRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, q: String) {
         try {
             api.planRequestApi(q).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun planDateRequestApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        date: String
+    ) {
+        try {
+            api.planDateRequestApi(date).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
