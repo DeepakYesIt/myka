@@ -76,6 +76,7 @@
                     android:background="@drawable/orange_shape_bg">
 
                     <TextView
+                        android:id="@+id/tvCustomDates"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:drawablePadding="@dimen/_5sdp"

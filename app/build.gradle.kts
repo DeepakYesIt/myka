@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.yesitlabs.mykaapp"
+    namespace = "com.mykameal.planner"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.yesitlabs.mykaapp"
+        applicationId = "com.mykameal.planner"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -60,6 +60,7 @@ dependencies {
 
     //viewpager
     implementation("androidx.viewpager2:viewpager2:1.1.0")
+
 
     //Retrofit for api
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -122,7 +123,4 @@ dependencies {
     implementation ("com.github.dewinjm:monthyear-picker:1.0.2")
 
     implementation ("com.github.jaiselrahman:FilePicker:1.3.2")
-
-
-
 }
