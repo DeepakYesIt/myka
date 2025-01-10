@@ -7,13 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.findNavController
-import com.yesitlabs.mykaapp.OnItemClickListener
-import com.yesitlabs.mykaapp.R
-import com.yesitlabs.mykaapp.basedata.SessionManagement
-import com.yesitlabs.mykaapp.activity.MainActivity
-import com.yesitlabs.mykaapp.adapter.PreferencesAdapter
-import com.yesitlabs.mykaapp.databinding.FragmentPreferencesBinding
-import com.yesitlabs.mykaapp.model.DataPreferencesModel
+import com.mykameal.planner.model.DataPreferencesModel
 
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.R
@@ -21,7 +15,6 @@ import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.adapter.PreferencesAdapter
 import com.mykameal.planner.databinding.FragmentPreferencesBinding
-import com.mykameal.planner.model.DataModel
 
 class PreferencesFragment : Fragment(), OnItemClickListener {
 

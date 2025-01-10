@@ -1,4 +1,4 @@
-import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.DataPlayByDate
+import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.DataPlayByDate
 
 data class PlanByDateApiResponse(
     val code: Int,

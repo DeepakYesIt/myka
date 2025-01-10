@@ -4,15 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.yesitlabs.mykaapp.OnItemClickListener
-import com.yesitlabs.mykaapp.R
-import com.yesitlabs.mykaapp.databinding.AdapterBodyGoalsBinding
-import com.yesitlabs.mykaapp.databinding.AdapterPreferencesItemBinding
-import com.yesitlabs.mykaapp.model.DataModel
-import com.yesitlabs.mykaapp.model.DataPreferencesModel
+import com.mykameal.planner.model.DataPreferencesModel
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.databinding.AdapterPreferencesItemBinding
-import com.mykameal.planner.model.DataModel
 
 
 class PreferencesAdapter(var datalist: List<DataPreferencesModel>, private var requireActivity: FragmentActivity, private var onItemClickListener: OnItemClickListener): RecyclerView.Adapter<PreferencesAdapter.ViewHolder>() {

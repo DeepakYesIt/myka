@@ -30,43 +30,22 @@ import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.yesitlabs.mykaapp.OnItemClickListener
 import com.yesitlabs.mykaapp.OnItemSelectPlanTypeListener
-import com.yesitlabs.mykaapp.R
-import com.yesitlabs.mykaapp.activity.MainActivity
 import com.yesitlabs.mykaapp.adapter.AdapterPlanBreakByDateFast
-import com.yesitlabs.mykaapp.adapter.AdapterPlanBreakFast
-import com.yesitlabs.mykaapp.adapter.CalendarDayDateAdapter
-import com.yesitlabs.mykaapp.adapter.ChooseDayAdapter
-import com.yesitlabs.mykaapp.adapter.ImageViewPagerAdapter
-import com.yesitlabs.mykaapp.apiInterface.BaseUrl
-import com.yesitlabs.mykaapp.basedata.BaseApplication
-import com.yesitlabs.mykaapp.basedata.NetworkResult
-import com.yesitlabs.mykaapp.basedata.SessionManagement
-import com.yesitlabs.mykaapp.databinding.FragmentPlanBinding
-import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.PlanViewModel
-import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
-import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.Data
-import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.RecipesModel
-import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.BreakfastModelPlanByDate
-import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.DataPlayByDate
-import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
-import com.yesitlabs.mykaapp.messageclass.ErrorMessage
-import com.yesitlabs.mykaapp.model.CalendarDataModel
-import com.yesitlabs.mykaapp.model.DataModel
+import com.mykameal.planner.adapter.CalendarDayDateAdapter
+import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.BreakfastModelPlanByDate
+import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.DataPlayByDate
 import com.yesitlabs.mykaapp.model.DateModel
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.adapter.AdapterPlanBreakFast
-import com.mykameal.planner.adapter.CalendarDayAdapter
 import com.mykameal.planner.adapter.ChooseDayAdapter
 import com.mykameal.planner.adapter.ImageViewPagerAdapter
 import com.mykameal.planner.apiInterface.BaseUrl
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.basedata.SessionManagement
-import com.mykameal.planner.commonworkutils.WeekDaysCalculator
 import com.mykameal.planner.databinding.FragmentPlanBinding
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.PlanViewModel
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
@@ -178,8 +157,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         // Display current week dates
         showWeekDates()
 
-
-        updateWeek()
 
         return binding!!.root
     }

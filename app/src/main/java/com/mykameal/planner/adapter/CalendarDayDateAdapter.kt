@@ -1,13 +1,13 @@
-package com.yesitlabs.mykaapp.adapter
+package com.mykameal.planner.adapter
 
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.yesitlabs.mykaapp.R
-import com.yesitlabs.mykaapp.basedata.BaseApplication
-import com.yesitlabs.mykaapp.databinding.CalendarItemDayBinding
+import com.mykameal.planner.R
+import com.mykameal.planner.basedata.BaseApplication
+import com.mykameal.planner.databinding.CalendarItemDayBinding
 import com.yesitlabs.mykaapp.model.DateModel
 
 class CalendarDayDateAdapter(val days: MutableList<DateModel>, private val onDaySelected: (String) -> Unit) : RecyclerView.Adapter<CalendarDayDateAdapter.ViewHolder>() {

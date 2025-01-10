@@ -29,9 +29,7 @@ import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.commonworkutils.CommonWorkUtils
 import com.mykameal.planner.databinding.FragmentSearchBinding
-import com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen.model.Ingredient
-import com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen.model.SearchModel
-import com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen.model.SearchModelData
+
 import com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen.viewmodel.SearchRecipeViewModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import com.mykameal.planner.model.DataModel
@@ -48,7 +46,7 @@ class SearchFragment : Fragment(),View.OnClickListener {
     private lateinit var commonWorkUtils: CommonWorkUtils
     private lateinit var sessionManagement: SessionManagement
     private lateinit var searchRecipeViewModel:SearchRecipeViewModel
-    private val allIngredients = mutableListOf<Ingredient>()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -107,7 +105,7 @@ class SearchFragment : Fragment(),View.OnClickListener {
                 when (it) {
                     is NetworkResult.Success -> {
                            val gson = Gson()
-                           val searchModel = gson.fromJson(it.data, SearchModel::class.java)
+                          /* val searchModel = gson.fromJson(it.data, SearchModel::class.java)
                            if (searchModel.code == 200 && searchModel.success) {
                                showDataInUi(searchModel.data)
                            } else {
@@ -116,7 +114,7 @@ class SearchFragment : Fragment(),View.OnClickListener {
                                }else{
                                    showAlertFunction(searchModel.message, false)
                                }
-                           }
+                           }*/
                     }
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
@@ -130,7 +128,7 @@ class SearchFragment : Fragment(),View.OnClickListener {
     }
 
 
-    private fun showDataInUi(searchModelData: SearchModelData) {
+    /*private fun showDataInUi(searchModelData: SearchModelData) {
 
         if (searchModelData!=null){
             if (searchModelData.recipes!=null && searchModelData.recipes.size>0){
@@ -145,7 +143,7 @@ class SearchFragment : Fragment(),View.OnClickListener {
                 }
             }
         }
-    }
+    }*/
 
     private fun showAlertFunction(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)

@@ -2,9 +2,6 @@ package com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel
 
 import androidx.lifecycle.ViewModel
 import com.google.gson.JsonObject
-import com.yesitlabs.mykaapp.basedata.NetworkResult
-import com.yesitlabs.mykaapp.repository.MainRepository
-
 import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

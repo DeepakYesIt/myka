@@ -1,6 +1,4 @@
-package com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate
-
-import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
+package com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate
 
 data class DataPlayByDate(
     val Breakfast: MutableList<BreakfastModelPlanByDate>?,

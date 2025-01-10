@@ -23,8 +23,6 @@ import com.mykameal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-
-
 @AndroidEntryPoint
 class WalletFragment : Fragment() {
 

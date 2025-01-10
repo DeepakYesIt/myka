@@ -12,11 +12,10 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.yesitlabs.mykaapp.OnItemClickListener
+import com.mykameal.planner.R
+import com.mykameal.planner.databinding.AdapterMealTypeHorizentalBinding
 import com.yesitlabs.mykaapp.OnItemSelectPlanTypeListener
-import com.yesitlabs.mykaapp.R
-import com.yesitlabs.mykaapp.databinding.AdapterMealTypeHorizentalBinding
-import com.yesitlabs.mykaapp.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.BreakfastModelPlanByDate
+import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.BreakfastModelPlanByDate
 
 class AdapterPlanBreakByDateFast(var datalist: MutableList<BreakfastModelPlanByDate>?, var requireActivity: FragmentActivity, private var onItemClickListener: OnItemSelectPlanTypeListener, var type:String): RecyclerView.Adapter<AdapterPlanBreakByDateFast.ViewHolder>() {
 
@@ -27,7 +26,7 @@ class AdapterPlanBreakByDateFast(var datalist: MutableList<BreakfastModelPlanByD
         return ViewHolder(binding)
     }
 
-    fun updateList(updateList: MutableList<BreakfastModelPlanByDate>,type:String){
+    fun updateList(updateList: MutableList<BreakfastModelPlanByDate>, type:String){
         datalist=updateList
         this.type=type
         notifyDataSetChanged()
