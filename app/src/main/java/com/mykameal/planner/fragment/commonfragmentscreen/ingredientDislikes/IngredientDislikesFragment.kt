@@ -77,9 +77,20 @@ class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateIngDislike.visibility=View.VISIBLE
+            if (BaseApplication.isOnline(requireContext())) {
+                ingredientDislikeSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateIngDislike.visibility=View.GONE
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireContext())) {
+                ingredientDislikeApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
@@ -87,21 +98,6 @@ class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
                 findNavController().navigateUp()
             }
         })
-
-        if (sessionManagement.getCookingScreen()!="Profile"){
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireContext())) {
-                ingredientDislikeApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }else{
-            if (BaseApplication.isOnline(requireContext())) {
-                ingredientDislikeSelectApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
 
         initialize()
 

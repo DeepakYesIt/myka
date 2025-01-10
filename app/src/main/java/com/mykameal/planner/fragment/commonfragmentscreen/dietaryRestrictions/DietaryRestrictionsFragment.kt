@@ -72,32 +72,30 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateDietRest.visibility=View.VISIBLE
+
+            if (BaseApplication.isOnline(requireActivity())) {
+                dietaryRestrictionSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateDietRest.visibility=View.GONE
-        }
 
-        if (sessionManagement.getCookingScreen()!="Profile"){
             ///checking the device of mobile data in online and offline(show network error message)
             if (BaseApplication.isOnline(requireContext())) {
                 dietaryRestrictionApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        }else{
-            if (BaseApplication.isOnline(requireActivity())) {
-                dietaryRestrictionSelectApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
         }
+
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
         })
-
 
         initialize()
 

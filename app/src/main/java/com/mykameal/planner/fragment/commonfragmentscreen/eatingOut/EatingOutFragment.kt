@@ -66,9 +66,20 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateEatingOut.visibility=View.VISIBLE
+            if (BaseApplication.isOnline(requireActivity())) {
+                eatingOutSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateEatingOut.visibility=View.GONE
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireContext())) {
+                eatingOutApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
@@ -76,22 +87,6 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
                 findNavController().navigateUp()
             }
         })
-
-
-        if (sessionManagement.getCookingScreen()!="Profile"){
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireContext())) {
-                eatingOutApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }else{
-            if (BaseApplication.isOnline(requireActivity())) {
-                eatingOutSelectApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
 
         initialize()
 

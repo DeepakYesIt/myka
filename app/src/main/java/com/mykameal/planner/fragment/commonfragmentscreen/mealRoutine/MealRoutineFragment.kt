@@ -83,25 +83,22 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListen
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateMealRoutine.visibility=View.VISIBLE
+            if (BaseApplication.isOnline(requireContext())) {
+                mealRoutineSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateMealRoutine.visibility=View.GONE
-        }
-
-        if (sessionManagement.getCookingScreen()!="Profile"){
             ///checking the device of mobile data in online and offline(show network error message)
             if (BaseApplication.isOnline(requireContext())) {
                 mealRoutineApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        }else{
-            if (BaseApplication.isOnline(requireContext())) {
-                mealRoutineSelectApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
         }
+
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {

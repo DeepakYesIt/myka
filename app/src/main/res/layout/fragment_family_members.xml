@@ -160,6 +160,7 @@
                 android:id="@+id/relBottomBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/relRememberForgot"
                 android:layout_marginBottom="@dimen/_30sdp"
                 android:layout_alignParentBottom="true"
                 android:visibility="visible">
@@ -169,6 +170,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_40sdp"
                     android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_alignParentBottom="true"
                     android:weightSum="2">
 
                     <TextView
@@ -205,6 +207,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_alignParentBottom="true"
                     android:background="@drawable/green_btn_background">
 
                     <TextView

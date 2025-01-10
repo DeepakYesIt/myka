@@ -95,6 +95,10 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.android.gms:play-services-auth:21.1.1")
 
+/*    ///appsFlyer sdk for deep linking
+    implementation("com.appsflyer:af-android-sdk:6.11.0")*/
+
+
     //power spinner
     implementation("com.github.skydoves:powerspinner:1.2.7")
 

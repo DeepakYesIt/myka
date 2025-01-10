@@ -72,9 +72,21 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateCookingFrequency.visibility=View.VISIBLE
+
+            if (BaseApplication.isOnline(requireActivity())) {
+                cookingFrequencySelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateCookingFrequency.visibility=View.GONE
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireActivity())) {
+                cookingFrequencyApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
@@ -83,21 +95,6 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
             }
         })
 
-
-        if (sessionManagement.getCookingScreen()!="Profile"){
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireActivity())) {
-                cookingFrequencyApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }else{
-            if (BaseApplication.isOnline(requireActivity())) {
-                cookingFrequencySelectApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
 
         initialize()
 

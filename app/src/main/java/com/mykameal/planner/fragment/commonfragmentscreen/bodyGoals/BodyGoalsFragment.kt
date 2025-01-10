@@ -85,9 +85,22 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
         if (sessionManagement.getCookingScreen().equals("Profile")) {
             binding!!.llBottomBtn.visibility = View.GONE
             binding!!.rlUpdateBodyGoals.visibility = View.VISIBLE
+
+            if (BaseApplication.isOnline(requireActivity())) {
+                bodyGoalSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         } else {
             binding!!.llBottomBtn.visibility = View.VISIBLE
             binding!!.rlUpdateBodyGoals.visibility = View.GONE
+
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireActivity())) {
+                bodyGoalApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
 
@@ -112,20 +125,6 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
                 }
             })
 
-        if (sessionManagement.getCookingScreen() != "Profile") {
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireActivity())) {
-                bodyGoalApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        } else {
-            if (BaseApplication.isOnline(requireActivity())) {
-                bodyGoalSelectApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
 
         initialize()
 

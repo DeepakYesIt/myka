@@ -1,5 +1,6 @@
 package com.mykameal.planner.fragment.commonfragmentscreen.allergensIngredients
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -46,6 +47,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
     private var allergensSelectedId = mutableListOf<String>()
     private lateinit var allergenIngredientViewModel: AllergenIngredientViewModel
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -79,9 +81,22 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateAllergens.visibility=View.VISIBLE
+            if (BaseApplication.isOnline(requireActivity())) {
+                allergenIngredientSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateAllergens.visibility=View.GONE
+            ///checking the device of mobile data in online and offline(show network error message)
+            ///checking the device of mobile data in online and offline(show network error message)
+            /// allergies api implement
+            if (BaseApplication.isOnline(requireContext())) {
+                allergenIngredientApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
 
@@ -93,25 +108,6 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                     findNavController().navigateUp()
                 }
             })
-
-
-
-        if (sessionManagement.getCookingScreen()!="Profile"){
-            ///checking the device of mobile data in online and offline(show network error message)
-            ///checking the device of mobile data in online and offline(show network error message)
-            /// allergies api implement
-            if (BaseApplication.isOnline(requireContext())) {
-                allergenIngredientApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }else{
-            if (BaseApplication.isOnline(requireActivity())) {
-                allergenIngredientSelectApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
 
         ///main function using all triggered of this screen
         initialize()

@@ -93,8 +93,6 @@ object BaseApplication {
         }catch (e:Exception){
             fcmToken = "Token is null or empty"
         }
-
-
         return fcmToken
     }
 

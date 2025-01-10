@@ -72,9 +72,20 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateFavCuisine.visibility=View.VISIBLE
+            if (BaseApplication.isOnline(requireContext())) {
+                favouriteCuisineSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateFavCuisine.visibility=View.GONE
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireContext())) {
+                favouriteCuisineApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
@@ -83,21 +94,6 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
             }
         })
 
-
-        if (sessionManagement.getCookingScreen()!="Profile"){
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireContext())) {
-                favouriteCuisineApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }else{
-            if (BaseApplication.isOnline(requireContext())) {
-                favouriteCuisineSelectApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
 
         initialize()
 
