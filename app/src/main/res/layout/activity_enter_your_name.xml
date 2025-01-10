@@ -5,16 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.EnterYourNameActivity">
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
             <ImageView
                 android:id="@+id/imageKitchen"
                 android:layout_width="@dimen/_180sdp"
@@ -22,7 +19,6 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_30sdp"
                 android:src="@drawable/kitchen_assistant_images" />
-
             <TextView
                 android:id="@+id/tvAsYourAssistant"
                 android:layout_width="wrap_content"
@@ -34,7 +30,6 @@
                 android:text="As your Assistant"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_13sdp" />
-
             <TextView
                 android:id="@+id/tvAboutYou"
                 android:layout_width="wrap_content"
@@ -45,31 +40,8 @@
                 android:fontFamily="@font/poppins"
                 android:text="@string/bit_about_you"
                 android:textSize="@dimen/_13sdp" />
-
             <RelativeLayout
-                android:id="@+id/rlSelectNextBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginHorizontal="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_25sdp"
-                android:layout_marginBottom="@dimen/_20sdp"
-                android:background="@drawable/gray_btn_unselect_background">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:paddingHorizontal="@dimen/_50sdp"
-                    android:paddingVertical="@dimen/_10sdp"
-                    android:text="Next"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_13sdp" />
-
-            </RelativeLayout>
-
-            <RelativeLayout
+                android:id="@+id/lay1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvAboutYou"
@@ -214,9 +186,27 @@
                 </RelativeLayout>
 
             </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/rlSelectNextBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/lay1"
+                android:layout_marginHorizontal="@dimen/_20sdp"
+                android:layout_marginBottom="@dimen/_20sdp"
+                android:background="@drawable/gray_btn_unselect_background">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:paddingHorizontal="@dimen/_50sdp"
+                    android:paddingVertical="@dimen/_10sdp"
+                    android:text="Next"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_13sdp" />
+
+            </RelativeLayout>
         </RelativeLayout>
-
     </ScrollView>
-
 </RelativeLayout>

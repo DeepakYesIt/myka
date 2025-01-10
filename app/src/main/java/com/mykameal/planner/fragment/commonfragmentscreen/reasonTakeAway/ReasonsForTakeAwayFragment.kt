@@ -148,6 +148,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 sessionManagement.setReasonTakeAway(reasonSelect.toString())
                 val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
                 startActivity(intent)
+                requireActivity().finish()
             }
         }
 
@@ -250,6 +251,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
             dialogStillSkip.dismiss()
             val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
             startActivity(intent)
+            requireActivity().finish()
         }
     }
 

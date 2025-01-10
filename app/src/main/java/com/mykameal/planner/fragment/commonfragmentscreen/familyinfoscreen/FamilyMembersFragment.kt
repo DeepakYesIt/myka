@@ -40,10 +40,7 @@ class FamilyMembersFragment : Fragment() {
     private var childFriendlyStatus: String? = ""
     private lateinit var sessionManagement: SessionManagement
     private lateinit var familyMemberInfoViewModel: FamilyMemberInfoViewModel
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         binding = FragmentFamilyMembersBinding.inflate(inflater, container, false)
         sessionManagement = SessionManagement(requireActivity())

@@ -1,24 +1,32 @@
 package com.mykameal.planner.activity
 
 import android.app.Dialog
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.RelativeLayout
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.mykameal.planner.R
+import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.commonworkutils.CommonWorkUtils
 import com.mykameal.planner.databinding.ActivityMainBinding
 import com.mykameal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -27,6 +35,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     var binding: ActivityMainBinding? = null
     private lateinit var commonWorkUtils: CommonWorkUtils
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this))
@@ -39,7 +48,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         binding!!.llAddRecipeIndicator.visibility = View.INVISIBLE
         binding!!.llPlanIndicator.visibility = View.INVISIBLE
         binding!!.llCookedIndicator.visibility = View.INVISIBLE
-
+        getFcmToken()
         binding!!.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
         binding!!.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
         binding!!.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
@@ -59,13 +68,22 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         binding!!.relAddRecipeWeb.setOnClickListener(this)
         binding!!.relCreateNewRecipe.setOnClickListener(this)
 
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                101
+            )
+        }
+
         /// using function for find destination graph
         startDestination()
     }
 
     private fun startDestination() {
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.frameContainerMain) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.frameContainerMain) as NavHostFragment
         val navController = navHostFragment.navController
 
         val navGraph = navController.navInflater.inflate(R.navigation.main_graph)
@@ -234,6 +252,12 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 binding!!.cardViewAddRecipe.visibility = View.GONE
                 findNavController(R.id.frameContainerMain).navigate(R.id.createRecipeFragment)
             }
+        }
+    }
+
+    private fun getFcmToken() {
+        lifecycleScope.launch {
+            Log.d("Token ","******"+BaseApplication.fetchFcmToken())
         }
     }
 }

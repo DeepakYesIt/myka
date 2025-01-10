@@ -152,6 +152,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
             Log.d("@@@ Response profile", "message :- $response")
             if (apiModel.code == 200 && apiModel.success) {
                 dialog.dismiss()
+                sessionManagement.sessionClear()
                 startActivity(Intent(requireActivity(), AuthActivity::class.java).apply {
                     putExtra("type", "login")
                 })
@@ -183,7 +184,11 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
             if (!data.bio.equals("null")){
                 binding?.tvBio?.visibility=View.VISIBLE
                 binding?.tvBio?.setText(data.bio)
+            }else{
+                binding?.tvBio?.visibility=View.INVISIBLE
             }
+        }else{
+            binding?.tvBio?.visibility=View.INVISIBLE
         }
 
         if (data.profile_img!=null){

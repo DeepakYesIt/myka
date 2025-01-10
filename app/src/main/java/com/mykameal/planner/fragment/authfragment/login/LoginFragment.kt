@@ -20,6 +20,8 @@ import com.google.android.gms.tasks.Task
 import com.google.gson.Gson
 import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.R
+import com.mykameal.planner.activity.AuthActivity
+import com.mykameal.planner.activity.LetsStartOptionActivity
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
@@ -46,33 +48,37 @@ class LoginFragment : Fragment() {
     private lateinit var sessionManagement: SessionManagement
     private var mGoogleSignInClient: GoogleSignInClient? = null
 
-    private var userName:String?=""
-    private var cookingFor:String?=""
-    private var userGender:String?=""
-    private var partnerName:String?=""
-    private var partnerAge:String?=""
-    private var partnerGender:String?=""
-    private var familyMemName:String?=""
-    private var familyMemAge:String?=""
-    private var familyMemStatus:String?=""
-    private var bodyGoals:String?=""
+    private var userName: String? = ""
+    private var cookingFor: String? = ""
+    private var userGender: String? = ""
+    private var partnerName: String? = ""
+    private var partnerAge: String? = ""
+    private var partnerGender: String? = ""
+    private var familyMemName: String? = ""
+    private var familyMemAge: String? = ""
+    private var familyMemStatus: String? = ""
+    private var bodyGoals: String? = ""
     private var dietarySelectedId = mutableListOf<String>()
     private var favouriteSelectedId = mutableListOf<String>()
     private var dislikeSelectedId = mutableListOf<String>()
     private var allergenSelectedId = mutableListOf<String>()
     private var mealRoutineSelectedId = mutableListOf<String>()
-    private var cookingFrequency:String?=""
-    private var spendingAmount:String?=""
-    private var spendingDuration:String?=""
-    private var eatingOut:String?=""
-    private var reasonTakeAway:String?=""
+    private var cookingFrequency: String? = ""
+    private var spendingAmount: String? = ""
+    private var spendingDuration: String? = ""
+    private var eatingOut: String? = ""
+    private var reasonTakeAway: String? = ""
+    private var token: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentLoginBinding.inflate(inflater, container, false)
+
+
+        (activity as AuthActivity).type
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
         sessionManagement = SessionManagement(requireContext())
@@ -84,15 +90,23 @@ class LoginFragment : Fragment() {
             requireActivity(),
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-
-                    findNavController().navigateUp()
+                    val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
+                    startActivity(intent)
+                    requireActivity().finish()
                 }
             })
+
 
         ///main function using all triggered of this screen
         initialize()
 
         return binding!!.root
+    }
+
+    private fun getFcmToken() {
+        lifecycleScope.launch {
+            token = BaseApplication.fetchFcmToken()
+        }
     }
 
     private fun initialize() {
@@ -105,86 +119,86 @@ class LoginFragment : Fragment() {
         } else {
             cookingFor = "3"
         }
-        if (sessionManagement.getUserName()!=""){
-            userName=sessionManagement.getUserName()
+
+        if (sessionManagement.getUserName() != "") {
+            userName = sessionManagement.getUserName()
         }
 
-        if (sessionManagement.getGender()!=""){
-            userGender=sessionManagement.getGender()
+        if (sessionManagement.getGender() != "") {
+            userGender = sessionManagement.getGender()
         }
 
-        if (sessionManagement.getPartnerName()!=""){
-            partnerName=sessionManagement.getPartnerName()
+        if (sessionManagement.getPartnerName() != "") {
+            partnerName = sessionManagement.getPartnerName()
         }
 
-
-        if (sessionManagement.getPartnerAge()!=""){
-            partnerAge=sessionManagement.getPartnerAge()
+        if (sessionManagement.getPartnerAge() != "") {
+            partnerAge = sessionManagement.getPartnerAge()
         }
 
-        if (sessionManagement.getPartnerGender()!=""){
-            partnerGender=sessionManagement.getPartnerGender()
+        if (sessionManagement.getPartnerGender() != "") {
+            partnerGender = sessionManagement.getPartnerGender()
         }
 
-        if (sessionManagement.getFamilyMemName()!=""){
-            familyMemName=sessionManagement.getFamilyMemName()
+        if (sessionManagement.getFamilyMemName() != "") {
+            familyMemName = sessionManagement.getFamilyMemName()
         }
 
-        if (sessionManagement.getFamilyMemAge()!=""){
-            familyMemAge=sessionManagement.getFamilyMemAge()
+        if (sessionManagement.getFamilyMemAge() != "") {
+            familyMemAge = sessionManagement.getFamilyMemAge()
         }
 
-        if (sessionManagement.getFamilyStatus()!=""){
-            familyMemStatus=sessionManagement.getFamilyStatus()
+        if (sessionManagement.getFamilyStatus() != "") {
+            familyMemStatus = sessionManagement.getFamilyStatus()
         }
 
-        if (sessionManagement.getBodyGoal()!=""){
-            bodyGoals=sessionManagement.getBodyGoal()
+        if (sessionManagement.getBodyGoal() != "") {
+            bodyGoals = sessionManagement.getBodyGoal()
         }
 
-        if (sessionManagement.getDietaryRestrictionList()!=null){
-            dietarySelectedId= sessionManagement.getDietaryRestrictionList()!!
+        if (sessionManagement.getDietaryRestrictionList() != null) {
+            dietarySelectedId = sessionManagement.getDietaryRestrictionList()!!
         }
 
-        if (sessionManagement.getFavouriteCuisineList()!=null){
-            favouriteSelectedId= sessionManagement.getFavouriteCuisineList()!!
+        if (sessionManagement.getFavouriteCuisineList() != null) {
+            favouriteSelectedId = sessionManagement.getFavouriteCuisineList()!!
         }
 
-        if (sessionManagement.getDislikeIngredientList()!=null){
-            dislikeSelectedId= sessionManagement.getDislikeIngredientList()!!
+        if (sessionManagement.getDislikeIngredientList() != null) {
+            dislikeSelectedId = sessionManagement.getDislikeIngredientList()!!
         }
 
-        if (sessionManagement.getAllergenIngredientList()!=null){
-            allergenSelectedId= sessionManagement.getAllergenIngredientList()!!
+        if (sessionManagement.getAllergenIngredientList() != null) {
+            allergenSelectedId = sessionManagement.getAllergenIngredientList()!!
         }
 
-        if (sessionManagement.getMealRoutineList()!=null){
-            mealRoutineSelectedId= sessionManagement.getMealRoutineList()!!
+        if (sessionManagement.getMealRoutineList() != null) {
+            mealRoutineSelectedId = sessionManagement.getMealRoutineList()!!
         }
 
-        if (sessionManagement.getCookingFrequency()!=""){
-            cookingFrequency=sessionManagement.getCookingFrequency()
+        if (sessionManagement.getCookingFrequency() != "") {
+            cookingFrequency = sessionManagement.getCookingFrequency()
         }
 
-        if (sessionManagement.getSpendingAmount()!=""){
-            spendingAmount=sessionManagement.getSpendingAmount()
+        if (sessionManagement.getSpendingAmount() != "") {
+            spendingAmount = sessionManagement.getSpendingAmount()
         }
 
-        if (sessionManagement.getSpendingDuration()!=""){
-            spendingDuration=sessionManagement.getSpendingDuration()
+        if (sessionManagement.getSpendingDuration() != "") {
+            spendingDuration = sessionManagement.getSpendingDuration()
         }
 
-        if (sessionManagement.getEatingOut()!=""){
-            eatingOut=sessionManagement.getEatingOut()
+        if (sessionManagement.getEatingOut() != "") {
+            eatingOut = sessionManagement.getEatingOut()
         }
 
-        if (sessionManagement.getReasonTakeAway()!=""){
-            reasonTakeAway=sessionManagement.getReasonTakeAway()
+        if (sessionManagement.getReasonTakeAway() != "") {
+            reasonTakeAway = sessionManagement.getReasonTakeAway()
         }
 
         logOutGoogle()
 
-        binding!!.googleImages.setOnClickListener{
+        binding!!.googleImages.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
                 val signInIntent = mGoogleSignInClient!!.signInIntent
                 startActivityForResult(signInIntent, googleLogin)
@@ -211,9 +225,9 @@ class LoginFragment : Fragment() {
 
         /// handle on back pressed
         binding!!.imagesBackLogin.setOnClickListener {
-//            val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
-//            startActivity(intent)
-            findNavController().navigateUp()
+            val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
+            startActivity(intent)
+            requireActivity().finish()
         }
 
         /// handle click event on forgot password & redirection
@@ -257,8 +271,7 @@ class LoginFragment : Fragment() {
     private fun loginApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            loginViewModel.userLogin(
-                {
+            loginViewModel.userLogin({
                     BaseApplication.dismissMe()
                     when (it) {
                         is NetworkResult.Success -> {
@@ -286,7 +299,7 @@ class LoginFragment : Fragment() {
                 },
                 binding!!.etSignEmailPhone.text.toString().trim(),
                 binding!!.etSignPassword.text.toString().trim(),
-                "Android", BaseApplication.getToken()
+                "Android", token
             )
         }
     }
@@ -296,7 +309,7 @@ class LoginFragment : Fragment() {
 
         sessionManagement.setLoginSession(true)
 
-        if (loginModelData.email!=null){
+        if (loginModelData.email != null) {
             sessionManagement.setEmail(loginModelData.email)
         }
 
@@ -304,17 +317,20 @@ class LoginFragment : Fragment() {
             sessionManagement.setUserName(loginModelData.name)
         }
 
-        if (loginModelData.user_type == 1) {
-            sessionManagement.setCookingFor("Myself")
+        val cookingFor = if (loginModelData.cooking_for_type != null) {
+            when (loginModelData.cooking_for_type) {
+                1 -> "Myself"
+                2 -> "MyPartner"
+                3 -> "MyFamily"
+                else -> {
+                    "Not Select"
+                }
+            }
+        } else {
+            "Not Select"
         }
 
-        if (loginModelData.user_type == 2) {
-            sessionManagement.setCookingFor("MyPartner")
-        }
-
-        if (loginModelData.user_type == 3) {
-            sessionManagement.setCookingFor("MyFamily")
-        }
+        sessionManagement.setCookingFor(cookingFor)
 
         if (loginModelData.profile_img != null) {
             sessionManagement.setImage(loginModelData.profile_img.toString())
@@ -331,6 +347,9 @@ class LoginFragment : Fragment() {
 
         val intent = Intent(requireActivity(), MainActivity::class.java)
         startActivity(intent)
+        requireActivity().finish()
+
+
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {
@@ -390,7 +409,6 @@ class LoginFragment : Fragment() {
         try {
             val account: GoogleSignInAccount = completedTask.getResult(ApiException::class.java)
             if (account != null) {
-
                 val personEmail = account.email
                 val personId = account.id
                 val personPhoto = account.photoUrl
@@ -417,16 +435,14 @@ class LoginFragment : Fragment() {
                     BaseApplication.dismissMe()
                     when (it) {
                         is NetworkResult.Success -> {
-                            val gson = Gson()
-                            val signUpVerificationModel =
-                                gson.fromJson(it.data, SocialLoginModel::class.java)
-                            if (signUpVerificationModel.code == 200 && signUpVerificationModel.success) {
-                                showDataInSession(signUpVerificationModel.data)
+                            val apiModel = Gson().fromJson(it.data, SocialLoginModel::class.java)
+                            if (apiModel.code == 200 && apiModel.success) {
+                                showDataInSession(apiModel.data)
                             } else {
-                                if (signUpVerificationModel.code == ErrorMessage.code) {
-                                    showAlertFunction(signUpVerificationModel.message, true)
+                                if (apiModel.code == ErrorMessage.code) {
+                                    showAlertFunction(apiModel.message, true)
                                 } else {
-                                    showAlertFunction(signUpVerificationModel.message, false)
+                                    showAlertFunction(apiModel.message, false)
                                 }
                             }
                         }
@@ -463,37 +479,41 @@ class LoginFragment : Fragment() {
                 allergenSelectedId,
                 dislikeSelectedId,
                 "Android",
-                ""
+                token
             )
         }
     }
 
-    private fun showDataInSession(
-        signUpVerificationModelData: SocialLoginModelData
-    ) {
+    private fun showDataInSession(signUpVerificationModelData: SocialLoginModelData) {
 
         sessionManagement.setLoginSession(true)
 
-        if (signUpVerificationModelData.email!=null){
-            sessionManagement.setEmail(signUpVerificationModelData.email.toString())
-
+        if (signUpVerificationModelData.email != null) {
+            sessionManagement.setEmail(signUpVerificationModelData.email)
         }
 
         if (signUpVerificationModelData.name != null) {
             sessionManagement.setUserName(signUpVerificationModelData.name)
         }
 
-        if (signUpVerificationModelData.cooking_for_type == 1) {
-            sessionManagement.setCookingFor("Myself")
+        if (signUpVerificationModelData.profile_img != null) {
+            sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
         }
 
-        if (signUpVerificationModelData.cooking_for_type == 2) {
-            sessionManagement.setCookingFor("MyPartner")
+        val cookingFor = if (signUpVerificationModelData.cooking_for_type != null) {
+            when (signUpVerificationModelData.cooking_for_type) {
+                1 -> "Myself"
+                2 -> "MyPartner"
+                3 -> "MyFamily"
+                else -> {
+                    "Not Select"
+                }
+            }
+        } else {
+            "Not Select"
         }
 
-        if (signUpVerificationModelData.cooking_for_type == 3) {
-            sessionManagement.setCookingFor("MyFamily")
-        }
+        sessionManagement.setCookingFor(cookingFor)
 
         if (signUpVerificationModelData.profile_img != null) {
             sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
@@ -509,7 +529,14 @@ class LoginFragment : Fragment() {
 
         val intent = Intent(requireActivity(), MainActivity::class.java)
         startActivity(intent)
+        requireActivity().finish()
 
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+        getFcmToken()
     }
 
 }

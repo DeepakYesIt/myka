@@ -90,7 +90,6 @@ object NetworkModule {
             // Clear user session
             val sessionManagement = SessionManagement(appContext)
             sessionManagement.sessionClear()
-
             // Show a toast message
             Toast.makeText(appContext, "Your Session Expired", Toast.LENGTH_LONG).show()
 

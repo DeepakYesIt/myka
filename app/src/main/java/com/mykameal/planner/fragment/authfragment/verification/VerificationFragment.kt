@@ -45,33 +45,33 @@ class VerificationFragment : Fragment() {
     private lateinit var verificationViewModel: VerificationViewModel
     private lateinit var sessionManagement: SessionManagement
 
-    private var userID:String?=""
-    private var userName:String?=""
-    private var cookingFor:String?=""
-    private var userGender:String?=""
-    private var partnerName:String?=""
-    private var partnerAge:String?=""
-    private var partnerGender:String?=""
-    private var familyMemName:String?=""
-    private var familyMemAge:String?=""
-    private var familyMemStatus:String?=""
-    private var bodyGoals:String?=""
+    private var userID: String? = ""
+    private var userName: String? = ""
+    private var cookingFor: String? = ""
+    private var userGender: String? = ""
+    private var partnerName: String? = ""
+    private var partnerAge: String? = ""
+    private var partnerGender: String? = ""
+    private var familyMemName: String? = ""
+    private var familyMemAge: String? = ""
+    private var familyMemStatus: String? = ""
+    private var bodyGoals: String? = ""
     private var dietarySelectedId = mutableListOf<String>()
     private var favouriteSelectedId = mutableListOf<String>()
     private var dislikeSelectedId = mutableListOf<String>()
     private var allergenSelectedId = mutableListOf<String>()
     private var mealRoutineSelectedId = mutableListOf<String>()
-    private var cookingFrequency:String?=""
-    private var spendingAmount:String?=""
-    private var spendingDuration:String?=""
-    private var eatingOut:String?=""
-    private var reasonTakeAway:String?=""
-
+    private var cookingFrequency: String? = ""
+    private var spendingAmount: String? = ""
+    private var spendingDuration: String? = ""
+    private var eatingOut: String? = ""
+    private var reasonTakeAway: String? = ""
+    private var token: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentVerificationBinding.inflate(inflater, container, false)
 
@@ -104,7 +104,6 @@ class VerificationFragment : Fragment() {
 
     private fun initialize() {
 
-
         /// check value is contains email aur phone
         if (value!!.contains("@")) {
             binding!!.tvCodeSent.text = "we have sent the code to " + value
@@ -115,96 +114,95 @@ class VerificationFragment : Fragment() {
         }
 
         /// screen type value for signup screen
-        if (screenType=="signup"){
-            userID= requireArguments().getString("userId", "")
+        if (screenType == "signup") {
+            userID = requireArguments().getString("userId", "")
 
-            if (sessionManagement.getCookingFor()=="Myself"){
-                cookingFor="1"
-            }else if (sessionManagement.getCookingFor()=="MyPartner"){
-                cookingFor="2"
-            }else{
-                cookingFor="3"
+            if (sessionManagement.getCookingFor() == "Myself") {
+                cookingFor = "1"
+            } else if (sessionManagement.getCookingFor() == "MyPartner") {
+                cookingFor = "2"
+            } else {
+                cookingFor = "3"
             }
 
-            if (sessionManagement.getUserName()!=""){
-                userName=sessionManagement.getUserName()
+            if (sessionManagement.getUserName() != "") {
+                userName = sessionManagement.getUserName()
             }
 
-            if (sessionManagement.getGender()!=""){
-                userGender=sessionManagement.getGender()
+            if (sessionManagement.getGender() != "") {
+                userGender = sessionManagement.getGender()
             }
 
-            if (sessionManagement.getPartnerName()!=""){
-                partnerName=sessionManagement.getPartnerName()
+            if (sessionManagement.getPartnerName() != "") {
+                partnerName = sessionManagement.getPartnerName()
             }
 
 
-            if (sessionManagement.getPartnerAge()!=""){
-                partnerAge=sessionManagement.getPartnerAge()
+            if (sessionManagement.getPartnerAge() != "") {
+                partnerAge = sessionManagement.getPartnerAge()
             }
 
-            if (sessionManagement.getPartnerGender()!=""){
-                partnerGender=sessionManagement.getPartnerGender()
+            if (sessionManagement.getPartnerGender() != "") {
+                partnerGender = sessionManagement.getPartnerGender()
             }
 
-            if (sessionManagement.getFamilyMemName()!=""){
-                familyMemName=sessionManagement.getFamilyMemName()
+            if (sessionManagement.getFamilyMemName() != "") {
+                familyMemName = sessionManagement.getFamilyMemName()
             }
 
-            if (sessionManagement.getFamilyMemAge()!=""){
-                familyMemAge=sessionManagement.getFamilyMemAge()
+            if (sessionManagement.getFamilyMemAge() != "") {
+                familyMemAge = sessionManagement.getFamilyMemAge()
             }
 
-            if (sessionManagement.getFamilyStatus()!=""){
-                familyMemStatus=sessionManagement.getFamilyStatus()
+            if (sessionManagement.getFamilyStatus() != "") {
+                familyMemStatus = sessionManagement.getFamilyStatus()
             }
 
-            if (sessionManagement.getBodyGoal()!=""){
-                bodyGoals=sessionManagement.getBodyGoal()
+            if (sessionManagement.getBodyGoal() != "") {
+                bodyGoals = sessionManagement.getBodyGoal()
             }
 
-            if (sessionManagement.getDietaryRestrictionList()!=null){
-                dietarySelectedId= sessionManagement.getDietaryRestrictionList()!!
+            if (sessionManagement.getDietaryRestrictionList() != null) {
+                dietarySelectedId = sessionManagement.getDietaryRestrictionList()!!
             }
 
-            if (sessionManagement.getFavouriteCuisineList()!=null){
-                favouriteSelectedId= sessionManagement.getFavouriteCuisineList()!!
+            if (sessionManagement.getFavouriteCuisineList() != null) {
+                favouriteSelectedId = sessionManagement.getFavouriteCuisineList()!!
             }
 
-            if (sessionManagement.getDislikeIngredientList()!=null){
-                dislikeSelectedId= sessionManagement.getDislikeIngredientList()!!
+            if (sessionManagement.getDislikeIngredientList() != null) {
+                dislikeSelectedId = sessionManagement.getDislikeIngredientList()!!
             }
 
-            if (sessionManagement.getAllergenIngredientList()!=null){
-                allergenSelectedId= sessionManagement.getAllergenIngredientList()!!
+            if (sessionManagement.getAllergenIngredientList() != null) {
+                allergenSelectedId = sessionManagement.getAllergenIngredientList()!!
             }
 
-            if (sessionManagement.getMealRoutineList()!=null){
-                mealRoutineSelectedId= sessionManagement.getMealRoutineList()!!
+            if (sessionManagement.getMealRoutineList() != null) {
+                mealRoutineSelectedId = sessionManagement.getMealRoutineList()!!
             }
 
-            if (sessionManagement.getCookingFrequency()!=""){
-                cookingFrequency=sessionManagement.getCookingFrequency()
+            if (sessionManagement.getCookingFrequency() != "") {
+                cookingFrequency = sessionManagement.getCookingFrequency()
             }
 
-            if (sessionManagement.getSpendingAmount()!=""){
-                spendingAmount=sessionManagement.getSpendingAmount()
+            if (sessionManagement.getSpendingAmount() != "") {
+                spendingAmount = sessionManagement.getSpendingAmount()
             }
 
-            if (sessionManagement.getSpendingDuration()!=""){
-                spendingDuration=sessionManagement.getSpendingDuration()
+            if (sessionManagement.getSpendingDuration() != "") {
+                spendingDuration = sessionManagement.getSpendingDuration()
             }
 
-            if (sessionManagement.getEatingOut()!=""){
-                eatingOut=sessionManagement.getEatingOut()
+            if (sessionManagement.getEatingOut() != "") {
+                eatingOut = sessionManagement.getEatingOut()
             }
 
-            if (sessionManagement.getReasonTakeAway()!=""){
-                reasonTakeAway=sessionManagement.getReasonTakeAway()
+            if (sessionManagement.getReasonTakeAway() != "") {
+                reasonTakeAway = sessionManagement.getReasonTakeAway()
             }
 
         }
-
 
         //// handle on back pressed
         binding!!.imgBackVerification.setOnClickListener {
@@ -213,84 +211,68 @@ class VerificationFragment : Fragment() {
 
         /// handle click event for resend password timer and api
         binding!!.textResend.setOnClickListener {
-            binding!!.relResendVerificationTimer.visibility = View.VISIBLE
-            binding!!.textResend.isEnabled = false
-            if (screenType=="signup"){
-                if (BaseApplication.isOnline(requireActivity())) {
+            if (BaseApplication.isOnline(requireActivity())) {
+                if (screenType == "signup") {
                     signUpResendOtp()
                 } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            }else{
-                if (BaseApplication.isOnline(requireActivity())) {
                     forgotPasswordApi()
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-
         }
 
         //// handle click event for verify otp is valid or not
         binding!!.rlVerificationVerify.setOnClickListener {
-            if (validate()) {
-                if (screenType == "signup") {
-                    ///checking the device of mobile data in online and offline(show network error message)
-                    ///// sign up otp verify api
-                    if (BaseApplication.isOnline(requireActivity())) {
+            ///checking the device of mobile data in online and offline(show network error message) sign up otp verify api
+            if (BaseApplication.isOnline(requireActivity())) {
+                if (validate()) {
+                    if (screenType == "signup") {
                         signUpOtpVerify()
                     } else {
-                        BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                    }
-//                    successDialog()
-                } else {
-                    ///checking the device of mobile data in online and offline(show network error message)
-                    //// forgot password otp verify api
-                    if (BaseApplication.isOnline(requireActivity())) {
                         forgotOtpVerifyApi()
-                    } else {
-                        BaseApplication.alertError(
-                            requireContext(),
-                            ErrorMessage.networkError,
-                            false
-                        )
                     }
                 }
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
+
     }
 
     private fun signUpResendOtp() {
-            BaseApplication.showMe(requireContext())
-            lifecycleScope.launch {
-                verificationViewModel.resendSignUpModel({
-                    BaseApplication.dismissMe()
-                    when (it) {
-                        is NetworkResult.Success -> {
-                            val gson = Gson()
-                            val resendSignUpModel = gson.fromJson(it.data, ResendSignUpOtpModel::class.java)
-                            if (resendSignUpModel.code == 200 && resendSignUpModel.success) {
-                                startTime()
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            verificationViewModel.resendSignUpModel({
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val resendSignUpModel =
+                            gson.fromJson(it.data, ResendSignUpOtpModel::class.java)
+                        if (resendSignUpModel.code == 200 && resendSignUpModel.success) {
+                            binding!!.relResendVerificationTimer.visibility = View.VISIBLE
+                            binding!!.textResend.isEnabled = false
+                            startTime()
+                        } else {
+                            if (resendSignUpModel.code == ErrorMessage.code) {
+                                showAlertFunction(resendSignUpModel.message, true)
                             } else {
-                                if (resendSignUpModel.code == ErrorMessage.code) {
-                                    showAlertFunction(resendSignUpModel.message, true)
-                                } else {
-                                    showAlertFunction(resendSignUpModel.message, false)
-                                }
+                                showAlertFunction(resendSignUpModel.message, false)
                             }
                         }
-
-                        is NetworkResult.Error -> {
-                            showAlertFunction(it.message, false)
-                        }
-
-                        else -> {
-                            showAlertFunction(it.message, false)
-                        }
                     }
-                }, value.toString())
-            }
+
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            }, value.toString())
+        }
 
 
     }
@@ -305,6 +287,8 @@ class VerificationFragment : Fragment() {
                         val gson = Gson()
                         val forgotModel = gson.fromJson(it.data, ForgotPasswordModel::class.java)
                         if (forgotModel.code == 200 && forgotModel.success) {
+                            binding!!.relResendVerificationTimer.visibility = View.VISIBLE
+                            binding!!.textResend.isEnabled = false
                             startTime()
                         } else {
                             if (forgotModel.code == ErrorMessage.code) {
@@ -331,38 +315,60 @@ class VerificationFragment : Fragment() {
     private fun signUpOtpVerify() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            verificationViewModel.signUpOtpVerify({
-                BaseApplication.dismissMe()
-                when (it) {
-                    is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val signUpVerificationModel = gson.fromJson(it.data, SignUpVerificationModel::class.java)
-                        if (signUpVerificationModel.code == 200 && signUpVerificationModel.success) {
+            verificationViewModel.signUpOtpVerify(
+                {
+                    BaseApplication.dismissMe()
+                    when (it) {
+                        is NetworkResult.Success -> {
+                            val gson = Gson()
+                            val signUpVerificationModel = gson.fromJson(it.data, SignUpVerificationModel::class.java)
+                            if (signUpVerificationModel.code == 200 && signUpVerificationModel.success) {
 
-                            showDataInSession(signUpVerificationModel.data)
+                                showDataInSession(signUpVerificationModel.data)
 
-                        } else {
-                            if (signUpVerificationModel.code == ErrorMessage.code) {
-                                showAlertFunction(signUpVerificationModel.message, true)
                             } else {
-                                showAlertFunction(signUpVerificationModel.message, false)
+                                if (signUpVerificationModel.code == ErrorMessage.code) {
+                                    showAlertFunction(signUpVerificationModel.message, true)
+                                } else {
+                                    showAlertFunction(signUpVerificationModel.message, false)
+                                }
                             }
                         }
-                    }
 
-                    is NetworkResult.Error -> {
-                        showAlertFunction(it.message, false)
-                    }
+                        is NetworkResult.Error -> {
+                            showAlertFunction(it.message, false)
+                        }
 
-                    else -> {
-                        showAlertFunction(it.message, false)
+                        else -> {
+                            showAlertFunction(it.message, false)
+                        }
                     }
-                }
-            }, userID, binding!!.otpView.otp.toString(),userName,userGender,bodyGoals,cookingFrequency,eatingOut,reasonTakeAway,cookingFor,
-                partnerName,partnerAge,partnerGender, familyMemName,familyMemAge,familyMemStatus,
-                mealRoutineSelectedId,spendingAmount,
-                spendingDuration,dietarySelectedId,favouriteSelectedId,
-                allergenSelectedId,dislikeSelectedId,"Android","")
+                },
+                userID,
+                binding!!.otpView.otp.toString(),
+                userName,
+                userGender,
+                bodyGoals,
+                cookingFrequency,
+                eatingOut,
+                reasonTakeAway,
+                cookingFor,
+                partnerName,
+                partnerAge,
+                partnerGender,
+                familyMemName,
+                familyMemAge,
+                familyMemStatus,
+                mealRoutineSelectedId,
+                spendingAmount,
+                spendingDuration,
+                dietarySelectedId,
+                favouriteSelectedId,
+                allergenSelectedId,
+                dislikeSelectedId,
+                "Android",
+                token
+            )
         }
     }
 
@@ -370,9 +376,9 @@ class VerificationFragment : Fragment() {
 
 
         sessionManagement.setLoginSession(true)
-        if (value!!.contains("@")){
+        if (value!!.contains("@")) {
             sessionManagement.setEmail(value.toString())
-        }else{
+        } else {
             sessionManagement.setPhone(value.toString())
         }
 
@@ -380,15 +386,15 @@ class VerificationFragment : Fragment() {
             sessionManagement.setUserName(signUpVerificationModelData.name)
         }
 
-        if (signUpVerificationModelData.user_type==1){
+        if (signUpVerificationModelData.user_type == 1) {
             sessionManagement.setCookingFor("Myself")
         }
 
-        if (signUpVerificationModelData.user_type==2){
+        if (signUpVerificationModelData.user_type == 2) {
             sessionManagement.setCookingFor("MyPartner")
         }
 
-        if (signUpVerificationModelData.user_type==3){
+        if (signUpVerificationModelData.user_type == 3) {
             sessionManagement.setCookingFor("MyFamily")
         }
 
@@ -508,6 +514,17 @@ class VerificationFragment : Fragment() {
             findNavController().navigate(R.id.turnOnLocationFragment)
         }
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        getFcmToken()
+    }
+
+    private fun getFcmToken() {
+        lifecycleScope.launch {
+            token = BaseApplication.fetchFcmToken()
+        }
     }
 
 }

@@ -3,6 +3,7 @@ package com.mykameal.planner.activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import com.mykameal.planner.basedata.SessionManagement
@@ -68,6 +69,9 @@ class CookingForScreenActivity : AppCompatActivity() {
         binding!!.rlNextCooking.setOnClickListener{
             sessionManagement.setCookingFor(clickStatus!!)
             sessionManagement.setCookingScreen("")
+
+            Log.d("sessionManagement.getCookingFor() ","****"+sessionManagement.getCookingFor())
+
             val intent = Intent(this@CookingForScreenActivity, CookingForMyselfActivity::class.java)
             startActivity(intent)
         }
