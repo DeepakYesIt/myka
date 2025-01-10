@@ -316,6 +316,8 @@ class SessionManagement(var context: Context) {
     fun sessionClear(){
         editor?.apply()
         editor?.clear()
+        editor?.commit()
+
     }
 
 

@@ -2,7 +2,7 @@ package com.mykameal.planner.fragment.commonfragmentscreen.bodyGoals.model
 
 data class BodyGoalModel(
     val code: Int,
-    val `data`: List<BodyGoalModelData>,
+    val `data`: MutableList<BodyGoalModelData>,
     val message: String,
     val success: Boolean
 )

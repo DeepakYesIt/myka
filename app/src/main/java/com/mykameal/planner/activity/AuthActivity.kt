@@ -1,18 +1,25 @@
 package com.mykameal.planner.activity
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.NavHostFragment
 import com.mykameal.planner.R
 import com.mykameal.planner.databinding.ActivityAuthBinding
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint
 class AuthActivity : AppCompatActivity() {
 
     private var binding:ActivityAuthBinding?=null
-    private var type:String=""
+    var type:String=""
+    var REQUEST_CODE:Int=101
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,4 +54,7 @@ class AuthActivity : AppCompatActivity() {
         navController.graph = navGraph
 
     }
+
+
+
 }

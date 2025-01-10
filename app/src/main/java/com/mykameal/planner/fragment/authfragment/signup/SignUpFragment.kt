@@ -3,11 +3,11 @@ package com.mykameal.planner.fragment.authfragment.signup
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -45,32 +45,32 @@ class SignUpFragment : Fragment() {
     private lateinit var sessionManagement: SessionManagement
     private var mGoogleSignInClient: GoogleSignInClient? = null
 
-    private var userName:String?=""
-    private var cookingFor:String?=""
-    private var userGender:String?=""
-    private var partnerName:String?=""
-    private var partnerAge:String?=""
-    private var partnerGender:String?=""
-    private var familyMemName:String?=""
-    private var familyMemAge:String?=""
-    private var familyMemStatus:String?=""
-    private var bodyGoals:String?=""
+    private var userName: String? = ""
+    private var cookingFor: String? = ""
+    private var userGender: String? = ""
+    private var partnerName: String? = ""
+    private var partnerAge: String? = ""
+    private var partnerGender: String? = ""
+    private var familyMemName: String? = ""
+    private var familyMemAge: String? = ""
+    private var familyMemStatus: String? = ""
+    private var bodyGoals: String? = ""
     private var dietarySelectedId = mutableListOf<String>()
     private var favouriteSelectedId = mutableListOf<String>()
     private var dislikeSelectedId = mutableListOf<String>()
     private var allergenSelectedId = mutableListOf<String>()
     private var mealRoutineSelectedId = mutableListOf<String>()
-    private var cookingFrequency:String?=""
-    private var spendingAmount:String?=""
-    private var spendingDuration:String?=""
-    private var eatingOut:String?=""
-    private var reasonTakeAway:String?=""
-
+    private var cookingFrequency: String? = ""
+    private var spendingAmount: String? = ""
+    private var spendingDuration: String? = ""
+    private var eatingOut: String? = ""
+    private var reasonTakeAway: String? = ""
+    private var token: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentSignUpBinding.inflate(inflater, container, false)
 
@@ -82,7 +82,7 @@ class SignUpFragment : Fragment() {
             requireActivity(),
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    findNavController().navigateUp()
+                    findNavController().navigate(R.id.loginFragment)
                 }
             })
 
@@ -105,81 +105,81 @@ class SignUpFragment : Fragment() {
         } else {
             cookingFor = "3"
         }
-        if (sessionManagement.getUserName()!=""){
-            userName=sessionManagement.getUserName()
+        if (sessionManagement.getUserName() != "") {
+            userName = sessionManagement.getUserName()
         }
 
-        if (sessionManagement.getGender()!=""){
-            userGender=sessionManagement.getGender()
+        if (sessionManagement.getGender() != "") {
+            userGender = sessionManagement.getGender()
         }
 
-        if (sessionManagement.getPartnerName()!=""){
-            partnerName=sessionManagement.getPartnerName()
+        if (sessionManagement.getPartnerName() != "") {
+            partnerName = sessionManagement.getPartnerName()
         }
 
 
-        if (sessionManagement.getPartnerAge()!=""){
-            partnerAge=sessionManagement.getPartnerAge()
+        if (sessionManagement.getPartnerAge() != "") {
+            partnerAge = sessionManagement.getPartnerAge()
         }
 
-        if (sessionManagement.getPartnerGender()!=""){
-            partnerGender=sessionManagement.getPartnerGender()
+        if (sessionManagement.getPartnerGender() != "") {
+            partnerGender = sessionManagement.getPartnerGender()
         }
 
-        if (sessionManagement.getFamilyMemName()!=""){
-            familyMemName=sessionManagement.getFamilyMemName()
+        if (sessionManagement.getFamilyMemName() != "") {
+            familyMemName = sessionManagement.getFamilyMemName()
         }
 
-        if (sessionManagement.getFamilyMemAge()!=""){
-            familyMemAge=sessionManagement.getFamilyMemAge()
+        if (sessionManagement.getFamilyMemAge() != "") {
+            familyMemAge = sessionManagement.getFamilyMemAge()
         }
 
-        if (sessionManagement.getFamilyStatus()!=""){
-            familyMemStatus=sessionManagement.getFamilyStatus()
+        if (sessionManagement.getFamilyStatus() != "") {
+            familyMemStatus = sessionManagement.getFamilyStatus()
         }
 
-        if (sessionManagement.getBodyGoal()!=""){
-            bodyGoals=sessionManagement.getBodyGoal()
+        if (sessionManagement.getBodyGoal() != "") {
+            bodyGoals = sessionManagement.getBodyGoal()
         }
 
-        if (sessionManagement.getDietaryRestrictionList()!=null){
-            dietarySelectedId= sessionManagement.getDietaryRestrictionList()!!
+        if (sessionManagement.getDietaryRestrictionList() != null) {
+            dietarySelectedId = sessionManagement.getDietaryRestrictionList()!!
         }
 
-        if (sessionManagement.getFavouriteCuisineList()!=null){
-            favouriteSelectedId= sessionManagement.getFavouriteCuisineList()!!
+        if (sessionManagement.getFavouriteCuisineList() != null) {
+            favouriteSelectedId = sessionManagement.getFavouriteCuisineList()!!
         }
 
-        if (sessionManagement.getDislikeIngredientList()!=null){
-            dislikeSelectedId= sessionManagement.getDislikeIngredientList()!!
+        if (sessionManagement.getDislikeIngredientList() != null) {
+            dislikeSelectedId = sessionManagement.getDislikeIngredientList()!!
         }
 
-        if (sessionManagement.getAllergenIngredientList()!=null){
-            allergenSelectedId= sessionManagement.getAllergenIngredientList()!!
+        if (sessionManagement.getAllergenIngredientList() != null) {
+            allergenSelectedId = sessionManagement.getAllergenIngredientList()!!
         }
 
-        if (sessionManagement.getMealRoutineList()!=null){
-            mealRoutineSelectedId= sessionManagement.getMealRoutineList()!!
+        if (sessionManagement.getMealRoutineList() != null) {
+            mealRoutineSelectedId = sessionManagement.getMealRoutineList()!!
         }
 
-        if (sessionManagement.getCookingFrequency()!=""){
-            cookingFrequency=sessionManagement.getCookingFrequency()
+        if (sessionManagement.getCookingFrequency() != "") {
+            cookingFrequency = sessionManagement.getCookingFrequency()
         }
 
-        if (sessionManagement.getSpendingAmount()!=""){
-            spendingAmount=sessionManagement.getSpendingAmount()
+        if (sessionManagement.getSpendingAmount() != "") {
+            spendingAmount = sessionManagement.getSpendingAmount()
         }
 
-        if (sessionManagement.getSpendingDuration()!=""){
-            spendingDuration=sessionManagement.getSpendingDuration()
+        if (sessionManagement.getSpendingDuration() != "") {
+            spendingDuration = sessionManagement.getSpendingDuration()
         }
 
-        if (sessionManagement.getEatingOut()!=""){
-            eatingOut=sessionManagement.getEatingOut()
+        if (sessionManagement.getEatingOut() != "") {
+            eatingOut = sessionManagement.getEatingOut()
         }
 
-        if (sessionManagement.getReasonTakeAway()!=""){
-            reasonTakeAway=sessionManagement.getReasonTakeAway()
+        if (sessionManagement.getReasonTakeAway() != "") {
+            reasonTakeAway = sessionManagement.getReasonTakeAway()
         }
 
         logOutGoogle()
@@ -191,7 +191,7 @@ class SignUpFragment : Fragment() {
 
         //// handle on back pressed
         binding!!.imagesBackSignUp.setOnClickListener {
-            findNavController().navigateUp()
+            findNavController().navigate(R.id.loginFragment)
         }
 
         binding!!.googleImages.setOnClickListener {
@@ -335,7 +335,6 @@ class SignUpFragment : Fragment() {
         try {
             val account: GoogleSignInAccount = completedTask.getResult(ApiException::class.java)
             if (account != null) {
-      
                 val personEmail = account.email
                 val personId = account.id
                 val personPhoto = account.photoUrl
@@ -362,9 +361,9 @@ class SignUpFragment : Fragment() {
                     BaseApplication.dismissMe()
                     when (it) {
                         is NetworkResult.Success -> {
+                            Log.d("Api Response ","@@@@@@"+it.data)
                             val gson = Gson()
-                            val signUpVerificationModel =
-                                gson.fromJson(it.data, SignUpVerificationModel::class.java)
+                            val signUpVerificationModel = gson.fromJson(it.data, SignUpVerificationModel::class.java)
                             if (signUpVerificationModel.code == 200 && signUpVerificationModel.success) {
                                 showDataInSession(signUpVerificationModel.data, personEmail)
                             } else {
@@ -375,11 +374,9 @@ class SignUpFragment : Fragment() {
                                 }
                             }
                         }
-
                         is NetworkResult.Error -> {
                             showAlertFunction(it.message, false)
                         }
-
                         else -> {
                             showAlertFunction(it.message, false)
                         }
@@ -408,15 +405,12 @@ class SignUpFragment : Fragment() {
                 allergenSelectedId,
                 dislikeSelectedId,
                 "Android",
-                ""
+                token
             )
         }
     }
 
-    private fun showDataInSession(
-        signUpVerificationModelData: SignUpVerificationModelData,
-        personEmail: String?
-    ) {
+    private fun showDataInSession(signUpVerificationModelData: SignUpVerificationModelData, personEmail: String?) {
 
         sessionManagement.setLoginSession(true)
         sessionManagement.setEmail(personEmail!!)
@@ -425,17 +419,24 @@ class SignUpFragment : Fragment() {
             sessionManagement.setUserName(signUpVerificationModelData.name)
         }
 
-        if (signUpVerificationModelData.user_type == 1) {
-            sessionManagement.setCookingFor("Myself")
+        if (signUpVerificationModelData.profile_img != null) {
+            sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
         }
 
-        if (signUpVerificationModelData.user_type == 2) {
-            sessionManagement.setCookingFor("MyPartner")
+        val cookingFor = if (signUpVerificationModelData.cooking_for_type != null) {
+            when (signUpVerificationModelData.cooking_for_type) {
+                1 -> "Myself"
+                2 -> "MyPartner"
+                3 -> "MyFamily"
+                else -> {
+                    "Not Select"
+                }
+            }
+        } else {
+            "Not Select"
         }
 
-        if (signUpVerificationModelData.user_type == 3) {
-            sessionManagement.setCookingFor("MyFamily")
-        }
+        sessionManagement.setCookingFor(cookingFor)
 
         if (signUpVerificationModelData.profile_img != null) {
             sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
@@ -451,7 +452,20 @@ class SignUpFragment : Fragment() {
 
         val intent = Intent(requireActivity(), MainActivity::class.java)
         startActivity(intent)
+        requireActivity().finish()
 
     }
+
+    override fun onStart() {
+        super.onStart()
+        getFcmToken()
+    }
+
+    private fun getFcmToken() {
+        lifecycleScope.launch {
+            token = BaseApplication.fetchFcmToken()
+        }
+    }
+
 
 }

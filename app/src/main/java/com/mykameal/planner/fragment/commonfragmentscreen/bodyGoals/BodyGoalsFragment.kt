@@ -196,8 +196,7 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
         }
     }
 
-    private fun showDataInUi(bodyModelData: List<BodyGoalModelData>) {
-
+    private fun showDataInUi(bodyModelData: MutableList<BodyGoalModelData>) {
         if (bodyModelData != null && bodyModelData.size > 0) {
             bodyModelData1 = bodyModelData
             bodyGoalAdapter = BodyGoalAdapter(bodyModelData, requireActivity(), this)
@@ -308,7 +307,9 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
 
 
     override fun itemClick(selectItem: Int?, status1: String?, type: String?) {
+
         bodySelect = ""
+
         if (status1.equals("-1")) {
             status = "2"
             binding!!.tvNextBtn.isClickable = true

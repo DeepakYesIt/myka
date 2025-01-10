@@ -29,8 +29,11 @@ import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.GetUserPre
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.mykameal.planner.fragment.commonfragmentscreen.familyinfoscreen.viewmodel.FamilyMemberInfoViewModel
 import com.mykameal.planner.messageclass.ErrorMessage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+
+@AndroidEntryPoint
 class FamilyMembersFragment : Fragment() {
     private var binding: FragmentFamilyMembersBinding? = null
     private var isChecked: Boolean? = null
@@ -38,10 +41,7 @@ class FamilyMembersFragment : Fragment() {
     private var childFriendlyStatus: String? = ""
     private lateinit var sessionManagement: SessionManagement
     private lateinit var familyMemberInfoViewModel: FamilyMemberInfoViewModel
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         binding = FragmentFamilyMembersBinding.inflate(inflater, container, false)
         sessionManagement = SessionManagement(requireActivity())
@@ -51,18 +51,15 @@ class FamilyMembersFragment : Fragment() {
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateFamMem.visibility=View.VISIBLE
-        }else{
-            binding!!.llBottomBtn.visibility=View.VISIBLE
-            binding!!.rlUpdateFamMem.visibility=View.GONE
-        }
-
-        if (sessionManagement.getCookingScreen()=="Profile"){
             ///checking the device of mobile data in online and offline(show network error message)
             if (BaseApplication.isOnline(requireContext())) {
                 familyMemApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
+        }else{
+            binding!!.llBottomBtn.visibility=View.VISIBLE
+            binding!!.rlUpdateFamMem.visibility=View.GONE
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(

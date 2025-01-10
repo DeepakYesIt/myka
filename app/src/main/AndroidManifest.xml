@@ -16,6 +16,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <uses-permission android:name="android.permission.STORAGE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.WRITE_MEDIA_IMAGES" />
     <uses-feature
@@ -24,7 +25,7 @@
 
     <application
         android:name=".basedata.MykaBaseApplication"
-        android:allowBackup="true"
+        android:fullBackupOnly="true"
         android:usesCleartextTraffic="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -38,30 +39,47 @@
         <activity
             android:name=".activity.MainActivity"
             android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.AuthActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.LetsStartOptionActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.CookingForMyselfActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.CookingForScreenActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.EnterYourNameActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.OnBoardingActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.IntroPageActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.SplashActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -73,6 +91,16 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <service
+            android:name="com.mykameal.planner.fcm.MyFirebaseMessagingService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

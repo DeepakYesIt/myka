@@ -35,14 +35,13 @@ class EnterYourNameActivity : AppCompatActivity() {
 
     private fun initialize() {
 
-        ///click event for Next Choose Cooking for Screen
+        // click event for Next Choose Cooking for Screen
         binding!!.rlSelectNextBtn.setOnClickListener {
             if (validate()) {
                 if (statusCheck == "2") {
                     sessionManagement.setUserName(binding!!.etUserName.text.toString().trim())
                     sessionManagement.setGender(binding!!.tvChooseGender.text.toString().trim())
-                    val intent =
-                        Intent(this@EnterYourNameActivity, CookingForScreenActivity::class.java)
+                    val intent = Intent(this@EnterYourNameActivity, CookingForScreenActivity::class.java)
                     startActivity(intent)
                 }
             }

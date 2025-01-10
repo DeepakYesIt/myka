@@ -12,19 +12,19 @@ data class GetUserPreference(
 )
 
 data class GetUserPreferenceData(
-    val allergesingredient: List<DietaryRestrictionsModelData>,
-    val bodygoal: List<BodyGoalModelData>,
-    val cookingfrequency: List<BodyGoalModelData>,
-    val cookingschedule: List<Cookingschedule>,
-    val dietaryrestriction: List<DietaryRestrictionsModelData>,
-    val eatingout: List<BodyGoalModelData>,
+    val allergesingredient: MutableList<DietaryRestrictionsModelData>,
+    val bodygoal: MutableList<BodyGoalModelData>,
+    val cookingfrequency: MutableList<BodyGoalModelData>,
+    val cookingschedule: MutableList<Cookingschedule>,
+    val dietaryrestriction: MutableList<DietaryRestrictionsModelData>,
+    val eatingout: MutableList<BodyGoalModelData>,
     val familyDetail: FamilyDetail,
-    val favouritcuisine: List<DietaryRestrictionsModelData>,
+    val favouritcuisine: MutableList<DietaryRestrictionsModelData>,
     val grocereisExpenses: GrocereisExpenses,
-    val ingredientdislike: List<DietaryRestrictionsModelData>,
-    val mealroutine: List<MealRoutineModelData>,
+    val ingredientdislike: MutableList<DietaryRestrictionsModelData>,
+    val mealroutine: MutableList<MealRoutineModelData>,
     val partnerDetail: PartnerDetail,
-    val takeawayreason: List<BodyGoalModelData>
+    val takeawayreason: MutableList<BodyGoalModelData>
 )
 
 

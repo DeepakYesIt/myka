@@ -25,6 +25,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.AuthActivity
+import kotlinx.coroutines.tasks.await
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -93,10 +94,25 @@ object BaseApplication {
         }catch (e:Exception){
             fcmToken = "Token is null or empty"
         }
-
-
         return fcmToken
     }
+
+    suspend fun fetchFcmToken(): String {
+        return try {
+            val token = FirebaseMessaging.getInstance().token.await()
+            if (!token.isNullOrEmpty()) {
+                Log.d("FCMToken", "Token retrieved successfully: $token")
+                token
+            } else {
+                Log.e("FCMToken", "Token is null or empty")
+                "Token is null or empty"
+            }
+        } catch (e: Exception) {
+            Log.e("FCMToken", "Exception while fetching token", e)
+            "Fetching FCM registration token failed"
+        }
+    }
+
 
 
     fun isOnline(context: Context?): Boolean {

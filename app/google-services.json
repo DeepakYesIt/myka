@@ -7,18 +7,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1008724107712:android:44b9a2837ebcebaf3de825",
+        "mobilesdk_app_id": "1:1008724107712:android:79c12c3b719b07493de825",
         "android_client_info": {
-          "package_name": "com.yesitlabs.mykaapp"
+          "package_name": "com.mykameal.planner"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1008724107712-a98hc0af1puvmh7ulkflmdul9js2mmbv.apps.googleusercontent.com",
+          "client_id": "1008724107712-022hq82qa53qflhnt75a5u908qfrp6vk.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.yesitlabs.mykaapp",
-            "certificate_hash": "c93edcf5913bf13588a6d6fb5217f219b2cf2516"
+            "package_name": "com.mykameal.planner",
+            "certificate_hash": "8105b1423b2f4b9b79e0c880922df0ccc7f3988f"
           }
         },
         {
