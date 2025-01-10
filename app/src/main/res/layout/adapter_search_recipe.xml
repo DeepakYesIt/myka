@@ -17,11 +17,17 @@
         android:gravity="center"
         android:layout_centerInParent="true">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imgRecipe"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:src="@drawable/apple_image" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/apple_image"/>
+
+<!--        <ImageView-->
+<!--            android:id="@+id/imgRecipe"-->
+<!--            android:layout_width="@dimen/_40sdp"-->
+<!--            android:layout_height="@dimen/_40sdp"-->
+<!--            android:src="@drawable/apple_image" />-->
 
         <TextView
             android:id="@+id/tvRecipeName"
