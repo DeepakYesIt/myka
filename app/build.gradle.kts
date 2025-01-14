@@ -64,6 +64,9 @@ dependencies {
     //viewpager
     implementation("androidx.viewpager2:viewpager2:1.1.0")
 
+    ///appsflyer sdk for deeplinking
+    implementation("com.appsflyer:af-android-sdk:6.12.1")  // Check for the latest version on AppsFlyer's documentation.
+
 
     //Retrofit for api
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

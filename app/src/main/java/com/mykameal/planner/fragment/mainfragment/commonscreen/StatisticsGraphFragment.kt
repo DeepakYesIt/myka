@@ -1,13 +1,18 @@
 package com.mykameal.planner.fragment.mainfragment.commonscreen
 
+
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.appsflyer.AppsFlyerLib
+import com.appsflyer.deeplink.DeepLinkResult
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -15,6 +20,7 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
+import com.mykameal.planner.commonworkutils.shareApp
 import com.mykameal.planner.databinding.FragmentStatisticsGraphBinding
 
 class StatisticsGraphFragment : Fragment() {
@@ -43,6 +49,33 @@ class StatisticsGraphFragment : Fragment() {
     }
 
     private fun initialize() {
+        Log.d("AppsFlyer22", "Deep link found, store")
+
+        AppsFlyerLib.getInstance().subscribeForDeepLink { deepLinkResult ->
+            when (deepLinkResult.status) {
+                DeepLinkResult.Status.FOUND -> {
+                    Log.d("AppsFlyer22", "Deep link found, store")
+
+                    val deepLinkValue = deepLinkResult.deepLink?.getStringValue("deep_link_value")
+                    if (deepLinkValue == "profile_screen") {
+                        // Navigate to Profile Screen
+                        Log.d("AppsFlyer22", "profile")
+
+                    } else {
+                        Log.d("AppsFlyer22", "Deep link statistics")
+
+                        // Handle other deep link values
+                    }
+                }
+                DeepLinkResult.Status.NOT_FOUND -> {
+                    Log.d("AppsFlyer22", "Deep link not found, redirecting to Play Store")
+                    redirectToPlayStore()
+                }
+                DeepLinkResult.Status.ERROR -> {
+                    Log.d("AppsFlyer22", "Error in deep link: ${deepLinkResult.error}")
+                }
+            }
+        }
 
         binding!!.imgBackStats.setOnClickListener {
             findNavController().navigateUp()
@@ -71,7 +104,8 @@ class StatisticsGraphFragment : Fragment() {
         xAxis.granularity = 1f
 
         binding!!.textInviteFriends.setOnClickListener {
-            val appPackageName: String = requireActivity().packageName
+            shareApp(requireActivity())
+           /* val appPackageName: String = requireActivity().packageName
             val myIntent = Intent(Intent.ACTION_SEND)
             myIntent.type = "text/plain"
             val body =
@@ -79,7 +113,7 @@ class StatisticsGraphFragment : Fragment() {
             val sub = "Your Subject"
             myIntent.putExtra(Intent.EXTRA_SUBJECT, sub)
             myIntent.putExtra(Intent.EXTRA_TEXT, body)
-            startActivity(Intent.createChooser(myIntent, "Share Using"))
+            startActivity(Intent.createChooser(myIntent, "Share Using"))*/
         }
 
         binding!!.barChart.setOnClickListener{
@@ -87,5 +121,13 @@ class StatisticsGraphFragment : Fragment() {
         }
 
     }
+
+    private fun redirectToPlayStore() {
+        val playStoreIntent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse("https://play.google.com/store/apps/details?id=com.yesitlabs.luvu")
+        }
+        startActivity(playStoreIntent)
+    }
+
 
 }

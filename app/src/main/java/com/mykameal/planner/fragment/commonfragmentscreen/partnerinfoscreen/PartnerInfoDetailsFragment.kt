@@ -25,6 +25,7 @@ import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.databinding.FragmentPartnerInfoDetailsBinding
+import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.FamilyDetail
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.PartnerDetail
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
@@ -66,6 +67,10 @@ class PartnerInfoDetailsFragment : Fragment() {
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdatePartInfo.visibility=View.GONE
+
+            if (partnerInfoViewModel.getPartnerData()!=null){
+                showDataInUi(partnerInfoViewModel.getPartnerData()!!)
+            }
         }
 
 
@@ -174,6 +179,12 @@ class PartnerInfoDetailsFragment : Fragment() {
 
         binding!!.tvNextBtn.setOnClickListener {
             if (status=="2"){
+                val partnerLocalData: PartnerDetail?=null
+                partnerLocalData!!.name=binding!!.etPartnerName.text.toString().trim()
+                partnerLocalData!!.age=binding!!.etPartnerAge.text.toString().trim()
+                partnerLocalData!!.gender=binding!!.tvChooseGender.text.toString().trim()
+                partnerInfoViewModel.setPartnerData(partnerLocalData)
+
                 sessionManagement.setPartnerName(binding!!.etPartnerName.text.toString().trim())
                 sessionManagement.setPartnerAge(binding!!.etPartnerAge.text.toString().trim())
                 sessionManagement.setPartnerGender(binding!!.tvChooseGender.text.toString().trim())

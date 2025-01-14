@@ -95,11 +95,15 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
             binding!!.llBottomBtn.visibility = View.VISIBLE
             binding!!.rlUpdateBodyGoals.visibility = View.GONE
 
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireActivity())) {
-                bodyGoalApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            if (bodyGoalViewModel.getBodyGoalData()!=null){
+                showDataInUi(bodyGoalViewModel.getBodyGoalData()!!)
+            }else{
+                ///checking the device of mobile data in online and offline(show network error message)
+                if (BaseApplication.isOnline(requireActivity())) {
+                    bodyGoalApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
 
@@ -235,6 +239,7 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
 
         binding!!.tvNextBtn.setOnClickListener {
             if (status == "2") {
+                bodyGoalViewModel.setBodyGoalData(bodyModelData1!!.toMutableList())
                 sessionManagement.setBodyGoal(bodySelect.toString())
 //                NavAnimations.navigateForward(findNavController(), R.id.dietaryRestrictionsFragment)
                 findNavController().navigate(R.id.dietaryRestrictionsFragment)

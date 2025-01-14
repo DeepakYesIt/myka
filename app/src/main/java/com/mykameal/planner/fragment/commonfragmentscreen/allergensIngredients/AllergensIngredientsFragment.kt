@@ -89,13 +89,18 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateAllergens.visibility=View.GONE
-            ///checking the device of mobile data in online and offline(show network error message)
-            ///checking the device of mobile data in online and offline(show network error message)
-            /// allergies api implement
-            if (BaseApplication.isOnline(requireContext())) {
-                allergenIngredientApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+
+            if (allergenIngredientViewModel.getAllergensData()!=null){
+                showDataInUi(allergenIngredientViewModel.getAllergensData()!!)
+            }else {
+                ///checking the device of mobile data in online and offline(show network error message)
+                ///checking the device of mobile data in online and offline(show network error message)
+                /// allergies api implement
+                if (BaseApplication.isOnline(requireContext())) {
+                    allergenIngredientApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
 
@@ -178,6 +183,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         /// handle click event for redirect next part
         binding!!.tvNextBtn.setOnClickListener {
             if (status=="2"){
+                allergenIngredientViewModel.setAllergensData(dietaryRestrictionsModelData)
                 sessionManagement.setAllergenIngredientList(allergensSelectedId)
                 if (sessionManagement.getCookingFor().equals("Myself")) {
                     findNavController().navigate(R.id.mealRoutineFragment)

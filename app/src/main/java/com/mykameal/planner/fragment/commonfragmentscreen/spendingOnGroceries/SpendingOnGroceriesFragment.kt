@@ -75,6 +75,10 @@ class SpendingOnGroceriesFragment : Fragment() {
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateSpendingGroc.visibility=View.GONE
+
+            if (spendingGroceriesViewModel.getGroceriesData()!=null){
+                showDataInUi(spendingGroceriesViewModel.getGroceriesData()!!)
+            }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
@@ -153,6 +157,10 @@ class SpendingOnGroceriesFragment : Fragment() {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
+                val groceriesLocalData: GrocereisExpenses?=null
+                groceriesLocalData!!.amount=binding!!.etSpendingAmount.text.toString().trim()
+                groceriesLocalData!!.duration=binding!!.tvChooseDuration.text.toString().trim().toLowerCase()
+                spendingGroceriesViewModel.setGroceriesData(groceriesLocalData)
                 sessionManagement.setSpendingAmount(binding!!.etSpendingAmount.text.toString().trim())
                 sessionManagement.setSpendingDuration(binding!!.tvChooseDuration.text.toString().trim().toLowerCase())
                 findNavController().navigate(R.id.eatingOutFragment)

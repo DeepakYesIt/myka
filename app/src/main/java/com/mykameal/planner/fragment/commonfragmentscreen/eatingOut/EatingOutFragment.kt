@@ -41,6 +41,7 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue:Int=0
     private lateinit var eatingOutViewModel: EatingOutViewModel
+    private var eatingOutModelsData: List<BodyGoalModelData>?=null
 
 
     override fun onCreateView(
@@ -74,11 +75,16 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateEatingOut.visibility=View.GONE
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireContext())) {
-                eatingOutApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+
+            if (eatingOutViewModel.getEatingOutData()!=null){
+                showDataInUi(eatingOutViewModel.getEatingOutData()!!)
+            }else{
+                ///checking the device of mobile data in online and offline(show network error message)
+                if (BaseApplication.isOnline(requireContext())) {
+                    eatingOutApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
 
@@ -195,6 +201,7 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
     private fun showDataInUi(bodyModelData: List<BodyGoalModelData>) {
 
         if (bodyModelData!=null && bodyModelData.isNotEmpty()){
+            eatingOutModelsData=bodyModelData
             bodyGoalAdapter = BodyGoalAdapter(bodyModelData, requireActivity(), this)
             binding!!.rcyEatingOut.adapter = bodyGoalAdapter
         }
@@ -216,6 +223,7 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
 
             R.id.tvNextBtn->{
                 if (status=="2"){
+                    eatingOutViewModel.setEatingOutData(eatingOutModelsData!!.toMutableList())
                     sessionManagement.setEatingOut(eatingOutSelect.toString())
                     findNavController().navigate(R.id.reasonsForTakeAwayFragment)
 //                    val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)

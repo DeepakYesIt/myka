@@ -41,6 +41,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
     private var status:String?=null
     private var dietarySelectedId = mutableListOf<String>()
     private lateinit var dietaryRestrictionsViewModel: DietaryRestrictionsViewModel
+    private var dietaryModelsData: List<DietaryRestrictionsModelData>?=null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -82,12 +83,17 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateDietRest.visibility=View.GONE
 
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireContext())) {
-                dietaryRestrictionApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            if (dietaryRestrictionsViewModel.getDietaryResData()!=null){
+                showDataInUi(dietaryRestrictionsViewModel.getDietaryResData()!!)
+            }else{
+                ///checking the device of mobile data in online and offline(show network error message)
+                if (BaseApplication.isOnline(requireContext())) {
+                    dietaryRestrictionApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
+
         }
 
 
@@ -165,6 +171,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
     private fun showDataInUi(dietaryModelData: List<DietaryRestrictionsModelData>) {
 
         if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
+            dietaryModelsData=dietaryModelData
             dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
             binding!!.rcyDietaryRestrictions.adapter = dietaryRestrictionsAdapter
         }
@@ -192,6 +199,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
+                dietaryRestrictionsViewModel.setDietaryResData(dietaryModelsData!!)
                 sessionManagement.setDietaryRestrictionList(dietarySelectedId)
                 if (sessionManagement.getCookingFor().equals("Myself")){
                     findNavController().navigate(R.id.favouriteCuisinesFragment)

@@ -85,12 +85,18 @@ class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateIngDislike.visibility=View.GONE
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireContext())) {
-                ingredientDislikeApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+
+            if (dislikeIngredientsViewModel.getDislikeIngData()!=null){
+                showDataInUi(dislikeIngredientsViewModel.getDislikeIngData()!!)
+            }else{
+                ///checking the device of mobile data in online and offline(show network error message)
+                if (BaseApplication.isOnline(requireContext())) {
+                    ingredientDislikeApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
+
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
@@ -151,6 +157,7 @@ class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
+                dislikeIngredientsViewModel.setDislikeIngData(dietaryRestrictionsModelData)
                 sessionManagement.setDislikeIngredientList(dislikeSelectedId)
                 findNavController().navigate(R.id.allergensIngredientsFragment)
             }
