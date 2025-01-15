@@ -551,11 +551,11 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
 
     override suspend fun upDateImageNameRequestApi(
         successCallback: (response: NetworkResult<String>) -> Unit,
-        Image: MultipartBody.Part?,
+        image: MultipartBody.Part?,
         name: RequestBody
     ) {
         try {
-            api.upDateImageNameRequestApi(Image,name).apply {
+            api.upDateImageNameRequestApi(image,name).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

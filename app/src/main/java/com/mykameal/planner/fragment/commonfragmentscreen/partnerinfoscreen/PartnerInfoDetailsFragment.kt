@@ -1,7 +1,6 @@
 package com.mykameal.planner.fragment.commonfragmentscreen.partnerinfoscreen
 
 import android.app.Dialog
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -20,12 +19,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.mykameal.planner.R
-import com.mykameal.planner.activity.CookingForScreenActivity
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.databinding.FragmentPartnerInfoDetailsBinding
-import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.FamilyDetail
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.PartnerDetail
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
@@ -181,10 +178,19 @@ class PartnerInfoDetailsFragment : Fragment() {
 
         binding!!.tvNextBtn.setOnClickListener {
             if (status=="2"){
-                val partnerLocalData: PartnerDetail?=null
-                partnerLocalData!!.name=binding!!.etPartnerName.text.toString().trim()
-                partnerLocalData!!.age=binding!!.etPartnerAge.text.toString().trim()
-                partnerLocalData!!.gender=binding!!.tvChooseGender.text.toString().trim()
+                val partnerLocalData = PartnerDetail(
+                    age = "",
+                    created_at = "",  // Provide an appropriate value or default
+                    deleted_at = null,  // This can remain null if it's optional
+                    gender = "",
+                    id = 0,  // Default value or appropriate ID
+                    name = "",
+                    updated_at = "",
+                    user_id = 0  // Default value or appropriate user ID
+                )
+                partnerLocalData.name=binding!!.etPartnerName.text.toString().trim()
+                partnerLocalData.age=binding!!.etPartnerAge.text.toString().trim()
+                partnerLocalData.gender=binding!!.tvChooseGender.text.toString().trim()
                 partnerInfoViewModel.setPartnerData(partnerLocalData)
 
                 sessionManagement.setPartnerName(binding!!.etPartnerName.text.toString().trim())

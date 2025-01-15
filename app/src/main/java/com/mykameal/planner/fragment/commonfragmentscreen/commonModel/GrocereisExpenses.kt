@@ -3,7 +3,7 @@ package com.mykameal.planner.fragment.commonfragmentscreen.commonModel
 data class GrocereisExpenses(
     var amount: String,
     val created_at: String,
-    val deleted_at: Any,
+    val deleted_at: Any?,
     var duration: String,
     val id: Int,
     val updated_at: String,

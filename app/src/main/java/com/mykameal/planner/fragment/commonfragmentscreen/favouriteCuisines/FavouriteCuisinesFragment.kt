@@ -49,7 +49,6 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentFavouriteCuisinesBinding.inflate(inflater, container, false)
-
         favouriteCuisineViewModel = ViewModelProvider(this)[FavouriteCuisineViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
@@ -100,9 +99,7 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
             }
         })
 
-
         initialize()
-
         return binding!!.root
     }
 

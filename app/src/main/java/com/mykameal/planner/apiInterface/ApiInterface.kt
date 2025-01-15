@@ -39,7 +39,7 @@ interface ApiInterface {
     @FormUrlEncoded
     @POST(ApiEndPoint.userSignup)
     suspend fun userSignUp(
-        @Field("email_or_phone") email_or_phone: String,
+        @Field("email_or_phone") emailOrPhone: String,
         @Field("password") password: String
     ): Response<JsonObject>
 
@@ -119,7 +119,7 @@ interface ApiInterface {
     @FormUrlEncoded
     @POST(ApiEndPoint.resendOtp)
     suspend fun resendOtp(
-        @Field("email_or_phone") email_or_phone: String
+        @Field("email_or_phone") emailOrPhone: String
     ): Response<JsonObject>
 
 
@@ -145,13 +145,13 @@ interface ApiInterface {
     @FormUrlEncoded
     @POST(ApiEndPoint.updateLocation)
     suspend fun updateLocation(
-        @Field("location_on_off") location_on_off: String
+        @Field("location_on_off") locationOnOff: String
     ): Response<JsonObject>
 
     @FormUrlEncoded
     @POST(ApiEndPoint.updateNotification)
     suspend fun updateNotification(
-        @Field("notification_status") notification_status: String
+        @Field("notification_status") notificationStatus: String
     ): Response<JsonObject>
 
 

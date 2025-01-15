@@ -3,7 +3,7 @@ package com.mykameal.planner.fragment.commonfragmentscreen.commonModel
 data class PartnerDetail(
     var age: String,
     val created_at: String,
-    val deleted_at: Any,
+    val deleted_at: Any?,
     var gender: String,
     val id: Int,
     var name: String,
@@ -14,7 +14,7 @@ data class PartnerDetail(
 data class FamilyDetail(
     var age: String,
     val created_at: String,
-    val deleted_at: Any,
+    val deleted_at: Any?,
     var status: String,
     val id: Int,
     var name: String,
