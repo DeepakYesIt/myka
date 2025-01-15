@@ -38,7 +38,7 @@ object ApiEndPoint {
     const val bankAddUrl="add-bank-details"
     const val walletAmountUrl="get-wallet"
     const val logOutUrl="user-Logout"
-    const val deleteUrl="user-Logout"
+    const val deleteUrl="user-delete"
     const val updateNotificationUrl="update-notification"
     const val recipeDetailsUrl="get-recipe"
     const val allRecipeUrl="all-recipe"

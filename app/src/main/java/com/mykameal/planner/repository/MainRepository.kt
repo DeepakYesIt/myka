@@ -55,7 +55,6 @@ interface MainRepository {
     suspend fun userProfileDataApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
     suspend fun userLogOutDataApi(successCallback: (response: NetworkResult<String>) -> Unit)
-
     suspend fun userDeleteDataApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
     suspend fun upDateProfileRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,name:String,bio:String, genderType: String,dob:String,height:String

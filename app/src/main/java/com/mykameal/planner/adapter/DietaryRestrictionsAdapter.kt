@@ -24,6 +24,7 @@ class DietaryRestrictionsAdapter(private var datalist: List<DietaryRestrictionsM
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
         holder.binding.tvTitleName.text=datalist[position].name
 
         // Inside your adapter's onBindViewHolder method
@@ -45,7 +46,7 @@ class DietaryRestrictionsAdapter(private var datalist: List<DietaryRestrictionsM
 
             // Handle item click
             relMainLayout.setOnClickListener {
-              /*  if (position == 0) {
+                if (position == 0) {
                     // Handle "select all" or first item case
                     selectedPositions.clear()
                     datalist.forEach { it.selected = false } // Reset all selections
@@ -53,13 +54,13 @@ class DietaryRestrictionsAdapter(private var datalist: List<DietaryRestrictionsM
                     datalist[position].selected = true // Mark the first item as selected
                     selectedPositions.add(0)
                     dietaryId.add(datalist[position].id.toString())
-                } else {*/
+                } else {
                     // Remove "select all" if another item is clicked
-                /*    if (0 in selectedPositions) {
+                    if (0 in selectedPositions) {
                         selectedPositions.remove(0)
                         datalist[0].selected = false
                         dietaryId.clear()
-                    }*/
+                    }
 
                     // Toggle selection state for the clicked item
                     if (position in selectedPositions) {
@@ -73,7 +74,7 @@ class DietaryRestrictionsAdapter(private var datalist: List<DietaryRestrictionsM
                         dietaryId.add(datalist[position].id.toString())
                         onItemClickListener.itemClicked(position, dietaryId, "2", "true")
                     }
-               /* }*/
+                }
                 notifyDataSetChanged() // Refresh the UI
             }
         }

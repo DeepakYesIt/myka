@@ -194,10 +194,19 @@ class FamilyMembersFragment : Fragment() {
 
         binding!!.tvNextBtn.setOnClickListener {
             if (status == "2") {
-                val familyLocalData: FamilyDetail?=null
-                familyLocalData!!.name=binding!!.etMembersName.text.toString().trim()
-                familyLocalData!!.age=binding!!.etMemberAge.text.toString().trim()
-                familyLocalData!!.status=childFriendlyStatus.toString()
+                val familyLocalData = FamilyDetail(
+                    name = "",
+                    age = "",
+                    status = "",
+                    id = 0,  // Default or appropriate ID
+                    created_at = "",
+                    updated_at = "",
+                    deleted_at = null,  // This can remain null if it's optional
+                    user_id = 0  // Default or appropriate user ID
+                )
+                familyLocalData.name=binding!!.etMembersName.text.toString().trim()
+                familyLocalData.age=binding!!.etMemberAge.text.toString().trim()
+                familyLocalData.status=childFriendlyStatus.toString()
                 familyMemberInfoViewModel.setFamilyData(familyLocalData)
 
                 sessionManagement.setFamilyMemName(binding!!.etMembersName.text.toString().trim())

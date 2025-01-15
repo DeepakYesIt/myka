@@ -157,10 +157,19 @@ class SpendingOnGroceriesFragment : Fragment() {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
-                val groceriesLocalData: GrocereisExpenses?=null
-                groceriesLocalData!!.amount=binding!!.etSpendingAmount.text.toString().trim()
-                groceriesLocalData!!.duration=binding!!.tvChooseDuration.text.toString().trim().toLowerCase()
+                val groceriesLocalData = GrocereisExpenses(
+                    amount = "",
+                    created_at = "",
+                    deleted_at = null,
+                    duration = "",
+                    id = 0,         // Default or appropriate ID
+                    updated_at = "",
+                    user_id = 0  // Default or appropriate user ID
+                )
+                groceriesLocalData.amount=binding!!.etSpendingAmount.text.toString().trim()
+                groceriesLocalData.duration=binding!!.tvChooseDuration.text.toString().trim().toLowerCase()
                 spendingGroceriesViewModel.setGroceriesData(groceriesLocalData)
+
                 sessionManagement.setSpendingAmount(binding!!.etSpendingAmount.text.toString().trim())
                 sessionManagement.setSpendingDuration(binding!!.tvChooseDuration.text.toString().trim().toLowerCase())
                 findNavController().navigate(R.id.eatingOutFragment)
