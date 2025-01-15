@@ -24,7 +24,7 @@ class AdapterFoodListItem(private var datalist: List<DataModel>, private var req
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         holder.binding.tvBreakfast.text = datalist[position].title
-        holder.binding.relBreakfast.setBackgroundResource(datalist[position].image)
+//        holder.binding.imageData.setBackgroundResource(datalist[position].image)
 
         holder.binding.cardViews.setOnClickListener{
             onItemSelectListener.itemClick(position,"","Christmas")
@@ -58,7 +58,7 @@ class AdapterFoodListItem(private var datalist: List<DataModel>, private var req
     }
 
     private fun updateValue(tvServes: TextView) {
-        tvServes.text = String.format("%02d", quantity)
+        tvServes.text ="Serves"+ String.format("%02d", quantity)
 
     }
 

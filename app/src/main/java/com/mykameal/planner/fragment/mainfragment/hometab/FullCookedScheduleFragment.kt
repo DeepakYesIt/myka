@@ -16,12 +16,14 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.OnItemLongClickListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.adapter.CalendarDayAdapter
+import com.mykameal.planner.adapter.DragDropHelper
 import com.mykameal.planner.adapter.IngredientsBreakFastAdapter
 import com.mykameal.planner.adapter.IngredientsDinnerAdapter
 import com.mykameal.planner.adapter.IngredientsLunchAdapter
@@ -31,6 +33,7 @@ import com.mykameal.planner.model.DataModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+
 
 class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongClickListener {
 
@@ -73,6 +76,9 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
         fullCookSchLunchModel()
         fullCookSchDinnerModel()
         initialize()
+
+
+
 
         return binding!!.root
     }
@@ -265,9 +271,13 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
         dataList1.add(data1)
         dataList1.add(data2)
 
-        ingredientBreakFastAdapter =
-            IngredientsBreakFastAdapter(dataList1, requireActivity(), this, this)
+        ingredientBreakFastAdapter = IngredientsBreakFastAdapter(dataList1, requireActivity(), this, this)
         binding!!.rcySearchBreakFast.adapter = ingredientBreakFastAdapter
+
+       /* val itemTouchHelper = ItemTouchHelper(DragDropHelper(ingredientBreakFastAdapter!!))
+        itemTouchHelper.attachToRecyclerView(binding!!.rcySearchBreakFast)*/
+
+
     }
 
     private fun fullCookSchLunchModel() {

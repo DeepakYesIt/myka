@@ -2,159 +2,126 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardViews"
-    android:layout_width="@dimen/_135sdp"
-    android:layout_height="@dimen/_190sdp"
-    android:layout_margin="@dimen/_5sdp"
-    android:layout_marginBottom="@dimen/_10sdp"
-    android:layout_marginEnd="@dimen/_10sdp"
+    android:layout_width="@dimen/_140sdp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/_8sdp"
+    android:layout_marginTop="@dimen/_5sdp"
     android:elevation="@dimen/_10sdp"
+    android:layout_marginBottom="@dimen/_5sdp"
     app:cardCornerRadius="@dimen/_10sdp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="@dimen/_7sdp">
+        android:layout_margin="@dimen/_7sdp">
 
         <RelativeLayout
             android:id="@+id/relBreakfast"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_120sdp"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:background="@drawable/bread_breakfast_image">
-
-            <RelativeLayout
-                android:id="@+id/relWatchTimer"
+            android:layout_height="wrap_content">
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imageData"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_136sdp"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/no_image"
+                app:shapeAppearanceOverlay="@style/CornerCut" />
+            <include
+                android:id="@+id/lay_progess"
+                layout="@layout/progess_loader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_5sdp"
-                android:layout_marginTop="@dimen/_4sdp"
-                android:background="@drawable/small_transparent_bg"
-                android:paddingHorizontal="@dimen/_3sdp"
-                android:paddingVertical="@dimen/_3sdp">
-
-                <ImageView
-                    android:id="@+id/imgWatch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/watch_white_icon" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_4sdp"
-                    android:layout_toEndOf="@+id/imgWatch"
-                    android:text="45 min"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_10sdp" />
-
-            </RelativeLayout>
-
+                android:layout_centerInParent="true"/>
             <ImageView
-                android:id="@+id/imgThreeDot"
+                android:id="@+id/imgAppleRemove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_4sdp"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_4sdp"
+                android:paddingVertical="@dimen/_3sdp"
+                android:src="@drawable/ic_apple_icon" />
+            <ImageView
+                android:id="@+id/imgHeartRed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:padding="@dimen/_5sdp"
-                android:layout_marginTop="@dimen/_8sdp"
-                android:layout_marginEnd="@dimen/_4sdp"
-                android:src="@drawable/three_dot_icon"
-                app:tint="@color/white" />
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardViewItems"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="@dimen/_8sdp"
-                android:layout_alignParentEnd="true"
-                android:visibility="visible"
-                android:layout_marginEnd="@dimen/_6sdp"
-                android:layout_marginTop="@dimen/_25sdp"
-                app:cardBackgroundColor="@color/white">
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingVertical="@dimen/_5sdp"
-                    android:paddingHorizontal="@dimen/_5sdp">
-
-                    <TextView
-                        android:id="@+id/tvRemoveRecipe"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:drawablePadding="@dimen/_5sdp"
-                        android:text="Remove Recipe"
-                        app:drawableStartCompat="@drawable/remove_recipe_icon" />
-
-                    <TextView
-                        android:id="@+id/tvMoveRecipe"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/tvRemoveRecipe"
-                        android:drawablePadding="@dimen/_5sdp"
-                        android:text="Move Recipe"
-                        app:drawableStartCompat="@drawable/remove_recipe_icon" />
-
-                </RelativeLayout>
-
-
-            </androidx.cardview.widget.CardView>
-
+                android:layout_margin="@dimen/_6sdp"
+                android:src="@drawable/heart_red_icon" />
         </RelativeLayout>
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/relBreakfast">
-
-            <RelativeLayout
-                android:id="@+id/relNameReview"
+            <TextView
+                android:id="@+id/tvBreakfast"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_3sdp">
+                android:fontFamily="@font/montserrat_semibold"
+                android:text="Pasta"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:singleLine="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:textSize="@dimen/_10sdp" />
 
+            <RelativeLayout
+                android:id="@+id/relYearsAgo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvBreakfast">
                 <TextView
-                    android:id="@+id/tvBreakfast"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/textTimeAgo"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:text="Bread"
-                    android:textSize="@dimen/_13sdp" />
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:fontFamily="@font/poppins"
+                    android:drawableStart="@drawable/ic_food_clock"
+                    android:singleLine="true"
+                    android:text="2 days ago"
+                    android:textColor="#3C4541"
+                    android:textSize="@dimen/_10sdp" />
 
             </RelativeLayout>
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/relNameReview"
-                android:layout_marginTop="@dimen/_6sdp">
-
-                <TextView
-                    android:id="@+id/tvAddToPlan"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/add_to_plan_bg"
-                    android:drawablePadding="@dimen/_6sdp"
-                    android:padding="@dimen/_4sdp"
-                    android:text="Add to plan"
-                    android:textColor="#FFFFFF"
-                    android:textSize="@dimen/_11sdp"
-                    app:drawableStartCompat="@drawable/add_icon" />
+                android:layout_below="@+id/relYearsAgo"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="@dimen/_7sdp">
 
                 <ImageView
-                    android:id="@+id/basketImg"
+                    android:id="@+id/imageMinusItem"
+                    android:layout_width="@dimen/_15sdp"
+                    android:layout_height="@dimen/_15sdp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_minus_iconss" />
+
+                <TextView
+                    android:id="@+id/tvServes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_alignParentEnd="true"
+                    android:layout_marginHorizontal="@dimen/_10sdp"
+                    android:layout_toEndOf="@+id/imageMinusItem"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="Serves 2"
+                    android:textSize="@dimen/_11sdp" />
+
+                <ImageView
+                    android:id="@+id/imagePlusItem"
+                    android:layout_width="@dimen/_15sdp"
+                    android:layout_height="@dimen/_15sdp"
+                    android:layout_centerVertical="true"
                     android:layout_marginStart="@dimen/_3sdp"
-                    android:src="@drawable/orange_basket_icon" />
+                    android:layout_toEndOf="@+id/tvServes"
+                    android:src="@drawable/add_food_item_icon" />
 
-
-            </RelativeLayout>
-
+            </LinearLayout>
         </RelativeLayout>
-
     </RelativeLayout>
-
 </androidx.cardview.widget.CardView>

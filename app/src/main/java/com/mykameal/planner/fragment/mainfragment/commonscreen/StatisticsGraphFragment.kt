@@ -2,6 +2,7 @@ package com.mykameal.planner.fragment.mainfragment.commonscreen
 
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -20,12 +21,16 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
+import com.mykameal.planner.customview.SpendingChartView
+
 import com.mykameal.planner.commonworkutils.shareApp
 import com.mykameal.planner.databinding.FragmentStatisticsGraphBinding
 
 class StatisticsGraphFragment : Fragment() {
 
     private var binding:FragmentStatisticsGraphBinding?=null
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,6 +47,37 @@ class StatisticsGraphFragment : Fragment() {
                 findNavController().navigateUp()
             }
         })
+
+       /* val spendingData = listOf(
+            SpendingChartView.BarData(300f, "01 June", Color.parseColor("#FFA500")),  // Orange
+            SpendingChartView.BarData(600f, "07 June", Color.parseColor("#32CD32")),  // Green
+            SpendingChartView.BarData(200f, "14 June", Color.parseColor("#FF0000")),  // Red
+            SpendingChartView.BarData(400f, "21 June", Color.parseColor("#FFA500"))   // Orange
+        )
+        binding!!.spendingChart.setData(spendingData)*/
+
+        // Create chart data
+        val data = listOf(
+            SpendingChartView.BarData(300f, "01","Jun", Color.parseColor("#FFA500")),
+            SpendingChartView.BarData(600f, "02","Jun", Color.parseColor("#32CD32")),
+            SpendingChartView.BarData(200f, "03", "Jun",Color.parseColor("#FF4040")),
+           /* SpendingChartView.BarData(400f, "04","Jun", Color.parseColor("#FFA500")),
+            SpendingChartView.BarData(600f, "05","Jun", Color.parseColor("#32CD32")),
+            SpendingChartView.BarData(400f, "06","Jun", Color.parseColor("#32CD32")),
+            SpendingChartView.BarData(300f, "07","Jun", Color.parseColor("#32CD32")),*/
+            )
+
+        binding!!.spendingChart.setData(data, 1566f, 60f)
+
+       /* val values = listOf(300.0, 600.0, 200.0, 400.0)
+        val colors = listOf(
+            Color.parseColor("#FFA500"),  // Orange
+            Color.parseColor("#00FF00"),  // Green
+            Color.parseColor("#FF0000"),  // Red
+            Color.parseColor("#FFA500")   // Orange
+        )
+
+        binding!!.spendingChart.setData(values, colors)*/
 
         initialize()
 

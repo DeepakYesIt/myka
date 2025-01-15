@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.mykameal.planner.R
 import com.mykameal.planner.adapter.OnboardingAdapter
+import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.databinding.ActivityOnBoardingBinding
 import com.mykameal.planner.model.OnboardingItem
 
@@ -22,11 +23,16 @@ class OnBoardingActivity : AppCompatActivity() {
     private var binding: ActivityOnBoardingBinding? = null
     var datalist : ArrayList<OnboardingItem> = arrayListOf()
     private var adapters:OnboardingAdapter?=null
+    private lateinit var sessionManagement: SessionManagement
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityOnBoardingBinding.inflate(LayoutInflater.from(this))
         setContentView(binding!!.root)
+        sessionManagement = SessionManagement(this)
+        sessionManagement.setFirstTime(false)
+
 
         adapters = OnboardingAdapter(datalist)
         binding!!.viewpager.adapter = adapters

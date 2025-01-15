@@ -115,9 +115,9 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
                 override fun handleOnBackPressed() {
                     if (sessionManagement.getCookingScreen() != "Profile") {
                         if (sessionManagement.getCookingFor().equals("Myself")) {
-                            val intent =
-                                Intent(requireActivity(), CookingForScreenActivity::class.java)
-                            startActivity(intent)
+                           /* val intent = Intent(requireActivity(), CookingForScreenActivity::class.java)
+                            startActivity(intent)*/
+                            requireActivity().finish()
                         } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
                             findNavController().navigateUp()
                         } else {
@@ -221,8 +221,9 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
         binding!!.imageBackBodyGoals.setOnClickListener {
             if (sessionManagement.getCookingScreen() != "Profile") {
                 if (sessionManagement.getCookingFor().equals("Myself")) {
-                    val intent = Intent(requireActivity(), CookingForScreenActivity::class.java)
-                    startActivity(intent)
+                   /* val intent = Intent(requireActivity(), CookingForScreenActivity::class.java)
+                    startActivity(intent)*/
+                    requireActivity().finish()
                 } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
                     findNavController().navigateUp()
                 } else {

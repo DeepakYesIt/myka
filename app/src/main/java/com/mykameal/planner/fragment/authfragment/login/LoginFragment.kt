@@ -90,8 +90,9 @@ class LoginFragment : Fragment() {
             requireActivity(),
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
+                    /*val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
                     startActivity(intent)
+                    requireActivity().finish()*/
                     requireActivity().finish()
                 }
             })
@@ -225,8 +226,9 @@ class LoginFragment : Fragment() {
 
         /// handle on back pressed
         binding!!.imagesBackLogin.setOnClickListener {
-            val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
+            /*val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
             startActivity(intent)
+            requireActivity().finish()*/
             requireActivity().finish()
         }
 

@@ -2,6 +2,8 @@ package com.mykameal.planner.adapter
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.content.ClipData
+import android.content.ClipDescription
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,9 +13,10 @@ import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.OnItemLongClickListener
 import com.mykameal.planner.databinding.AdapterIngredientsItemBinding
 import com.mykameal.planner.model.DataModel
+import java.util.Collections
 
 
-class IngredientsBreakFastAdapter(private var datalist: List<DataModel>, private var requireActivity: FragmentActivity,
+class IngredientsBreakFastAdapter( var datalist: List<DataModel>, private var requireActivity: FragmentActivity,
                                   private var onItemClickListener: OnItemClickListener, private var onItemLongClickListener: OnItemLongClickListener): RecyclerView.Adapter<IngredientsBreakFastAdapter.ViewHolder>() {
 
     private var checkStatus:String?=null
@@ -25,6 +28,19 @@ class IngredientsBreakFastAdapter(private var datalist: List<DataModel>, private
         val inflater = LayoutInflater.from(parent.context)
         val binding: AdapterIngredientsItemBinding = AdapterIngredientsItemBinding.inflate(inflater, parent,false);
         return ViewHolder(binding)
+    }
+
+    fun moveItem(fromPosition: Int, toPosition: Int) {
+        if (fromPosition < toPosition) {
+            for (i in fromPosition until toPosition) {
+                Collections.swap(datalist, i, i + 1)
+            }
+        } else {
+            for (i in fromPosition downTo toPosition + 1) {
+                Collections.swap(datalist, i, i - 1)
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -77,8 +93,18 @@ class IngredientsBreakFastAdapter(private var datalist: List<DataModel>, private
             onItemClickListener.itemClick(position, checkStatus,checkTypeStatus)
         }
         holder.itemView.setOnLongClickListener{
+            val clipData = ClipData(
+                datalist[position].title, // Use the title as the drag data
+                arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
+                ClipData.Item(datalist[position].title)
+            )
+
+            val shadowBuilder = View.DragShadowBuilder(holder.itemView)
+            holder.itemView.startDragAndDrop(clipData, shadowBuilder, null, 0)
             onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
             true
+            /*onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
+            true*/
         }
     }
 

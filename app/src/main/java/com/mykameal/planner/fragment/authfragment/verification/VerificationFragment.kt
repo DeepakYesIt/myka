@@ -323,9 +323,7 @@ class VerificationFragment : Fragment() {
                             val gson = Gson()
                             val signUpVerificationModel = gson.fromJson(it.data, SignUpVerificationModel::class.java)
                             if (signUpVerificationModel.code == 200 && signUpVerificationModel.success) {
-
                                 showDataInSession(signUpVerificationModel.data)
-
                             } else {
                                 if (signUpVerificationModel.code == ErrorMessage.code) {
                                     showAlertFunction(signUpVerificationModel.message, true)

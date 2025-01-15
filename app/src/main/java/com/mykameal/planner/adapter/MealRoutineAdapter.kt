@@ -1,5 +1,6 @@
 package com.mykameal.planner.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,11 +11,7 @@ import com.mykameal.planner.R
 import com.mykameal.planner.databinding.AdapterBodyGoalsBinding
 import com.mykameal.planner.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModelData
 
-class MealRoutineAdapter(
-    private var mealRoutineModelData: List<MealRoutineModelData>,
-    private var requireActivity: FragmentActivity,
-    private var onItemClickedListener: OnItemClickedListener
-) : RecyclerView.Adapter<MealRoutineAdapter.ViewHolder>() {
+class MealRoutineAdapter(var mealRoutineModelData: List<MealRoutineModelData>, var requireActivity: FragmentActivity, var onItemClickedListener: OnItemClickedListener) : RecyclerView.Adapter<MealRoutineAdapter.ViewHolder>() {
 
     private val selectedIds = mutableListOf<String>()
 
@@ -25,6 +22,7 @@ class MealRoutineAdapter(
         return ViewHolder(binding)
     }
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         holder.binding.tvTitleName.text = mealRoutineModelData[position].name

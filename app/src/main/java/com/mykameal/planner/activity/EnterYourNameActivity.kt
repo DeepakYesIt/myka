@@ -43,6 +43,7 @@ class EnterYourNameActivity : AppCompatActivity() {
                     sessionManagement.setGender(binding!!.tvChooseGender.text.toString().trim())
                     val intent = Intent(this@EnterYourNameActivity, CookingForScreenActivity::class.java)
                     startActivity(intent)
+                    finish()
                 }
             }
         }
