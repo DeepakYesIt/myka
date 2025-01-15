@@ -23,6 +23,7 @@ class CookingForScreenActivity : AppCompatActivity() {
         sessionManagement = SessionManagement(this@CookingForScreenActivity)
         sessionManagement.setCookingFor(clickStatus!!)
 
+
         ///main function using all triggered of this screen
         initialize()
     }
@@ -76,5 +77,11 @@ class CookingForScreenActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
     }
 }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.BaseApplication.fetchFcmToken
+import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.databinding.ActivityIntroPageBinding
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -13,7 +14,6 @@ import kotlinx.coroutines.launch
 class IntroPageActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityIntroPageBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Use `inflate` method directly without creating an extra object
@@ -21,8 +21,6 @@ class IntroPageActivity : AppCompatActivity() {
         setContentView(binding.root)
         // Initialize UI and logic
         initialize()
-
-
 
 //        Log.d("token :- ","*****"+ BaseApplication.getToken())
     }

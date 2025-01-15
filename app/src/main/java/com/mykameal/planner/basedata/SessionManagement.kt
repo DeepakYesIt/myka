@@ -9,13 +9,19 @@ import com.google.gson.reflect.TypeToken
 class SessionManagement(var context: Context) {
     var dialog: Dialog? = null
     private var editor: SharedPreferences.Editor? = null
+    private var editorFirstTime: SharedPreferences.Editor? = null
     private var pref: SharedPreferences? = null
+    private var prefFirstTime: SharedPreferences? = null
     private val gson = Gson()
 
 
     init {
         pref = context.getSharedPreferences(AppConstant.LOGIN_SESSION, Context.MODE_PRIVATE)
         editor = pref?.edit()
+
+
+        prefFirstTime = context.getSharedPreferences(AppConstant.FirstTime, Context.MODE_PRIVATE)
+        editorFirstTime = prefFirstTime?.edit()
     }
 
     companion object {
@@ -33,6 +39,18 @@ class SessionManagement(var context: Context) {
     fun getLoginSession(): Boolean {
         return pref!!.getBoolean(AppConstant.loginSession, false)
     }
+
+
+    fun setFirstTime(status:Boolean){
+        editorFirstTime!!.putBoolean(AppConstant.SessionFirstTime, status)
+        editorFirstTime!!.commit()
+    }
+
+    fun getFirstTime(): Boolean {
+        return prefFirstTime!!.getBoolean(AppConstant.SessionFirstTime, true)
+    }
+
+
 
 
 

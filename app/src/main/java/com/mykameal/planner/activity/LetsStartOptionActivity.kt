@@ -24,7 +24,11 @@ class LetsStartOptionActivity : AppCompatActivity() {
 
         // Set an OnClickListener for the "Lets Start cooking" Button
         binding.rlLetsCooking.setOnClickListener {
-            navigateToAuthActivity("signup")
+           /* navigateToAuthActivity("signup")*/
+            val intent = Intent(this@LetsStartOptionActivity, IntroPageActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
+            finish()
         }
     }
 

@@ -130,11 +130,19 @@
                 android:layout_below="@id/tvSavings"
                 android:textSize="@dimen/_13sdp"/>
 
+            <com.mykameal.planner.customview.SpendingChartView
+                android:id="@+id/spendingChart"
+                android:layout_width="match_parent"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_below="@id/textSpent"
+                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:layout_height="400dp" />
+
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/barChart"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:layout_below="@+id/textSpent"
+                android:layout_below="@+id/spendingChart"
                 android:layout_marginHorizontal="@dimen/_16sdp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"

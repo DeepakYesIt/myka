@@ -19,6 +19,7 @@ import com.google.gson.Gson
 import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.R
+import com.mykameal.planner.activity.AuthActivity
 import com.mykameal.planner.activity.LetsStartOptionActivity
 import com.mykameal.planner.adapter.BodyGoalAdapter
 import com.mykameal.planner.basedata.BaseApplication
@@ -149,9 +150,10 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         binding!!.tvNextBtn.setOnClickListener {
             if (status == "2") {
                 sessionManagement.setReasonTakeAway(reasonSelect.toString())
-                val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
+                /*val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
                 startActivity(intent)
-                requireActivity().finish()
+                requireActivity().finish()*/
+                navigateToAuthActivity("login")
             }
         }
 
@@ -162,6 +164,13 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
+    }
+    private fun navigateToAuthActivity(type: String) {
+        val intent = Intent(requireActivity(), AuthActivity::class.java).apply {
+            putExtra("type", type)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        }
+        startActivity(intent)
     }
 
     private fun updateReasonTakeAwayApi() {
@@ -252,9 +261,10 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         tvDialogSkipBtn.setOnClickListener {
             sessionManagement.setReasonTakeAway("")
             dialogStillSkip.dismiss()
-            val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
+            /*val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
             startActivity(intent)
-            requireActivity().finish()
+            requireActivity().finish()*/
+            navigateToAuthActivity("login")
         }
     }
 

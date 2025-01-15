@@ -28,7 +28,6 @@ class SplashActivity : AppCompatActivity() {
         sessionManagement = SessionManagement(this)
         // Initialize screen actions
 
-
         initialize()
     }
 
@@ -36,14 +35,23 @@ class SplashActivity : AppCompatActivity() {
         lifecycleScope.launch {
             delay(SPLASH_DELAY)
             // Check login session and navigate accordingly
-            val targetActivity = if (sessionManagement.getLoginSession()) {
-                MainActivity::class.java
-            } else {
-                IntroPageActivity::class.java
+            if (sessionManagement.getFirstTime()){
+                val intent = Intent(this@SplashActivity, IntroPageActivity::class.java)
+                startActivity(intent)
+                finish()
+            }else{
+                val targetActivity = if (sessionManagement.getLoginSession()) {
+                    MainActivity::class.java
+                } else {
+                    LetsStartOptionActivity::class.java
+                }
+                val intent = Intent(this@SplashActivity, targetActivity)
+                startActivity(intent)
+                finish()
             }
-            val intent = Intent(this@SplashActivity, targetActivity)
-            startActivity(intent)
-            finish()
+
+
+
         }
     }
 }

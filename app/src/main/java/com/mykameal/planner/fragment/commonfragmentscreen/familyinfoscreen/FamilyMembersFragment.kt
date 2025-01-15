@@ -69,8 +69,9 @@ class FamilyMembersFragment : Fragment() {
                     if (sessionManagement.getCookingScreen()=="Profile"){
                         findNavController().navigateUp()
                     }else{
-                        val intent = Intent(requireActivity(), CookingForScreenActivity::class.java)
-                        startActivity(intent)
+                       /* val intent = Intent(requireActivity(), CookingForScreenActivity::class.java)
+                        startActivity(intent)*/
+                        requireActivity().finish()
                     }
 
                 }
@@ -164,8 +165,9 @@ class FamilyMembersFragment : Fragment() {
             if (sessionManagement.getCookingScreen()=="Profile"){
                 findNavController().navigateUp()
             }else{
-                val intent = Intent(requireActivity(), CookingForScreenActivity::class.java)
-                startActivity(intent)
+                /*val intent = Intent(requireActivity(), CookingForScreenActivity::class.java)
+                startActivity(intent)*/
+                requireActivity().finish()
             }
         }
 

@@ -49,13 +49,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/relNameSwap"
         android:layout_marginHorizontal="@dimen/_8sdp"
-        android:layout_marginVertical="@dimen/_15sdp">
-
+        android:layout_marginTop="@dimen/_10sdp">
         <RelativeLayout
             android:id="@+id/imageBread"
-            android:layout_width="@dimen/_160sdp"
-            android:layout_height="@dimen/_150sdp">
-
+            android:layout_width="@dimen/_150sdp"
+            android:layout_height="@dimen/_140sdp">
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imageData"
                 android:layout_width="match_parent"
@@ -64,7 +62,6 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/no_image"
                 app:shapeAppearanceOverlay="@style/CornerCut" />
-
             <include
                 android:id="@+id/lay_progess"
                 layout="@layout/progess_loader"
@@ -72,7 +69,6 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"/>
         </RelativeLayout>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -81,7 +77,6 @@
             android:layout_toEndOf="@id/imageBread"
             android:gravity="center"
             android:orientation="vertical">
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_30sdp"
@@ -90,13 +85,11 @@
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:paddingHorizontal="@dimen/_3sdp">
-
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_15sdp"
                     android:layout_marginStart="@dimen/_3sdp"
                     android:src="@drawable/ic_minus_square_icon" />
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -104,8 +97,7 @@
                     android:fontFamily="@font/poppins_medium"
                     android:text="2 servings"
                     android:textColor="#000000"
-                    android:textSize="@dimen/_12sdp" />
-
+                    android:textSize="@dimen/_10sdp" />
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -134,7 +126,7 @@
                     android:fontFamily="@font/poppins_medium"
                     android:text="Total Time"
                     android:textColor="#000000"
-                    android:textSize="@dimen/_12sdp" />
+                    android:textSize="@dimen/_10sdp" />
             </LinearLayout>
 
             <TextView
@@ -146,7 +138,7 @@
                 android:fontFamily="@font/poppins_medium"
                 android:text="0 min"
                 android:textColor="#FE9F45"
-                android:textSize="@dimen/_12sdp" />
+                android:textSize="@dimen/_10sdp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -169,7 +161,7 @@
                     android:fontFamily="@font/poppins_medium"
                     android:text="Prep Time"
                     android:textColor="#000000"
-                    android:textSize="@dimen/_12sdp" />
+                    android:textSize="@dimen/_10sdp" />
             </LinearLayout>
 
             <TextView
@@ -180,7 +172,7 @@
                 android:fontFamily="@font/poppins_medium"
                 android:text="0 min"
                 android:textColor="#FE9F45"
-                android:textSize="@dimen/_12sdp" />
+                android:textSize="@dimen/_10sdp" />
 
         </LinearLayout>
 
@@ -210,7 +202,7 @@
                 android:fontFamily="@font/poppins_medium"
                 android:text="Calories"
                 android:textColor="#000000"
-                android:textSize="@dimen/_11sdp" />
+                android:textSize="@dimen/_10sdp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -251,7 +243,7 @@
                 android:fontFamily="@font/poppins_medium"
                 android:text="Fat"
                 android:textColor="#000000"
-                android:textSize="@dimen/_11sdp" />
+                android:textSize="@dimen/_10sdp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -292,7 +284,7 @@
                 android:fontFamily="@font/poppins_medium"
                 android:text="Carbs"
                 android:textColor="#000000"
-                android:textSize="@dimen/_11sdp" />
+                android:textSize="@dimen/_10sdp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -333,7 +325,7 @@
                 android:fontFamily="@font/poppins_medium"
                 android:text="Protein"
                 android:textColor="#000000"
-                android:textSize="@dimen/_11sdp" />
+                android:textSize="@dimen/_10sdp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
