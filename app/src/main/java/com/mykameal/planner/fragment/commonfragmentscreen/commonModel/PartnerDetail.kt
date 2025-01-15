@@ -1,23 +1,23 @@
 package com.mykameal.planner.fragment.commonfragmentscreen.commonModel
 
 data class PartnerDetail(
-    val age: String,
+    var age: String,
     val created_at: String,
     val deleted_at: Any,
-    val gender: String,
+    var gender: String,
     val id: Int,
-    val name: String,
+    var name: String,
     val updated_at: String,
     val user_id: Int
 )
 
 data class FamilyDetail(
-    val age: String,
+    var age: String,
     val created_at: String,
     val deleted_at: Any,
-    val status: String,
+    var status: String,
     val id: Int,
-    val name: String,
+    var name: String,
     val updated_at: String,
     val user_id: Int
 )

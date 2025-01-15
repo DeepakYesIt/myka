@@ -66,17 +66,18 @@ class SpendingOnGroceriesFragment : Fragment() {
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateSpendingGroc.visibility=View.VISIBLE
-        }else{
-            binding!!.llBottomBtn.visibility=View.VISIBLE
-            binding!!.rlUpdateSpendingGroc.visibility=View.GONE
-        }
-
-        if (sessionManagement.getCookingScreen()=="Profile"){
             ///checking the device of mobile data in online and offline(show network error message)
             if (BaseApplication.isOnline(requireContext())) {
                 spendingGroceriesApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }else{
+            binding!!.llBottomBtn.visibility=View.VISIBLE
+            binding!!.rlUpdateSpendingGroc.visibility=View.GONE
+
+            if (spendingGroceriesViewModel.getGroceriesData()!=null){
+                showDataInUi(spendingGroceriesViewModel.getGroceriesData()!!)
             }
         }
 
@@ -156,6 +157,10 @@ class SpendingOnGroceriesFragment : Fragment() {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
+                val groceriesLocalData: GrocereisExpenses?=null
+                groceriesLocalData!!.amount=binding!!.etSpendingAmount.text.toString().trim()
+                groceriesLocalData!!.duration=binding!!.tvChooseDuration.text.toString().trim().toLowerCase()
+                spendingGroceriesViewModel.setGroceriesData(groceriesLocalData)
                 sessionManagement.setSpendingAmount(binding!!.etSpendingAmount.text.toString().trim())
                 sessionManagement.setSpendingDuration(binding!!.tvChooseDuration.text.toString().trim().toLowerCase())
                 findNavController().navigate(R.id.eatingOutFragment)

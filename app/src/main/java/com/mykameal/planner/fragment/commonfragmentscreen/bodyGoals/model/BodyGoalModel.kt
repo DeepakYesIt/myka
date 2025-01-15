@@ -8,7 +8,6 @@ data class BodyGoalModel(
 )
 
 data class BodyGoalModelData(
-
     val id: Int,
     val name: String,
     var selected:Boolean=false

@@ -41,6 +41,7 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue:Int=0
     private lateinit var eatingOutViewModel: EatingOutViewModel
+    private var eatingOutModelsData: List<BodyGoalModelData>?=null
 
 
     override fun onCreateView(
@@ -66,9 +67,25 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateEatingOut.visibility=View.VISIBLE
+            if (BaseApplication.isOnline(requireActivity())) {
+                eatingOutSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateEatingOut.visibility=View.GONE
+
+            if (eatingOutViewModel.getEatingOutData()!=null){
+                showDataInUi(eatingOutViewModel.getEatingOutData()!!)
+            }else{
+                ///checking the device of mobile data in online and offline(show network error message)
+                if (BaseApplication.isOnline(requireContext())) {
+                    eatingOutApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
@@ -76,22 +93,6 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
                 findNavController().navigateUp()
             }
         })
-
-
-        if (sessionManagement.getCookingScreen()!="Profile"){
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireContext())) {
-                eatingOutApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }else{
-            if (BaseApplication.isOnline(requireActivity())) {
-                eatingOutSelectApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
 
         initialize()
 
@@ -200,6 +201,7 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
     private fun showDataInUi(bodyModelData: List<BodyGoalModelData>) {
 
         if (bodyModelData!=null && bodyModelData.isNotEmpty()){
+            eatingOutModelsData=bodyModelData
             bodyGoalAdapter = BodyGoalAdapter(bodyModelData, requireActivity(), this)
             binding!!.rcyEatingOut.adapter = bodyGoalAdapter
         }
@@ -221,6 +223,7 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
 
             R.id.tvNextBtn->{
                 if (status=="2"){
+                    eatingOutViewModel.setEatingOutData(eatingOutModelsData!!.toMutableList())
                     sessionManagement.setEatingOut(eatingOutSelect.toString())
                     findNavController().navigate(R.id.reasonsForTakeAwayFragment)
 //                    val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)

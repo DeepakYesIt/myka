@@ -9,10 +9,8 @@
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
+
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <uses-permission android:name="android.permission.STORAGE" />
@@ -35,12 +33,28 @@
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MykaApp"
-        tools:targetApi="31">
+        tools:targetApi="31"
+        tools:replace="android:fullBackupContent">
         <activity
             android:name=".activity.MainActivity"
             android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="AppLinkUrlError">
+            <intent-filter android:label="Deep link">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                    android:host="//mykaandroidapp.onelink.me"/>
+                    <!--android:pathPrefix="/tNkO" -->/>
+            </intent-filter>
+        </activity>
+   <!--     <activity
+            android:name=".activity.MainActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
+            android:exported="false" />-->
         <activity
             android:name=".activity.AuthActivity"
             android:windowSoftInputMode="adjustPan"
@@ -101,6 +115,17 @@
             </intent-filter>
         </service>
 
+    <!--    <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW" />
+
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+
+            &lt;!&ndash; Replace "onlink-basic-app" with your OneLink domain &ndash;&gt;
+            <data
+                android:host="onelink-basic-app.onelink.me"
+                android:scheme="https" />
+        </intent-filter>-->
     </application>
 
 </manifest>

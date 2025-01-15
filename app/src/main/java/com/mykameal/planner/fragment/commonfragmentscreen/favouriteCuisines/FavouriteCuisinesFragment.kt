@@ -41,6 +41,7 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
     private var status:String?=""
     private var favouriteSelectId = mutableListOf<String>()
     private lateinit var favouriteCuisineViewModel: FavouriteCuisineViewModel
+    private var favouriteCuiModelData: List<DietaryRestrictionsModelData>?=null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,9 +73,25 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateFavCuisine.visibility=View.VISIBLE
+            if (BaseApplication.isOnline(requireContext())) {
+                favouriteCuisineSelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateFavCuisine.visibility=View.GONE
+
+            if (favouriteCuisineViewModel.getFavouriteCuiData()!=null){
+                showDataInUi(favouriteCuisineViewModel.getFavouriteCuiData()!!)
+            }else{
+                ///checking the device of mobile data in online and offline(show network error message)
+                if (BaseApplication.isOnline(requireContext())) {
+                    favouriteCuisineApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
@@ -83,21 +100,6 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
             }
         })
 
-
-        if (sessionManagement.getCookingScreen()!="Profile"){
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireContext())) {
-                favouriteCuisineApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }else{
-            if (BaseApplication.isOnline(requireContext())) {
-                favouriteCuisineSelectApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
 
         initialize()
 
@@ -121,6 +123,7 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
+                favouriteCuisineViewModel.setFavouriteCuiData(favouriteCuiModelData!!)
                 sessionManagement.setFavouriteCuisineList(favouriteSelectId)
                 if (sessionManagement.getCookingFor().equals("Myself")){
                     findNavController().navigate(R.id.ingredientDislikesFragment)
@@ -263,6 +266,7 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
     private fun showDataInUi(dietaryModelData: List<DietaryRestrictionsModelData>) {
 
         if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
+            favouriteCuiModelData=dietaryModelData
             adapterFavouriteCuisinesItem = AdapterFavouriteCuisinesItem(dietaryModelData, requireActivity(), this)
             binding!!.rcyFavCuisines.adapter = adapterFavouriteCuisinesItem
         }

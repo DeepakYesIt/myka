@@ -269,7 +269,6 @@ class LoginFragment : Fragment() {
         mGoogleSignInClient!!.signOut()
     }
 
-
     /// login api implement and redirection
     private fun loginApi() {
         BaseApplication.showMe(requireContext())

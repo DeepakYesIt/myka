@@ -32,16 +32,17 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListener {
+class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListener {
 
     private var binding: FragmentMealRoutineBinding? = null
 
     private lateinit var sessionManagement: SessionManagement
     private var mealRoutineAdapter: MealRoutineAdapter? = null
-    private var totalProgressValue:Int=0
-    private var status:String?=""
+    private var totalProgressValue: Int = 0
+    private var status: String? = ""
     private var mealRoutineSelectedId = mutableListOf<String>()
     private lateinit var mealRoutineViewModel: MealRoutineViewModel
+    private var mealRoutineModelData: List<MealRoutineModelData>? = null
 
 
     override fun onCreateView(
@@ -54,60 +55,65 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListen
         mealRoutineViewModel = ViewModelProvider(this)[MealRoutineViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
-        if (sessionManagement.getCookingFor().equals("Myself")){
-            binding!!.textAllergensIng.visibility=View.VISIBLE
-            binding!!.textAllergensIngPartner.visibility=View.GONE
-            binding!!.textAllergensIngFamily.visibility=View.GONE
-            binding!!.tvMealRoutineDesc.text=getString(R.string.meal_routine_desc)
-            binding!!.progressBar6.max=10
-            totalProgressValue=10
+        if (sessionManagement.getCookingFor().equals("Myself")) {
+            binding!!.textAllergensIng.visibility = View.VISIBLE
+            binding!!.textAllergensIngPartner.visibility = View.GONE
+            binding!!.textAllergensIngFamily.visibility = View.GONE
+            binding!!.tvMealRoutineDesc.text = getString(R.string.meal_routine_desc)
+            binding!!.progressBar6.max = 10
+            totalProgressValue = 10
             updateProgress(6)
-        } else if (sessionManagement.getCookingFor().equals("MyPartner")){
-            binding!!.textAllergensIng.visibility=View.GONE
-            binding!!.textAllergensIngPartner.visibility=View.VISIBLE
-            binding!!.textAllergensIngFamily.visibility=View.GONE
-            binding!!.tvMealRoutineDesc.text="Which days do you guys normally meal prep or cook on?\n"
-            binding!!.progressBar6.max=11
-            totalProgressValue=11
+        } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
+            binding!!.textAllergensIng.visibility = View.GONE
+            binding!!.textAllergensIngPartner.visibility = View.VISIBLE
+            binding!!.textAllergensIngFamily.visibility = View.GONE
+            binding!!.tvMealRoutineDesc.text =
+                "Which days do you guys normally meal prep or cook on?\n"
+            binding!!.progressBar6.max = 11
+            totalProgressValue = 11
             updateProgress(7)
         } else {
-            binding!!.textAllergensIng.visibility=View.GONE
-            binding!!.textAllergensIngPartner.visibility=View.GONE
-            binding!!.textAllergensIngFamily.visibility=View.VISIBLE
-            binding!!.tvMealRoutineDesc.text="What meals do you typically cook for your family?"
-            binding!!.progressBar6.max=11
-            totalProgressValue=11
+            binding!!.textAllergensIng.visibility = View.GONE
+            binding!!.textAllergensIngPartner.visibility = View.GONE
+            binding!!.textAllergensIngFamily.visibility = View.VISIBLE
+            binding!!.tvMealRoutineDesc.text = "What meals do you typically cook for your family?"
+            binding!!.progressBar6.max = 11
+            totalProgressValue = 11
             updateProgress(7)
         }
 
-        if (sessionManagement.getCookingScreen().equals("Profile")){
-            binding!!.llBottomBtn.visibility=View.GONE
-            binding!!.rlUpdateMealRoutine.visibility=View.VISIBLE
-        }else{
-            binding!!.llBottomBtn.visibility=View.VISIBLE
-            binding!!.rlUpdateMealRoutine.visibility=View.GONE
-        }
-
-        if (sessionManagement.getCookingScreen()!="Profile"){
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireContext())) {
-                mealRoutineApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }else{
+        if (sessionManagement.getCookingScreen().equals("Profile")) {
+            binding!!.llBottomBtn.visibility = View.GONE
+            binding!!.rlUpdateMealRoutine.visibility = View.VISIBLE
             if (BaseApplication.isOnline(requireContext())) {
                 mealRoutineSelectApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
+        } else {
+            binding!!.llBottomBtn.visibility = View.VISIBLE
+            binding!!.rlUpdateMealRoutine.visibility = View.GONE
+
+            if (mealRoutineViewModel.getMealRoutineData() != null) {
+                showDataInUi(mealRoutineViewModel.getMealRoutineData()!!)
+            } else {
+                ///checking the device of mobile data in online and offline(show network error message)
+                if (BaseApplication.isOnline(requireContext())) {
+                    mealRoutineApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            requireActivity(),
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
 
         initialize()
 
@@ -162,14 +168,16 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListen
                         } else {
                             if (mealRoutineModel.code == ErrorMessage.code) {
                                 showAlertFunction(mealRoutineModel.message, true)
-                            }else{
+                            } else {
                                 showAlertFunction(mealRoutineModel.message, false)
                             }
                         }
                     }
+
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
+
                     else -> {
                         showAlertFunction(it.message, false)
                     }
@@ -192,14 +200,16 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListen
                         } else {
                             if (bodyModel.code == ErrorMessage.code) {
                                 showAlertFunction(bodyModel.message, true)
-                            }else{
+                            } else {
                                 showAlertFunction(bodyModel.message, false)
                             }
                         }
                     }
+
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
+
                     else -> {
                         showAlertFunction(it.message, false)
                     }
@@ -209,7 +219,8 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListen
     }
 
     private fun showDataInUi(dietaryModelData: List<MealRoutineModelData>) {
-        if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
+        if (dietaryModelData != null && dietaryModelData.isNotEmpty()) {
+            mealRoutineModelData = dietaryModelData
             mealRoutineAdapter = MealRoutineAdapter(dietaryModelData, requireActivity(), this)
             binding!!.rcyMealRoutine.adapter = mealRoutineAdapter
         }
@@ -220,23 +231,25 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListen
     }
 
     override fun onClick(item: View?) {
-        when(item!!.id){
+        when (item!!.id) {
 
-            R.id.imgBackMealRoutine->{
+            R.id.imgBackMealRoutine -> {
                 findNavController().navigateUp()
             }
-            R.id.tvSkipBtn-> {
+
+            R.id.tvSkipBtn -> {
                 stillSkipDialog()
             }
 
-            R.id.tvNextBtn ->{
-                if (status=="2"){
+            R.id.tvNextBtn -> {
+                if (status == "2") {
+                    mealRoutineViewModel.setMealRoutineData(mealRoutineModelData!!)
                     sessionManagement.setMealRoutineList(mealRoutineSelectedId)
                     findNavController().navigate(R.id.cookingFrequencyFragment)
                 }
             }
 
-            R.id.rlUpdateMealRoutine->{
+            R.id.rlUpdateMealRoutine -> {
                 if (BaseApplication.isOnline(requireContext())) {
                     updateMealRoutineApi()
                 } else {
@@ -255,44 +268,52 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListen
                 when (it) {
                     is NetworkResult.Success -> {
                         val gson = Gson()
-                        val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                        val updateModel =
+                            gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
                         if (updateModel.code == 200 && updateModel.success) {
                             findNavController().navigateUp()
                         } else {
                             if (updateModel.code == ErrorMessage.code) {
                                 showAlertFunction(updateModel.message, true)
-                            }else{
+                            } else {
                                 showAlertFunction(updateModel.message, false)
                             }
                         }
                     }
+
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
+
                     else -> {
                         showAlertFunction(it.message, false)
                     }
                 }
-            },mealRoutineSelectedId)
+            }, mealRoutineSelectedId)
         }
     }
 
-    override fun itemClicked(position: Int?, list: MutableList<String>, status1: String?, type: String?) {
-    /*    if (status1 == "1") {
-            status = ""
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
-        } else {
-            status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            mealRoutineSelectedId=list
-        }*/
+    override fun itemClicked(
+        position: Int?,
+        list: MutableList<String>,
+        status1: String?,
+        type: String?
+    ) {
+        /*    if (status1 == "1") {
+                status = ""
+                binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            } else {
+                status = "2"
+                binding!!.tvNextBtn.isClickable = true
+                binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                mealRoutineSelectedId=list
+            }*/
 
         if (status1.equals("-1")) {
             status = "2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            mealRoutineSelectedId=list
+            mealRoutineSelectedId = list
             return
         }
 
@@ -300,7 +321,7 @@ class MealRoutineFragment : Fragment(),View.OnClickListener, OnItemClickedListen
             status = "2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            mealRoutineSelectedId=list
+            mealRoutineSelectedId = list
         } else {
             status = ""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)

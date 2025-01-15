@@ -44,6 +44,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
     private var reasonSelect: String? = ""
     private lateinit var reasonTakeAwayViewModel: ReasonTakeAwayViewModel
     private var bodyGoalAdapter: BodyGoalAdapter? = null
+    private var reasonTakeModelData: List<BodyGoalModelData>?=null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,25 +69,22 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateReasonTakeAway.visibility=View.VISIBLE
+            if (BaseApplication.isOnline(requireContext())) {
+                reasonTakeAwaySelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateReasonTakeAway.visibility=View.GONE
-        }
-
-        if (sessionManagement.getCookingScreen()!="Profile"){
             ///checking the device of mobile data in online and offline(show network error message)
             if (BaseApplication.isOnline(requireContext())) {
                 reasonTakeAwayApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        }else{
-            if (BaseApplication.isOnline(requireContext())) {
-                reasonTakeAwaySelectApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
         }
+
 
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
@@ -149,6 +147,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
 
         binding!!.tvNextBtn.setOnClickListener {
             if (status == "2") {
+                reasonTakeAwayViewModel.setReasonTakeData(reasonTakeModelData!!.toMutableList())
                 sessionManagement.setReasonTakeAway(reasonSelect.toString())
                 /*val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
                 startActivity(intent)
@@ -236,6 +235,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
 
     private fun showDataInUi(bodyModelData: List<BodyGoalModelData>) {
         if (bodyModelData!=null && bodyModelData.size>0){
+            reasonTakeModelData=bodyModelData
             bodyGoalAdapter = BodyGoalAdapter(bodyModelData, requireActivity(), this)
             binding!!.rcyTakeAway.adapter = bodyGoalAdapter
         }

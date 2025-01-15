@@ -26,12 +26,12 @@ import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.databinding.FragmentFamilyMembersBinding
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.FamilyDetail
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
+import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.GrocereisExpenses
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.mykameal.planner.fragment.commonfragmentscreen.familyinfoscreen.viewmodel.FamilyMemberInfoViewModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-
 
 @AndroidEntryPoint
 class FamilyMembersFragment : Fragment() {
@@ -60,6 +60,10 @@ class FamilyMembersFragment : Fragment() {
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateFamMem.visibility=View.GONE
+
+            if (familyMemberInfoViewModel.getFamilyData()!=null){
+                showDataInUi(familyMemberInfoViewModel.getFamilyData()!!)
+            }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -190,6 +194,12 @@ class FamilyMembersFragment : Fragment() {
 
         binding!!.tvNextBtn.setOnClickListener {
             if (status == "2") {
+                val familyLocalData: FamilyDetail?=null
+                familyLocalData!!.name=binding!!.etMembersName.text.toString().trim()
+                familyLocalData!!.age=binding!!.etMemberAge.text.toString().trim()
+                familyLocalData!!.status=childFriendlyStatus.toString()
+                familyMemberInfoViewModel.setFamilyData(familyLocalData)
+
                 sessionManagement.setFamilyMemName(binding!!.etMembersName.text.toString().trim())
                 sessionManagement.setFamilyMemAge(binding!!.etMemberAge.text.toString().trim())
                 sessionManagement.setFamilyStatus(childFriendlyStatus.toString())

@@ -41,6 +41,7 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
     private var status:String?=null
     private var cookingSelect: String? = null
     private lateinit var cookingFrequencyViewModel: CookingFrequencyViewModel
+    private var cookingFreqModelData: List<BodyGoalModelData>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,7 +64,7 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
             totalProgressValue=11
             updateProgress(8)
         } else {
-            binding!!.tvCookFreqDesc.text="How often do you cook meals for your family?"
+            binding!!.tvCookFreqDesc.text="How often do you cook meals for your family?" 
             binding!!.progressBar7.max=11
             totalProgressValue=11
             updateProgress(8)
@@ -72,9 +73,26 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateCookingFrequency.visibility=View.VISIBLE
+
+            if (BaseApplication.isOnline(requireActivity())) {
+                cookingFrequencySelectApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }else{
             binding!!.llBottomBtn.visibility=View.VISIBLE
             binding!!.rlUpdateCookingFrequency.visibility=View.GONE
+
+            if (cookingFrequencyViewModel.getCookingFreqData()!=null){
+                showDataInUi(cookingFrequencyViewModel.getCookingFreqData() !!)
+            }else{
+                ///checking the device of mobile data in online and offline(show network error message)
+                if (BaseApplication.isOnline(requireActivity())) {
+                    cookingFrequencyApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
@@ -83,21 +101,6 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
             }
         })
 
-
-        if (sessionManagement.getCookingScreen()!="Profile"){
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireActivity())) {
-                cookingFrequencyApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }else{
-            if (BaseApplication.isOnline(requireActivity())) {
-                cookingFrequencySelectApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
 
         initialize()
 
@@ -121,6 +124,7 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
+                cookingFrequencyViewModel.setCookingFreqData(cookingFreqModelData!!.toMutableList())
                 sessionManagement.setCookingFrequency(cookingSelect.toString())
                 if (sessionManagement.getCookingFor().equals("Myself")){
                     findNavController().navigate(R.id.spendingOnGroceriesFragment)
@@ -260,10 +264,11 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
         }
     }
 
-    private fun showDataInUi(bogyGoalModelData: List<BodyGoalModelData>) {
+    private fun showDataInUi(bodyGoalModelData: List<BodyGoalModelData>) {
 
-        if (bogyGoalModelData!=null && bogyGoalModelData.size>0){
-            bodyGoalAdapter = BodyGoalAdapter(bogyGoalModelData, requireActivity(), this)
+        if (bodyGoalModelData!=null && bodyGoalModelData.size>0){
+            cookingFreqModelData=bodyGoalModelData
+            bodyGoalAdapter = BodyGoalAdapter(bodyGoalModelData, requireActivity(), this)
             binding!!.rcyCookingFreq.adapter = bodyGoalAdapter
         }
 

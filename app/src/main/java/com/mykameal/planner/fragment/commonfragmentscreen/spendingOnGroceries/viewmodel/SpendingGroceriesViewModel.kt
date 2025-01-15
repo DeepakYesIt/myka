@@ -2,12 +2,30 @@ package com.mykameal.planner.fragment.commonfragmentscreen.spendingOnGroceries.v
 
 import androidx.lifecycle.ViewModel
 import com.mykameal.planner.basedata.NetworkResult
+import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.GrocereisExpenses
+import com.mykameal.planner.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.Data
 import com.mykameal.planner.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class SpendingGroceriesViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
+
+    private var groceriesLocalData: GrocereisExpenses?=null
+
+    fun setGroceriesData(data: GrocereisExpenses) {
+        groceriesLocalData=data
+    }
+
+    // Method to clear data
+    fun clearData() {
+        groceriesLocalData = null // Clear LiveData
+        // Reset other variables
+    }
+
+    fun getGroceriesData(): GrocereisExpenses? {
+        return groceriesLocalData
+    }
 
     suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit) {
         repository.userPreferencesApi { successCallback(it) }

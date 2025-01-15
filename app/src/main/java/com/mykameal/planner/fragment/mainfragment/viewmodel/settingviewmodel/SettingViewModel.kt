@@ -12,7 +12,7 @@ import javax.inject.Inject
 class SettingViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
 
-    var localData: Data?=null
+    private var localData: Data?=null
 
 
     suspend fun userProfileData(successCallback: (response: NetworkResult<String>) -> Unit){

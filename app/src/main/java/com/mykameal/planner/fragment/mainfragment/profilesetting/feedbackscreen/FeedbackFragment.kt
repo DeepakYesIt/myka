@@ -76,8 +76,6 @@ class FeedbackFragment : Fragment() {
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-
-            /*feedbackSubmitDialog()*/
         }
 
         return binding!!.root

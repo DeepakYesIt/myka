@@ -1,11 +1,12 @@
 package com.mykameal.planner.activity
 
 import android.app.Dialog
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,11 +16,14 @@ import android.view.WindowManager
 import android.widget.EditText
 import android.widget.RelativeLayout
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import com.appsflyer.AppsFlyerLib
+import com.appsflyer.deeplink.DeepLinkResult
 import com.mykameal.planner.R
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.commonworkutils.CommonWorkUtils
@@ -42,6 +46,8 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         setContentView(binding!!.root)
 
         commonWorkUtils = CommonWorkUtils(this)
+
+        handleDeepLink(intent)
 
         binding!!.llHomeIndicator.visibility = View.VISIBLE
         binding!!.llSearchIndicator.visibility = View.INVISIBLE
@@ -80,7 +86,30 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
         /// using function for find destination graph
         startDestination()
+
     }
+
+
+
+        private fun handleDeepLink(intent: Intent?) {
+            intent?.data?.let { uri ->
+                val deepLinkValue = uri.getQueryParameter("deep_link_value")
+                val deepLinkSub1 = uri.getQueryParameter("deep_link_sub1")
+                Log.d("DeepLink", "Deep link value: $deepLinkValue, Sub1: $deepLinkSub1")
+
+                // Navigate to the appropriate screen based on the deep link
+                when (deepLinkValue) {
+                    "profile_screen" -> {
+                        // Navigate to Profile screen
+                        startActivity(Intent(this, AuthActivity::class.java))
+                    }
+                    else -> {
+                        // Handle other cases or show a default screen
+                    }
+                }
+            }
+        }
+
 
     private fun startDestination() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.frameContainerMain) as NavHostFragment
@@ -213,7 +242,6 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             }
         }
     }
-
 
     /// use switch case to redirection or handle click event
     override fun onClick(v: View?) {

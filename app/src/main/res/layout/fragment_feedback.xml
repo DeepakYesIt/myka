@@ -124,7 +124,7 @@
                 android:id="@+id/relEditDesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/edittext_name_bg"
+                android:background="@drawable/feedback_message_bg"
                 android:layout_marginTop="@dimen/_8sdp"
                 android:layout_below="@+id/relGiveYourFeedback">
 
@@ -132,12 +132,14 @@
                     android:id="@+id/edtDesc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="This app has completely changed how I plan meals! I love how easy it is to find healthy recipes and create shopping lists. It’s a game-changer for my weekly grocery trips "
+                    android:hint="This app has completely changed how I plan meals! I love how easy it is to find healthy recipes and create shopping lists. It’s a game-changer for my weekly grocery trips"
                     android:padding="@dimen/_8sdp"
                     android:background="@null"
+                    android:text=""
                     android:textSize="@dimen/_13sdp"
                     android:textColorHint="@color/light_black"
-                    android:fontFamily="@font/poppins"/>
+                    android:fontFamily="@font/poppins"
+                    android:gravity="top|start" /> <!-- Align text to the top left -->
 
             </RelativeLayout>
 

@@ -73,6 +73,7 @@ object NetworkModule {
             .connectTimeout(120, TimeUnit.MINUTES)
             .writeTimeout(120, TimeUnit.MINUTES)
             .readTimeout(120, TimeUnit.MINUTES)
+    
             .build()
     }
 

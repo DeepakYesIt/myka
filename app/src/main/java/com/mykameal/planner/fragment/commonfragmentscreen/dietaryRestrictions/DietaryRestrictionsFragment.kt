@@ -41,6 +41,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
     private var status:String?=null
     private var dietarySelectedId = mutableListOf<String>()
     private lateinit var dietaryRestrictionsViewModel: DietaryRestrictionsViewModel
+    private var dietaryModelsData: List<DietaryRestrictionsModelData>?=null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,32 +73,35 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
         if (sessionManagement.getCookingScreen().equals("Profile")){
             binding!!.llBottomBtn.visibility=View.GONE
             binding!!.rlUpdateDietRest.visibility=View.VISIBLE
-        }else{
-            binding!!.llBottomBtn.visibility=View.VISIBLE
-            binding!!.rlUpdateDietRest.visibility=View.GONE
-        }
 
-        if (sessionManagement.getCookingScreen()!="Profile"){
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireContext())) {
-                dietaryRestrictionApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }else{
             if (BaseApplication.isOnline(requireActivity())) {
                 dietaryRestrictionSelectApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
+        }else{
+            binding!!.llBottomBtn.visibility=View.VISIBLE
+            binding!!.rlUpdateDietRest.visibility=View.GONE
+
+            if (dietaryRestrictionsViewModel.getDietaryResData()!=null){
+                showDataInUi(dietaryRestrictionsViewModel.getDietaryResData()!!)
+            }else{
+                ///checking the device of mobile data in online and offline(show network error message)
+                if (BaseApplication.isOnline(requireContext())) {
+                    dietaryRestrictionApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
+
         }
+
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
         })
-
 
         initialize()
 
@@ -167,6 +171,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
     private fun showDataInUi(dietaryModelData: List<DietaryRestrictionsModelData>) {
 
         if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
+            dietaryModelsData=dietaryModelData
             dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
             binding!!.rcyDietaryRestrictions.adapter = dietaryRestrictionsAdapter
         }
@@ -194,6 +199,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
+                dietaryRestrictionsViewModel.setDietaryResData(dietaryModelsData!!)
                 sessionManagement.setDietaryRestrictionList(dietarySelectedId)
                 if (sessionManagement.getCookingFor().equals("Myself")){
                     findNavController().navigate(R.id.favouriteCuisinesFragment)
