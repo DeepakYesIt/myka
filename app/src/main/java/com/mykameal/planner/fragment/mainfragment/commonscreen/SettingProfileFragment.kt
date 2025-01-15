@@ -38,12 +38,10 @@ import com.mykameal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-
 @AndroidEntryPoint
 class SettingProfileFragment : Fragment(), View.OnClickListener {
 
     private var binding: FragmentSettingProfileBinding? = null
-    private var isMenuOpened: Boolean = false
     private var isAboutAppExpanded: Boolean = false
     private var isPostalCodeExpanded: Boolean = false
     private lateinit var commonWorkUtils: CommonWorkUtils
@@ -53,7 +51,6 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         binding = FragmentSettingProfileBinding.inflate(inflater, container, false)
-
         viewModel = ViewModelProvider(requireActivity())[SettingViewModel::class.java]
 
         setupUIVisibility()
@@ -69,7 +66,6 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
         fetchDataOnLoad()
 
         return binding!!.root
-
     }
 
     private fun fetchDataOnLoad() {
@@ -88,7 +84,6 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
             }
         }
     }
-
 
     private fun  userLogOutData(dialog: Dialog) {
         BaseApplication.showMe(requireContext())
@@ -443,6 +438,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
+
         dialog.show()
 
     }
