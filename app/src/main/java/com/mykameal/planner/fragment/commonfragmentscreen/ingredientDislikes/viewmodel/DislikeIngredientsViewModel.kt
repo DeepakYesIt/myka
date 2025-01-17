@@ -3,19 +3,20 @@ package com.mykameal.planner.fragment.commonfragmentscreen.ingredientDislikes.vi
 import androidx.lifecycle.ViewModel
 import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
+import com.mykameal.planner.fragment.commonfragmentscreen.ingredientDislikes.model.DislikedIngredientsModelData
 import com.mykameal.planner.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 @HiltViewModel
 class DislikeIngredientsViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
-    private var dislikeIngLocalData: List<DietaryRestrictionsModelData>?=null
+    private var dislikeIngLocalData: MutableList<DislikedIngredientsModelData>?=null
 
     suspend fun getDislikeIngredients(successCallback: (response: NetworkResult<String>) -> Unit){
         repository.getDislikeIngredients { successCallback(it) }
     }
 
-    fun setDislikeIngData(data: List<DietaryRestrictionsModelData>) {
+    fun setDislikeIngData(data: MutableList<DislikedIngredientsModelData>) {
         dislikeIngLocalData=data
     }
 
@@ -25,7 +26,7 @@ class DislikeIngredientsViewModel @Inject constructor(private val repository: Ma
         // Reset other variables
     }
 
-    fun getDislikeIngData(): List<DietaryRestrictionsModelData>? {
+    fun getDislikeIngData(): MutableList<DislikedIngredientsModelData>? {
         return dislikeIngLocalData
     }
 

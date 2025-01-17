@@ -2,7 +2,7 @@ package com.mykameal.planner.fragment.commonfragmentscreen.mealRoutine.model
 
 data class MealRoutineModel(
     val code: Int,
-    val `data`: List<MealRoutineModelData>,
+    val `data`: MutableList<MealRoutineModelData>,
     val message: String,
     val success: Boolean
 )

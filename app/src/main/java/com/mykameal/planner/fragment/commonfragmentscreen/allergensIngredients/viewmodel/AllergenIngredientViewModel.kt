@@ -2,6 +2,7 @@ package com.mykameal.planner.fragment.commonfragmentscreen.allergensIngredients.
 
 import androidx.lifecycle.ViewModel
 import com.mykameal.planner.basedata.NetworkResult
+import com.mykameal.planner.fragment.commonfragmentscreen.allergensIngredients.model.AllergensIngredientModelData
 import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
 import com.mykameal.planner.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,13 +11,13 @@ import javax.inject.Inject
 @HiltViewModel
 class AllergenIngredientViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
-    var allergensLocalData: List<DietaryRestrictionsModelData>?=null
+    private var allergensLocalData: MutableList<AllergensIngredientModelData>?=null
 
     suspend fun getAllergensIngredients(successCallback: (response: NetworkResult<String>) -> Unit){
         repository.getAllergensIngredients { successCallback(it) }
     }
 
-    fun setAllergensData(data: List<DietaryRestrictionsModelData>) {
+    fun setAllergensData(data: MutableList<AllergensIngredientModelData>) {
         allergensLocalData=data
     }
 
@@ -26,7 +27,7 @@ class AllergenIngredientViewModel @Inject constructor(private val repository: Ma
         // Reset other variables
     }
 
-    fun getAllergensData(): List<DietaryRestrictionsModelData>? {
+    fun getAllergensData(): MutableList<AllergensIngredientModelData>? {
         return allergensLocalData
     }
 

@@ -7,8 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class VerificationViewModel @Inject constructor(private val repository: MainRepository) :
-    ViewModel() {
+class VerificationViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
 
     suspend fun signUpOtpVerify(
         successCallback: (response: NetworkResult<String>) -> Unit,
@@ -64,10 +63,7 @@ class VerificationViewModel @Inject constructor(private val repository: MainRepo
     }
 
     suspend fun forgotOtpVerify(
-        successCallback: (response: NetworkResult<String>) -> Unit,
-        emailOrPhone: String,
-        otp: String
-    ) {
+        successCallback: (response: NetworkResult<String>) -> Unit, emailOrPhone: String, otp: String) {
         repository.forgotOtpVerify({ successCallback(it) }, emailOrPhone, otp)
     }
 

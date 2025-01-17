@@ -12,7 +12,7 @@ object ApiEndPoint {
     const val eatingOut="eating_out"
     const val takeAwayReason="take_away_reason"
     const val userSignup="user-signup"
-    const val otpVerify="otp-verify"
+    const val  otpVerify="otp-verify"
     const val forgotPassword="user-forgot-Password"
     const val forgotOtpVerify="forget-otp-verify"
     const val resendOtp="resenddotp"

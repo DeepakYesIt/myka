@@ -10,13 +10,13 @@ import javax.inject.Inject
 @HiltViewModel
 class MealRoutineViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
-    private var mealRoutineLocalData: List<MealRoutineModelData>?=null
+    private var mealRoutineLocalData: MutableList<MealRoutineModelData>?=null
 
     suspend fun getMealRoutine(successCallback: (response: NetworkResult<String>) -> Unit){
         repository.getMealRoutine { successCallback(it) }
     }
 
-    fun setMealRoutineData(data: List<MealRoutineModelData>) {
+    fun setMealRoutineData(data: MutableList<MealRoutineModelData>) {
         mealRoutineLocalData=data
     }
 
@@ -26,7 +26,7 @@ class MealRoutineViewModel @Inject constructor(private val repository: MainRepos
         // Reset other variables
     }
 
-    fun getMealRoutineData(): List<MealRoutineModelData>? {
+    fun getMealRoutineData(): MutableList<MealRoutineModelData>? {
         return mealRoutineLocalData
     }
 

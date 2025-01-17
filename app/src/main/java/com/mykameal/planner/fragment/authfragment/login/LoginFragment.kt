@@ -1,16 +1,24 @@
 package com.mykameal.planner.fragment.authfragment.login
 
+import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.RelativeLayout
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -23,12 +31,16 @@ import com.mykameal.planner.R
 import com.mykameal.planner.activity.AuthActivity
 import com.mykameal.planner.activity.LetsStartOptionActivity
 import com.mykameal.planner.activity.MainActivity
+import com.mykameal.planner.adapter.AdapterAllergensIngItem
+import com.mykameal.planner.adapter.RememberMeAdapter
+import com.mykameal.planner.adapter.RememberSelect
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.databinding.FragmentLoginBinding
 import com.mykameal.planner.commonworkutils.CommonWorkUtils
 import com.mykameal.planner.fragment.authfragment.login.model.LoginModel
 import com.mykameal.planner.fragment.authfragment.login.model.LoginModelData
+import com.mykameal.planner.fragment.authfragment.login.model.RememberMe
 import com.mykameal.planner.fragment.authfragment.login.model.SocialLoginModel
 import com.mykameal.planner.fragment.authfragment.login.model.SocialLoginModelData
 import com.mykameal.planner.fragment.authfragment.login.viewmodel.LoginViewModel
@@ -42,7 +54,7 @@ class LoginFragment : Fragment() {
 
     private var binding: FragmentLoginBinding? = null
     private lateinit var commonWorkUtils: CommonWorkUtils
-    private var checkStatus: Boolean? = null
+    private var checkStatus: Boolean? = false
     private lateinit var loginViewModel: LoginViewModel
     private val googleLogin = 100
     private lateinit var sessionManagement: SessionManagement
@@ -199,6 +211,10 @@ class LoginFragment : Fragment() {
 
         logOutGoogle()
 
+        binding!!.etSignEmailPhone.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
+            showRememberDialog()
+        }
+
         binding!!.googleImages.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
                 val signInIntent = mGoogleSignInClient!!.signInIntent
@@ -256,14 +272,52 @@ class LoginFragment : Fragment() {
         }
     }
 
+    private fun showRememberDialog() {
+        val filterList: MutableList<RememberMe> = ArrayList()
+        var value: RememberMe? = null
+
+        val dialogRemember: Dialog = context?.let { Dialog(it) }!!
+        dialogRemember.setContentView(R.layout.dialog_remember)
+        dialogRemember.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        dialogRemember.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val rvRememberData = dialogRemember.findViewById<RecyclerView>(R.id.rvRememberData)
+        val rlOkayBtn = dialogRemember.findViewById<RelativeLayout>(R.id.rlOkayBtn)
+        dialogRemember.show()
+        dialogRemember.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        val data: String = sessionManagement.getRememberMe()
+
+        if (data.isNotEmpty()) {
+            val objectList = Gson().fromJson(data, Array<RememberMe>::class.java).asList()
+
+            // Populate the filterList with the entire objectList (since type is not used anymore)
+            filterList.addAll(objectList)
+
+            val adapter = RememberMeAdapter(filterList, requireContext(), object : RememberSelect {
+                override fun selectRemember(remember: RememberMe) {
+                    value = remember
+                }
+            })
+            rvRememberData.adapter = adapter
+        }
+
+        rlOkayBtn.setOnClickListener {
+            if (value != null) {
+                dialogRemember.dismiss()
+                binding!!.etSignEmailPhone.setText(value?.email)
+                binding!!.etSignPassword.setText(value?.pass)
+                checkStatus = true
+            }
+        }
+    }
+
 
     private fun logOutGoogle() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .build()
-
-        // Build a GoogleSignInClient with the options specified by gso.
-
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
         mGoogleSignInClient!!.signOut()
@@ -273,13 +327,20 @@ class LoginFragment : Fragment() {
     private fun loginApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            loginViewModel.userLogin({
+            loginViewModel.userLogin(
+                {
                     BaseApplication.dismissMe()
                     when (it) {
                         is NetworkResult.Success -> {
                             val gson = Gson()
                             val loginModel = gson.fromJson(it.data, LoginModel::class.java)
                             if (loginModel.code == 200 && loginModel.success) {
+                                if (checkStatus == true) {
+                                    saveRemember(
+                                        binding!!.etSignEmailPhone.text.toString().trim(),
+                                        binding!!.etSignPassword.text.toString().trim()
+                                    )
+                                }
                                 showDataInUi(loginModel.data)
                             } else {
                                 if (loginModel.code == ErrorMessage.code) {
@@ -306,9 +367,33 @@ class LoginFragment : Fragment() {
         }
     }
 
+    private fun saveRemember(emailOrPhone: String, password: String) {
+        val data: String = sessionManagement.getRememberMe()
+        var checkDuplicate = false
+        var mutableList: MutableList<RememberMe>? = ArrayList()
+        if (data != null && data != "") {
+            val objectList: List<RememberMe> = Gson().fromJson(data, Array<RememberMe>::class.java).asList()
+            mutableList = objectList.toMutableList()
+            Log.e("*****", objectList.toString())
+            for (item in objectList) {
+                if (item.email == emailOrPhone) {
+                    checkDuplicate = true
+                    break
+                }
+            }
+        } else {
+            mutableList?.add(RememberMe(emailOrPhone, password))
+        }
+        if (mutableList != null) {
+            if (!checkDuplicate) {
+                mutableList.add(RememberMe(emailOrPhone, password))
+            }
+            sessionManagement.setRememberMe(mutableList)
+        }
+    }
+
     /// handle set session and redirection implement
     private fun showDataInUi(loginModelData: LoginModelData) {
-
         sessionManagement.setLoginSession(true)
 
         if (loginModelData.email != null) {
@@ -363,7 +448,8 @@ class LoginFragment : Fragment() {
         val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]"
         val emaPattern = Pattern.compile(emailPattern)
         val emailMatcher = emaPattern.matcher(binding!!.etSignEmailPhone.text.toString().trim())
-        val passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%^&+=])(?=\\S+\$).{6,}\$"
+        val passwordPattern =
+            "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%^&+=])(?=\\S+\$).{6,}\$"
         val pattern = Pattern.compile(passwordPattern)
         val passMatchers = pattern.matcher(binding!!.etSignPassword.text.toString().trim())
         if (binding!!.etSignEmailPhone.text.toString().trim().isEmpty()) {
@@ -437,7 +523,8 @@ class LoginFragment : Fragment() {
                     BaseApplication.dismissMe()
                     when (it) {
                         is NetworkResult.Success -> {
-                            val apiModel = Gson().fromJson(it.data, SocialLoginModel::class.java)
+                            val apiModel =
+                                Gson().fromJson(it.data, SocialLoginModel::class.java)
                             if (apiModel.code == 200 && apiModel.success) {
                                 showDataInSession(apiModel.data)
                             } else {

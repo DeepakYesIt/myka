@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,7 @@ import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.databinding.FragmentMealRoutineBinding
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
+import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
 import com.mykameal.planner.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModel
 import com.mykameal.planner.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModelData
 import com.mykameal.planner.fragment.commonfragmentscreen.mealRoutine.viewmodel.MealRoutineViewModel
@@ -42,7 +44,7 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
     private var status: String? = ""
     private var mealRoutineSelectedId = mutableListOf<String>()
     private lateinit var mealRoutineViewModel: MealRoutineViewModel
-    private var mealRoutineModelData: List<MealRoutineModelData>? = null
+    private var mealRoutineModelData: MutableList<MealRoutineModelData>? = null
 
 
     override fun onCreateView(
@@ -96,6 +98,10 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
 
             if (mealRoutineViewModel.getMealRoutineData() != null) {
                 showDataInUi(mealRoutineViewModel.getMealRoutineData()!!)
+                if (status=="2"){
+                    binding!!.tvNextBtn.isClickable = true
+                    binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                }
             } else {
                 ///checking the device of mobile data in online and offline(show network error message)
                 if (BaseApplication.isOnline(requireContext())) {
@@ -218,10 +224,14 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
         }
     }
 
-    private fun showDataInUi(dietaryModelData: List<MealRoutineModelData>) {
-        if (dietaryModelData != null && dietaryModelData.isNotEmpty()) {
-            mealRoutineModelData = dietaryModelData
-            mealRoutineAdapter = MealRoutineAdapter(dietaryModelData, requireActivity(), this)
+    private fun showDataInUi(mealRoutineModelsData: MutableList<MealRoutineModelData>) {
+        if (mealRoutineModelsData != null && mealRoutineModelsData.isNotEmpty()) {
+            if (mealRoutineViewModel.getMealRoutineData()==null){
+                // Add "None" option at the first position
+                mealRoutineModelsData.add(0, MealRoutineModelData( id = -1, "Select All",selected = false)) // ID set to -1 as an indicator
+            }
+            mealRoutineModelData = mealRoutineModelsData
+            mealRoutineAdapter = MealRoutineAdapter(mealRoutineModelsData, requireActivity(), this)
             binding!!.rcyMealRoutine.adapter = mealRoutineAdapter
         }
     }
@@ -256,7 +266,6 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }
-
         }
     }
 
@@ -293,27 +302,12 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
         }
     }
 
-    override fun itemClicked(
-        position: Int?,
-        list: MutableList<String>,
-        status1: String?,
-        type: String?
-    ) {
-        /*    if (status1 == "1") {
-                status = ""
-                binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
-            } else {
-                status = "2"
-                binding!!.tvNextBtn.isClickable = true
-                binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-                mealRoutineSelectedId=list
-            }*/
-
+    override fun itemClicked(position: Int?, list: MutableList<String>?, status1: String?, type: String?) {
         if (status1.equals("-1")) {
             status = "2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            mealRoutineSelectedId = list
+            mealRoutineSelectedId = list!!
             return
         }
 
@@ -321,7 +315,7 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
             status = "2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            mealRoutineSelectedId = list
+            mealRoutineSelectedId = list!!
         } else {
             status = ""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)

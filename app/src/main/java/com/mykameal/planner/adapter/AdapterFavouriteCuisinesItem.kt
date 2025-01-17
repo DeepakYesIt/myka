@@ -8,9 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mykameal.planner.OnItemClickedListener
 import com.mykameal.planner.R
 import com.mykameal.planner.databinding.AdapterBodyGoalsBinding
-import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
+import com.mykameal.planner.fragment.commonfragmentscreen.favouriteCuisines.model.FavouriteCuisinesModelData
 
-class AdapterFavouriteCuisinesItem(private var dietaryRestrictionsModelData: List<DietaryRestrictionsModelData>,
+class AdapterFavouriteCuisinesItem(private var favouriteCuisineModelData: List<FavouriteCuisinesModelData>,
                                    private var requireActivity: FragmentActivity,
                                    private var onItemClickedListener: OnItemClickedListener):
     RecyclerView.Adapter<AdapterFavouriteCuisinesItem.ViewHolder>() {
@@ -26,75 +26,138 @@ class AdapterFavouriteCuisinesItem(private var dietaryRestrictionsModelData: Lis
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.tvTitleName.text=dietaryRestrictionsModelData[position].name
+        holder.binding.tvTitleName.text=favouriteCuisineModelData[position].name
 
+        // Inside your adapter's onBindViewHolder method
         holder.binding.apply {
-            // Update UI based on selection state
-            if (dietaryRestrictionsModelData[position].selected) {
+            // Update UI based on the data model's 'selected' property
+            if (favouriteCuisineModelData[position].selected) {
                 imageRightTick.visibility = View.VISIBLE
                 relMainLayout.setBackgroundResource(R.drawable.orange_box_bg)
-                if (!dietaryId.contains(dietaryRestrictionsModelData[position].id.toString())) {
-                    dietaryId.add(dietaryRestrictionsModelData[position].id.toString())
+                if (!dietaryId.contains(favouriteCuisineModelData[position].id.toString())) {
+                    dietaryId.add(favouriteCuisineModelData[position].id.toString())
                 }
                 onItemClickedListener.itemClicked(position, dietaryId, "-1", "")
             } else {
                 imageRightTick.visibility = View.GONE
                 relMainLayout.setBackgroundResource(R.drawable.gray_box_border_bg)
-                dietaryId.remove(dietaryRestrictionsModelData[position].id.toString())
+                dietaryId.remove(favouriteCuisineModelData[position].id.toString())
+            }
+
+            // Handle item click
+            relMainLayout.setOnClickListener {
+                if (position == 0) {
+                    // Handle "None" (first item) case
+                    if (favouriteCuisineModelData[position].selected) {
+                        // Deselect "None"
+                        favouriteCuisineModelData[position].selected = false
+                        selectedPositions.remove(0)
+                        dietaryId.clear()
+                        onItemClickedListener.itemClicked(position, dietaryId, "2", "false")
+                    } else {
+                        // Select "None" and clear all other selections
+                        selectedPositions.clear()
+                        favouriteCuisineModelData.forEach { it.selected = false }
+                        dietaryId.clear()
+
+                        favouriteCuisineModelData[position].selected = true
+                        selectedPositions.add(0)
+                        dietaryId.add(favouriteCuisineModelData[position].id.toString())
+                        onItemClickedListener.itemClicked(position, dietaryId, "2", "true")
+                    }
+                } else {
+                    // Deselect "select all" if another item is clicked
+                    if (selectedPositions.contains(0)) {
+                        selectedPositions.remove(0)
+                        favouriteCuisineModelData[0].selected = false
+                        dietaryId.clear()
+                    }
+
+                    // Toggle the current item's selection state
+                    if (favouriteCuisineModelData[position].selected) {
+                        // Deselect the item
+                        favouriteCuisineModelData[position].selected = false
+                        selectedPositions.remove(position)
+                        dietaryId.remove(favouriteCuisineModelData[position].id.toString())
+                        onItemClickedListener.itemClicked(position, dietaryId, "2", "false")
+                    } else {
+                        // Select the item
+                        favouriteCuisineModelData[position].selected = true
+                        selectedPositions.add(position)
+                        dietaryId.add(favouriteCuisineModelData[position].id.toString())
+                        onItemClickedListener.itemClicked(position, dietaryId, "2", "true")
+                    }
+                }
+                notifyDataSetChanged() // Refresh the UI
+            }
+        }
+
+        /*holder.binding.apply {
+            // Update UI based on selection state
+            if (favouriteCuisineModelData[position].selected) {
+                imageRightTick.visibility = View.VISIBLE
+                relMainLayout.setBackgroundResource(R.drawable.orange_box_bg)
+                if (!dietaryId.contains(favouriteCuisineModelData[position].id.toString())) {
+                    dietaryId.add(favouriteCuisineModelData[position].id.toString())
+                }
+                onItemClickedListener.itemClicked(position, dietaryId, "-1", "")
+            } else {
+                imageRightTick.visibility = View.GONE
+                relMainLayout.setBackgroundResource(R.drawable.gray_box_border_bg)
+                dietaryId.remove(favouriteCuisineModelData[position].id.toString())
             }
 
             // Handle click event for selection
             relMainLayout.setOnClickListener {
-               /* when (position) {
+                when (position) {
                     0 -> {
                         // "Select All" logic
                         selectedPositions.clear()
                         dietaryId.clear()
 
-                        if (!dietaryRestrictionsModelData[position].selected) {
+                        if (!favouriteCuisineModelData[position].selected) {
                             // Select all
-                            dietaryRestrictionsModelData.forEachIndexed { index, model ->
-                                model.selected = index == 0 || !dietaryRestrictionsModelData[position].selected // Select "All" and all others
+                            favouriteCuisineModelData.forEachIndexed { index, model ->
+                                model.selected = index == 0 || !favouriteCuisineModelData[position].selected // Select "All" and all others
                                 if (index > 0) dietaryId.add(model.id.toString())
                             }
-                            selectedPositions.addAll(dietaryRestrictionsModelData.indices)
+                            selectedPositions.addAll(favouriteCuisineModelData.indices)
                         } else {
                             // Deselect all
-                            dietaryRestrictionsModelData.forEach { it.selected = false }
+                            favouriteCuisineModelData.forEach { it.selected = false }
                         }
                     }
-                    else -> {*/
+                    else -> {
                         // Individual item logic
-                        dietaryRestrictionsModelData[position].selected = !dietaryRestrictionsModelData[position].selected
-                        if (dietaryRestrictionsModelData[position].selected) {
-                            dietaryId.add(dietaryRestrictionsModelData[position].id.toString())
+                        favouriteCuisineModelData[position].selected = !favouriteCuisineModelData[position].selected
+                        if (favouriteCuisineModelData[position].selected) {
+                            dietaryId.add(favouriteCuisineModelData[position].id.toString())
                             selectedPositions.add(position)
                             onItemClickedListener.itemClicked(position, dietaryId, "", "true")
 
                         } else {
-                            dietaryId.remove(dietaryRestrictionsModelData[position].id.toString())
+                            dietaryId.remove(favouriteCuisineModelData[position].id.toString())
                             selectedPositions.remove(position)
                             onItemClickedListener.itemClicked(position, dietaryId, "", "false")
 
                         }
-
-                       /* // Deselect "Select All" if any item is toggled
-                        if (dietaryRestrictionsModelData[0].selected) {
-                            dietaryRestrictionsModelData[0].selected = false
+                        // Deselect "Select All" if any item is toggled
+                        if (favouriteCuisineModelData[0].selected) {
+                            favouriteCuisineModelData[0].selected = false
                             selectedPositions.remove(0)
-                        }*/
-              /*      }
-                }*/
+                        }
+                    }
+                }
 
                 // Notify changes to the specific item or all items
                 notifyDataSetChanged()
 
             }
-        }
+        }*/
     }
 
     override fun getItemCount(): Int {
-        return dietaryRestrictionsModelData.size
+        return favouriteCuisineModelData.size
     }
 
     class ViewHolder(var binding: AdapterBodyGoalsBinding) : RecyclerView.ViewHolder(binding.root){

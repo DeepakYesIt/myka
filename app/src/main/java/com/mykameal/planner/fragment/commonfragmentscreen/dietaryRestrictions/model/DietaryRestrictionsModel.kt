@@ -2,7 +2,7 @@ package com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.m
 
 data class DietaryRestrictionsModel(
     val code: Int,
-    val `data`: List<DietaryRestrictionsModelData>,
+    val `data`: MutableList<DietaryRestrictionsModelData>,
     val message: String,
     val success: Boolean
 )

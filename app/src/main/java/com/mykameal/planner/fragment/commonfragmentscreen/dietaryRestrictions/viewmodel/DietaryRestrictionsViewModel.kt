@@ -11,13 +11,13 @@ import javax.inject.Inject
 @HiltViewModel
 class DietaryRestrictionsViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
-    private var dietaryRestLocalData: List<DietaryRestrictionsModelData>?=null
+    private var dietaryRestLocalData: MutableList<DietaryRestrictionsModelData>?=null
 
     suspend fun getDietaryRestrictions(successCallback: (response: NetworkResult<String>) -> Unit){
         repository.getDietaryRestrictions { successCallback(it) }
     }
 
-    fun setDietaryResData(data: List<DietaryRestrictionsModelData>) {
+    fun setDietaryResData(data: MutableList<DietaryRestrictionsModelData>) {
         dietaryRestLocalData=data
     }
 
@@ -27,7 +27,7 @@ class DietaryRestrictionsViewModel @Inject constructor(private val repository: M
         // Reset other variables
     }
 
-    fun getDietaryResData(): List<DietaryRestrictionsModelData>? {
+    fun getDietaryResData(): MutableList<DietaryRestrictionsModelData>? {
         return dietaryRestLocalData
     }
 

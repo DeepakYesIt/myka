@@ -1,7 +1,10 @@
 package com.mykameal.planner.fragment.commonfragmentscreen.commonModel
 
+import com.mykameal.planner.fragment.commonfragmentscreen.allergensIngredients.model.AllergensIngredientModelData
 import com.mykameal.planner.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModelData
 import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
+import com.mykameal.planner.fragment.commonfragmentscreen.favouriteCuisines.model.FavouriteCuisinesModelData
+import com.mykameal.planner.fragment.commonfragmentscreen.ingredientDislikes.model.DislikedIngredientsModelData
 import com.mykameal.planner.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModelData
 
 data class GetUserPreference(
@@ -12,16 +15,16 @@ data class GetUserPreference(
 )
 
 data class GetUserPreferenceData(
-    val allergesingredient: MutableList<DietaryRestrictionsModelData>,
+    val allergesingredient: MutableList<AllergensIngredientModelData>,
     val bodygoal: MutableList<BodyGoalModelData>,
     val cookingfrequency: MutableList<BodyGoalModelData>,
     val cookingschedule: MutableList<Cookingschedule>,
     val dietaryrestriction: MutableList<DietaryRestrictionsModelData>,
     val eatingout: MutableList<BodyGoalModelData>,
     val familyDetail: FamilyDetail,
-    val favouritcuisine: MutableList<DietaryRestrictionsModelData>,
+    val favouritcuisine: MutableList<FavouriteCuisinesModelData>,
     val grocereisExpenses: GrocereisExpenses,
-    val ingredientdislike: MutableList<DietaryRestrictionsModelData>,
+    val ingredientdislike: MutableList<DislikedIngredientsModelData>,
     val mealroutine: MutableList<MealRoutineModelData>,
     val partnerDetail: PartnerDetail,
     val takeawayreason: MutableList<BodyGoalModelData>
