@@ -68,6 +68,14 @@ interface MainRepository {
  suspend fun notificationRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, pushNotification: String,recipeRecommendations: String,productUpdates: String,promotionalUpdates: String)
 
  suspend fun recipeDetailsRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, url: String)
+
+ suspend fun recipeReviewRequestApi(
+     successCallback: (response: NetworkResult<String>) -> Unit,
+     url: String,
+     msg: String,
+     ratingBarcount: String
+ )
+
  suspend fun homeDetailsRequestApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
  suspend fun recipeAddBasketRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)

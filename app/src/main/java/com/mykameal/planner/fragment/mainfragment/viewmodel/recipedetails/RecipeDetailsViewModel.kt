@@ -3,7 +3,6 @@ package com.mykameal.planner.fragment.mainfragment.viewmodel.recipedetails
 import androidx.lifecycle.ViewModel
 import com.google.gson.JsonObject
 import com.mykameal.planner.basedata.NetworkResult
-import com.mykameal.planner.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.Data
 import com.mykameal.planner.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -40,9 +39,8 @@ class RecipeDetailsViewModel @Inject constructor(private val repository: MainRep
     }
 
 
-    suspend fun recipeReviewRequest(successCallback: (response: NetworkResult<String>) -> Unit,
-                                    mealType: String, url: String, msg: String,ratingBarSmall:String){
-        repository.recipeDetailsRequestApi({ successCallback(it) },url)
+    suspend fun recipeReviewRequest(successCallback: (response: NetworkResult<String>) -> Unit, url: String, msg: String,ratingBarcount:String){
+        repository.recipeReviewRequestApi({ successCallback(it) },url,msg,ratingBarcount)
     }
 
 }

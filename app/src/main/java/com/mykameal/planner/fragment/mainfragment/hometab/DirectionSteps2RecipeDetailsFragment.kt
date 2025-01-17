@@ -309,7 +309,6 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
                 Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
                 val intent=Intent(requireActivity(),MealRatingActivity::class.java)
                 intent.putExtra("uri",uri)
-                intent.putExtra("mealType",mealType)
                 startActivity(intent)
 //                findNavController().navigate(R.id.rateYourMealFragment)
             } else {

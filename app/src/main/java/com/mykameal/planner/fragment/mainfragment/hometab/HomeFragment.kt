@@ -136,7 +136,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 binding!!.imageCookedMeals.visibility=View.GONE
                 binding!!.rlSeeAllBtn.visibility=View.VISIBLE
                 binding!!.llRecipesCooked.visibility=View.VISIBLE
-                recipeCookedAdapter = RecipeCookedAdapter(data?.userData)
+                recipeCookedAdapter = RecipeCookedAdapter(data.userData,requireActivity(),this)
                 binding!!.rcyRecipesCooked.adapter = recipeCookedAdapter
             }else{
                 binding!!.relPlanMeal.visibility=View.VISIBLE
@@ -432,7 +432,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
-        if (type == "heart") {
+        /*if (type == "heart") {
             addRecipeDialog(position, type)
         } else if (type == "minus") {
             if (status == "1") {
@@ -442,7 +442,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             findNavController().navigate(R.id.missingIngredientsFragment)
         }else{
             findNavController().navigate(R.id.recipeDetailsFragment)
-        }
+        }*/
     }
 
     private fun addRecipeDialog(position: Int?, type: String) {

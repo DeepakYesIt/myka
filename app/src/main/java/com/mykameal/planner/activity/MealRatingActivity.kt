@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -20,8 +21,12 @@ import com.mykameal.planner.databinding.AdapterMealTypeHorizentalBinding
 import com.mykameal.planner.fragment.mainfragment.viewmodel.recipedetails.RecipeDetailsViewModel
 import com.mykameal.planner.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.ProfileRootResponse
 import com.mykameal.planner.messageclass.ErrorMessage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+
+
+@AndroidEntryPoint
 class MealRatingActivity : AppCompatActivity() {
 
     private var mealType: String = ""
@@ -37,7 +42,7 @@ class MealRatingActivity : AppCompatActivity() {
         setContentView(binding.root)
         viewModel = ViewModelProvider(this)[RecipeDetailsViewModel::class.java]
 
-        mealType = intent?.getStringExtra("mealType").toString()
+
         uri = intent?.getStringExtra("uri").toString()
 
 
@@ -72,7 +77,7 @@ class MealRatingActivity : AppCompatActivity() {
             viewModel.recipeReviewRequest({
                 BaseApplication.dismissMe()
                 handleApiUpdateResponse(it)
-            },mealType,uri, binding.edMsg.text.toString(),binding.ratingBarSmall.rating.toString())
+            },uri, binding.edMsg.text.toString(),binding.ratingBarSmall.rating.toInt().toString())
         }
     }
 
@@ -89,7 +94,8 @@ class MealRatingActivity : AppCompatActivity() {
             val apiModel = Gson().fromJson(data, ProfileRootResponse::class.java)
             Log.d("@@@ Health profile", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                 finish()
+                Toast.makeText(this@MealRatingActivity,apiModel.message,Toast.LENGTH_LONG).show()
+                finish()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)

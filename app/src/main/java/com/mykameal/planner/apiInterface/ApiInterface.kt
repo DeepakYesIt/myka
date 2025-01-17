@@ -224,6 +224,14 @@ interface ApiInterface {
     @POST(ApiEndPoint.recipeDetailsUrl)
     suspend fun recipeDetailsRequestApi(@Field("uri") url: String): Response<JsonObject>
 
+    @FormUrlEncoded
+    @POST(ApiEndPoint.mealReviewUrl)
+    suspend fun recipeReviewRequestApi(
+        @Field("uri") url: String,
+        @Field("comment") msg: String,
+        @Field("rating") ratingBarcount: String
+    ): Response<JsonObject>
+
 
     @POST(ApiEndPoint.homeUrl)
     suspend fun homeDetailsRequestApi(): Response<JsonObject>

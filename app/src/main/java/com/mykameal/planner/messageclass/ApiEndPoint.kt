@@ -41,6 +41,7 @@ object ApiEndPoint {
     const val deleteUrl="user-delete"
     const val updateNotificationUrl="update-notification"
     const val recipeDetailsUrl="get-recipe"
+    const val mealReviewUrl="meal-review"
     const val homeUrl="home-data"
     const val allRecipeUrl="all-recipe"
     const val getMealsUrl="get-meals"

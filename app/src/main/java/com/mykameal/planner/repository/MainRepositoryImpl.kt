@@ -633,6 +633,28 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
         }
     }
 
+    override suspend fun recipeReviewRequestApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        url: String,
+        msg: String,
+        ratingBarcount: String
+    ) {
+        try {
+            api.recipeReviewRequestApi(url,msg,ratingBarcount).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
     override suspend fun homeDetailsRequestApi(successCallback: (response: NetworkResult<String>) -> Unit) {
         try {
             api.homeDetailsRequestApi().apply {
