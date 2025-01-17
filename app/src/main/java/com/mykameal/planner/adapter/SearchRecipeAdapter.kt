@@ -23,13 +23,18 @@ class SearchRecipeAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.tvRecipeName.text = ingredientsList[position].food
+        if (ingredientsList[position].food!=null){
+            holder.binding.tvRecipeName.text = ingredientsList[position].food
+        }
 
-        Glide.with(requireActivity)
-            .load(ingredientsList[position].image)
-            .placeholder(R.drawable.mask_group_icon)
-            .error(R.drawable.mask_group_icon)
-            .into(holder.binding.imgRecipe)
+        if (ingredientsList[position].image!=null){
+            Glide.with(requireActivity)
+                .load(ingredientsList[position].image)
+                .placeholder(R.drawable.mask_group_icon)
+                .error(R.drawable.mask_group_icon)
+                .into(holder.binding.imgRecipe)
+        }
+
     }
 
     override fun getItemCount(): Int {
