@@ -1,10 +1,12 @@
 package com.mykameal.planner.fragment.mainfragment.hometab
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Html
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,50 +16,215 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.gson.Gson
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.OnItemLongClickListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.adapter.AdapterSuperMarket
-import com.mykameal.planner.adapter.IngredientsDinnerAdapter
+import com.mykameal.planner.adapter.RecipeCookedAdapter
 import com.mykameal.planner.apiInterface.BaseUrl
 import com.mykameal.planner.basedata.BaseApplication
+import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.databinding.FragmentHomeBinding
+import com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.HomeViewModel
+import com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.HomeApiResponse
+import com.mykameal.planner.messageclass.ErrorMessage
 import com.mykameal.planner.model.DataModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+
+@AndroidEntryPoint
 class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnItemLongClickListener {
 
     private var binding: FragmentHomeBinding? = null
     private var dataList3: MutableList<DataModel> = mutableListOf()
-    private var ingredientDinnerAdapter: IngredientsDinnerAdapter? = null
+    private var recipeCookedAdapter: RecipeCookedAdapter? = null
     private var adapterSuperMarket: AdapterSuperMarket? = null
     private var statuses:String?=""
     private var checkStatus:Boolean?=false
     private var recySuperMarket:RecyclerView?=null
     private lateinit var sessionManagement: SessionManagement
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    private lateinit var viewModel: HomeViewModel
+
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+
         // Inflate the layout for this fragment
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         sessionManagement = SessionManagement(requireContext())
+
+        viewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
+
+
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
 
         (activity as MainActivity?)?.changeBottom("home")
 
         homeSchDinnerModel()
-        addSuperMarketDialog()
+//        addSuperMarketDialog()
 
         initialize()
 
+
+        // When screen load then api call
+        fetchDataOnLoad()
+
         return binding!!.root
     }
+
+    private fun fetchDataOnLoad() {
+        if (BaseApplication.isOnline(requireActivity())) {
+            fetchHomeDetailsData()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
+    private fun fetchHomeDetailsData() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.homeDetailsRequest {
+                BaseApplication.dismissMe()
+                handleApiResponse(it)
+            }
+        }
+    }
+
+    private fun handleApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, HomeApiResponse::class.java)
+            Log.d("@@@ Recipe Details ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                showData(apiModel.data)
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun showData(data: com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.DataModel?) {
+        try {
+
+            if (data?.userData!=null && data.userData.size>0){
+                binding!!.relPlanMeal.visibility=View.GONE
+                binding!!.imageCookedMeals.visibility=View.GONE
+                binding!!.rlSeeAllBtn.visibility=View.VISIBLE
+                binding!!.llRecipesCooked.visibility=View.VISIBLE
+                recipeCookedAdapter = RecipeCookedAdapter(data.userData,requireActivity(),this)
+                binding!!.rcyRecipesCooked.adapter = recipeCookedAdapter
+            }else{
+                binding!!.relPlanMeal.visibility=View.VISIBLE
+                binding!!.imageCookedMeals.visibility=View.VISIBLE
+                binding!!.rlSeeAllBtn.visibility=View.GONE
+                binding!!.llRecipesCooked.visibility=View.GONE
+            }
+
+            if (data!!.graph_value==0){
+                binding!!.imagePlanMeal.visibility=View.VISIBLE
+                binding!!.imageCheckSav.visibility=View.GONE
+            }else{
+                binding!!.imagePlanMeal.visibility=View.GONE
+                binding!!.imageCheckSav.visibility=View.VISIBLE
+            }
+
+            if (data.date!=null){
+                val name=BaseApplication.getColoredSpanned("Next meal to be cooked on ","#3C4541") + BaseApplication.getColoredSpanned(data.date+".","#06C169")
+                binding!!.tvHomeDesc.text=Html.fromHtml(name)
+            }else{
+                binding!!.tvHomeDesc.text="Your cooking schedule is empty! Tap the button below to add a meal and get started."
+            }
+
+            if (data.frezzer!=null){
+
+                if (data.frezzer.Breakfast!=null){
+                    binding!!.tvfreezerbreakfast.text = ""+data.frezzer.Breakfast
+                }
+                if (data.frezzer.Lunch!=null){
+                    binding!!.tvfreezerlunch.text = ""+data.frezzer.Lunch
+                }
+                if (data.frezzer.Dinner!=null){
+                    binding!!.tvfreezerdinner.text = ""+data.frezzer.Dinner
+                }
+
+                if (data.frezzer.Snacks!=null){
+                    binding!!.laySnack.visibility=View.VISIBLE
+                    binding!!.tvfreezersnack.text = ""+data.frezzer.Snacks
+                }else{
+                    binding!!.tvfreezersnack.visibility=View.GONE
+                }
+
+                if (data.frezzer.Teatime!=null){
+                    binding!!.layTeatime.visibility=View.VISIBLE
+                    binding!!.tvfreezerteatime.text = ""+data.frezzer.Teatime
+                }else{
+                    binding!!.layTeatime.visibility=View.GONE
+                }
+
+
+            }
+
+            if (data.fridge!=null){
+
+                if (data.fridge.Breakfast!=null){
+                    binding!!.tvfridgebreakfast.text = ""+data.fridge.Breakfast
+                }
+                if (data.fridge.Lunch!=null){
+                    binding!!.tvfridgelunch.text = ""+data.fridge.Lunch
+                }
+                if (data.fridge.Dinner!=null){
+                    binding!!.tvfridgedinner.text = ""+data.fridge.Dinner
+                }
+                if (data.fridge.Snacks!=null){
+                    binding!!.laySnack.visibility=View.VISIBLE
+                    binding!!.tvfridgesnack.text = ""+data.fridge.Snacks
+                }else{
+                    binding!!.laySnack.visibility=View.GONE
+                }
+
+                if (data.fridge.Teatime!=null){
+                    binding!!.layTeatime.visibility=View.VISIBLE
+                    binding!!.tvfridgeteatime.text = ""+data.fridge.Teatime
+                }else{
+                    binding!!.layTeatime.visibility=View.GONE
+                }
+            }
+
+        }catch (e:Exception){
+            showAlert(e.message, false)
+        }
+    }
+
+
+    private fun showAlert(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
+    }
+
 
     private fun addSuperMarketDialog() {
         val dialogAddItem: Dialog = context?.let { Dialog(it) }!!
@@ -164,8 +331,8 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         dataList3.add(data4)
         dataList3.add(data5)
 
-        ingredientDinnerAdapter = IngredientsDinnerAdapter(dataList3, requireActivity(), this, this)
-        binding!!.rcyRecipesCooked.adapter = ingredientDinnerAdapter
+       /* ingredientDinnerAdapter = IngredientsDinnerAdapter(dataList3, requireActivity(), this, null,this)
+        binding!!.rcyRecipesCooked.adapter = ingredientDinnerAdapter*/
     }
 
     private fun initialize() {
@@ -197,8 +364,9 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
         binding!!.rlPlanAMealBtn.setOnClickListener(this)
         binding!!.imgHearRedIcons.setOnClickListener(this)
-        binding!!.imageRecipeSeeAll.setOnClickListener(this)
-        binding!!.relMonthlySavings.setOnClickListener(this)
+        binding!!.imagePlanMeal.setOnClickListener(this)
+//        binding!!.imageRecipeSeeAll.setOnClickListener(this)
+//        binding!!.relMonthlySavings.setOnClickListener(this)
         binding!!.imageCheckSav.setOnClickListener(this)
 
 
@@ -216,14 +384,17 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 //                findNavController().navigate(R.id.cookedFragment)
             }
 
-            R.id.relMonthlySavings->{
+          /*  R.id.relMonthlySavings->{
                 binding!!.imagePlanMeal.visibility=View.GONE
                 binding!!.imageCheckSav.visibility=View.VISIBLE
 
             }
-
+*/
             R.id.imageCheckSav->{
                 findNavController().navigate(R.id.statisticsGraphFragment)
+            }
+            R.id.imagePlanMeal->{
+                findNavController().navigate(R.id.planFragment)
             }
 
             R.id.imageCookedMeals->{
@@ -250,18 +421,18 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 findNavController().navigate(R.id.homeSubscriptionFragment)
             }
 
-            R.id.imageRecipeSeeAll->{
+          /*  R.id.imageRecipeSeeAll->{
                 binding!!.tvHomeDesc.text=getString(R.string.sept_meal_planner)
                 binding!!.relPlanMeal.visibility=View.GONE
                 binding!!.llRecipesCooked.visibility=View.VISIBLE
                 binding!!.tvHomeDesc.visibility=View.GONE
                 binding!!.tvHomeSeptDate.visibility=View.VISIBLE
-            }
+            }*/
         }
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
-        if (type == "heart") {
+        /*if (type == "heart") {
             addRecipeDialog(position, type)
         } else if (type == "minus") {
             if (status == "1") {
@@ -271,7 +442,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             findNavController().navigate(R.id.missingIngredientsFragment)
         }else{
             findNavController().navigate(R.id.recipeDetailsFragment)
-        }
+        }*/
     }
 
     private fun addRecipeDialog(position: Int?, type: String) {

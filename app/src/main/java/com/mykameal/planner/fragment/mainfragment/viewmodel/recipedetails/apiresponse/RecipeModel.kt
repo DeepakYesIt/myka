@@ -8,6 +8,7 @@ data class RecipeModel(
     val calories: Double?,
     val totalTime: Int?,
     val statusInGredients: Boolean=false,
-    val ingredients: MutableList<IngredientsModel>?
+    val ingredients: MutableList<IngredientsModel>?,
+    val instructionLines: MutableList<String>?
 
 )

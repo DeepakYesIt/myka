@@ -92,6 +92,7 @@ class IngredientsBreakFastAdapter( var datalist: List<DataModel>, private var re
             }
             onItemClickListener.itemClick(position, checkStatus,checkTypeStatus)
         }
+
         holder.itemView.setOnLongClickListener{
             val clipData = ClipData(
                 datalist[position].title, // Use the title as the drag data

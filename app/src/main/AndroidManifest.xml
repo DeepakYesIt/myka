@@ -5,96 +5,109 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"
         tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <uses-permission android:name="android.permission.STORAGE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.WRITE_MEDIA_IMAGES" />
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
 
     <application
         android:name=".basedata.MykaBaseApplication"
-        android:fullBackupOnly="true"
-        android:usesCleartextTraffic="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
+        android:fullBackupOnly="true"
         android:icon="@mipmap/app_icon"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MykaApp"
-        tools:targetApi="31"
-        tools:replace="android:fullBackupContent">
+        android:usesCleartextTraffic="true"
+        tools:replace="android:fullBackupContent"
+        tools:targetApi="31">
+        <activity
+            android:name=".activity.MealRatingActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".activity.MainActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="portrait"
             android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
             tools:ignore="AppLinkUrlError">
             <intent-filter android:label="Deep link">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https"
-                    android:host="//mykaandroidapp.onelink.me"/>
-                    <!--android:pathPrefix="/tNkO" -->/>
+
+                <data
+                    android:host="//mykaandroidapp.onelink.me"
+                    android:scheme="https" />
+                <!-- android:pathPrefix="/tNkO" -->
+                />
             </intent-filter>
         </activity>
-   <!--     <activity
+        <!--
+     <activity
             android:name=".activity.MainActivity"
             android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait"
-            android:exported="false" />-->
+            android:exported="false" />
+        -->
         <activity
             android:name=".activity.AuthActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:exported="false"
             android:screenOrientation="portrait"
-            android:exported="false" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activity.LetsStartOptionActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:exported="false"
             android:screenOrientation="portrait"
-            android:exported="false" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activity.CookingForMyselfActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:exported="false"
             android:screenOrientation="portrait"
-            android:exported="false" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activity.CookingForScreenActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:exported="false"
             android:screenOrientation="portrait"
-            android:exported="false" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activity.EnterYourNameActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:exported="false"
             android:screenOrientation="portrait"
-            android:exported="false" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activity.OnBoardingActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:exported="false"
             android:screenOrientation="portrait"
-            android:exported="false" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activity.IntroPageActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:exported="false"
             android:screenOrientation="portrait"
-            android:exported="false" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activity.SplashActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:exported="true"
             android:screenOrientation="portrait"
-            android:exported="true">
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -107,25 +120,13 @@
             android:resource="@array/preloaded_fonts" />
 
         <service
-            android:name="com.mykameal.planner.fcm.MyFirebaseMessagingService"
+            android:name=".fcm.MyFirebaseMessagingService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-    <!--    <intent-filter android:autoVerify="true">
-            <action android:name="android.intent.action.VIEW" />
-
-            <category android:name="android.intent.category.DEFAULT" />
-            <category android:name="android.intent.category.BROWSABLE" />
-
-            &lt;!&ndash; Replace "onlink-basic-app" with your OneLink domain &ndash;&gt;
-            <data
-                android:host="onelink-basic-app.onelink.me"
-                android:scheme="https" />
-        </intent-filter>-->
     </application>
 
 </manifest>

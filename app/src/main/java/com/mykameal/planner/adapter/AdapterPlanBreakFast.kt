@@ -45,11 +45,14 @@ class AdapterPlanBreakFast(var datalist: MutableList<BreakfastModel>?, private v
             holder.binding.tvTime.text = ""+ item.recipe.totalTime +" min "
         }
 
-        if (item?.is_like ==0 ){
-            holder.binding.imgHeartRed.setImageResource(R.drawable.heart_white_icon)
-        }else{
-            holder.binding.imgHeartRed.setImageResource(R.drawable.heart_red_icon)
+        if (item?.is_like!=null){
+            if (item?.is_like ==0 ){
+                holder.binding.imgHeartRed.setImageResource(R.drawable.heart_white_icon)
+            }else{
+                holder.binding.imgHeartRed.setImageResource(R.drawable.heart_red_icon)
+            }
         }
+
 
 
         if (item?.recipe?.images?.SMALL?.url!=null){
@@ -98,7 +101,7 @@ class AdapterPlanBreakFast(var datalist: MutableList<BreakfastModel>?, private v
 
         holder.itemView.setOnClickListener{
             if (item?.recipe?.uri!=null){
-                onItemClickListener.itemClick(position,"3", item.recipe.uri)
+                onItemClickListener.itemClick(position, type, item.recipe.uri)
             }
         }
 

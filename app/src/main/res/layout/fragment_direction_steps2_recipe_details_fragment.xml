@@ -86,12 +86,20 @@
                     android:layout_height="wrap_content">
 
                     <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/imageData"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/_130sdp"
                         android:adjustViewBounds="true"
                         android:scaleType="centerCrop"
                         android:src="@drawable/boiling_egg_image2"
                         app:shapeAppearanceOverlay="@style/CornerCut" />
+
+                    <include
+                        android:id="@+id/lay_progess"
+                        layout="@layout/progess_loader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -108,6 +116,7 @@
                             android:paddingStart="@dimen/_10sdp">
 
                             <TextView
+                                android:id="@+id/tv_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppins_medium"
@@ -151,6 +160,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:elevation="@dimen/_10sdp"
+                    android:layout_marginHorizontal="@dimen/_2sdp"
                     app:cardBackgroundColor="@color/white"
                     app:cardCornerRadius="@dimen/_15sdp">
 
@@ -174,6 +184,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/poppins"
+                            android:layout_marginTop="@dimen/_10sdp"
                             android:text="Fill the saucepan with cold water, ensuring the eggs are covered by about 1 inch (2.5 cm) of water."
                             android:textColor="#464646"
                             android:textSize="@dimen/_12sdp" />
@@ -186,6 +197,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
+                    android:visibility="gone"
                     android:background="@drawable/rectangular_orange_bg">
 
                     <androidx.cardview.widget.CardView
@@ -232,12 +244,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_40sdp"
                     android:layout_marginTop="@dimen/_70sdp"
-                    android:layout_marginBottom="@dimen/_30sdp"
-                    android:weightSum="2">
+                    android:gravity="center"
+                    android:layout_marginBottom="@dimen/_30sdp">
 
                     <TextView
                         android:id="@+id/tvPreviousBtn"
-                        android:layout_width="0dp"
+                        android:layout_width="@dimen/_100sdp"
                         android:layout_height="match_parent"
                         android:text="Previous Step"
                         android:background="@drawable/outline_green_border_bg"
@@ -245,12 +257,11 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:textColor="@color/light_green"
-                        android:textSize="@dimen/_13sdp"
-                        android:layout_weight="1"/>
+                        android:textSize="@dimen/_13sdp" />
 
                     <TextView
                         android:id="@+id/tvNextStepBtn"
-                        android:layout_width="0dp"
+                        android:layout_width="@dimen/_100sdp"
                         android:layout_height="match_parent"
                         android:text="Next Step"
                         android:background="@drawable/green_fill_corner_bg"
@@ -259,8 +270,7 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:textSize="@dimen/_13sdp"
-                        android:textColor="@color/white"
-                        android:layout_weight="1"/>
+                        android:textColor="@color/white" />
 
                 </LinearLayout>
 

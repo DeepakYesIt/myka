@@ -10,6 +10,8 @@ import javax.inject.Inject
 class RecipeDetailsViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
 
+    private var localData: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.recipedetails.apiresponse.Data>?=null
+
     suspend fun recipeDetailsRequest(successCallback: (response: NetworkResult<String>) -> Unit,
                                     url: String){
         repository.recipeDetailsRequestApi({ successCallback(it) },url)
@@ -21,6 +23,24 @@ class RecipeDetailsViewModel @Inject constructor(private val repository: MainRep
         repository.recipeAddBasketRequestApi({ successCallback(it) },jsonObject)
     }
 
+    suspend fun recipeAddToPlanRequest(successCallback: (response: NetworkResult<String>) -> Unit, jsonObject: JsonObject
+    ){
+        repository.recipeAddToPlanRequestApi({ successCallback(it) },jsonObject)
+    }
 
+
+    fun setRecipeData(data: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.recipedetails.apiresponse.Data>) {
+        localData=data
+    }
+
+
+    fun getRecipeData(): MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.recipedetails.apiresponse.Data>? {
+        return localData
+    }
+
+
+    suspend fun recipeReviewRequest(successCallback: (response: NetworkResult<String>) -> Unit, url: String, msg: String,ratingBarcount:String){
+        repository.recipeReviewRequestApi({ successCallback(it) },url,msg,ratingBarcount)
+    }
 
 }

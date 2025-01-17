@@ -6,66 +6,70 @@
     android:layout_height="match_parent"
     tools:context=".fragment.mainfragment.hometab.HomeFragment">
 
+    <RelativeLayout
+        android:id="@+id/relMainLayout"
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_marginHorizontal="@dimen/_15sdp"
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imageProfile"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:src="@drawable/mask_group_icon"
+            app:civ_border_color="@color/light_green"
+            app:civ_border_width="@dimen/_2sdp" />
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_marginEnd="@dimen/_5sdp"
+            android:layout_toStartOf="@id/imgHearRedIcons"
+            android:layout_toEndOf="@id/imageProfile"
+            android:fontFamily="@font/montserrat_semibold"
+            android:textSize="@dimen/_12sdp" />
+
+        <ImageView
+            android:id="@+id/imgHearRedIcons"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_toStartOf="@+id/imgBasketIcon"
+            android:src="@drawable/heart_red_icon" />
+
+        <ImageView
+            android:id="@+id/imgBasketIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/yellow_basket_icon" />
+
+    </RelativeLayout>
+
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/relMainLayout"
+        android:layout_marginTop="@dimen/_10sdp"
         android:fillViewport="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_20sdp">
+            android:layout_height="wrap_content">
 
-            <RelativeLayout
-                android:id="@+id/relMainLayout"
-                android:layout_width="match_parent"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                android:layout_height="wrap_content">
 
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/imageProfile"
-                    android:layout_width="@dimen/_40sdp"
-                    android:layout_height="@dimen/_40sdp"
-                    android:src="@drawable/mask_group_icon"
-                    app:civ_border_color="@color/light_green"
-                    app:civ_border_width="@dimen/_2sdp" />
-
-                <TextView
-                    android:id="@+id/tv_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="@dimen/_5sdp"
-                    android:layout_marginEnd="@dimen/_5sdp"
-                    android:layout_toStartOf="@id/imgHearRedIcons"
-                    android:layout_toEndOf="@id/imageProfile"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:textSize="@dimen/_12sdp" />
-
-                <ImageView
-                    android:id="@+id/imgHearRedIcons"
-                    android:layout_width="@dimen/_30sdp"
-                    android:layout_height="@dimen/_30sdp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="@dimen/_10sdp"
-                    android:layout_toStartOf="@+id/imgBasketIcon"
-                    android:src="@drawable/heart_red_icon" />
-
-                <ImageView
-                    android:id="@+id/imgBasketIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/yellow_basket_icon" />
-
-            </RelativeLayout>
 
             <TextView
                 android:id="@+id/tvCookingSchedule"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/relMainLayout"
                 android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:fontFamily="@font/montserrat_semibold"
@@ -250,7 +254,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerInParent="true"
-                                android:paddingHorizontal="@dimen/_25sdp"
+                                android:paddingHorizontal="@dimen/_20sdp"
                                 android:paddingVertical="@dimen/_8sdp"
                                 android:text="See All"
                                 android:textColor="@color/white"
@@ -364,6 +368,7 @@
                                         android:textSize="@dimen/_13sdp" />
 
                                     <TextView
+                                        android:id="@+id/tvfridgebreakfast"
                                         android:layout_width="wrap_content"
                                         android:layout_height="@dimen/_40sdp"
                                         android:layout_gravity="center_horizontal"
@@ -373,6 +378,7 @@
                                         android:textSize="@dimen/_13sdp" />
 
                                     <TextView
+                                        android:id="@+id/tvfreezerbreakfast"
                                         android:layout_width="wrap_content"
                                         android:layout_height="@dimen/_40sdp"
                                         android:layout_gravity="center_horizontal"
@@ -398,6 +404,7 @@
                                         android:textSize="@dimen/_13sdp" />
 
                                     <TextView
+                                        android:id="@+id/tvfridgelunch"
                                         android:layout_width="wrap_content"
                                         android:layout_height="@dimen/_40sdp"
                                         android:layout_gravity="center_horizontal"
@@ -407,6 +414,7 @@
                                         android:textSize="@dimen/_13sdp" />
 
                                     <TextView
+                                        android:id="@+id/tvfreezerlunch"
                                         android:layout_width="wrap_content"
                                         android:layout_height="@dimen/_40sdp"
                                         android:layout_gravity="center_horizontal"
@@ -432,6 +440,7 @@
                                         android:textSize="@dimen/_13sdp" />
 
                                     <TextView
+                                        android:id="@+id/tvfridgedinner"
                                         android:layout_width="wrap_content"
                                         android:layout_height="@dimen/_40sdp"
                                         android:layout_gravity="center_horizontal"
@@ -441,6 +450,7 @@
                                         android:textSize="@dimen/_13sdp" />
 
                                     <TextView
+                                        android:id="@+id/tvfreezerdinner"
                                         android:layout_width="wrap_content"
                                         android:layout_height="@dimen/_40sdp"
                                         android:layout_gravity="center_horizontal"
@@ -452,9 +462,11 @@
                                 </LinearLayout>
 
                                 <LinearLayout
+                                    android:id="@+id/lay_snack"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="@dimen/_10sdp"
+                                    android:visibility="gone"
                                     android:orientation="vertical">
 
                                     <TextView
@@ -466,6 +478,7 @@
                                         android:textSize="@dimen/_13sdp" />
 
                                     <TextView
+                                        android:id="@+id/tvfridgesnack"
                                         android:layout_width="wrap_content"
                                         android:layout_height="@dimen/_40sdp"
                                         android:layout_gravity="center_horizontal"
@@ -475,6 +488,7 @@
                                         android:textSize="@dimen/_13sdp" />
 
                                     <TextView
+                                        android:id="@+id/tvfreezersnack"
                                         android:layout_width="wrap_content"
                                         android:layout_height="@dimen/_40sdp"
                                         android:layout_gravity="center_horizontal"
@@ -487,36 +501,64 @@
 
                                 </LinearLayout>
 
+                                <LinearLayout
+                                    android:id="@+id/lay_teatime"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:visibility="gone"
+                                    android:layout_marginStart="@dimen/_10sdp"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/poppins_medium"
+                                        android:text="Teatime"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/_13sdp" />
+
+                                    <TextView
+                                        android:id="@+id/tvfridgeteatime"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="@dimen/_40sdp"
+                                        android:layout_gravity="center_horizontal"
+                                        android:gravity="center_vertical"
+                                        android:text="-"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/_13sdp" />
+
+                                    <TextView
+                                        android:id="@+id/tvfreezerteatime"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="@dimen/_40sdp"
+                                        android:layout_gravity="center_horizontal"
+                                        android:gravity="center_vertical"
+                                        android:text="-"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/_13sdp" />
+                                </LinearLayout>
                             </LinearLayout>
-
                         </HorizontalScrollView>
-
                     </androidx.constraintlayout.widget.ConstraintLayout>
-
                 </RelativeLayout>
-
             </androidx.cardview.widget.CardView>
-
             <RelativeLayout
                 android:id="@+id/relMonthlySavings"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_150sdp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_below="@+id/cardViewCooked">
-
                 <ImageView
                     android:id="@+id/imagePlanMeal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/monthly_savings_plan_bg"/>
-
                 <ImageView
                     android:id="@+id/imageCheckSav"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
                     android:src="@drawable/check_savings_image"/>
-
             </RelativeLayout>
 
 <!--            <RelativeLayout-->

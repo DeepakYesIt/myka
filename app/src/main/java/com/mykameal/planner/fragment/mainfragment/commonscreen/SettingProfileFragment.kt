@@ -405,6 +405,8 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
                     imageNameEditable.visibility = View.GONE
                     imageEditTargets.visibility = View.GONE
                     relProfileNameImage.setBackgroundResource(R.drawable.calendar_events_bg)
+                    sessionManagement.setUserName(binding!!.tvUserName.text.toString())
+                    apiModel.data.profile_img?.let { sessionManagement.setImage(it) }
                 }
             } else {
                 if (apiModel.code == ErrorMessage.code) {

@@ -35,6 +35,7 @@ import com.mykameal.planner.OnItemSelectListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.adapter.AdapterRecipeItem
+import com.mykameal.planner.adapter.CalendarDayDateAdapter
 import com.mykameal.planner.adapter.ChooseDayAdapter
 import com.mykameal.planner.adapter.CookWareAdapter
 import com.mykameal.planner.adapter.IngredientsRecipeAdapter
@@ -47,10 +48,12 @@ import com.mykameal.planner.fragment.mainfragment.viewmodel.recipedetails.apires
 import com.mykameal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import com.mykameal.planner.model.DataModel
+import com.yesitlabs.mykaapp.model.DateModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 
@@ -73,7 +76,13 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
     private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
     private lateinit var viewModel: RecipeDetailsViewModel
     private var uri: String = ""
+    private var mealType: String = ""
     private var localData: MutableList<Data> = mutableListOf()
+    var currentDate = Date() // Current date
+
+    // Define global variables
+    private lateinit var startDate: Date
+    private lateinit var endDate: Date
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,15 +93,18 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         viewModel = ViewModelProvider(requireActivity())[RecipeDetailsViewModel::class.java]
 
         uri = arguments?.getString("uri", "").toString()
+        mealType = arguments?.getString("mealType", "").toString()
+
+//        Toast.makeText(requireContext(), "mealType$mealType",Toast.LENGTH_LONG).show()
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
 
         setupBackNavigation()
 
-
-        ingredientsModel()
+//        ingredientsModel()
         initialize()
+
 
         // When screen load then api call
         fetchDataOnLoad()
@@ -140,7 +152,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ Recipe Details ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                 Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
                 findNavController().navigateUp()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
@@ -162,7 +174,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             if (apiModel.code == 200 && apiModel.success) {
                 if (apiModel.data != null && apiModel.data.size > 0) {
                     showData(apiModel.data)
-                }else{
+                } else {
                     binding!!.layBottom.visibility = View.GONE
                     binding!!.webView.visibility = View.GONE
                 }
@@ -180,12 +192,13 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
 
     @SuppressLint("SetTextI18n")
     private fun showData(data: MutableList<Data>) {
-        localData.clear()
-        localData.addAll(data)
+        /*localData.clear()
+        localData.addAll(data)*/
 
-        if (localData[0].recipe?.images?.SMALL?.url != null) {
+        viewModel.setRecipeData(data)
+        if (viewModel.getRecipeData()?.get(0)!!.recipe?.images?.SMALL?.url != null) {
             Glide.with(requireContext())
-                .load(localData[0].recipe?.images?.SMALL?.url)
+                .load(viewModel.getRecipeData()?.get(0)!!.recipe?.images?.SMALL?.url)
                 .error(R.drawable.no_image)
                 .placeholder(R.drawable.no_image)
                 .listener(object : RequestListener<Drawable> {
@@ -215,39 +228,45 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             binding!!.layProgess.root.visibility = View.GONE
         }
 
-        if (localData[0].recipe?.label != null) {
-            binding!!.tvTitle.text = "" + localData[0].recipe?.label
+        if (viewModel.getRecipeData()?.get(0)!!.recipe?.label != null) {
+            binding!!.tvTitle.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.label
         }
 
-        if (localData[0].recipe?.calories != null) {
-            binding!!.tvCalories.text = "" + localData[0].recipe?.calories?.toInt()
+        if (viewModel.getRecipeData()?.get(0)!!.recipe?.calories != null) {
+            binding!!.tvCalories.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.calories?.toInt()
         }
 
-        if (localData[0].recipe?.totalNutrients?.FAT?.quantity != null) {
-            binding!!.tvFat.text = "" + localData[0].recipe?.totalNutrients?.FAT?.quantity?.toInt()
+        if (viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.FAT?.quantity != null) {
+            binding!!.tvFat.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.FAT?.quantity?.toInt()
         }
 
-        if (localData[0].recipe?.totalNutrients?.PROCNT?.quantity != null) {
+        if (viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.PROCNT?.quantity != null) {
             binding!!.tvProtein.text =
-                "" + localData[0].recipe?.totalNutrients?.PROCNT?.quantity?.toInt()
+                "" + viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.PROCNT?.quantity?.toInt()
         }
 
-        if (localData[0].recipe?.totalNutrients?.CHOCDF?.quantity != null) {
-            binding!!.tvCarbs.text =
-                "" + localData[0].recipe?.totalNutrients?.CHOCDF?.quantity?.toInt()
+        if (viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.CHOCDF?.quantity != null) {
+            binding!!.tvCarbs.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.CHOCDF?.quantity?.toInt()
         }
 
 
-        if (localData[0].recipe?.totalTime != null) {
-            binding!!.tvTotaltime.text = "" + localData[0].recipe?.totalTime + " min "
+        if (viewModel.getRecipeData()?.get(0)!!.recipe?.totalTime != null) {
+            binding!!.tvTotaltime.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.totalTime + " min "
         }
 
-        if (localData[0].recipe?.ingredients != null && localData[0].recipe?.ingredients!!.size > 0) {
-            ingredientsRecipeAdapter =
-                IngredientsRecipeAdapter(localData[0].recipe?.ingredients, requireActivity(), this)
+        if (viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients != null && viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients!!.size > 0) {
+            ingredientsRecipeAdapter = IngredientsRecipeAdapter(viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients, requireActivity(), this)
             binding!!.rcyIngCookWareRecipe.adapter = ingredientsRecipeAdapter
             binding!!.layBottom.visibility = View.VISIBLE
-        }else{
+        } else {
+            binding!!.layBottom.visibility = View.GONE
+        }
+
+
+        if (viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines != null && viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines!!.size > 0) {
+            adapterRecipeItem = AdapterRecipeItem(viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines!!, requireActivity())
+            binding!!.layBottom.visibility = View.VISIBLE
+        } else {
             binding!!.layBottom.visibility = View.GONE
         }
 
@@ -309,15 +328,12 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             binding!!.textCookWare.setTextColor(Color.parseColor("#3C4541"))
             binding!!.textRecipe.setTextColor(Color.parseColor("#3C4541"))
 
-            /*binding!!.relServingsPeople.visibility = View.VISIBLE
+            binding!!.textStepInstructions.visibility = View.GONE
+            binding!!.relTittleList.visibility = View.VISIBLE
+            binding!!.relServingsPeople.visibility = View.VISIBLE
             binding!!.layBottomPlanBasket.visibility = View.VISIBLE
-            binding!!.relIngSelectAll.visibility = View.VISIBLE*/
-            /* binding!!.relCookware.visibility = View.GONE
-             binding!!.relRecipe.visibility = View.GONE
-             binding!!.textStepInstructions.visibility = View.GONE*/
-            binding!!.layBottom.visibility = View.VISIBLE
             binding!!.webView.visibility = View.GONE
-            if (localData.size > 0) {
+            if (viewModel.getRecipeData()?.size!! > 0) {
                 // Update the drawable based on the selectAll state
                 val drawableRes =
                     if (selectAll) R.drawable.orange_checkbox_images else R.drawable.orange_uncheck_box_images
@@ -328,8 +344,11 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                     0
                 )
                 // Notify adapter with updated data
-                ingredientsRecipeAdapter?.updateList(localData[0].recipe?.ingredients!!)
+                ingredientsRecipeAdapter?.updateList(viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients!!)
                 binding!!.rcyIngCookWareRecipe.adapter = ingredientsRecipeAdapter
+                binding!!.layBottom.visibility = View.VISIBLE
+            }else{
+                binding!!.layBottom.visibility = View.GONE
             }
         }
 
@@ -342,12 +361,6 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             binding!!.textCookWare.setTextColor(Color.parseColor("#FFFFFF"))
             binding!!.textRecipe.setTextColor(Color.parseColor("#3C4541"))
 
-            /*binding!!.relServingsPeople.visibility = View.GONE
-            binding!!.layBottomPlanBasket.visibility = View.GONE
-            binding!!.relIngSelectAll.visibility = View.GONE*/
-            /* binding!!.relCookware.visibility = View.VISIBLE
-             binding!!.relRecipe.visibility = View.GONE
-             binding!!.textStepInstructions.visibility = View.GONE*/
             binding!!.layBottom.visibility = View.GONE
 
             loadUrl()
@@ -364,27 +377,35 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             binding!!.textCookWare.setTextColor(Color.parseColor("#3C4541"))
             binding!!.textRecipe.setTextColor(Color.parseColor("#FFFFFF"))
 
-            /*  binding!!.relServingsPeople.visibility = View.GONE
-              binding!!.layBottomPlanBasket.visibility = View.GONE
-              binding!!.relIngSelectAll.visibility = View.GONE*/
-            /* binding!!.relCookware.visibility = View.GONE
-             binding!!.relRecipe.visibility = View.VISIBLE
-             binding!!.textStepInstructions.visibility = View.VISIBLE*/
+            binding!!.textStepInstructions.visibility = View.VISIBLE
+            binding!!.relTittleList.visibility = View.GONE
+            binding!!.relServingsPeople.visibility = View.GONE
+            binding!!.layBottomPlanBasket.visibility = View.GONE
 
-            binding!!.layBottom.visibility = View.GONE
-            loadUrl()
-//            recipeModel()
+            if (viewModel.getRecipeData()?.size!!  > 0) {
+                binding!!.rcyIngCookWareRecipe.adapter = adapterRecipeItem
+                binding!!.layBottom.visibility = View.VISIBLE
+            }else{
+                binding!!.layBottom.visibility = View.GONE
+            }
+
 
         }
 
-
-
         binding!!.textStepInstructions.setOnClickListener {
-            findNavController().navigate(R.id.directionSteps1RecipeDetailsFragment)
+//            findNavController().navigate(R.id.directionSteps1RecipeDetailsFragment)
+            if (viewModel.getRecipeData()!=null){
+                if (viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines!!.size > 0) {
+                    val bundle=Bundle()
+                    bundle.putString("uri",uri)
+                    bundle.putString("mealType",mealType)
+                    findNavController().navigate(R.id.directionSteps2RecipeDetailsFragmentFragment,bundle)
+                }
+            }
         }
 
         binding!!.tvSelectAllBtn.setOnClickListener {
-            if (localData.size > 0) {
+            if (viewModel.getRecipeData()?.size!!  > 0) {
                 selectAll = !selectAll // Toggle the selectAll value
                 // Update the drawable based on the selectAll state
                 val drawableRes =
@@ -397,11 +418,11 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                 )
 
                 // Update the status of each ingredient dynamically
-                localData[0].recipe?.ingredients?.forEach { ingredient ->
+                viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients?.forEach { ingredient ->
                     ingredient.status = selectAll
                 }
                 // Notify adapter with updated data
-                ingredientsRecipeAdapter?.updateList(localData[0].recipe?.ingredients!!)
+                ingredientsRecipeAdapter?.updateList(viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients!!)
             }
         }
 
@@ -409,7 +430,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         binding!!.layBasket.setOnClickListener {
 
             if (BaseApplication.isOnline(requireActivity())) {
-                if (localData.size>0){
+                if (viewModel.getRecipeData()?.size!!  > 0) {
                     try {
                         // Create a JsonObject for the main JSON structure
                         val jsonObject = JsonObject()
@@ -417,7 +438,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                         // Create a JsonArray for ingredients
                         val jsonArray = JsonArray()
                         // Iterate through the ingredients and add them to the array if status is true
-                        localData[0].recipe?.ingredients?.forEach { ingredientsModel ->
+                        viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients?.forEach { ingredientsModel ->
                             if (ingredientsModel.status) {
                                 // Create a JsonObject for each ingredient
                                 val ingredientObject = JsonObject()
@@ -425,7 +446,10 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                                 ingredientObject.addProperty("image", ingredientsModel.image)
                                 ingredientObject.addProperty("food", ingredientsModel.food)
                                 ingredientObject.addProperty("quantity", ingredientsModel.quantity)
-                                ingredientObject.addProperty("foodCategory", ingredientsModel.foodCategory)
+                                ingredientObject.addProperty(
+                                    "foodCategory",
+                                    ingredientsModel.foodCategory
+                                )
                                 ingredientObject.addProperty("measure", ingredientsModel.measure)
                                 // Add the ingredient object to the array
                                 jsonArray.add(ingredientObject)
@@ -436,7 +460,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                         // Log the final JSON data
                         Log.d("final data", "******$jsonObject")
                         addBasketDetailsApi(jsonObject)
-                    }catch (e:Exception){
+                    } catch (e: Exception) {
                         BaseApplication.alertError(requireContext(), e.message, false)
                     }
                 }
@@ -444,6 +468,8 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
+
+
     }
 
     private fun addBasketDetailsApi(jsonObject: JsonObject) {
@@ -459,7 +485,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
     @SuppressLint("SetJavaScriptEnabled")
     private fun loadUrl() {
         binding!!.webView.visibility = View.VISIBLE
-        if (localData.size > 0) {
+        if (viewModel.getRecipeData()?.size!!  > 0) {
             val webSettings: WebSettings = binding!!.webView.settings
             webSettings.javaScriptEnabled = true
             webSettings.domStorageEnabled = true
@@ -472,8 +498,8 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             // Set WebViewClient to handle page loading within the WebView
             binding!!.webView.webViewClient = WebViewClient()
 
-           // Load the URL if it is not null or empty
-            val url = localData[0].recipe?.url?.replace("http:", "https:")
+            // Load the URL if it is not null or empty
+            val url = viewModel.getRecipeData()?.get(0)!!.recipe?.url?.replace("http:", "https:")
             Log.d("url", "****$url")
             if (!url.isNullOrEmpty()) {
                 binding!!.webView.loadUrl(url)
@@ -489,7 +515,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         binding!!.tvValues.text = String.format("%02d", quantity)
     }
 
-    private fun chooseDayDialog() {
+    /*private fun chooseDayDialog() {
         val dialogChooseDay: Dialog = context?.let { Dialog(it) }!!
         dialogChooseDay.setContentView(R.layout.alert_dialog_choose_day)
         dialogChooseDay.window!!.setLayout(
@@ -519,77 +545,140 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         btnNext.setOnClickListener {
             changeWeek(1)
         }
+    }*/
+
+    @SuppressLint("SetTextI18n")
+    private fun chooseDayDialog() {
+        val dialogChooseDay: Dialog = context?.let { Dialog(it) }!!
+        dialogChooseDay.setContentView(R.layout.alert_dialog_choose_day)
+        dialogChooseDay.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        dialogChooseDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val rcyChooseDaySch = dialogChooseDay.findViewById<RecyclerView>(R.id.rcyChooseDaySch)
+        tvWeekRange = dialogChooseDay.findViewById(R.id.tvWeekRange)
+        val rlDoneBtn = dialogChooseDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
+        val btnPrevious = dialogChooseDay.findViewById<ImageView>(R.id.btnPrevious)
+        val btnNext = dialogChooseDay.findViewById<ImageView>(R.id.btnNext)
+        dialogChooseDay.show()
+        dialogChooseDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        showWeekDates()
+        dataList.clear()
+        val daysOfWeek =
+            listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        for (day in daysOfWeek) {
+            val data = DataModel().apply {
+                title = day
+                isOpen = false
+                type = "CookingSchedule"
+                date = ""
+            }
+            dataList.add(data)
+        }
+
+
+        rcyChooseDaySch!!.adapter = ChooseDayAdapter(dataList, requireActivity())
+
+
+        rlDoneBtn.setOnClickListener {
+            dialogChooseDay.dismiss()
+            chooseDayMealTypeDialog()
+
+        }
+
+        btnPrevious.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+            currentDate = calendar.time
+            // Display next week dates
+            println("\nAfter clicking 'Next':")
+            showWeekDates()
+        }
+
+        btnNext.setOnClickListener {
+            // Simulate clicking the "Next" button to move to the next week
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            calendar.add(Calendar.WEEK_OF_YEAR, 1) // Move to next week
+            currentDate = calendar.time
+            // Display next week dates
+            println("\nAfter clicking 'Next':")
+            showWeekDates()
+        }
+
+
     }
 
-    private fun changeWeek(weeks: Int) {
-        calendar.add(Calendar.WEEK_OF_YEAR, weeks)
-        updateWeekRange()
+    private fun getWeekDates(currentDate: Date): Pair<Date, Date> {
+        val calendar = Calendar.getInstance()
+        calendar.time = currentDate
+        // Set the calendar to the start of the week (Monday)
+        calendar.firstDayOfWeek = Calendar.MONDAY
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val startOfWeek = calendar.time
+
+        // Set the calendar to the end of the week (Saturday)
+        calendar.add(Calendar.DAY_OF_WEEK, 6)
+        val endOfWeek = calendar.time
+        return Pair(startOfWeek, endOfWeek)
     }
 
-    private fun cookingScheduleModel() {
-        val dataList = ArrayList<DataModel>()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-        val data6 = DataModel()
-        val data7 = DataModel()
+    fun formatDate(date: Date): String {
+        val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+        return dateFormat.format(date)
+    }
 
-        data1.title = "Monday"
-        data1.isOpen = false
-        data1.type = "CookingSchedule"
+    private fun getDaysBetween(startDate: Date, endDate: Date): MutableList<DateModel> {
+        val dateList = mutableListOf<DateModel>()
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // Format for the date
+        val dayFormat =
+            SimpleDateFormat("EEEE", Locale.getDefault()) // Format for the day name (e.g., Monday)
 
-        data2.title = "Tuesday"
-        data2.isOpen = false
-        data2.type = "CookingSchedule"
+        val calendar = Calendar.getInstance()
+        calendar.time = startDate
 
-        data3.title = "Wednesday"
-        data3.isOpen = false
-        data3.type = "CookingSchedule"
+        while (!calendar.time.after(endDate)) {
+            val date = dateFormat.format(calendar.time)  // Get the formatted date (yyyy-MM-dd)
+            val dayName =
+                dayFormat.format(calendar.time)  // Get the day name (Monday, Tuesday, etc.)
 
-        data4.title = "Thursday"
-        data4.isOpen = false
-        data4.type = "CookingSchedule"
+            val localDate = DateModel()
+            localDate.day = dayName
+            localDate.date = date
+            // Combine both the day name and the date
+//            dateList.add("$dayName, $date")
+            dateList.add(localDate)
 
-        data5.title = "Friday"
-        data5.isOpen = false
-        data5.type = "CookingSchedule"
 
-        data6.title = "Saturday"
-        data6.isOpen = false
-        data6.type = "CookingSchedule"
+            // Move to the next day
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
 
-        data7.title = "Sunday"
-        data7.isOpen = false
-        data7.type = "CookingSchedule"
-
-        dataList.add(data1)
-        dataList.add(data2)
-        dataList.add(data3)
-        dataList.add(data4)
-        dataList.add(data5)
-        dataList.add(data6)
-        dataList.add(data7)
-
-        chooseDayAdapter = ChooseDayAdapter(dataList, requireActivity())
-        rcyChooseDaySch!!.adapter = chooseDayAdapter
-
+        return dateList
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateWeekRange() {
-        val startOfWeek = calendar.apply {
-            set(Calendar.DAY_OF_WEEK, firstDayOfWeek)
-        }.time
+    fun showWeekDates() {
+        Log.d("currentDate :- ", "******$currentDate")
+        val (startDate, endDate) = getWeekDates(currentDate)
+        this.startDate = startDate
+        this.endDate = endDate
 
-        val endOfWeek = calendar.apply {
-            add(Calendar.DAY_OF_WEEK, 6)
-        }.time
+        println("Week Start Date: ${formatDate(startDate)}")
+        println("Week End Date: ${formatDate(endDate)}")
 
-        tvWeekRange!!.text = "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
-        calendar.add(Calendar.DAY_OF_WEEK, -6) // Reset endOfWeek calculation
+        // Get all dates between startDate and endDate
+        val daysBetween = getDaysBetween(startDate, endDate)
+
+        // Print the dates
+        println("Days between ${startDate} and ${endDate}:")
+        daysBetween.forEach { println(it) }
+        tvWeekRange?.text = "" + formatDate(startDate) + "-" + formatDate(endDate)
+
     }
+
 
     private fun chooseDayMealTypeDialog() {
         val dialogChooseMealDay: Dialog = context?.let { Dialog(it) }!!
@@ -599,31 +688,27 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         dialogChooseMealDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        tvWeekRange = dialogChooseMealDay.findViewById(R.id.tvWeekRange)
         val rlDoneBtn = dialogChooseMealDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
-        val btnPrevious = dialogChooseMealDay.findViewById<ImageView>(R.id.btnPrevious)
-        val btnNext = dialogChooseMealDay.findViewById<ImageView>(R.id.btnNext)
         // button event listener
         val tvBreakfast = dialogChooseMealDay.findViewById<TextView>(R.id.tvBreakfast)
         val tvLunch = dialogChooseMealDay.findViewById<TextView>(R.id.tvLunch)
         val tvDinner = dialogChooseMealDay.findViewById<TextView>(R.id.tvDinner)
         val tvSnacks = dialogChooseMealDay.findViewById<TextView>(R.id.tvSnacks)
         val tvTeatime = dialogChooseMealDay.findViewById<TextView>(R.id.tvTeatime)
-
-
-
-
-
         dialogChooseMealDay.show()
-        updateWeekRange()
         dialogChooseMealDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
         var type = ""
 
-        fun updateSelection(selectedType: String, selectedView: TextView, allViews: List<TextView>) {
+        fun updateSelection(
+            selectedType: String,
+            selectedView: TextView,
+            allViews: List<TextView>
+        ) {
             type = selectedType
             allViews.forEach { view ->
-                val drawable = if (view == selectedView) R.drawable.radio_select_icon else R.drawable.radio_unselect_icon
+                val drawable =
+                    if (view == selectedView) R.drawable.radio_select_icon else R.drawable.radio_unselect_icon
                 view.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0)
             }
         }
@@ -650,17 +735,95 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             updateSelection("Teatime", tvTeatime, allViews)
         }
 
+
         rlDoneBtn.setOnClickListener {
-
-            dialogChooseMealDay.dismiss()
+            if (BaseApplication.isOnline(requireActivity())) {
+                addToPlan(dialogChooseMealDay, type)
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
-        btnPrevious.setOnClickListener {
-            changeWeek(-1)
-        }
+    }
 
-        btnNext.setOnClickListener {
-            changeWeek(1)
+
+    private fun addToPlan(dialogChooseMealDay: Dialog, selectType: String) {
+
+        // Create a JsonObject for the main JSON structure
+        val jsonObject = JsonObject()
+        if (uri != null) {
+            jsonObject.addProperty("type", selectType)
+            jsonObject.addProperty("uri", uri)
+            // Create a JsonArray for ingredients
+            val jsonArray = JsonArray()
+            val latestList = getDaysBetween(startDate, endDate)
+            for (i in dataList.indices) {
+                val data = DataModel()
+                data.isOpen = dataList[i].isOpen
+                data.title = dataList[i].title
+                data.date = latestList[i].date
+                dataList[i] = data
+            }
+            // Iterate through the ingredients and add them to the array if status is true
+            dataList.forEach { data ->
+                if (data.isOpen) {
+                    // Create a JsonObject for each ingredient
+                    val ingredientObject = JsonObject()
+                    ingredientObject.addProperty("date", data.date)
+
+                    ingredientObject.addProperty("day", data.title)
+                    // Add the ingredient object to the array
+                    jsonArray.add(ingredientObject)
+                }
+            }
+
+            // Add the ingredients array to the main JSON object
+            jsonObject.add("slot", jsonArray)
+        }
+        Log.d("json object ", "******$jsonObject")
+
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.recipeAddToPlanRequest({
+                BaseApplication.dismissMe()
+                handleApiAddToPlanResponse(it, dialogChooseMealDay)
+            }, jsonObject)
+        }
+    }
+
+    private fun handleApiAddToPlanResponse(
+        result: NetworkResult<String>,
+        dialogChooseMealDay: Dialog
+    ) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessAddToPlanResponse(
+                result.data.toString(),
+                dialogChooseMealDay
+            )
+
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessAddToPlanResponse(data: String, dialogChooseMealDay: Dialog) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                dataList.clear()
+                dialogChooseMealDay.dismiss()
+                Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
         }
     }
 
@@ -789,21 +952,21 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         dataList2.add(data3)
         dataList2.add(data4)
 
-        adapterRecipeItem = AdapterRecipeItem(dataList2, requireActivity())
-        binding!!.rcyIngCookWareRecipe.adapter = adapterRecipeItem
+        /*adapterRecipeItem = AdapterRecipeItem(dataList2, requireActivity())
+        binding!!.rcyIngCookWareRecipe.adapter = adapterRecipeItem*/
     }
 
     override fun itemSelect(position: Int?, status: String?, type: String?) {
 
-        localData[0].recipe?.ingredients?.forEachIndexed { index, ingredient ->
+        viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients?.forEachIndexed { index, ingredient ->
             if (index == position) {
-                ingredient.status = localData[0].recipe?.ingredients?.get(position)?.status != true
+                ingredient.status = viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients?.get(position)?.status != true
             }
         }
         // Notify adapter with updated data
-        ingredientsRecipeAdapter?.updateList(localData[0].recipe?.ingredients!!)
+        ingredientsRecipeAdapter?.updateList(viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients!!)
 
-        selectAll = localData[0].recipe?.ingredients?.all { it.status } == true
+        selectAll = viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients?.all { it.status } == true
 
         // Update the drawable based on the selectAll state
         val drawableRes =

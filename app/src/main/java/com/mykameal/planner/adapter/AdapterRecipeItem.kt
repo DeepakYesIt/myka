@@ -1,5 +1,6 @@
 package com.mykameal.planner.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
@@ -7,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mykameal.planner.databinding.AdapterRecipeItemBinding
 import com.mykameal.planner.model.DataModel
 
-class AdapterRecipeItem(private var datalist: List<DataModel>, private var requireActivity: FragmentActivity): RecyclerView.Adapter<AdapterRecipeItem.ViewHolder>() {
+class AdapterRecipeItem(var datalist: MutableList<String>, var requireActivity: FragmentActivity): RecyclerView.Adapter<AdapterRecipeItem.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -16,10 +17,11 @@ class AdapterRecipeItem(private var datalist: List<DataModel>, private var requi
         return ViewHolder(binding)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.tvTitleName.text = datalist[position].title
-        holder.binding.tvTitleDescriptions.text = datalist[position].description
+        holder.binding.tvTitleName.text = "Step "+(position+1)
+        holder.binding.tvTitleDescriptions.text = datalist[position]
 
 
     }
