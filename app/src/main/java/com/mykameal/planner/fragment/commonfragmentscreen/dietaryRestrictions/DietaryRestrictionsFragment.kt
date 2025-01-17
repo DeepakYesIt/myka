@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -41,7 +42,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
     private var status:String?=null
     private var dietarySelectedId = mutableListOf<String>()
     private lateinit var dietaryRestrictionsViewModel: DietaryRestrictionsViewModel
-    private var dietaryModelsData: List<DietaryRestrictionsModelData>?=null
+    private var dietaryModelsData: MutableList<DietaryRestrictionsModelData>?=null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -168,9 +169,13 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
         }
     }
 
-    private fun showDataInUi(dietaryModelData: List<DietaryRestrictionsModelData>) {
+    private fun showDataInUi(dietaryModelData: MutableList<DietaryRestrictionsModelData>) {
 
         if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
+            if (dietaryRestrictionsViewModel.getDietaryResData()==null){
+                // Add "None" option at the first position
+                dietaryModelData.add(0, DietaryRestrictionsModelData( id = -1, selected = false,"None")) // ID set to -1 as an indicator
+            }
             dietaryModelsData=dietaryModelData
             dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
             binding!!.rcyDietaryRestrictions.adapter = dietaryRestrictionsAdapter
@@ -201,7 +206,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
             if (status=="2"){
                 dietaryRestrictionsViewModel.setDietaryResData(dietaryModelsData!!)
                 sessionManagement.setDietaryRestrictionList(dietarySelectedId)
-                if (sessionManagement.getCookingFor().equals("Myself")){
+                  if (sessionManagement.getCookingFor().equals("Myself")){
                     findNavController().navigate(R.id.favouriteCuisinesFragment)
                 } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
                     findNavController().navigate(R.id.ingredientDislikesFragment)
@@ -277,25 +282,30 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
         }
     }
 
-    override fun itemClicked(position: Int?, list: MutableList<String>, status1: String?, type: String?) {
+    override fun itemClicked(position: Int?, list: MutableList<String>?, status1: String?, type: String?) {
 
-        if (status1.equals("-1")) {
-            status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            dietarySelectedId=list
-            return
-        }
+            if (status1.equals("-1")) {
+                if (position==0){
+                    dietarySelectedId.clear()
+                }else{
+                    dietarySelectedId=list!!
+                }
+                status = "2"
+                binding!!.tvNextBtn.isClickable = true
+                binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                return
+            }
 
-        if (type.equals("true")) {
-            status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            dietarySelectedId=list
-        } else {
-            status = ""
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
-        }
+            if (type.equals("true")) {
+                status = "2"
+                binding!!.tvNextBtn.isClickable = true
+                binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                dietarySelectedId=list!!
+            } else {
+                status = ""
+                binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            }
+
 
     }
 

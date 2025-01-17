@@ -59,10 +59,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:fontFamily="@font/poppins"
                 android:paddingHorizontal="@dimen/_50sdp"
                 android:paddingVertical="@dimen/_12sdp"
                 android:text="Okay"
-                android:fontFamily="@font/poppins"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_13sdp" />
 

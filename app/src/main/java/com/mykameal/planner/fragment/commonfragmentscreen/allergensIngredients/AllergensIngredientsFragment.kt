@@ -21,15 +21,19 @@ import com.google.gson.Gson
 import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.OnItemClickedListener
 import com.mykameal.planner.R
+import com.mykameal.planner.adapter.AdapterAllergensIngItem
 import com.mykameal.planner.adapter.DietaryRestrictionsAdapter
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.databinding.FragmentAllergensIngredientsBinding
+import com.mykameal.planner.fragment.commonfragmentscreen.allergensIngredients.model.AllergensIngredientModel
+import com.mykameal.planner.fragment.commonfragmentscreen.allergensIngredients.model.AllergensIngredientModelData
 import com.mykameal.planner.fragment.commonfragmentscreen.allergensIngredients.viewmodel.AllergenIngredientViewModel
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModel
 import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
+import com.mykameal.planner.fragment.commonfragmentscreen.favouriteCuisines.model.FavouriteCuisinesModelData
 import com.mykameal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -39,11 +43,11 @@ import java.util.Locale
 class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
 
     private var binding: FragmentAllergensIngredientsBinding? = null
-    private var dietaryRestrictionsAdapter: DietaryRestrictionsAdapter? = null
+    private var allergenIngAdapter: AdapterAllergensIngItem? = null
     private lateinit var sessionManagement: SessionManagement
-    private var dietaryRestrictionsModelData = mutableListOf<DietaryRestrictionsModelData>()
+    private var allergenIngModelData = mutableListOf<AllergensIngredientModelData>()
     private var totalProgressValue: Int = 0
-    private var status:String?=null
+    private var status: String? = null
     private var allergensSelectedId = mutableListOf<String>()
     private lateinit var allergenIngredientViewModel: AllergenIngredientViewModel
 
@@ -55,44 +59,49 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         // Inflate the layout for this fragment
         binding = FragmentAllergensIngredientsBinding.inflate(inflater, container, false)
 
-        allergenIngredientViewModel = ViewModelProvider(this)[AllergenIngredientViewModel::class.java]
+        allergenIngredientViewModel =
+            ViewModelProvider(this)[AllergenIngredientViewModel::class.java]
         sessionManagement = SessionManagement(requireContext())
 
-            /// checked session value cooking for
-            if (sessionManagement.getCookingFor().equals("Myself")) {
-                binding!!.tvAllergensDesc.text = getString(R.string.allergens_ingredients_desc)
-                binding!!.progressBar5.max = 10
-                totalProgressValue = 10
-                updateProgress(5)
-            } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-                binding!!.tvAllergensDesc.text =
-                    "Pick ingredients you and your partner are allergic to"
-                binding!!.progressBar5.max = 11
-                totalProgressValue = 11
-                updateProgress(5)
-            } else {
-                binding!!.tvAllergensDesc.text =
-                    "Which ingredients are you and your family allergic to?"
-                binding!!.progressBar5.max = 11
-                totalProgressValue = 11
-                updateProgress(5)
-            }
+        /// checked session value cooking for
+        if (sessionManagement.getCookingFor().equals("Myself")) {
+            binding!!.tvAllergensDesc.text = getString(R.string.allergens_ingredients_desc)
+            binding!!.progressBar5.max = 10
+            totalProgressValue = 10
+            updateProgress(5)
+        } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
+            binding!!.tvAllergensDesc.text =
+                "Pick ingredients you and your partner are allergic to"
+            binding!!.progressBar5.max = 11
+            totalProgressValue = 11
+            updateProgress(5)
+        } else {
+            binding!!.tvAllergensDesc.text =
+                "Which ingredients are you and your family allergic to?"
+            binding!!.progressBar5.max = 11
+            totalProgressValue = 11
+            updateProgress(5)
+        }
 
-        if (sessionManagement.getCookingScreen().equals("Profile")){
-            binding!!.llBottomBtn.visibility=View.GONE
-            binding!!.rlUpdateAllergens.visibility=View.VISIBLE
+        if (sessionManagement.getCookingScreen().equals("Profile")) {
+            binding!!.llBottomBtn.visibility = View.GONE
+            binding!!.rlUpdateAllergens.visibility = View.VISIBLE
             if (BaseApplication.isOnline(requireActivity())) {
                 allergenIngredientSelectApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        }else{
-            binding!!.llBottomBtn.visibility=View.VISIBLE
-            binding!!.rlUpdateAllergens.visibility=View.GONE
+        } else {
+            binding!!.llBottomBtn.visibility = View.VISIBLE
+            binding!!.rlUpdateAllergens.visibility = View.GONE
 
-            if (allergenIngredientViewModel.getAllergensData()!=null){
+            if (allergenIngredientViewModel.getAllergensData() != null) {
                 showDataInUi(allergenIngredientViewModel.getAllergensData()!!)
-            }else {
+                if (status=="2"){
+                    binding!!.tvNextBtn.isClickable = true
+                    binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                }
+            } else {
                 ///checking the device of mobile data in online and offline(show network error message)
                 ///checking the device of mobile data in online and offline(show network error message)
                 /// allergies api implement
@@ -123,7 +132,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
     private fun allergenIngredientSelectApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            allergenIngredientViewModel.userPreferencesApi{
+            allergenIngredientViewModel.userPreferencesApi {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
@@ -134,14 +143,16 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                         } else {
                             if (bodyModel.code == ErrorMessage.code) {
                                 showAlertFunction(bodyModel.message, true)
-                            }else{
+                            } else {
                                 showAlertFunction(bodyModel.message, false)
                             }
                         }
                     }
+
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
+
                     else -> {
                         showAlertFunction(it.message, false)
                     }
@@ -182,8 +193,8 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
 
         /// handle click event for redirect next part
         binding!!.tvNextBtn.setOnClickListener {
-            if (status=="2"){
-                allergenIngredientViewModel.setAllergensData(dietaryRestrictionsModelData)
+            if (status == "2") {
+                allergenIngredientViewModel.setAllergensData(allergenIngModelData)
                 sessionManagement.setAllergenIngredientList(allergensSelectedId)
                 if (sessionManagement.getCookingFor().equals("Myself")) {
                     findNavController().navigate(R.id.mealRoutineFragment)
@@ -195,7 +206,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
             }
         }
 
-        binding!!.rlUpdateAllergens.setOnClickListener{
+        binding!!.rlUpdateAllergens.setOnClickListener {
             ///checking the device of mobile data in online and offline(show network error message)
             if (BaseApplication.isOnline(requireActivity())) {
                 updateAllergensApi()
@@ -213,20 +224,23 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 when (it) {
                     is NetworkResult.Success -> {
                         val gson = Gson()
-                        val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                        val updateModel =
+                            gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
                         if (updateModel.code == 200 && updateModel.success) {
                             findNavController().navigateUp()
                         } else {
                             if (updateModel.code == ErrorMessage.code) {
                                 showAlertFunction(updateModel.message, true)
-                            }else{
+                            } else {
                                 showAlertFunction(updateModel.message, false)
                             }
                         }
                     }
+
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
+
                     else -> {
                         showAlertFunction(it.message, false)
                     }
@@ -237,14 +251,15 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
 
 
     private fun searchable(editText: String) {
-        val filteredList: MutableList<DietaryRestrictionsModelData> = java.util.ArrayList<DietaryRestrictionsModelData>()
-        for (item in dietaryRestrictionsModelData) {
+        val filteredList: MutableList<AllergensIngredientModelData> =
+            java.util.ArrayList<AllergensIngredientModelData>()
+        for (item in allergenIngModelData) {
             if (item.name.toLowerCase().contains(editText.lowercase(Locale.getDefault()))) {
                 filteredList.add(item)
             }
         }
         if (filteredList.size > 0) {
-            dietaryRestrictionsAdapter!!.filterList(filteredList)
+            allergenIngAdapter!!.filterList(filteredList)
             binding!!.rcyAllergensDesc.visibility = View.VISIBLE
         } else {
             binding!!.rcyAllergensDesc.visibility = View.GONE
@@ -259,20 +274,23 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 when (it) {
                     is NetworkResult.Success -> {
                         val gson = Gson()
-                        val dietaryModel = gson.fromJson(it.data, DietaryRestrictionsModel::class.java)
+                        val dietaryModel =
+                            gson.fromJson(it.data, AllergensIngredientModel::class.java)
                         if (dietaryModel.code == 200 && dietaryModel.success) {
                             showDataInUi(dietaryModel.data)
                         } else {
                             if (dietaryModel.code == ErrorMessage.code) {
                                 showAlertFunction(dietaryModel.message, true)
-                            }else{
+                            } else {
                                 showAlertFunction(dietaryModel.message, false)
                             }
                         }
                     }
+
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
+
                     else -> {
                         showAlertFunction(it.message, false)
                     }
@@ -281,11 +299,17 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         }
     }
 
-    private fun showDataInUi(dietaryModelData: List<DietaryRestrictionsModelData>) {
-        if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
-            dietaryRestrictionsModelData= dietaryModelData.toMutableList()
-            dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
-            binding!!.rcyAllergensDesc.adapter = dietaryRestrictionsAdapter
+    private fun showDataInUi(allergensModelData: MutableList<AllergensIngredientModelData>) {
+        if (allergensModelData != null && allergensModelData.isNotEmpty()) {
+            if (allergenIngredientViewModel.getAllergensData() == null) {
+                allergensModelData.add(
+                    0,
+                    AllergensIngredientModelData(id = -1, selected = false, "None")
+                ) // ID set to -1 as an indicator
+            }
+            allergenIngModelData = allergensModelData.toMutableList()
+            allergenIngAdapter = AdapterAllergensIngItem(allergensModelData, requireActivity(), this)
+            binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
         }
     }
 
@@ -319,26 +343,28 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         }
     }
 
-    override fun itemClicked(position: Int?, list: MutableList<String>, status1: String?, type: String?) {
-        if (status1.equals("-1")) {
-            status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            allergensSelectedId=list
-            return
-        }
+    override fun itemClicked(position: Int?, list: MutableList<String>?, status1: String?, type: String?) {
+            if (status1.equals("-1")) {
+                if (position==0){
+                    allergensSelectedId.clear()
+                }else{
+                    allergensSelectedId = list!!
+                }
+                status = "2"
+                binding!!.tvNextBtn.isClickable = true
+                binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                return
+            }
 
-        if (type.equals("true")) {
-            status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            allergensSelectedId=list
-        } else {
-            status = ""
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
-        }
+            if (type.equals("true")) {
+                status = "2"
+                binding!!.tvNextBtn.isClickable = true
+                binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                allergensSelectedId = list!!
+            } else {
+                status = ""
+                binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            }
 
     }
-
-
 }

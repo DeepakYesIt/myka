@@ -5,12 +5,15 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.mykameal.planner.fragment.authfragment.login.model.RememberMe
 
 class SessionManagement(var context: Context) {
     var dialog: Dialog? = null
     private var editor: SharedPreferences.Editor? = null
+    private var editor2: SharedPreferences.Editor? = null
     private var editorFirstTime: SharedPreferences.Editor? = null
     private var pref: SharedPreferences? = null
+    private var pref2: SharedPreferences? = null
     private var prefFirstTime: SharedPreferences? = null
     private val gson = Gson()
 
@@ -18,6 +21,9 @@ class SessionManagement(var context: Context) {
     init {
         pref = context.getSharedPreferences(AppConstant.LOGIN_SESSION, Context.MODE_PRIVATE)
         editor = pref?.edit()
+
+        pref2 = context.getSharedPreferences(AppConstant.RememberMe, Context.MODE_PRIVATE)
+        editor2 = pref2?.edit()
 
 
         prefFirstTime = context.getSharedPreferences(AppConstant.FirstTime, Context.MODE_PRIVATE)
@@ -35,6 +41,31 @@ class SessionManagement(var context: Context) {
         private const val isIdVerification = "isIdVerification"
     }
 
+/*    fun setRememberMe(remember: MutableList<String>?) {
+        val json = gson.toJson(remember)
+        editor2!!.putString(AppConstant.rememberMe, json)
+        editor2!!.commit()
+    }
+
+    fun getRememberMe(): MutableList<String>? {
+        val json = pref2?.getString(AppConstant.rememberMe, null)
+        return if (json != null) {
+            val type = object : TypeToken<List<String>>() {}.type
+            gson.fromJson(json, type)
+        } else {
+            null
+        }
+    }*/
+
+    fun setRememberMe(value : List<RememberMe>){
+        editor2!!.putString(AppConstant.rememberMe, Gson().toJson(value))
+        editor2!!.apply()
+    }
+
+
+    fun getRememberMe() : String{
+        return pref2!!.getString(AppConstant.rememberMe,"")!!
+    }
 
     fun getLoginSession(): Boolean {
         return pref!!.getBoolean(AppConstant.loginSession, false)
@@ -49,8 +80,6 @@ class SessionManagement(var context: Context) {
     fun getFirstTime(): Boolean {
         return prefFirstTime!!.getBoolean(AppConstant.SessionFirstTime, true)
     }
-
-
 
 
 

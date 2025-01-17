@@ -20,14 +20,18 @@ import com.google.gson.Gson
 import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.OnItemClickedListener
 import com.mykameal.planner.R
+import com.mykameal.planner.adapter.AdapterDislikeIngredientItem
 import com.mykameal.planner.adapter.DietaryRestrictionsAdapter
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.databinding.FragmentIngredientDislikesBinding
+import com.mykameal.planner.fragment.commonfragmentscreen.allergensIngredients.model.AllergensIngredientModelData
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModel
 import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
+import com.mykameal.planner.fragment.commonfragmentscreen.ingredientDislikes.model.DislikedIngredientsModel
+import com.mykameal.planner.fragment.commonfragmentscreen.ingredientDislikes.model.DislikedIngredientsModelData
 import com.mykameal.planner.fragment.commonfragmentscreen.ingredientDislikes.viewmodel.DislikeIngredientsViewModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,8 +42,8 @@ import java.util.Locale
 class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
 
     private var binding: FragmentIngredientDislikesBinding? = null
-    private var dietaryRestrictionsModelData = mutableListOf<DietaryRestrictionsModelData>()
-    private var dietaryRestrictionsAdapter: DietaryRestrictionsAdapter? = null
+    private var dislikeIngredientModelData = mutableListOf<DislikedIngredientsModelData>()
+    private var dislikeIngredientsAdapter: AdapterDislikeIngredientItem? = null
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue:Int=0
     private var status:String?=""
@@ -88,6 +92,10 @@ class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
 
             if (dislikeIngredientsViewModel.getDislikeIngData()!=null){
                 showDataInUi(dislikeIngredientsViewModel.getDislikeIngData()!!)
+                if (status=="2"){
+                    binding!!.tvNextBtn.isClickable = true
+                    binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                }
             }else{
                 ///checking the device of mobile data in online and offline(show network error message)
                 if (BaseApplication.isOnline(requireContext())) {
@@ -157,7 +165,7 @@ class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
 
         binding!!.tvNextBtn.setOnClickListener{
             if (status=="2"){
-                dislikeIngredientsViewModel.setDislikeIngData(dietaryRestrictionsModelData)
+                dislikeIngredientsViewModel.setDislikeIngData(dislikeIngredientModelData)
                 sessionManagement.setDislikeIngredientList(dislikeSelectedId)
                 findNavController().navigate(R.id.allergensIngredientsFragment)
             }
@@ -219,7 +227,7 @@ class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
                 when (it) {
                     is NetworkResult.Success -> {
                         val gson = Gson()
-                        val dietaryModel = gson.fromJson(it.data, DietaryRestrictionsModel::class.java)
+                        val dietaryModel = gson.fromJson(it.data, DislikedIngredientsModel::class.java)
                         if (dietaryModel.code == 200 && dietaryModel.success) {
                             showDataInUi(dietaryModel.data)
                         } else {
@@ -241,11 +249,14 @@ class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
         }
     }
 
-    private fun showDataInUi(dietaryModelData: List<DietaryRestrictionsModelData>) {
-        if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
-            dietaryRestrictionsModelData= dietaryModelData.toMutableList()
-            dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
-            binding!!.rcyIngDislikes.adapter = dietaryRestrictionsAdapter
+    private fun showDataInUi(dislikeIngModelData: MutableList<DislikedIngredientsModelData>) {
+        if (dislikeIngModelData!=null && dislikeIngModelData.isNotEmpty()){
+            if (dislikeIngredientsViewModel.getDislikeIngData() == null) {
+                dislikeIngModelData.add(0, DislikedIngredientsModelData(id = -1, selected = false, "None")) // ID set to -1 as an indicator
+            }
+            dislikeIngredientModelData= dislikeIngModelData.toMutableList()
+            dislikeIngredientsAdapter = AdapterDislikeIngredientItem(dislikeIngModelData, requireActivity(), this)
+            binding!!.rcyIngDislikes.adapter = dislikeIngredientsAdapter
         }
     }
 
@@ -254,14 +265,14 @@ class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
     }
 
     private fun searchable(editText: String) {
-        val filteredList: MutableList<DietaryRestrictionsModelData> = java.util.ArrayList<DietaryRestrictionsModelData>()
-        for (item in dietaryRestrictionsModelData) {
+        val filteredList: MutableList<DislikedIngredientsModelData> = java.util.ArrayList<DislikedIngredientsModelData>()
+        for (item in dislikeIngredientModelData) {
             if (item.name.toLowerCase().contains(editText.lowercase(Locale.getDefault()))) {
                 filteredList.add(item)
             }
         }
         if (filteredList.size > 0) {
-            dietaryRestrictionsAdapter!!.filterList(filteredList)
+            dislikeIngredientsAdapter!!.filterList(filteredList)
             binding!!.rcyIngDislikes.visibility = View.VISIBLE
         } else {
             binding!!.rcyIngDislikes.visibility = View.GONE
@@ -289,26 +300,28 @@ class IngredientDislikesFragment : Fragment(),OnItemClickedListener {
         }
     }
 
+    override fun itemClicked(position: Int?, list: MutableList<String>?, status1: String?, type: String?) {
 
+            if (status1.equals("-1")) {
+                if (position==0){
+                    dislikeSelectedId.clear()
+                }else{
+                    dislikeSelectedId=list!!
+                }
+                status = "2"
+                binding!!.tvNextBtn.isClickable = true
+                binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                return
+            }
 
-    override fun itemClicked(position: Int?, list: MutableList<String>, status1: String?, type: String?) {
-        if (status1.equals("-1")) {
-            status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            dislikeSelectedId=list
-            return
+            if (type.equals("true")) {
+                status = "2"
+                binding!!.tvNextBtn.isClickable = true
+                binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                dislikeSelectedId=list!!
+            } else {
+                status = ""
+                binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            }
         }
-
-        if (type.equals("true")) {
-            status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            dislikeSelectedId=list
-        } else {
-            status = ""
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
-        }
-    }
-
 }

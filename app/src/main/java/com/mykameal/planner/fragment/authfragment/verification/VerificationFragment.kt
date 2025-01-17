@@ -1,5 +1,6 @@
 package com.mykameal.planner.fragment.authfragment.verification
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -35,6 +36,7 @@ import java.util.Locale
 
 @AndroidEntryPoint
 class VerificationFragment : Fragment() {
+
     private var binding: FragmentVerificationBinding? = null
     private var screenType: String? = null
     private var chooseType: String? = ""
@@ -85,10 +87,8 @@ class VerificationFragment : Fragment() {
         }
 
         /// handle on back pressed
-        requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
+        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(),
+            object : OnBackPressedCallback(true) { override fun handleOnBackPressed() {
                     findNavController().navigateUp()
                 }
             })
@@ -102,11 +102,12 @@ class VerificationFragment : Fragment() {
         return binding!!.root
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initialize() {
 
         /// check value is contains email aur phone
         if (value!!.contains("@")) {
-            binding!!.tvCodeSent.text = "we have sent the code to " + value
+            binding!!.tvCodeSent.text = "we have sent the code to $value"
             binding!!.tvLogInType.text = " email"
         } else {
             binding!!.tvLogInType.text = " phone"
@@ -136,7 +137,6 @@ class VerificationFragment : Fragment() {
             if (sessionManagement.getPartnerName() != "") {
                 partnerName = sessionManagement.getPartnerName()
             }
-
 
             if (sessionManagement.getPartnerAge() != "") {
                 partnerAge = sessionManagement.getPartnerAge()
@@ -180,6 +180,9 @@ class VerificationFragment : Fragment() {
 
             if (sessionManagement.getMealRoutineList() != null) {
                 mealRoutineSelectedId = sessionManagement.getMealRoutineList()!!
+                if (mealRoutineSelectedId.contains("-1")){
+                    mealRoutineSelectedId.remove("-1")
+                }
             }
 
             if (sessionManagement.getCookingFrequency() != "") {
@@ -201,7 +204,6 @@ class VerificationFragment : Fragment() {
             if (sessionManagement.getReasonTakeAway() != "") {
                 reasonTakeAway = sessionManagement.getReasonTakeAway()
             }
-
         }
 
         //// handle on back pressed
@@ -371,7 +373,6 @@ class VerificationFragment : Fragment() {
     }
 
     private fun showDataInSession(signUpVerificationModelData: SignUpVerificationModelData) {
-
 
         sessionManagement.setLoginSession(true)
         if (value!!.contains("@")) {

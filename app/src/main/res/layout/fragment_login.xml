@@ -134,7 +134,7 @@
                         android:id="@+id/checkBoxImages"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/tick_ckeckbox_images"/>
+                        android:src="@drawable/uncheck_box_images"/>
 
                     <TextView
                         android:layout_width="wrap_content"

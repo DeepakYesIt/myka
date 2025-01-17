@@ -26,22 +26,24 @@ import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.GetUserPre
 import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModel
 import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
+import com.mykameal.planner.fragment.commonfragmentscreen.favouriteCuisines.model.FavouriteCuisinesModel
+import com.mykameal.planner.fragment.commonfragmentscreen.favouriteCuisines.model.FavouriteCuisinesModelData
 import com.mykameal.planner.fragment.commonfragmentscreen.favouriteCuisines.viewmodel.FavouriteCuisineViewModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
+class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
 
     private var binding: FragmentFavouriteCuisinesBinding? = null
     private var adapterFavouriteCuisinesItem: AdapterFavouriteCuisinesItem? = null
     private lateinit var sessionManagement: SessionManagement
-    private var totalProgressValue:Int=0
-    private var status:String?=""
+    private var totalProgressValue: Int = 0
+    private var status: String? = ""
     private var favouriteSelectId = mutableListOf<String>()
     private lateinit var favouriteCuisineViewModel: FavouriteCuisineViewModel
-    private var favouriteCuiModelData: List<DietaryRestrictionsModelData>?=null
+    private var favouriteCuiModelData: MutableList<FavouriteCuisinesModelData>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,38 +54,38 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
         favouriteCuisineViewModel = ViewModelProvider(this)[FavouriteCuisineViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
-        if (sessionManagement.getCookingFor().equals("Myself")){
-            binding!!.tvCuisinesEnjoy.text="What cuisines do you enjoy most?"
-            binding!!.progressBar3.max=10
-            totalProgressValue=10
+        if (sessionManagement.getCookingFor().equals("Myself")) {
+            binding!!.tvCuisinesEnjoy.text = "What cuisines do you enjoy most?"
+            binding!!.progressBar3.max = 10
+            totalProgressValue = 10
             updateProgress(3)
-        }else if (sessionManagement.getCookingFor().equals("MyPartner")){
-            binding!!.tvCuisinesEnjoy.text="What cuisines do you and your partner enjoy most?"
-            binding!!.progressBar3.max=11
-            totalProgressValue=11
+        } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
+            binding!!.tvCuisinesEnjoy.text = "What cuisines do you and your partner enjoy most?"
+            binding!!.progressBar3.max = 11
+            totalProgressValue = 11
             updateProgress(6)
         } else {
-            binding!!.tvCuisinesEnjoy.text="What cuisines do you and your family enjoy most?"
-            binding!!.progressBar3.max=11
-            totalProgressValue=11
+            binding!!.tvCuisinesEnjoy.text = "What cuisines do you and your family enjoy most?"
+            binding!!.progressBar3.max = 11
+            totalProgressValue = 11
             updateProgress(6)
         }
 
-        if (sessionManagement.getCookingScreen().equals("Profile")){
-            binding!!.llBottomBtn.visibility=View.GONE
-            binding!!.rlUpdateFavCuisine.visibility=View.VISIBLE
+        if (sessionManagement.getCookingScreen().equals("Profile")) {
+            binding!!.llBottomBtn.visibility = View.GONE
+            binding!!.rlUpdateFavCuisine.visibility = View.VISIBLE
             if (BaseApplication.isOnline(requireContext())) {
                 favouriteCuisineSelectApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        }else{
-            binding!!.llBottomBtn.visibility=View.VISIBLE
-            binding!!.rlUpdateFavCuisine.visibility=View.GONE
+        } else {
+            binding!!.llBottomBtn.visibility = View.VISIBLE
+            binding!!.rlUpdateFavCuisine.visibility = View.GONE
 
-            if (favouriteCuisineViewModel.getFavouriteCuiData()!=null){
+            if (favouriteCuisineViewModel.getFavouriteCuiData() != null) {
                 showDataInUi(favouriteCuisineViewModel.getFavouriteCuiData()!!)
-            }else{
+            } else {
                 ///checking the device of mobile data in online and offline(show network error message)
                 if (BaseApplication.isOnline(requireContext())) {
                     favouriteCuisineApi()
@@ -93,11 +95,13 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
             }
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(
+            requireActivity(),
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
 
         initialize()
         return binding!!.root
@@ -110,19 +114,19 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
 
     private fun initialize() {
 
-        binding!!.imbBackFavouriteCuisines.setOnClickListener{
+        binding!!.imbBackFavouriteCuisines.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.tvSkipBtn.setOnClickListener{
+        binding!!.tvSkipBtn.setOnClickListener {
             stillSkipDialog()
         }
 
-        binding!!.tvNextBtn.setOnClickListener{
-            if (status=="2"){
+        binding!!.tvNextBtn.setOnClickListener {
+            if (status == "2") {
                 favouriteCuisineViewModel.setFavouriteCuiData(favouriteCuiModelData!!)
                 sessionManagement.setFavouriteCuisineList(favouriteSelectId)
-                if (sessionManagement.getCookingFor().equals("Myself")){
+                if (sessionManagement.getCookingFor().equals("Myself")) {
                     findNavController().navigate(R.id.ingredientDislikesFragment)
                 } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
                     findNavController().navigate(R.id.mealRoutineFragment)
@@ -133,7 +137,7 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
             }
         }
 
-        binding!!.rlUpdateFavCuisine.setOnClickListener{
+        binding!!.rlUpdateFavCuisine.setOnClickListener {
             if (BaseApplication.isOnline(requireContext())) {
                 updateFavCuisineApi()
             } else {
@@ -150,20 +154,23 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
                 when (it) {
                     is NetworkResult.Success -> {
                         val gson = Gson()
-                        val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                        val updateModel =
+                            gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
                         if (updateModel.code == 200 && updateModel.success) {
                             findNavController().navigateUp()
                         } else {
                             if (updateModel.code == ErrorMessage.code) {
                                 showAlertFunction(updateModel.message, true)
-                            }else{
+                            } else {
                                 showAlertFunction(updateModel.message, false)
                             }
                         }
                     }
+
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
+
                     else -> {
                         showAlertFunction(it.message, false)
                     }
@@ -188,7 +195,7 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
         tvDialogSkipBtn.setOnClickListener {
             dialogStillSkip.dismiss()
             sessionManagement.setFavouriteCuisineList(null)
-            if (sessionManagement.getCookingFor().equals("Myself")){
+            if (sessionManagement.getCookingFor().equals("Myself")) {
                 findNavController().navigate(R.id.ingredientDislikesFragment)
             } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
                 findNavController().navigate(R.id.mealRoutineFragment)
@@ -213,14 +220,16 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
                         } else {
                             if (bodyModel.code == ErrorMessage.code) {
                                 showAlertFunction(bodyModel.message, true)
-                            }else{
+                            } else {
                                 showAlertFunction(bodyModel.message, false)
                             }
                         }
                     }
+
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
+
                     else -> {
                         showAlertFunction(it.message, false)
                     }
@@ -238,20 +247,23 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
                 when (it) {
                     is NetworkResult.Success -> {
                         val gson = Gson()
-                        val dietaryModel = gson.fromJson(it.data, DietaryRestrictionsModel::class.java)
+                        val dietaryModel =
+                            gson.fromJson(it.data, FavouriteCuisinesModel::class.java)
                         if (dietaryModel.code == 200 && dietaryModel.success) {
                             showDataInUi(dietaryModel.data)
                         } else {
                             if (dietaryModel.code == ErrorMessage.code) {
                                 showAlertFunction(dietaryModel.message, true)
-                            }else{
+                            } else {
                                 showAlertFunction(dietaryModel.message, false)
                             }
                         }
                     }
+
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
+
                     else -> {
                         showAlertFunction(it.message, false)
                     }
@@ -260,11 +272,18 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
         }
     }
 
-    private fun showDataInUi(dietaryModelData: List<DietaryRestrictionsModelData>) {
+    private fun showDataInUi(favouriteModelData: MutableList<FavouriteCuisinesModelData>) {
 
-        if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
-            favouriteCuiModelData=dietaryModelData
-            adapterFavouriteCuisinesItem = AdapterFavouriteCuisinesItem(dietaryModelData, requireActivity(), this)
+        if (favouriteModelData != null && favouriteModelData.isNotEmpty()) {
+            if (favouriteCuisineViewModel.getFavouriteCuiData() == null) {
+                favouriteModelData.add(
+                    0,
+                    FavouriteCuisinesModelData(id = -1, selected = false, "None")
+                ) // ID set to -1 as an indicator
+            }
+            favouriteCuiModelData = favouriteModelData
+            adapterFavouriteCuisinesItem =
+                AdapterFavouriteCuisinesItem(favouriteModelData, requireActivity(), this)
             binding!!.rcyFavCuisines.adapter = adapterFavouriteCuisinesItem
         }
     }
@@ -274,23 +293,18 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
     }
 
 
-    override fun itemClicked(position: Int?, list: MutableList<String>, status1: String?, type: String?
-    ) {
-    /*    if (status1 == "1") {
-            status=""
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
-        } else {
-            status="2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            favouriteSelectId=list
-        }*/
+    override fun itemClicked(position: Int?, list: MutableList<String>?, status1: String?, type: String?) {
 
         if (status1.equals("-1")) {
+            if (position==0){
+                favouriteSelectId.clear()
+            }else{
+                favouriteSelectId = list!!
+            }
             status = "2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            favouriteSelectId=list
+            favouriteSelectId = list!!
             return
         }
 
@@ -298,7 +312,7 @@ class FavouriteCuisinesFragment : Fragment(),OnItemClickedListener {
             status = "2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            favouriteSelectId=list
+            favouriteSelectId = list!!
         } else {
             status = ""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)

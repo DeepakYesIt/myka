@@ -3,19 +3,20 @@ package com.mykameal.planner.fragment.commonfragmentscreen.favouriteCuisines.vie
 import androidx.lifecycle.ViewModel
 import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
+import com.mykameal.planner.fragment.commonfragmentscreen.favouriteCuisines.model.FavouriteCuisinesModelData
 import com.mykameal.planner.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 @HiltViewModel
 class FavouriteCuisineViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
-    private var favouriteCuiLocalData: List<DietaryRestrictionsModelData>?=null
+    private var favouriteCuiLocalData: MutableList<FavouriteCuisinesModelData>?=null
 
         suspend fun getFavouriteCuisines(successCallback: (response: NetworkResult<String>) -> Unit){
         repository.getFavouriteCuisines { successCallback(it) }
     }
 
-    fun setFavouriteCuiData(data: List<DietaryRestrictionsModelData>) {
+    fun setFavouriteCuiData(data: MutableList<FavouriteCuisinesModelData>) {
         favouriteCuiLocalData=data
     }
 
@@ -25,7 +26,7 @@ class FavouriteCuisineViewModel @Inject constructor(private val repository: Main
         // Reset other variables
     }
 
-    fun getFavouriteCuiData(): List<DietaryRestrictionsModelData>? {
+    fun getFavouriteCuiData(): MutableList<FavouriteCuisinesModelData>? {
         return favouriteCuiLocalData
     }
 
