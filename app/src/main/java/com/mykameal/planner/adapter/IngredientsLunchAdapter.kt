@@ -2,6 +2,8 @@ package com.mykameal.planner.adapter
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.content.ClipData
+import android.content.ClipDescription
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -78,7 +80,17 @@ class IngredientsLunchAdapter(private var datalist: List<DataModel>, private var
             onItemClickListener.itemClick(position, checkStatus,checkTypeStatus)
         }
         holder.itemView.setOnLongClickListener{
+            val clipData = ClipData(
+                datalist[position].title, // Use the title as the drag data
+                arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
+                ClipData.Item(datalist[position].title)
+            )
+
+            val shadowBuilder = View.DragShadowBuilder(holder.itemView)
+            holder.itemView.startDragAndDrop(clipData, shadowBuilder, null, 0)
             onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
+            true
+          /*  onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)*/
             true
         }
     }

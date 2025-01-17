@@ -31,7 +31,8 @@ class DirectionSteps1RecipeDetailsFragment : Fragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                findNavController().navigate(R.id.recipeDetailsFragment)
+//                findNavController().navigate(R.id.recipeDetailsFragment)
+                findNavController().navigateUp()
             }
         })
 
@@ -49,7 +50,8 @@ class DirectionSteps1RecipeDetailsFragment : Fragment() {
     private fun initialize() {
 
         binding!!.imgStep1RecipeDetails.setOnClickListener{
-            findNavController().navigate(R.id.recipeDetailsFragment)
+//            findNavController().navigate(R.id.recipeDetailsFragment)
+            findNavController().navigateUp()
         }
 
         binding!!.relNextStep.setOnClickListener{

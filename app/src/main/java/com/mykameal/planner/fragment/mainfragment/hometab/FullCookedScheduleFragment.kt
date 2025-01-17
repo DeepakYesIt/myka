@@ -1,9 +1,13 @@
 package com.mykameal.planner.fragment.mainfragment.hometab
 
+import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.ClipDescription
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
+import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,22 +20,25 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.OnItemLongClickListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.adapter.CalendarDayAdapter
-import com.mykameal.planner.adapter.DragDropHelper
+import com.mykameal.planner.adapter.CalendarDayDateAdapter
 import com.mykameal.planner.adapter.IngredientsBreakFastAdapter
 import com.mykameal.planner.adapter.IngredientsDinnerAdapter
 import com.mykameal.planner.adapter.IngredientsLunchAdapter
+import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.databinding.FragmentFullCookedScheduleBinding
 import com.mykameal.planner.model.CalendarDataModel
 import com.mykameal.planner.model.DataModel
+import com.yesitlabs.mykaapp.model.DateModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 
@@ -46,12 +53,18 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
     private var dataList2: MutableList<DataModel> = mutableListOf()
     private var dataList3: MutableList<DataModel> = mutableListOf()
     private var calendarDayAdapter: CalendarDayAdapter? = null
+    private var calendarAdapter: CalendarDayDateAdapter? = null
     private var statuses: String? = ""
     private var checkStatus: Boolean? = false
 
     private val calendar = Calendar.getInstance()
     private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
     private val dateFormat1 = SimpleDateFormat("dd MMM", Locale.getDefault())
+
+    // Define global variables
+    private lateinit var startDate: Date
+    private lateinit var endDate: Date
+    var currentDate = Date() // Current date
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -71,6 +84,10 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
                 }
             })
 
+        binding!!.rlMainFullCooked.setOnClickListener {
+            onClickFalseEnabled()
+        }
+
         onClickFalseEnabled()
         fullCookSchBreakFastModel()
         fullCookSchLunchModel()
@@ -78,9 +95,215 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
         initialize()
 
 
+        // Display current week dates
+        showWeekDates()
 
 
         return binding!!.root
+    }
+
+    @SuppressLint("SetTextI18n")
+    fun showWeekDates() {
+        Log.d("currentDate :- ", "******$currentDate")
+        val (startDate, endDate) = getWeekDates(currentDate)
+        this.startDate=startDate
+        this.endDate=endDate
+
+        println("Week Start Date: ${formatDate(startDate)}")
+        println("Week End Date: ${formatDate(endDate)}")
+
+        // Get all dates between startDate and endDate
+        val daysBetween = getDaysBetween(startDate, endDate)
+
+        // Print the dates
+        println("Days between ${startDate} and ${endDate}:")
+        daysBetween.forEach { println(it) }
+        binding!!.tvCustomDates.text = BaseApplication.formatonlyMonthYear(startDate)
+        binding!!.textWeekRange.text = ""+formatDate(startDate)+"-"+formatDate(endDate)
+
+        tvWeekRange?.text = ""+formatDate(startDate)+"-"+formatDate(endDate)
+        calendarAdapter=CalendarDayDateAdapter(getDaysBetween(startDate, endDate)) {
+            /*// Handle item click if needed
+            if (BaseApplication.isOnline(requireActivity())) {
+                dataFatchByDate(it)
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }*/
+
+        }
+        // Update the RecyclerView
+        binding!!.recyclerViewWeekDays.adapter =  calendarAdapter
+
+        binding!!.recyclerViewWeekDays.setOnDragListener { view, dragEvent ->
+            when (dragEvent.action) {
+                DragEvent.ACTION_DRAG_STARTED -> {
+                    // Accept the drag only if the MIME type matches
+
+                    dragEvent.clipDescription?.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN) == true
+                }
+                DragEvent.ACTION_DRAG_ENTERED -> {
+                    // Optional: Highlight the RecyclerView background
+//                    view.setBackgroundColor(Color.LTGRAY)
+                    true
+                }
+                DragEvent.ACTION_DRAG_LOCATION -> {
+                    val recyclerView = view as RecyclerView // Cast the view to RecyclerView
+                    val childView = recyclerView.findChildViewUnder(dragEvent.x, dragEvent.y) // Call findChildViewUnder on RecyclerView
+                    val targetPosition = if (childView != null) {
+                        recyclerView.getChildAdapterPosition(childView) // Get the position of the child
+                    } else {
+                        RecyclerView.NO_POSITION // Return NO_POSITION if no child is found
+                    }
+
+                    if (targetPosition != RecyclerView.NO_POSITION) {
+
+                        // Retrieve the list of dates
+                        val dateList = getDaysBetween(startDate, endDate)
+
+                        // Update the status of the item at the target position
+                        dateList.forEachIndexed { index, dateModel ->
+                            if (index==targetPosition){
+                                dateModel.status=true
+                            }else{
+                                dateModel.status=false
+                            }
+
+                        }
+
+                        Log.d("Date ", "*****$dateList")
+
+                        // Notify the adapter to refresh the changed position
+                        calendarAdapter!!.updateList(dateList)
+                        calendarAdapter!!.notifyItemChanged(targetPosition)
+
+                        /*calendarAdapter!!.updateList(dateList)*/
+
+                    } else {
+                        Log.d("date position ", "No valid position under drag location")
+                    }
+                    true
+                }
+                DragEvent.ACTION_DRAG_EXITED -> {
+                    // Optional: Reset background or remove highlight
+//                    view.setBackgroundColor(Color.WHITE)
+                    true
+                }
+                DragEvent.ACTION_DROP -> {
+                    // Retrieve the dragged data
+                    val clipData = dragEvent.clipData
+                    val draggedItem = clipData.getItemAt(0).text.toString() // Assuming text represents the dragged item
+
+                    // Find the target position in RecyclerView
+                    val recyclerView = view as RecyclerView // Cast the view to RecyclerView
+                    val dropX = dragEvent.x // X-coordinate of the drop
+                    val dropY = dragEvent.y // Y-coordinate of the drop
+                    val childView = recyclerView.findChildViewUnder(dropX, dropY) // Find the child view under the drop position
+
+                    if (childView != null) {
+                        // Get the adapter position of the target item
+                        val dropPosition = recyclerView.getChildAdapterPosition(childView)
+
+                        if (dropPosition != RecyclerView.NO_POSITION) {
+                            Log.d("ACTION_DROP", "Item dropped at position: $dropPosition")
+
+                            Log.d("ACTION_DROP", "*******$dropPosition")
+
+                            Log.d("date position ", "******"+getDaysBetween(startDate, endDate)[dropPosition].date)
+
+                            Log.d("drop date and days","******"+getDaysBetween(startDate, endDate)[dropPosition].date+"-"+getDaysBetween(startDate, endDate)[dropPosition].day)
+                            Toast.makeText(requireContext(),"date "+getDaysBetween(startDate, endDate)[dropPosition].date+"-"+getDaysBetween(startDate, endDate)[dropPosition].day,Toast.LENGTH_LONG).show()
+                            Log.d("ACTION_DROP", "Target position: $dropPosition")
+
+                            // Retrieve the list of dates
+                            val dateList = getDaysBetween(startDate, endDate)
+
+                            // Update the status of the item at the target position
+                            dateList.forEachIndexed { index, dateModel ->
+                                if (index==dropPosition){
+                                    dateModel.status=true
+                                }else{
+                                    dateModel.status=false
+                                }
+
+                            }
+
+                            Log.d("Date ", "*****$dateList")
+
+                            // Notify the adapter to refresh the changed position
+                            calendarAdapter!!.updateList(dateList)
+
+                            // Optional: Notify the source RecyclerView to remove the dragged item
+                            // notifyItemRemovedInSource(draggedItem)
+                        } else {
+                            Log.d("ACTION_DROP", "No valid drop position found")
+                        }
+                    } else {
+                        Log.d("ACTION_DROP", "Dropped outside valid child views")
+                    }
+                    true
+                }
+
+                DragEvent.ACTION_DRAG_ENDED -> {
+                    // Reset background or clean up
+//                    view.setBackgroundColor(Color.WHITE)
+                    true
+                }
+                else -> false
+            }
+        }
+
+
+
+
+
+
+
+    }
+
+    private fun getDaysBetween(startDate: Date, endDate: Date): MutableList<DateModel> {
+        val dateList = mutableListOf<DateModel>()
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // Format for the date
+        val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault()) // Format for the day name (e.g., Monday)
+
+        val calendar = Calendar.getInstance()
+        calendar.time = startDate
+
+        while (!calendar.time.after(endDate)) {
+            val date = dateFormat.format(calendar.time)  // Get the formatted date (yyyy-MM-dd)
+            val dayName = dayFormat.format(calendar.time)  // Get the day name (Monday, Tuesday, etc.)
+
+            val localDate= DateModel()
+            localDate.day=dayName
+            localDate.date=date
+            // Combine both the day name and the date
+//            dateList.add("$dayName, $date")
+            dateList.add(localDate)
+
+
+            // Move to the next day
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        return dateList
+    }
+
+    private fun getWeekDates(currentDate: Date): Pair<Date, Date> {
+        val calendar = Calendar.getInstance()
+        calendar.time = currentDate
+        // Set the calendar to the start of the week (Monday)
+        calendar.firstDayOfWeek = Calendar.MONDAY
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val startOfWeek = calendar.time
+
+        // Set the calendar to the end of the week (Saturday)
+        calendar.add(Calendar.DAY_OF_WEEK, 6)
+        val endOfWeek = calendar.time
+        return Pair(startOfWeek, endOfWeek)
+    }
+
+    fun formatDate(date: Date): String {
+        val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+        return dateFormat.format(date)
     }
 
     private fun initialize() {
@@ -92,20 +315,46 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
         // Initialize RecyclerView and Adapter
         setupRecyclerView()
 
-        // Initial week update
-        updateWeek()
+//        // Initial week update
+//        updateWeek()
 
         binding!!.rlChangeCookSchedule.setOnClickListener {
 //            chooseDayMealTypeDialog()
         }
 
+
         binding!!.imagePrevious.setOnClickListener {
+//            changeWeekRange(-1)
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+            currentDate = calendar.time
+
+            // Display next week dates
+            println("\nAfter clicking 'Next':")
+            showWeekDates()
+        }
+
+        binding!!.imageNext.setOnClickListener {
+            /*changeWeekRange(1)*/
+            // Simulate clicking the "Next" button to move to the next week
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            calendar.add(Calendar.WEEK_OF_YEAR, 1) // Move to next week
+            currentDate = calendar.time
+
+            // Display next week dates
+            println("\nAfter clicking 'Next':")
+            showWeekDates()
+        }
+
+       /* binding!!.imagePrevious.setOnClickListener {
             changeWeekRange(-1)
         }
 
         binding!!.imageNext.setOnClickListener {
             changeWeekRange(1)
-        }
+        }*/
 
         binding!!.rlMainFullCooked.setOnLongClickListener {
             onClickEnabled()
@@ -129,6 +378,95 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
         }
         binding!!.recyclerViewWeekDays.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         binding!!.recyclerViewWeekDays.adapter = calendarDayAdapter
+
+
+        binding!!.recyclerViewWeekDays.setOnDragListener { view, dragEvent ->
+            when (dragEvent.action) {
+                DragEvent.ACTION_DRAG_STARTED -> {
+                    // Accept the drag only if the MIME type matches
+                    dragEvent.clipDescription?.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN) == true
+                }
+                DragEvent.ACTION_DRAG_ENTERED -> {
+                    // Optional: Highlight the RecyclerView background
+//                    view.setBackgroundColor(Color.LTGRAY)
+                    true
+                }
+                DragEvent.ACTION_DRAG_LOCATION -> {
+                    val recyclerView = view as RecyclerView // Cast the view to RecyclerView
+                    val childView = recyclerView.findChildViewUnder(dragEvent.x, dragEvent.y) // Call findChildViewUnder on RecyclerView
+                    val targetPosition = if (childView != null) {
+                        recyclerView.getChildAdapterPosition(childView) // Get the position of the child
+                    } else {
+                        RecyclerView.NO_POSITION // Return NO_POSITION if no child is found
+                    }
+
+                    if (targetPosition != RecyclerView.NO_POSITION) {
+//                        highlightDropPosition(targetPosition)
+                        Log.d("ACTION_DRAG_LOCATION", "Target position: $targetPosition")
+                    } else {
+                        Log.d("ACTION_DRAG_LOCATION", "No valid position under drag location")
+                    }
+                    true
+                }
+                DragEvent.ACTION_DRAG_EXITED -> {
+                    // Optional: Reset background or remove highlight
+//                    view.setBackgroundColor(Color.WHITE)
+                    true
+                }
+//                DragEvent.ACTION_DROP -> {
+//                    // Retrieve the dragged data
+//                    val clipData = dragEvent.clipData
+//                    val draggedItem = clipData.getItemAt(0).text.toString() // Assuming title represents the dragged item
+//
+//                    /*// Update data in target RecyclerView
+//                    (view.adapter as TargetAdapter).addItem(draggedItem)
+//
+//                    // Notify the source RecyclerView to remove the dragged item
+//                    notifyItemRemovedInSource(draggedItem)*/
+//                    Log.d("ACTION_DROP","*******")
+//                    true
+//                }
+                DragEvent.ACTION_DROP -> {
+                    // Retrieve the dragged data
+                    val clipData = dragEvent.clipData
+                    val draggedItem = clipData.getItemAt(0).text.toString() // Assuming text represents the dragged item
+
+                    // Find the target position in RecyclerView
+                    val recyclerView = view as RecyclerView // Cast the view to RecyclerView
+                    val dropX = dragEvent.x // X-coordinate of the drop
+                    val dropY = dragEvent.y // Y-coordinate of the drop
+                    val childView = recyclerView.findChildViewUnder(dropX, dropY) // Find the child view under the drop position
+
+                    if (childView != null) {
+                        // Get the adapter position of the target item
+                        val dropPosition = recyclerView.getChildAdapterPosition(childView)
+
+                        if (dropPosition != RecyclerView.NO_POSITION) {
+                            Log.d("ACTION_DROP", "Item dropped at position: $dropPosition")
+
+                            Log.d("ACTION_DROP", "*******$dropPosition")
+
+                            // Optional: Notify the source RecyclerView to remove the dragged item
+                            // notifyItemRemovedInSource(draggedItem)
+                        } else {
+                            Log.d("ACTION_DROP", "No valid drop position found")
+                        }
+                    } else {
+                        Log.d("ACTION_DROP", "Dropped outside valid child views")
+                    }
+                    true
+                }
+
+                DragEvent.ACTION_DRAG_ENDED -> {
+                    // Reset background or clean up
+//                    view.setBackgroundColor(Color.WHITE)
+                    true
+                }
+                else -> false
+            }
+        }
+
+
     }
 
     private fun openDialog(){
@@ -274,11 +612,36 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
         ingredientBreakFastAdapter = IngredientsBreakFastAdapter(dataList1, requireActivity(), this, this)
         binding!!.rcySearchBreakFast.adapter = ingredientBreakFastAdapter
 
-       /* val itemTouchHelper = ItemTouchHelper(DragDropHelper(ingredientBreakFastAdapter!!))
-        itemTouchHelper.attachToRecyclerView(binding!!.rcySearchBreakFast)*/
 
+        setupDragScrollForRecyclerView(binding!!.rcySearchBreakFast)
 
     }
+
+
+    private fun setupDragScrollForRecyclerView(recyclerView: RecyclerView) {
+        recyclerView.setOnDragListener { _, dragEvent ->
+            when (dragEvent.action) {
+                DragEvent.ACTION_DRAG_STARTED -> {
+                     binding!!.scroll.fullScroll(0)
+                    true
+                }
+
+                DragEvent.ACTION_DROP -> {
+                    // Handle the drop action here if needed
+                    true
+                }
+
+                DragEvent.ACTION_DRAG_ENDED -> {
+                    // Cleanup if needed
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+    }
+
 
     private fun fullCookSchLunchModel() {
         if (dataList2 != null) {
@@ -301,6 +664,9 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
         dataList2.add(data2)
         ingredientLunchAdapter = IngredientsLunchAdapter(dataList2, requireActivity(), this, this)
         binding!!.rcySearchLunch.adapter = ingredientLunchAdapter
+
+        setupDragScrollForRecyclerView(binding!!.rcySearchLunch)
+
     }
 
     private fun fullCookSchDinnerModel() {
@@ -344,8 +710,14 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
         dataList3.add(data4)
         dataList3.add(data5)
 
-        ingredientDinnerAdapter = IngredientsDinnerAdapter(dataList3, requireActivity(), this, this)
+        ingredientDinnerAdapter = IngredientsDinnerAdapter(dataList3, requireActivity(), this, binding!!.scroll,this)
         binding!!.rcySearchDinner.adapter = ingredientDinnerAdapter
+
+        setupDragScrollForRecyclerView(binding!!.rcySearchDinner)
+
+
+
+
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {

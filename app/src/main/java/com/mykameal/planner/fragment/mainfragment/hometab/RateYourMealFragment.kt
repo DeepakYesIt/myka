@@ -18,7 +18,7 @@ class RateYourMealFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding=FragmentRateYourMealBinding.inflate(layoutInflater, container, false)
 
@@ -27,12 +27,14 @@ class RateYourMealFragment : Fragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                findNavController().navigate(R.id.directionSteps2RecipeDetailsFragmentFragment)
+                findNavController().navigateUp()
+//                findNavController().navigate(R.id.directionSteps2RecipeDetailsFragmentFragment)
             }
         })
 
         binding!!.imgBackRateMeal.setOnClickListener{
-            findNavController().navigate(R.id.directionSteps2RecipeDetailsFragmentFragment)
+            findNavController().navigateUp()
+//            findNavController().navigate(R.id.directionSteps2RecipeDetailsFragmentFragment)
         }
 
         binding!!.relPublishReview.setOnClickListener{

@@ -109,6 +109,7 @@
     <string name="upload">Upload</string>
     <string name="enable_all_notification">Enable all notification</string>
     <string name="are_you_sure_to_remove_this_account">Are you sure to remove this account ?</string>
+    <string name="rate_your_recipe">Rate your recipe</string>
 
 
 </resources>

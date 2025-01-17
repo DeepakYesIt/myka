@@ -40,6 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/lay_title"
+        android:layout_above="@id/lay_bottom"
         android:layout_marginTop="@dimen/_10sdp"
         android:fillViewport="true">
 
@@ -124,7 +125,7 @@
                                 android:drawableStart="@drawable/rating_icon"
                                 android:drawablePadding="@dimen/_10sdp"
                                 android:fontFamily="@font/poppins_medium"
-                                android:text="4.7 (199)"
+                                android:text="0 (0)"
                                 android:textColor="#FFFFFF"
                                 android:textSize="@dimen/_10sdp" />
 
@@ -467,24 +468,26 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:padding="@dimen/_5sdp"
-                    android:weightSum="3">
+                    android:weightSum="2">
 
                     <LinearLayout
                         android:id="@+id/llIngredients"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:layout_marginEnd="@dimen/_5sdp"
                         android:gravity="center">
 
                         <TextView
                             android:id="@+id/textIngredients"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@drawable/select_bg"
                             android:paddingHorizontal="@dimen/_10sdp"
                             android:paddingVertical="@dimen/_5sdp"
                             android:fontFamily="@font/poppins"
                             android:text="Ingredients"
+                            android:gravity="center"
                             android:textColor="#FFFFFF"
                             android:textSize="@dimen/_12sdp" />
                     </LinearLayout>
@@ -494,6 +497,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:visibility="gone"
                         android:gravity="center">
 
                         <TextView
@@ -514,16 +518,18 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:layout_marginStart="@dimen/_5sdp"
                         android:gravity="center">
 
                         <TextView
                             android:id="@+id/textRecipe"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@drawable/unselect_bg"
                             android:paddingHorizontal="@dimen/_16sdp"
                             android:paddingVertical="@dimen/_5sdp"
                             android:text="Recipe"
+                            android:gravity="center"
                             android:fontFamily="@font/poppins"
                             android:textColor="#3C4541"
                             android:textSize="@dimen/_12sdp" />
@@ -532,7 +538,6 @@
             </com.google.android.material.card.MaterialCardView>
 
             <RelativeLayout
-                android:id="@+id/lay_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/materialIngCookRecipe">
@@ -701,76 +706,6 @@
                     android:orientation="vertical"
                     android:nestedScrollingEnabled="false"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/_10sdp"
-                    android:layout_marginHorizontal="@dimen/_12sdp"
-                    android:layout_below="@+id/rcyIngCookWareRecipe">
-
-                    <TextView
-                        android:id="@+id/textStepInstructions"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/_16sdp"
-                        android:layout_marginTop="@dimen/_20sdp"
-                        android:layout_marginBottom="@dimen/_10sdp"
-                        android:background="@drawable/button_bg"
-                        android:paddingVertical="@dimen/_10sdp"
-                        android:visibility="gone"
-                        android:text="View step by step instructions"
-                        android:textAlignment="center"
-                        android:textColor="@color/white" />
-
-                    <LinearLayout
-                        android:id="@+id/layBottomPlanBasket"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="@dimen/_5sdp"
-                        android:weightSum="2">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center">
-
-                            <TextView
-                                android:id="@+id/tvAddToPlan"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:background="@drawable/select_bg_add"
-                                android:drawablePadding="@dimen/_10sdp"
-                                android:padding="@dimen/_10sdp"
-                                android:text="Add to plan"
-                                android:textColor="#FFFFFF"
-                                android:textSize="@dimen/_13sdp"
-                                app:drawableStartCompat="@drawable/add_icon" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/lay_basket"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:background="@drawable/select_bg"
-                                android:drawablePadding="@dimen/_10sdp"
-                                android:padding="@dimen/_10sdp"
-                                android:text="Add to basket"
-                                android:textColor="#FFFFFF"
-                                android:textSize="@dimen/_13sdp"
-                                app:drawableStartCompat="@drawable/basket_icon" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                </RelativeLayout>
             </RelativeLayout>
 
             <WebView
@@ -786,5 +721,76 @@
 
     </ScrollView>
 
+    <RelativeLayout
+        android:id="@+id/lay_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/_10sdp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginHorizontal="@dimen/_12sdp">
+
+        <TextView
+            android:id="@+id/textStepInstructions"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:background="@drawable/button_bg"
+            android:paddingVertical="@dimen/_10sdp"
+            android:visibility="gone"
+            android:text="View step by step instructions"
+            android:textAlignment="center"
+            android:textColor="@color/white" />
+
+        <LinearLayout
+            android:id="@+id/layBottomPlanBasket"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="@dimen/_5sdp"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tvAddToPlan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/select_bg_add"
+                    android:drawablePadding="@dimen/_10sdp"
+                    android:padding="@dimen/_10sdp"
+                    android:text="Add to plan"
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/_13sdp"
+                    app:drawableStartCompat="@drawable/add_icon" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lay_basket"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/select_bg"
+                    android:drawablePadding="@dimen/_10sdp"
+                    android:padding="@dimen/_10sdp"
+                    android:text="Add to basket"
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/_13sdp"
+                    app:drawableStartCompat="@drawable/basket_icon" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
 
 </RelativeLayout>

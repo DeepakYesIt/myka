@@ -633,6 +633,23 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
         }
     }
 
+    override suspend fun homeDetailsRequestApi(successCallback: (response: NetworkResult<String>) -> Unit) {
+        try {
+            api.homeDetailsRequestApi().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
     override suspend fun recipeAddBasketRequestApi(
         successCallback: (response: NetworkResult<String>) -> Unit,
         jsonObject: JsonObject

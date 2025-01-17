@@ -225,6 +225,10 @@ interface ApiInterface {
     suspend fun recipeDetailsRequestApi(@Field("uri") url: String): Response<JsonObject>
 
 
+    @POST(ApiEndPoint.homeUrl)
+    suspend fun homeDetailsRequestApi(): Response<JsonObject>
+
+
     @POST(ApiEndPoint.addBasketeDetailsUrl)
     suspend fun recipeAddBasketRequestApi(@Body jsonObject: JsonObject): Response<JsonObject>
 

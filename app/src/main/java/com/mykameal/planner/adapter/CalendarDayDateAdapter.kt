@@ -10,7 +10,7 @@ import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.databinding.CalendarItemDayBinding
 import com.yesitlabs.mykaapp.model.DateModel
 
-class CalendarDayDateAdapter(val days: MutableList<DateModel>, private val onDaySelected: (String) -> Unit) : RecyclerView.Adapter<CalendarDayDateAdapter.ViewHolder>() {
+class CalendarDayDateAdapter(var days: MutableList<DateModel>, private val onDaySelected: (String) -> Unit) : RecyclerView.Adapter<CalendarDayDateAdapter.ViewHolder>() {
 
     private var selectedPosition = -1
 
@@ -28,7 +28,17 @@ class CalendarDayDateAdapter(val days: MutableList<DateModel>, private val onDay
         holder.binding.tvDayName.text = BaseApplication.getFirstLetterOfDay(day.day)
         holder.binding.tvDayDate.text = BaseApplication.formatOnlyDate(day.date)
 
-        if (position == selectedPosition) {
+        if (day.status){
+            holder.binding.llMainLayouts.setBackgroundResource(R.drawable.calendar_select_bg)
+            holder.binding.tvDayName.setTextColor(Color.parseColor("#ffffff"))
+            holder.binding.tvDayDate.setTextColor(Color.parseColor("#ffffff"))
+        }else{
+            holder.binding.llMainLayouts.setBackgroundResource(R.drawable.calendar_unselect_bg)
+            holder.binding.tvDayName.setTextColor(Color.parseColor("#999999"))
+            holder.binding.tvDayDate.setTextColor(Color.parseColor("#3C4541"))
+        }
+
+        /*if (position == selectedPosition) {
             holder.binding.llMainLayouts.setBackgroundResource(R.drawable.calendar_select_bg)
             holder.binding.tvDayName.setTextColor(Color.parseColor("#ffffff"))
             holder.binding.tvDayDate.setTextColor(Color.parseColor("#ffffff"))
@@ -36,7 +46,7 @@ class CalendarDayDateAdapter(val days: MutableList<DateModel>, private val onDay
             holder.binding.llMainLayouts.setBackgroundResource(R.drawable.calendar_unselect_bg)
             holder.binding.tvDayName.setTextColor(Color.parseColor("#999999"))
             holder.binding.tvDayDate.setTextColor(Color.parseColor("#3C4541"))
-        }
+        }*/
 
         holder.itemView.setOnClickListener {
             selectedPosition = position
@@ -46,6 +56,13 @@ class CalendarDayDateAdapter(val days: MutableList<DateModel>, private val onDay
 
 
 
+    }
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(daysList: MutableList<DateModel>){
+        days=daysList
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {

@@ -3,12 +3,15 @@ package com.mykameal.planner.fragment.mainfragment.viewmodel.recipedetails
 import androidx.lifecycle.ViewModel
 import com.google.gson.JsonObject
 import com.mykameal.planner.basedata.NetworkResult
+import com.mykameal.planner.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.Data
 import com.mykameal.planner.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 @HiltViewModel
 class RecipeDetailsViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
+
+    private var localData: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.recipedetails.apiresponse.Data>?=null
 
     suspend fun recipeDetailsRequest(successCallback: (response: NetworkResult<String>) -> Unit,
                                     url: String){
@@ -21,6 +24,25 @@ class RecipeDetailsViewModel @Inject constructor(private val repository: MainRep
         repository.recipeAddBasketRequestApi({ successCallback(it) },jsonObject)
     }
 
+    suspend fun recipeAddToPlanRequest(successCallback: (response: NetworkResult<String>) -> Unit, jsonObject: JsonObject
+    ){
+        repository.recipeAddToPlanRequestApi({ successCallback(it) },jsonObject)
+    }
 
+
+    fun setRecipeData(data: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.recipedetails.apiresponse.Data>) {
+        localData=data
+    }
+
+
+    fun getRecipeData(): MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.recipedetails.apiresponse.Data>? {
+        return localData
+    }
+
+
+    suspend fun recipeReviewRequest(successCallback: (response: NetworkResult<String>) -> Unit,
+                                    mealType: String, url: String, msg: String,ratingBarSmall:String){
+        repository.recipeDetailsRequestApi({ successCallback(it) },url)
+    }
 
 }

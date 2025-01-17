@@ -2,9 +2,13 @@ package com.mykameal.planner.adapter
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.content.ClipData
+import android.content.ClipDescription
+import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ScrollView
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.mykameal.planner.OnItemClickListener
@@ -16,6 +20,7 @@ class IngredientsDinnerAdapter(
     private var datalist: List<DataModel>,
     private var requireActivity: FragmentActivity,
     private var onItemClickListener: OnItemClickListener,
+     val recyclerView: ScrollView?,
     private var onItemLongClickListener: OnItemLongClickListener
 ) : RecyclerView.Adapter<IngredientsDinnerAdapter.ViewHolder>() {
 
@@ -82,10 +87,73 @@ class IngredientsDinnerAdapter(
             onItemClickListener.itemClick(position, checkStatus,checkTypeStatus)
         }
 
-        holder.itemView.setOnLongClickListener{
+        /*holder.itemView.setOnLongClickListener {
+            val clipData = ClipData(
+                datalist[position].title, // Use the title as the drag data
+                arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
+                ClipData.Item(datalist[position].title)
+            )
+
+            val shadowBuilder = View.DragShadowBuilder(holder.itemView)
+            holder.itemView.startDragAndDrop(clipData, shadowBuilder, null, 0)
+
+            // Setup onDragListener to handle scrolling
+            holder.itemView.setOnDragListener { v, event ->
+                when (event.action) {
+                    DragEvent.ACTION_DRAG_LOCATION -> {
+                        val yPosition = event.y.toInt()
+
+                        // Adjust this threshold based on your needs
+                        val threshold = 200
+                        if (yPosition < threshold) {
+                            // Scroll Up
+                            recyclerView!!.smoothScrollBy(0, -10) // Scroll up by 10 pixels
+                        } else if (yPosition > recyclerView!!.height - threshold) {
+                            // Scroll Down
+                            recyclerView!!.smoothScrollBy(0, 10) // Scroll down by 10 pixels
+                        }
+                    }
+                    DragEvent.ACTION_DRAG_ENDED -> {
+                        // Reset scroll behavior once drag is over
+                    }
+                }
+                true
+            }
+
+            onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
+            true
+        }*/
+
+        holder.itemView.setOnLongClickListener {
+            val clipData = ClipData(
+                datalist[position].title, // Use the title as the drag data
+                arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
+                ClipData.Item(datalist[position].title)
+            )
+            val shadowBuilder = View.DragShadowBuilder(holder.itemView)
+            holder.itemView.startDragAndDrop(clipData, shadowBuilder, null, 0)
+
+
+            // Notify the onItemLongClickListener of the long click event
             onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
             true
         }
+
+
+
+        /*holder.itemView.setOnLongClickListener{
+            val clipData = ClipData(
+                datalist[position].title, // Use the title as the drag data
+                arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
+                ClipData.Item(datalist[position].title)
+            )
+
+            val shadowBuilder = View.DragShadowBuilder(holder.itemView)
+            holder.itemView.startDragAndDrop(clipData, shadowBuilder, null, 0)
+            onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
+            true
+//            onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
+        }*/
     }
 
     fun setZiggleEnabled(enabled: Boolean) {

@@ -28,6 +28,7 @@ class IngredientsRecipeAdapter(var datalist: MutableList<IngredientsModel>?, var
     }
 
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateList(data: MutableList<IngredientsModel>){
         datalist=data
         notifyDataSetChanged()

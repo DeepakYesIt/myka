@@ -1214,9 +1214,10 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }
-            "3" -> {
+            status -> {
                 val bundle = Bundle()
                 bundle.putString("uri", type)
+                bundle.putString("mealType",status)
                 findNavController().navigate(R.id.recipeDetailsFragment, bundle)
             }
             "4" -> {

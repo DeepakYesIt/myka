@@ -98,7 +98,7 @@ class AdapterPlanBreakFast(var datalist: MutableList<BreakfastModel>?, private v
 
         holder.itemView.setOnClickListener{
             if (item?.recipe?.uri!=null){
-                onItemClickListener.itemClick(position,"3", item.recipe.uri)
+                onItemClickListener.itemClick(position, type, item.recipe.uri)
             }
         }
 

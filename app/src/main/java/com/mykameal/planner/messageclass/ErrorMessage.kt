@@ -7,6 +7,7 @@ object ErrorMessage {
      const val amounthightError:String="Please enter it under Available Balance."
      const val amountlowError:String="Please enter valid Balance."
      const val amountError:String="Invalid amount entered."
+     const val ratingError:String="Message can't be empty."
      const val amountEmptyError:String="Amount can't be empty."
      const val code: Int=206
 
@@ -19,6 +20,7 @@ object ErrorMessage {
      const val emailAddress="Please Enter your Address"
      const val phoneNumber="Please Enter Phone Number"
      const val bioError="Bio can't be empty."
+     const val cookedMealsError="Please select at least one."
      const val typeError="Select Height Type."
      const val activityTypeError="Select Your Activity Level."
      const val heightError="Height can't be empty."
