@@ -7,7 +7,6 @@
     app:cardBackgroundColor="@color/white"
     android:layout_marginHorizontal="@dimen/_15sdp"
     android:elevation="@dimen/_10sdp">
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -143,5 +142,4 @@
 
 
     </RelativeLayout>
-
 </androidx.cardview.widget.CardView>

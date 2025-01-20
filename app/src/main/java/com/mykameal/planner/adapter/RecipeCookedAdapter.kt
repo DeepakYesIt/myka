@@ -1,5 +1,6 @@
 package com.mykameal.planner.adapter
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.R
 import com.mykameal.planner.databinding.AdapterIngredientsItemBinding
 import com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.UserDataModel
+import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
 
 
 class RecipeCookedAdapter(var datalist: MutableList<UserDataModel>?, var requireActivity: FragmentActivity, var onItemClickListener: OnItemClickListener) : RecyclerView.Adapter<RecipeCookedAdapter.ViewHolder>() {
@@ -26,6 +28,14 @@ class RecipeCookedAdapter(var datalist: MutableList<UserDataModel>?, var require
             AdapterIngredientsItemBinding.inflate(inflater, parent, false);
         return ViewHolder(binding)
     }
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(data:  MutableList<UserDataModel>?){
+        datalist=data
+        notifyDataSetChanged()
+    }
+
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
@@ -90,7 +100,7 @@ class RecipeCookedAdapter(var datalist: MutableList<UserDataModel>?, var require
 
         holder.binding.imgHeartRed.setOnClickListener {
             if (data != null) {
-                onItemClickListener.itemClick(position,"4", "")
+                onItemClickListener.itemClick(position,"4", data.is_like.toString())
             }
         }
 

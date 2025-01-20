@@ -23,8 +23,8 @@ class PlanViewModel @Inject constructor(private val repository: MainRepository) 
 
 
     suspend fun likeUnlikeRequest(successCallback: (response: NetworkResult<String>) -> Unit,
-                                    uri: String,likeType: String){
-        repository.likeUnlikeRequestApi({ successCallback(it) },uri,likeType)
+                                    uri: String,likeType: String,type:String){
+        repository.likeUnlikeRequestApi({ successCallback(it) },uri,likeType,type)
     }
 
     suspend fun addBasketRequest(successCallback: (response: NetworkResult<String>) -> Unit,

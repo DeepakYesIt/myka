@@ -2,8 +2,11 @@ package com.mykameal.planner.apiInterface
 
 import com.google.gson.JsonObject
 import com.mykameal.planner.messageclass.ApiEndPoint
+import com.mykameal.planner.repository.VisionRequest
+import com.mykameal.planner.repository.VisionResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -413,6 +416,18 @@ interface ApiInterface {
     suspend fun recipeSearchApi(
         @Field("q") q: String?
     ): Response<JsonObject>
+
+
+
+ /*   @POST("v1/images:annotate")
+    fun annotateImage(@Body request: VisionRequest): Call<VisionResponse>*/
+
+    @Headers("Content-Type: application/json")
+    @POST("v1/images:annotate")
+    fun annotateImage(
+        @Query("key") apiKey: String,
+        @Body visionRequest: VisionRequest
+    ): Call<VisionResponse>
 
 
 }

@@ -1269,7 +1269,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             viewModel.likeUnlikeRequest({
                 BaseApplication.dismissMe()
                 handleLikeAndUnlikeApiResponse(it,item,adapter,type,mealList,position)
-            }, item.recipe?.uri!!,likeType)
+            }, item.recipe?.uri!!,likeType,"")
         }
     }
 
