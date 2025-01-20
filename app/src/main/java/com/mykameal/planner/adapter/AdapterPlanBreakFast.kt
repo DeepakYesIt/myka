@@ -19,7 +19,6 @@ import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apires
 
 class AdapterPlanBreakFast(var datalist: MutableList<BreakfastModel>?, private var requireActivity: FragmentActivity, private var onItemClickListener: OnItemClickListener, var type:String): RecyclerView.Adapter<AdapterPlanBreakFast.ViewHolder>() {
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding: AdapterMealTypeItemBinding = AdapterMealTypeItemBinding.inflate(inflater, parent,false);
@@ -52,7 +51,6 @@ class AdapterPlanBreakFast(var datalist: MutableList<BreakfastModel>?, private v
                 holder.binding.imgHeartRed.setImageResource(R.drawable.heart_red_icon)
             }
         }
-
 
 
         if (item?.recipe?.images?.SMALL?.url!=null){

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.mainfragment.cookedtab.AddMealCookedFragment">
+    tools:context=".fragment.mainfragment.cookedtab.addmealfragment.AddMealCookedFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -28,24 +28,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
+                    <include
+                        android:id="@+id/layProgress"
+                        layout="@layout/progess_loader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:visibility="visible" />
+
                     <RelativeLayout
-                        android:id="@+id/relProgress"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
-
-                        <include
-                            android:id="@+id/layProgress"
-                            layout="@layout/progess_loader"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:visibility="visible" />
-
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rcySearchCooked"
@@ -60,6 +53,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
+
                             android:fontFamily="@font/montserrat_medium"
                             android:text="No cooked dishes"
                             android:textColor="@color/black"
@@ -174,8 +168,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins_bold"
-                        android:text="Date Cooked"
-                        android:textColor="@color/black" />
+                        android:hint="Date Cooked"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/black" />
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -244,6 +239,7 @@
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:layout_marginTop="@dimen/_12sdp"
                 android:layout_marginBottom="@dimen/_10sdp"
+                android:visibility="invisible"
                 app:cardCornerRadius="@dimen/_10sdp"
                 app:cardElevation="@dimen/_6sdp">
 
@@ -251,13 +247,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <ImageView
+                    <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/imgIngRecipe"
                         android:layout_width="@dimen/_50sdp"
                         android:layout_height="@dimen/_50sdp"
                         android:layout_margin="@dimen/_8sdp"
-                        android:scaleType="fitXY"
-                        android:src="@drawable/bread_breakfast_image" />
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/no_image"
+                        app:shapeAppearanceOverlay="@style/CornerCut" />
+
+                    <include
+                        android:id="@+id/lay_progess"
+                        layout="@layout/progess_loader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true" />
+
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
@@ -271,7 +277,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/poppins_bold"
-                            android:text="Breakfast"
+                            android:text=""
                             android:textColor="@color/black" />
 
                     </RelativeLayout>

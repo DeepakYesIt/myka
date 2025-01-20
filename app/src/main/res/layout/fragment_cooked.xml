@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.mainfragment.cookedtab.CookedFragment">
-
+    tools:context=".fragment.mainfragment.cookedtab.cookedfragment.CookedFragment">
 
     <RelativeLayout
         android:id="@+id/rlHeader"
@@ -34,7 +33,6 @@
             android:textStyle="bold" />
 
     </RelativeLayout>
-
 
     <ScrollView
         android:layout_width="match_parent"
@@ -255,7 +253,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <ImageView
                     android:layout_width="@dimen/_80sdp"
@@ -292,7 +290,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <RelativeLayout
                     android:id="@+id/rlBreakfast"
@@ -367,129 +365,12 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/rlLunch2"
+                    android:id="@+id/relDinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/tvLunch2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/_15sdp"
-                        android:layout_marginTop="@dimen/_10sdp"
-                        android:fontFamily="@font/poppins"
-                        android:text="Lunch"
-                        android:textColor="#0A2533"
-                        android:textSize="@dimen/_12ssp"
-                        android:textStyle="bold" />
-
-                    <ImageView
-                        android:layout_width="@dimen/_25sdp"
-                        android:layout_height="@dimen/_25sdp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_marginTop="@dimen/_10sdp"
-                        android:layout_marginEnd="@dimen/_10sdp"
-                        android:src="@drawable/add_spoon_and_knife_icon" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rcvDinner"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/tvLunch2"
-                        android:orientation="horizontal"
-                        tools:listitem="@layout/adapter_layout_food_items_list" />
-
-                </RelativeLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/llFilledFreezer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <RelativeLayout
-                    android:id="@+id/rlBreakfastFreezer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/tvBreakFastFreezer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/_15sdp"
-                        android:layout_marginTop="@dimen/_10sdp"
-                        android:fontFamily="@font/poppins"
-                        android:text="Breakfast"
-                        android:textColor="#0A2533"
-                        android:textSize="@dimen/_12ssp"
-                        android:textStyle="bold" />
-
-                    <ImageView
-                        android:layout_width="@dimen/_25sdp"
-                        android:layout_height="@dimen/_25sdp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_marginTop="@dimen/_10sdp"
-                        android:layout_marginEnd="@dimen/_10sdp"
-                        android:src="@drawable/add_spoon_and_knife_icon" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rcvBreakfastFreezer"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/tvBreakFastFreezer"
-                        android:orientation="horizontal"
-                        tools:listitem="@layout/adapter_layout_food_items_list" />
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/rlLunchFreezer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/tvLunchFreezer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/_15sdp"
-                        android:layout_marginTop="@dimen/_10sdp"
-                        android:fontFamily="@font/poppins"
-                        android:text="Lunch"
-                        android:textColor="#0A2533"
-                        android:textSize="@dimen/_12ssp"
-                        android:textStyle="bold" />
-
-                    <ImageView
-                        android:layout_width="@dimen/_25sdp"
-                        android:layout_height="@dimen/_25sdp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_marginTop="@dimen/_10sdp"
-                        android:layout_marginEnd="@dimen/_10sdp"
-                        android:src="@drawable/add_spoon_and_knife_icon" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rcvLunchFreezer"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/tvLunchFreezer"
-                        android:orientation="horizontal"
-                        tools:listitem="@layout/adapter_layout_food_items_list" />
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/rlLunch2Freezer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/tvLunch2Freezer"
+                        android:id="@+id/tvDinner"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/_15sdp"
@@ -509,11 +390,11 @@
                         android:src="@drawable/add_spoon_and_knife_icon" />
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rcvDinnerFreezer"
+                        android:id="@+id/rcvDinner"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/tvLunch2Freezer"
+                        android:layout_below="@+id/tvDinner"
                         android:orientation="horizontal"
                         tools:listitem="@layout/adapter_layout_food_items_list" />
 

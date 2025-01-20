@@ -1,30 +1,69 @@
 package com.mykameal.planner.adapter
 
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.mykameal.planner.OnItemClickListener
+import com.mykameal.planner.R
 import com.mykameal.planner.databinding.AdapterLayoutFoodItemsListBinding
-import com.mykameal.planner.model.DataModel
+import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.Breakfast
 
-class AdapterFoodListItem(private var datalist: List<DataModel>, private var requireActivity: FragmentActivity, private var onItemSelectListener: OnItemClickListener) : RecyclerView.Adapter<AdapterFoodListItem.ViewHolder>() {
+class AdapterFoodListItem(private var itemList: List<Breakfast>, private var requireActivity: FragmentActivity, private var onItemSelectListener: OnItemClickListener) : RecyclerView.Adapter<AdapterFoodListItem.ViewHolder>() {
 
     private var quantity:Int=1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding: AdapterLayoutFoodItemsListBinding =
-            AdapterLayoutFoodItemsListBinding.inflate(inflater, parent, false);
+        val binding: AdapterLayoutFoodItemsListBinding = AdapterLayoutFoodItemsListBinding.inflate(inflater, parent, false);
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.tvBreakfast.text = datalist[position].title
+        holder.binding.tvBreakfast.text = itemList[position].recipe.label
 //        holder.binding.imageData.setBackgroundResource(datalist[position].image)
+
+        if (itemList[position].recipe.images.SMALL.url !=null){
+            Glide.with(requireActivity)
+                .load(itemList[position].recipe.images.SMALL.url)
+                .error(R.drawable.no_image)
+                .placeholder(R.drawable.no_image)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        holder.binding.layProgess.root.visibility= View.GONE
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        holder.binding.layProgess.root.visibility= View.GONE
+                        return false
+                    }
+                })
+                .into(holder.binding.imageData)
+        }else{
+            holder.binding.layProgess.root.visibility= View.GONE
+        }
 
         holder.binding.cardViews.setOnClickListener{
             onItemSelectListener.itemClick(position,"","Christmas")
@@ -63,7 +102,7 @@ class AdapterFoodListItem(private var datalist: List<DataModel>, private var req
     }
 
     override fun getItemCount(): Int {
-        return datalist.size
+        return itemList.size
     }
 
 

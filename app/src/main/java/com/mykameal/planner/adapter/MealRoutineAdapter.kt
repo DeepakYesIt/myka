@@ -47,12 +47,12 @@ class MealRoutineAdapter(
                     if (mealRoutineModelData[position].selected) {
                         // Deselect "Select All" and all other items
                         mealRoutineModelData.forEach { it.selected = false }
-                        onItemClickedListener.itemClicked(position, null, "-1", "false")
+                        onItemClickedListener.itemClicked(position, null, "2", "false")
                     } else {
                         // Select "Select All" and all other items
                         mealRoutineModelData.forEach { it.selected = true }
                         selectedIds = mealRoutineModelData.map { it.id.toString() }.toMutableList()
-                        onItemClickedListener.itemClicked(position, selectedIds, "-1", "true")
+                        onItemClickedListener.itemClicked(position, selectedIds, "2", "true")
                     }
                 } else {
                     // Toggle selection for individual items

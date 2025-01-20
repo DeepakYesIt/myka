@@ -49,7 +49,7 @@
                 android:layout_marginHorizontal="@dimen/_20sdp"
                 android:layout_marginTop="@dimen/_25sdp"
                 android:layout_marginBottom="@dimen/_20sdp"
-                android:background="@drawable/green_btn_background">
+                android:background="@drawable/gray_btn_unselect_background">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -130,7 +130,7 @@
                         android:gravity="center_vertical"
                         android:padding="@dimen/_10sdp"
                         android:singleLine="true"
-                        android:text="@string/select_gender"
+                        android:hint="@string/select_gender"
                         android:textColor="@color/light_black"
                         android:textColorHint="@color/light_black"
                         android:textSize="@dimen/_13sdp" />

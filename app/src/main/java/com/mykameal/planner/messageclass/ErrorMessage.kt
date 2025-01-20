@@ -19,6 +19,8 @@ object ErrorMessage {
      const val registeredEmailPhone:String="Please Enter Registered Email/Phone"
      const val emailAddress="Please Enter your Address"
      const val phoneNumber="Please Enter Phone Number"
+     const val cookbookName="Please Enter CookBook Name"
+     const val selectPrivatePublic="Please Select Private or Public"
      const val bioError="Bio can't be empty."
      const val cookedMealsError="Please select at least one."
      const val typeError="Select Height Type."
@@ -96,6 +98,7 @@ object ErrorMessage {
      const val addressUpload:String="Please upload Address Proof."
      const val idProofUpload:String="Please upload Id Proof."
      const val selfieProofUpload:String="Please upload Selfie Proof."
+     const val cookbookUpload:String="Please upload cookbook image."
 
      const val locationError="Please Turn On Your Location.Your location helps us enhance your overall experience, making it more convenient and efficient. Rest assured, your privacy is our priority, and your location data will be handled securely and responsibly.Thank you for helping us serve you better!"
      const val verifyStatus="Verified"

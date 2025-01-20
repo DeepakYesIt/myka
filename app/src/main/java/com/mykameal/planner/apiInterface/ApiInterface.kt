@@ -245,6 +245,10 @@ interface ApiInterface {
     suspend fun recipeAddToPlanRequestApi(@Body jsonObject: JsonObject): Response<JsonObject>
 
 
+    @Multipart
+    @POST(ApiEndPoint.createCookBook)
+    suspend fun createCookBook(@Part("name") name:RequestBody?,@Part image: MultipartBody.Part?, @Field("status") status:RequestBody?):Response<JsonObject>
+
     @POST(ApiEndPoint.getCardBankUrl)
     suspend fun getCardAndBankRequestApi(): Response<JsonObject>
 
@@ -255,7 +259,7 @@ interface ApiInterface {
 
     @FormUrlEncoded
     @POST(ApiEndPoint.getMealsUrl)
-    suspend fun planDateRequestApi(@Field("date") date: String): Response<JsonObject>
+    suspend fun planDateRequestApi(@Field("date") date: String,@Field("plan_type") planType:String): Response<JsonObject>
 
 
     @FormUrlEncoded

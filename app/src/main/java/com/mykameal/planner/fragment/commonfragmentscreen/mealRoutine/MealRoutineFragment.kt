@@ -304,10 +304,15 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
 
     override fun itemClicked(position: Int?, list: MutableList<String>?, status1: String?, type: String?) {
         if (status1.equals("-1")) {
+            if (position==0){
+                mealRoutineSelectedId.clear()
+            }else{
+                mealRoutineSelectedId = list!!
+            }
             status = "2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            mealRoutineSelectedId = list!!
+
             return
         }
 

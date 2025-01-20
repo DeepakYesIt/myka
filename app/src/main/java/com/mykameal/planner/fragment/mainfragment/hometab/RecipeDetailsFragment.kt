@@ -67,18 +67,13 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
     val dataList = ArrayList<DataModel>()
     private val dataList1 = ArrayList<DataModel>()
     private val dataList2 = ArrayList<DataModel>()
-    private var rcyChooseDaySch: RecyclerView? = null
     private var tvWeekRange: TextView? = null
-    private var chooseDayAdapter: ChooseDayAdapter? = null
-    private val calendar = Calendar.getInstance()
     private var selectAll: Boolean = false
     private var quantity: Int = 1
-    private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
     private lateinit var viewModel: RecipeDetailsViewModel
     private var uri: String = ""
     private var mealType: String = ""
-    private var localData: MutableList<Data> = mutableListOf()
-    var currentDate = Date() // Current date
+    private var currentDate = Date() // Current date
 
     // Define global variables
     private lateinit var startDate: Date

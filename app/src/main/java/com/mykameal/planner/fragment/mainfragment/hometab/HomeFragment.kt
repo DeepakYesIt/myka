@@ -185,8 +185,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 }else{
                     binding!!.layTeatime.visibility=View.GONE
                 }
-
-
             }
 
             if (data.fridge!=null){
@@ -348,7 +346,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
 
         if (sessionManagement.getUserName()!=null){
-            val name=BaseApplication.getColoredSpanned("Hello","#06C169") + BaseApplication.getColoredSpanned(" ,"+sessionManagement.getUserName(),"#000000")
+            val name=BaseApplication.getColoredSpanned("Hello","#06C169") + BaseApplication.getColoredSpanned(", "+sessionManagement.getUserName(),"#000000")
             binding?.tvName?.text =  Html.fromHtml(name)
         }
 

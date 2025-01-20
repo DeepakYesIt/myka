@@ -56,5 +56,7 @@ object ApiEndPoint {
 
     const val addMealUrl="add-meal"
 
+    const val createCookBook="add-cook-book"
+
 
 }

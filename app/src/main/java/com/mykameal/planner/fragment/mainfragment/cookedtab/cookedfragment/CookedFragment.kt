@@ -1,11 +1,9 @@
-package com.mykameal.planner.fragment.mainfragment.cookedtab
+package com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment
 
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,38 +11,37 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.gson.Gson
 import com.mykameal.planner.OnItemClickListener
-import com.mykameal.planner.model.FoodItem
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.adapter.AdapterFoodListItem
 import com.mykameal.planner.adapter.CalendarDayIndicatorAdapter
+import com.mykameal.planner.basedata.BaseApplication
+import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.databinding.FragmentCookedBinding
+import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.CookedTabModel
+import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.CookedTabModelData
+import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.viewmodel.CookedTabViewModel
+import com.mykameal.planner.messageclass.ErrorMessage
 import com.mykameal.planner.model.CalendarDataModel
-import com.mykameal.planner.model.DataModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-
+@AndroidEntryPoint
 class CookedFragment : Fragment(),OnItemClickListener {
     private var binding: FragmentCookedBinding? = null
-    private var dataList1: MutableList<DataModel> = mutableListOf()
-    private var dataList2: MutableList<DataModel> = mutableListOf()
-    private var dataList3: MutableList<DataModel> = mutableListOf()
-    private var foodListItemAdapter: AdapterFoodListItem? = null
+    private var cookedTabViewModel:CookedTabViewModel?=null
 
-//    private lateinit var adapter: FoodListAdapter
-//    private lateinit var adapterLunch: FoodListAdapter
-//    private lateinit var adapterDinner: FoodListAdapter
-//    private lateinit var adapterFreezer: FoodListAdapter
-//    private lateinit var adapterLunchFreezer: FoodListAdapter
-//    private lateinit var adapterDinnerFreezer: FoodListAdapter
+    private var foodListItemAdapter: AdapterFoodListItem? = null
     private var calendarDayAdapter: CalendarDayIndicatorAdapter? = null
 
-    private lateinit var handler: Handler
-    private val foodList = mutableListOf<FoodItem>()
     private val calendar = Calendar.getInstance()
     private var isOpened:Boolean?=null
     private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
@@ -59,6 +56,8 @@ class CookedFragment : Fragment(),OnItemClickListener {
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
+
+        cookedTabViewModel = ViewModelProvider(this)[CookedTabViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -101,20 +100,72 @@ class CookedFragment : Fragment(),OnItemClickListener {
             findNavController().navigate(R.id.addMealCookedFragment)
         }
 
-        handler = Handler(Looper.getMainLooper())
+        if (BaseApplication.isOnline(requireActivity())) {
+            cookedTabApi()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+
+    /*    handler = Handler(Looper.getMainLooper())
 
         handler.postDelayed({
             binding!!.llEmptyFridge.visibility = View.GONE
 
             binding!!.llFilledFridge.visibility = View.VISIBLE
             binding!!.llFilledFreezer.visibility = View.GONE
-        }, 7000)
+        }, 7000)*/
 
-        toggleFridgeToFreezer()
+  /*      toggleFridgeToFreezer()
         cookedBreakFastModel()
         cookedLunchModel()
-        cookedDinnerModel()
+        cookedDinnerModel()*/
 //        adapterInitialize()
+    }
+
+    private fun cookedTabApi() {
+        BaseApplication.showMe(requireActivity())
+        lifecycleScope.launch {
+            cookedTabViewModel!!.cookedDateRequest({
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val cookedModel = gson.fromJson(it.data, CookedTabModel::class.java)
+                        if (cookedModel.code == 200 && cookedModel.success) {
+                            showDataInUi(cookedModel.data)
+                        } else {
+                            if (cookedModel.code == ErrorMessage.code) {
+                                showAlertFunction(cookedModel.message, true)
+                            }else{
+                                showAlertFunction(cookedModel.message, false)
+                            }
+                        }
+                    }
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            },"","")
+        }
+    }
+
+    private fun showDataInUi(cookedTabModelData: CookedTabModelData) {
+        if (cookedTabModelData!=null){
+            if (cookedTabModelData.Breakfast.size!=null && cookedTabModelData.Breakfast.size>0){
+
+                foodListItemAdapter= AdapterFoodListItem(cookedTabModelData.Breakfast,requireActivity(),this)
+                binding!!.rcvBreakfast.adapter = foodListItemAdapter
+
+            }
+        }
+    }
+
+
+    private fun showAlertFunction(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
     }
 
     private fun changeWeekRange(weekRange: Int) {
@@ -158,130 +209,6 @@ class CookedFragment : Fragment(),OnItemClickListener {
 
     }
 
-    private fun cookedBreakFastModel() {
-        if (dataList1!=null){
-            dataList1.clear()
-        }
-        val data1 = DataModel()
-        val data2 = DataModel()
-
-        data1.title = "Pasta"
-        data1.isOpen = false
-        data1.type = "FullCookSchBreakFast"
-        data1.image = R.drawable.breakfast_images
-
-        data2.title = "BBQ"
-        data2.isOpen = true
-        data2.type = "FullCookSchBreakFast"
-        data2.image = R.drawable.chicken_skewers_images
-
-        dataList1.add(data1)
-        dataList1.add(data2)
-
-        foodListItemAdapter = AdapterFoodListItem(dataList1, requireActivity(), this)
-        binding!!.rcvBreakfast.adapter = foodListItemAdapter
-        binding!!.rcvBreakfastFreezer.adapter = foodListItemAdapter
-    }
-
-    private fun cookedLunchModel() {
-        if (dataList2!=null){
-            dataList2.clear()
-        }
-        val data1 = DataModel()
-        val data2 = DataModel()
-
-        data1.title = "Pasta"
-        data1.isOpen = false
-        data1.type = "FullCookSchLunch"
-        data1.image = R.drawable.lunch_pasta_images
-
-        data2.title = "Bar-B-Q"
-        data2.isOpen = false
-        data2.type = "FullCookSchLunch"
-        data2.image = R.drawable.lunch_bar_b_q_images
-
-        dataList2.add(data1)
-        dataList2.add(data2)
-        foodListItemAdapter = AdapterFoodListItem(dataList2, requireActivity(), this)
-        binding!!.rcvLunch.adapter = foodListItemAdapter
-        binding!!.rcvLunchFreezer.adapter = foodListItemAdapter
-    }
-
-    private fun cookedDinnerModel() {
-        if (dataList3!=null){
-            dataList3.clear()
-        }
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-
-        data1.title = "Lasagne"
-        data1.isOpen = false
-        data1.type = "FullCookSchDinner"
-        data1.image = R.drawable.dinner_lasagne_images
-
-        data2.title = "stawberry"
-        data2.isOpen = false
-        data2.type = "FullCookSchDinner"
-        data2.image = R.drawable.dinner_grilled_chicken_legs_images
-
-        data3.title = "Juices"
-        data3.isOpen = false
-        data3.type = "FullCookSchDinner"
-        data3.image = R.drawable.chicken_skewers_images
-
-        data4.title = "Lasagne"
-        data4.isOpen = false
-        data4.type = "FullCookSchDinner"
-        data4.image = R.drawable.dinner_lasagne_images
-
-        data5.title = "stawberry"
-        data5.isOpen = false
-        data5.type = "FullCookSchDinner"
-        data5.image = R.drawable.dinner_grilled_chicken_legs_images
-
-        dataList3.add(data1)
-        dataList3.add(data2)
-        dataList3.add(data3)
-        dataList3.add(data4)
-        dataList3.add(data5)
-
-        foodListItemAdapter = AdapterFoodListItem(dataList3, requireActivity(), this)
-        binding!!.rcvDinner.adapter = foodListItemAdapter
-        binding!!.rcvDinnerFreezer.adapter = foodListItemAdapter
-    }
-
-//    private fun adapterInitialize(){
-//        adapter = FoodListAdapter(requireContext(), itemList = foodList,this)
-//        adapterLunch = FoodListAdapter(requireContext(), itemList = foodList,this)
-//        adapterDinner = FoodListAdapter(requireContext(), itemList = foodList,this)
-//        adapterFreezer = FoodListAdapter(requireContext(), itemList = foodList,this)
-//        adapterLunchFreezer = FoodListAdapter(requireContext(), itemList = foodList,this)
-//        adapterDinnerFreezer = FoodListAdapter(requireContext(), itemList = foodList,this)
-//
-//        binding!!.rcvBreakfast.adapter = adapter
-//        binding!!.rcvLunch.adapter = adapterLunch
-//        binding!!.rcvDinner.adapter = adapterDinner
-//        binding!!.rcvBreakfastFreezer.adapter = adapterFreezer
-//        binding!!.rcvLunchFreezer.adapter = adapterLunchFreezer
-//        binding!!.rcvDinnerFreezer.adapter = adapterDinnerFreezer
-//
-//        val initialList = List(6) { index ->
-//            if (index % 2 == 0) {
-//                FoodItem("Burger", R.drawable.ic_food_image, R.drawable.ic_food_clock, R.drawable.ic_apple_icon, R.drawable.ic_wishlist_icon, "1 hour ago", "Serves 3")
-//            } else {
-//                FoodItem("Pasta", R.drawable.ic_food_image, R.drawable.ic_food_clock, R.drawable.ic_apple_icon, R.drawable.ic_wishlist_icon, "5 days ago", "Serves 2")
-//            }
-//        }
-//        adapter.addItems(initialList)
-//        adapterLunch.addItems(initialList)
-//        adapterDinner.addItems(initialList)
-//        adapterFreezer.addItems(initialList)
-//        adapterLunchFreezer.addItems(initialList)
-//        adapterDinnerFreezer.addItems(initialList)
-//    }
 
     private  fun toggleFridgeToFreezer(){
 
@@ -291,12 +218,8 @@ class CookedFragment : Fragment(),OnItemClickListener {
             binding!!.textFridge.setTextColor(Color.WHITE)
             binding!!.textFreezer.setTextColor(Color.BLACK)
             binding!!.llFilledFridge.visibility = View.VISIBLE
-            binding!!.llFilledFreezer.visibility = View.GONE
             binding!!.llEmptyFridge.visibility = View.GONE
 
-            cookedBreakFastModel()
-            cookedLunchModel()
-            cookedDinnerModel()
         }
 
         binding!!.textFreezer.setOnClickListener {
@@ -304,13 +227,9 @@ class CookedFragment : Fragment(),OnItemClickListener {
             binding!!.textFreezer.setBackgroundResource(R.drawable.selected_button_bg)
             binding!!.textFridge.setTextColor(Color.BLACK)
             binding!!.textFreezer.setTextColor(Color.WHITE)
-            binding!!.llFilledFreezer.visibility = View.VISIBLE
             binding!!.llFilledFridge.visibility = View.GONE
             binding!!.llEmptyFridge.visibility = View.GONE
 
-            cookedBreakFastModel()
-            cookedLunchModel()
-            cookedDinnerModel()
 
         }
     }

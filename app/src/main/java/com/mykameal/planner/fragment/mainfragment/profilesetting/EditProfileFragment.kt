@@ -66,7 +66,7 @@ class EditProfileFragment : Fragment() {
     }
 
 
-    fun getPath(context: Context, uri: Uri): String? {
+    private fun getPath(context: Context, uri: Uri): String? {
         var uri = uri
         val needToCheckUri = Build.VERSION.SDK_INT >= 19
         var selection: String? = null
@@ -198,9 +198,6 @@ class EditProfileFragment : Fragment() {
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-
-
-
         }
 
         binding.textChangeImage.setOnClickListener {

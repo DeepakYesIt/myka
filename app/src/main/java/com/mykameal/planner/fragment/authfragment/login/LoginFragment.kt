@@ -212,7 +212,10 @@ class LoginFragment : Fragment() {
         logOutGoogle()
 
         binding!!.etSignEmailPhone.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
-            showRememberDialog()
+            val data: String = sessionManagement.getRememberMe()
+            if (data.isNotEmpty()){
+                showRememberDialog()
+            }
         }
 
         binding!!.googleImages.setOnClickListener {

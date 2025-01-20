@@ -186,8 +186,6 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
         dialogCookedMeals.show()
         dialogCookedMeals.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
-
-
         var type=""
 
         tvYes.setOnClickListener{

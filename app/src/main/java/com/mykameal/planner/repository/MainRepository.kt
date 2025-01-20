@@ -84,7 +84,8 @@ interface MainRepository {
 
  suspend fun planRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, q: String)
 
- suspend fun planDateRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, date: String)
+ suspend fun planDateRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, date: String,planType:String)
+ suspend fun createCookBookApi(successCallback: (response: NetworkResult<String>) -> Unit,   name: RequestBody?, image: MultipartBody.Part?, status:RequestBody?)
 
  suspend fun likeUnlikeRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,  uri: String,likeType: String)
 

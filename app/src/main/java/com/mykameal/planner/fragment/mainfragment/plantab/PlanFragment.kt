@@ -200,7 +200,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             viewModel.planDateRequest({
                 BaseApplication.dismissMe()
                 handleApiPlanDateResponse(it)
-            }, date)
+            }, date,"0")
         }
     }
 

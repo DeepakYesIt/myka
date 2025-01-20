@@ -17,8 +17,8 @@ class PlanViewModel @Inject constructor(private val repository: MainRepository) 
     }
 
     suspend fun planDateRequest(successCallback: (response: NetworkResult<String>) -> Unit,
-                            date: String){
-        repository.planDateRequestApi({ successCallback(it) },date)
+                            date: String,planType:String){
+        repository.planDateRequestApi({ successCallback(it) },date,planType)
     }
 
 

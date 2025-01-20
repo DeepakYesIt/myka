@@ -135,7 +135,7 @@
         tools:layout="@layout/fragment_plan" />
     <fragment
         android:id="@+id/cookedFragment"
-        android:name="com.mykameal.planner.fragment.mainfragment.cookedtab.CookedFragment"
+        android:name="com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.CookedFragment"
         android:label="fragment_cooked"
         tools:layout="@layout/fragment_cooked" />
     <fragment
@@ -182,7 +182,7 @@
 
     <fragment
         android:id="@+id/createCookBookFragment"
-        android:name="com.mykameal.planner.fragment.mainfragment.hometab.CreateCookBookFragment"
+        android:name="com.mykameal.planner.fragment.mainfragment.hometab.createcookbookfragment.CreateCookBookFragment"
         android:label="fragment_create_cook_book"
         tools:layout="@layout/fragment_create_cook_book" />
     <fragment
@@ -256,7 +256,7 @@
         tools:layout="@layout/fragment_basket_screen" />
     <fragment
         android:id="@+id/addMealCookedFragment"
-        android:name="com.mykameal.planner.fragment.mainfragment.cookedtab.AddMealCookedFragment"
+        android:name="com.mykameal.planner.fragment.mainfragment.cookedtab.addmealfragment.AddMealCookedFragment"
         android:label="fragment_add_meal_cooked"
         tools:layout="@layout/fragment_add_meal_cooked" />
 
