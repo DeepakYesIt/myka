@@ -1,16 +1,17 @@
 package com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -19,6 +20,7 @@ import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.adapter.AdapterFoodListItem
+import com.mykameal.planner.adapter.CalendarDayDateAdapter
 import com.mykameal.planner.adapter.CalendarDayIndicatorAdapter
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
@@ -28,10 +30,12 @@ import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model
 import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.viewmodel.CookedTabViewModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import com.mykameal.planner.model.CalendarDataModel
+import com.mykameal.planner.model.DateModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 @AndroidEntryPoint
@@ -41,10 +45,15 @@ class CookedFragment : Fragment(),OnItemClickListener {
 
     private var foodListItemAdapter: AdapterFoodListItem? = null
     private var calendarDayAdapter: CalendarDayIndicatorAdapter? = null
-
+    private var planType:String="1"
     private val calendar = Calendar.getInstance()
     private var isOpened:Boolean?=null
+    private var currentDate = Date() // Current date
     private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+    // Define global variables
+    private lateinit var startDate: Date
+    private lateinit var endDate: Date
+    private var currentDateSelected:String=""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,6 +66,7 @@ class CookedFragment : Fragment(),OnItemClickListener {
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
 
+        currentDateSelected= BaseApplication.currentDateFormat().toString()
         cookedTabViewModel = ViewModelProvider(this)[CookedTabViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
@@ -71,6 +81,8 @@ class CookedFragment : Fragment(),OnItemClickListener {
     }
 
     private fun initialize() {
+
+        toggleFridgeToFreezer()
 
         updateWeek()
 
@@ -100,8 +112,13 @@ class CookedFragment : Fragment(),OnItemClickListener {
             findNavController().navigate(R.id.addMealCookedFragment)
         }
 
+        // Display current week dates
+        showWeekDates()
+
+
+
         if (BaseApplication.isOnline(requireActivity())) {
-            cookedTabApi()
+            cookedTabApi(currentDateSelected)
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
@@ -122,7 +139,80 @@ class CookedFragment : Fragment(),OnItemClickListener {
 //        adapterInitialize()
     }
 
-    private fun cookedTabApi() {
+
+    @SuppressLint("SetTextI18n")
+    fun showWeekDates() {
+        val (startDate, endDate) = getWeekDates(currentDate)
+        this.startDate=startDate
+        this.endDate=endDate
+
+        // Get all dates between startDate and endDate
+        val daysBetween = getDaysBetween(startDate, endDate)
+
+        daysBetween.forEach { println(it) }
+        binding!!.textMonthAndYear.text = BaseApplication.formatonlyMonthYear(startDate)
+        binding!!.textWeekRange.text = ""+formatDate(startDate)+"-"+formatDate(endDate)
+        // Update the RecyclerView
+        binding!!.recyclerViewWeekDays.adapter = CalendarDayDateAdapter(getDaysBetween(startDate, endDate)) {
+            // Handle item click if needed
+            currentDateSelected=it
+            if (BaseApplication.isOnline(requireActivity())) {
+                cookedTabApi(currentDateSelected)
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+
+        }
+
+    }
+
+    private fun getWeekDates(currentDate: Date): Pair<Date, Date> {
+        val calendar = Calendar.getInstance()
+        calendar.time = currentDate
+        // Set the calendar to the start of the week (Monday)
+        calendar.firstDayOfWeek = Calendar.MONDAY
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val startOfWeek = calendar.time
+
+        // Set the calendar to the end of the week (Saturday)
+        calendar.add(Calendar.DAY_OF_WEEK, 6)
+        val endOfWeek = calendar.time
+        return Pair(startOfWeek, endOfWeek)
+    }
+
+    private fun formatDate(date: Date): String {
+        val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+        return dateFormat.format(date)
+    }
+
+    private fun getDaysBetween(startDate: Date, endDate: Date): MutableList<DateModel> {
+        val dateList = mutableListOf<DateModel>()
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // Format for the date
+        val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault()) // Format for the day name (e.g., Monday)
+
+        val calendar = Calendar.getInstance()
+        calendar.time = startDate
+
+        while (!calendar.time.after(endDate)) {
+            val date = dateFormat.format(calendar.time)  // Get the formatted date (yyyy-MM-dd)
+            val dayName = dayFormat.format(calendar.time)  // Get the day name (Monday, Tuesday, etc.)
+
+            val localDate= DateModel()
+            localDate.day=dayName
+            localDate.date=date
+            // Combine both the day name and the date
+//            dateList.add("$dayName, $date")
+            dateList.add(localDate)
+
+
+            // Move to the next day
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        return dateList
+    }
+
+    private fun cookedTabApi(date: String) {
         BaseApplication.showMe(requireActivity())
         lifecycleScope.launch {
             cookedTabViewModel!!.cookedDateRequest({
@@ -148,16 +238,37 @@ class CookedFragment : Fragment(),OnItemClickListener {
                         showAlertFunction(it.message, false)
                     }
                 }
-            },"","")
+            },date,planType)
         }
     }
 
     private fun showDataInUi(cookedTabModelData: CookedTabModelData) {
         if (cookedTabModelData!=null){
-            if (cookedTabModelData.Breakfast.size!=null && cookedTabModelData.Breakfast.size>0){
 
+            if (cookedTabModelData.fridge!=null){
+                binding!!.textFridge.text="Fridge ("+cookedTabModelData.fridge.toString()+")"
+            }
+
+            if (cookedTabModelData.freezer!=null){
+                binding!!.textFreezer.text="Freezer ("+cookedTabModelData.freezer.toString()+")"
+            }
+
+            if (cookedTabModelData.Breakfast!!.size!=null && cookedTabModelData.Breakfast!=null){
                 foodListItemAdapter= AdapterFoodListItem(cookedTabModelData.Breakfast,requireActivity(),this)
                 binding!!.rcvBreakfast.adapter = foodListItemAdapter
+            }
+
+            if (cookedTabModelData.Lunch!!.size!=null && cookedTabModelData.Lunch!=null){
+
+                foodListItemAdapter= AdapterFoodListItem(cookedTabModelData.Lunch,requireActivity(),this)
+                binding!!.rcvLunch.adapter = foodListItemAdapter
+
+            }
+
+            if (cookedTabModelData.Dinner!!.size!=null && cookedTabModelData.Dinner!=null){
+
+                foodListItemAdapter= AdapterFoodListItem(cookedTabModelData.Dinner,requireActivity(),this)
+                binding!!.rcvDinner.adapter = foodListItemAdapter
 
             }
         }
@@ -219,7 +330,7 @@ class CookedFragment : Fragment(),OnItemClickListener {
             binding!!.textFreezer.setTextColor(Color.BLACK)
             binding!!.llFilledFridge.visibility = View.VISIBLE
             binding!!.llEmptyFridge.visibility = View.GONE
-
+            planType="1"
         }
 
         binding!!.textFreezer.setOnClickListener {
@@ -229,8 +340,7 @@ class CookedFragment : Fragment(),OnItemClickListener {
             binding!!.textFreezer.setTextColor(Color.WHITE)
             binding!!.llFilledFridge.visibility = View.GONE
             binding!!.llEmptyFridge.visibility = View.GONE
-
-
+            planType="2"
         }
     }
 

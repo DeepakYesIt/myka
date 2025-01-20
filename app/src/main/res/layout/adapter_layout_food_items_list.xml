@@ -106,7 +106,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/_10sdp"
                     android:fontFamily="@font/montserrat_medium"
-                    android:text="Serves 2"
+                    android:text="Serves 1"
                     android:textSize="@dimen/_11sdp" />
 
                 <ImageView

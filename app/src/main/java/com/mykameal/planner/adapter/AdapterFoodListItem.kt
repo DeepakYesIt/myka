@@ -31,7 +31,25 @@ class AdapterFoodListItem(private var itemList: List<Breakfast>, private var req
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         holder.binding.tvBreakfast.text = itemList[position].recipe.label
-//        holder.binding.imageData.setBackgroundResource(datalist[position].image)
+
+        if (itemList[position].is_like!=null){
+            if (itemList[position].is_like ==0 ){
+                holder.binding.imgHeartRed.setImageResource(R.drawable.heart_white_icon)
+            }else{
+                holder.binding.imgHeartRed.setImageResource(R.drawable.heart_red_icon)
+            }
+        }
+
+        if (itemList[position].created_date!=null){
+            if (itemList[position].created_date!=""){
+                holder.binding.textTimeAgo.text="Serves "+itemList[position].created_date.toString()
+            }
+        }
+
+
+        if (itemList[position].servings!=null){
+            holder.binding.tvServes.text=itemList[position].servings.toString()
+        }
 
         if (itemList[position].recipe.images.SMALL.url !=null){
             Glide.with(requireActivity)

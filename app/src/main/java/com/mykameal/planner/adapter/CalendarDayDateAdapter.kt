@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mykameal.planner.R
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.databinding.CalendarItemDayBinding
-import com.yesitlabs.mykaapp.model.DateModel
+import com.mykameal.planner.model.DateModel
 
 class CalendarDayDateAdapter(var days: MutableList<DateModel>, private val onDaySelected: (String) -> Unit) : RecyclerView.Adapter<CalendarDayDateAdapter.ViewHolder>() {
 

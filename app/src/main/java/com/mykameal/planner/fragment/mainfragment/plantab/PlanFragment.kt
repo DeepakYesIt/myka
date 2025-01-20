@@ -35,7 +35,7 @@ import com.yesitlabs.mykaapp.adapter.AdapterPlanBreakByDateFast
 import com.mykameal.planner.adapter.CalendarDayDateAdapter
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.BreakfastModelPlanByDate
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.DataPlayByDate
-import com.yesitlabs.mykaapp.model.DateModel
+import com.mykameal.planner.model.DateModel
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
@@ -96,7 +96,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     lateinit var adapter: ImageViewPagerAdapter
     val dataList = arrayListOf<DataModel>()
     private lateinit var layonboarding_indicator: LinearLayout
-    var currentDate = Date() // Current date
+    private var currentDate = Date() // Current date
 
     // Define global variables
     private lateinit var startDate: Date
@@ -153,10 +153,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         )
         adapter = ImageViewPagerAdapter(requireContext(), imageList)
 
-
         // Display current week dates
         showWeekDates()
-
 
         return binding!!.root
     }
@@ -658,7 +656,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         return Pair(startOfWeek, endOfWeek)
     }
 
-    fun formatDate(date: Date): String {
+    private fun formatDate(date: Date): String {
         val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
         return dateFormat.format(date)
     }
