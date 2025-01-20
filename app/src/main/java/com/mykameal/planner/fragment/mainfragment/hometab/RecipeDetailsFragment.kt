@@ -821,134 +821,14 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         }
     }
 
-    private fun ingredientsModel() {
-        dataList.clear()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
 
-        data1.title = "Olive Oil"
-        data1.description = "1 Tbsp"
-        data1.isOpen = false
-        data1.type = "IngDetails"
-        data1.image = R.drawable.olive_image
-
-        data2.title = "Garlic Mayo"
-        data2.description = "3 Tbsp"
-        data2.isOpen = false
-        data2.type = "IngDetails"
-        data2.image = R.drawable.garlic_mayo_image
-
-        data3.title = "Olive Oil"
-        data3.description = "3 Tbsp"
-        data3.isOpen = false
-        data3.type = "IngDetails"
-        data3.image = R.drawable.olive_oil_image2
-
-        data4.title = "Olive Oil"
-        data4.description = "1 kg"
-        data4.isOpen = false
-        data4.type = "IngDetails"
-        data4.image = R.drawable.olive_chicken_image
-
-        data5.title = "Tomato"
-        data5.description = "0.5 kg"
-        data5.isOpen = false
-        data5.type = "IngDetails"
-        data5.image = R.drawable.tomato_ing_image
-
-        dataList.add(data1)
-        dataList.add(data2)
-        dataList.add(data3)
-        dataList.add(data4)
-        dataList.add(data5)
-
-
-        /*ingredientsRecipeAdapter = IngredientsRecipeAdapter(dataList, requireActivity())
-        binding!!.rcyIngCookWareRecipe.adapter = ingredientsRecipeAdapter*/
-    }
 
     private fun cookWareModel() {
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-
-        data1.title = "Cooker"
-        data1.isOpen = false
-        data1.type = "CookWare"
-        data1.image = R.drawable.cooker_image
-
-        data2.title = "Cutting board"
-        data2.isOpen = false
-        data2.type = "CookWare"
-        data2.image = R.drawable.cutting_board_image
-
-        data3.title = "Grater"
-        data3.isOpen = false
-        data3.type = "CookWare"
-        data3.image = R.drawable.grater_image
-
-        data4.title = "Peeler"
-        data4.isOpen = false
-        data4.type = "CookWare"
-        data4.image = R.drawable.peeler_image
-
-        data5.title = "Mixing bowl"
-        data5.isOpen = false
-        data5.type = "CookWare"
-        data5.image = R.drawable.mixing_bowl_image
-
-        dataList1.add(data1)
-        dataList1.add(data2)
-        dataList1.add(data3)
-        dataList1.add(data4)
-        dataList1.add(data5)
-
         cookWareAdapter = CookWareAdapter(dataList1, requireActivity())
         binding!!.rcyIngCookWareRecipe.adapter = cookWareAdapter
     }
 
-    private fun recipeModel() {
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
 
-        data1.title = "Step 1:"
-        data1.description = "Lorem ispum Lorem ispumLorem ispum Lorem ispum Lorem ispum"
-        data1.isOpen = false
-        data1.type = "Recipe"
-
-        data2.title = "Step 2:"
-        data2.description =
-            "Lorem ispum Lorem ispumLorem ispum Lorem ispum Lorem ispumLorem ispum Lorem ispum"
-        data2.isOpen = false
-        data2.type = "Recipe"
-
-        data3.title = "Step 3:"
-        data3.description =
-            "Lorem ispum Lorem ispumLorem ispum Lorem ispum Lorem ispumLorem ispum Lorem ispumLorem ispum Lorem ispum"
-        data3.isOpen = false
-        data3.type = "Recipe"
-
-        data4.title = "Step 4:"
-        data4.description =
-            "Lorem ispum Lorem ispumLorem ispum Lorem ispum Lorem ispumLorem ispum Lorem ispumLorem ispum Lorem ispum Lorem ispumLorem ispum"
-        data4.isOpen = false
-        data4.type = "Recipe"
-
-        dataList2.add(data1)
-        dataList2.add(data2)
-        dataList2.add(data3)
-        dataList2.add(data4)
-
-        /*adapterRecipeItem = AdapterRecipeItem(dataList2, requireActivity())
-        binding!!.rcyIngCookWareRecipe.adapter = adapterRecipeItem*/
-    }
 
     override fun itemSelect(position: Int?, status: String?, type: String?) {
 

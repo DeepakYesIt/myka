@@ -101,6 +101,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     // Define global variables
     private lateinit var startDate: Date
     private lateinit var endDate: Date
+    private var calendarAdapter: CalendarDayDateAdapter? = null
+
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -179,16 +181,29 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         binding!!.textWeekRange.text = ""+formatDate(startDate)+"-"+formatDate(endDate)
 
         tvWeekRange?.text = ""+formatDate(startDate)+"-"+formatDate(endDate)
-        // Update the RecyclerView
-        binding!!.recyclerViewWeekDays.adapter = CalendarDayDateAdapter(getDaysBetween(startDate, endDate)) {
+
+        calendarAdapter=CalendarDayDateAdapter(getDaysBetween(startDate, endDate)) {
             // Handle item click if needed
+            val dateList = getDaysBetween(startDate, endDate)
+            // Update the status of the item at the target position
+            dateList.forEachIndexed { index, dateModel ->
+                if (index==it){
+                    dateModel.status=true
+                }else{
+                    dateModel.status=false
+                }
+            }
+            Log.d("Date ", "*****$dateList")
+            // Notify the adapter to refresh the changed position
+            calendarAdapter!!.updateList(dateList)
             if (BaseApplication.isOnline(requireActivity())) {
-                dataFatchByDate(it)
+                dataFatchByDate(dateList[it].date)
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-
         }
+        // Update the RecyclerView
+        binding!!.recyclerViewWeekDays.adapter =  calendarAdapter
 
     }
 

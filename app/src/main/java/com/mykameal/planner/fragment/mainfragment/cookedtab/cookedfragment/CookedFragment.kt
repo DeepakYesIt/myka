@@ -87,7 +87,7 @@ class CookedFragment : Fragment(),OnItemClickListener {
         updateWeek()
 
         binding!!.imagePrevious.setOnClickListener {
-            changeWeekRange(-1)
+             changeWeekRange(-1)
         }
 
         binding!!.imageNext.setOnClickListener {
@@ -270,6 +270,9 @@ class CookedFragment : Fragment(),OnItemClickListener {
                 foodListItemAdapter= AdapterFoodListItem(cookedTabModelData.Dinner,requireActivity(),this)
                 binding!!.rcvDinner.adapter = foodListItemAdapter
 
+            if (cookedTabModelData.Breakfast!=null && cookedTabModelData.Breakfast.size>0){
+                foodListItemAdapter= AdapterFoodListItem(cookedTabModelData.Breakfast,requireActivity(),this)
+                binding!!.rcvBreakfast.adapter = foodListItemAdapter
             }
         }
     }

@@ -10,7 +10,7 @@ import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.databinding.CalendarItemDayBinding
 import com.mykameal.planner.model.DateModel
 
-class CalendarDayDateAdapter(var days: MutableList<DateModel>, private val onDaySelected: (String) -> Unit) : RecyclerView.Adapter<CalendarDayDateAdapter.ViewHolder>() {
+class CalendarDayDateAdapter(var days: MutableList<DateModel>, private val onDaySelected: (Int) -> Unit) : RecyclerView.Adapter<CalendarDayDateAdapter.ViewHolder>() {
 
     private var selectedPosition = -1
 
@@ -49,9 +49,9 @@ class CalendarDayDateAdapter(var days: MutableList<DateModel>, private val onDay
         }*/
 
         holder.itemView.setOnClickListener {
-            selectedPosition = position
+//            selectedPosition = position
             notifyDataSetChanged()
-            onDaySelected(day.date)
+            onDaySelected(position)
         }
 
 
