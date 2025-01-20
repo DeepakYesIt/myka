@@ -2,6 +2,7 @@ package com.mykameal.planner.fragment.mainfragment.viewmodel.recipedetails.apire
 
 data class RecipeModel(
     val label: String?,
+    val source: String?,
     val url: String?,
     val images: ImagesModel?,
     val totalNutrients: TotalNutrientsModel?,

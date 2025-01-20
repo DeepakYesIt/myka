@@ -154,11 +154,9 @@ class CookedFragment : Fragment(),OnItemClickListener {
 
     private fun showDataInUi(cookedTabModelData: CookedTabModelData) {
         if (cookedTabModelData!=null){
-            if (cookedTabModelData.Breakfast.size!=null && cookedTabModelData.Breakfast.size>0){
-
+            if (cookedTabModelData.Breakfast!=null && cookedTabModelData.Breakfast.size>0){
                 foodListItemAdapter= AdapterFoodListItem(cookedTabModelData.Breakfast,requireActivity(),this)
                 binding!!.rcvBreakfast.adapter = foodListItemAdapter
-
             }
         }
     }

@@ -126,10 +126,11 @@
                                 android:textSize="@dimen/_13sdp" />
 
                             <TextView
+                                android:id="@+id/tv_by"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppins_medium"
-                                android:text="By Cotter Crunch"
+                                android:text="By "
                                 android:textColor="#FFFFFF"
                                 android:textSize="@dimen/_10sdp" />
                         </LinearLayout>

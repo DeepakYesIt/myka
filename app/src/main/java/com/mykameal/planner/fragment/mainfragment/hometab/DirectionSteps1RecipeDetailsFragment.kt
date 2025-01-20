@@ -106,6 +106,10 @@ class DirectionSteps1RecipeDetailsFragment : Fragment() {
             binding!!.tvTitle.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.label
         }
 
+        if (viewModel.getRecipeData()?.get(0)!!.recipe?.source != null) {
+            binding!!.tvBy.text = "By " + viewModel.getRecipeData()?.get(0)!!.recipe?.source
+        }
+
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients != null && viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients!!.size > 0) {
             adapterPrepareCookItem = AdapterPrepareCookItem(viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients, requireActivity())
             binding!!.rcyPrepareToCook.adapter = adapterPrepareCookItem
