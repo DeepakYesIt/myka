@@ -16,7 +16,10 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
         repository.homeDetailsRequestApi { successCallback(it) }
     }
 
-
+    suspend fun likeUnlikeRequest(successCallback: (response: NetworkResult<String>) -> Unit,
+                                  uri: String,likeType: String,type:String){
+        repository.likeUnlikeRequestApi({ successCallback(it) },uri,likeType,type)
+    }
 
 
 }

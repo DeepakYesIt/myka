@@ -399,7 +399,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                     val bundle=Bundle()
                     bundle.putString("uri",uri)
                     bundle.putString("mealType",mealType)
-                    findNavController().navigate(R.id.directionSteps2RecipeDetailsFragmentFragment,bundle)
+                    findNavController().navigate(R.id.directionSteps1RecipeDetailsFragment,bundle)
                 }
             }
         }

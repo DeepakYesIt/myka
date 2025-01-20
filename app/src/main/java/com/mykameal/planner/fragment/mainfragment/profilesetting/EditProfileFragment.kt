@@ -5,16 +5,19 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,9 +27,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.github.dhaval2404.imagepicker.ImagePicker
+
 import com.google.gson.Gson
+
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
+import com.mykameal.planner.apiInterface.ApiInterface
 import com.mykameal.planner.apiInterface.BaseUrl
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
@@ -35,12 +41,22 @@ import com.mykameal.planner.databinding.FragmentEditProfileBinding
 import com.mykameal.planner.fragment.mainfragment.viewmodel.settingviewmodel.SettingViewModel
 import com.mykameal.planner.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.ProfileRootResponse
 import com.mykameal.planner.messageclass.ErrorMessage
+import com.mykameal.planner.repository.Feature
+import com.mykameal.planner.repository.Image
+import com.mykameal.planner.repository.Request
+import com.mykameal.planner.repository.VisionRequest
+import com.mykameal.planner.repository.VisionResponse
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.Call
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
+import java.io.InputStream
+
 
 class EditProfileFragment : Fragment() {
 
@@ -55,15 +71,109 @@ class EditProfileFragment : Fragment() {
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.let { uri ->
+
+//                val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, uri)
                 file = getPath(requireContext(), uri)?.let { File(it) }
+                /*processImage(bitmap)*/
+// Now you can send the image URI to Vision API for processing
+                // Convert image to Base64
+                val base64Image = convertImageToBase64(uri)
+
+                // Call Vision API to recognize the image
+                recognizeImage(base64Image)
+
                 Glide.with(this)
                     .load(uri)
                     .placeholder(R.drawable.mask_group_icon)
                     .error(R.drawable.mask_group_icon)
                     .into(binding.imageEditProfile)
+
             }
         }
     }
+
+    fun recognizeImage(base64Image: String) {
+
+        /*val visionApiService = createRetrofit().create(ApiInterface::class.java)
+
+        // Request setup
+        val features = listOf(Feature("WEB_DETECTION ", 1))
+        val image = Image(base64Image)
+        val request = Request(image, features)
+        val visionRequest = VisionRequest(listOf(request))
+        val call = visionApiService.annotateImage("AIzaSyB1WtrB2oHQmyIX1ZpaXzbI9kOA2FlkCXk",visionRequest)
+        call.enqueue(object : retrofit2.Callback<VisionResponse> {
+            override fun onResponse(call: Call<VisionResponse>, response: retrofit2.Response<VisionResponse>) {
+                if (response.isSuccessful) {
+                    val labels = response.body()?.responses?.get(0)?.labelAnnotations
+                    labels?.forEach {
+                        Log.d("Google Vision", "Label: ${it.description}, Confidence: ${it.score}")
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<VisionResponse>, t: Throwable) {
+                Log.e("Google Vision", "API call failed", t)
+            }
+        })*/
+
+        BaseApplication.showMe(requireContext())
+        val visionApiService = createRetrofit().create(ApiInterface::class.java)
+
+// Request setup for WEB_DETECTION instead of LABEL_DETECTION
+        val features = listOf(Feature("WEB_DETECTION", 1))  // Adjusting to use WEB_DETECTION
+        val image = Image(base64Image)
+        val request = Request(image, features)
+        val visionRequest = VisionRequest(listOf(request))
+
+// Pass your API key (this is just for demonstration, don't hardcode your API key)
+        val apiKey = "AIzaSyB1WtrB2oHQmyIX1ZpaXzbI9kOA2FlkCXk"
+
+        val call = visionApiService.annotateImage(apiKey, visionRequest)
+        call.enqueue(object : retrofit2.Callback<VisionResponse> {
+            override fun onResponse(call: Call<VisionResponse>, response: retrofit2.Response<VisionResponse>) {
+                BaseApplication.dismissMe()
+                if (response.isSuccessful) {
+                    val webDetection = response.body()?.responses?.get(0)?.webDetection
+                   if (webDetection!=null){
+                       if (webDetection.webEntities.size>0){
+                           Toast.makeText(requireContext(),"Name :-"+webDetection?.webEntities!![0].description.toString(),Toast.LENGTH_LONG).show()
+                           Log.d("Google Vision", "Similar Image: "+ webDetection?.webEntities!![0].description.toString())
+                       }
+                   }
+                }else{
+                    Toast.makeText(requireContext(),"Name :-"+response.message(),Toast.LENGTH_LONG).show()
+                }
+            }
+
+            override fun onFailure(call: Call<VisionResponse>, t: Throwable) {
+                Log.e("Google Vision", "API call failed", t)
+                Toast.makeText(requireContext(),"Name :-"+t.message,Toast.LENGTH_LONG).show()
+            }
+        })
+
+
+    }
+
+    // Retrofit setup
+    fun createRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://vision.googleapis.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+
+    fun convertImageToBase64(uri: Uri): String {
+        val inputStream: InputStream? = requireContext().contentResolver.openInputStream(uri)
+        val bytes = inputStream?.readBytes()
+        return Base64.encodeToString(bytes, Base64.DEFAULT)
+    }
+
+
+
+
+
 
 
     fun getPath(context: Context, uri: Uri): String? {

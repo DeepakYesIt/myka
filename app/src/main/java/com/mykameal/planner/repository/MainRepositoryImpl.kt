@@ -752,7 +752,8 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
     override suspend fun likeUnlikeRequestApi(
         successCallback: (response: NetworkResult<String>) -> Unit,
         uri: String,
-        likeType: String
+        likeType: String,
+        type: String
     ) {
         try {
             api.likeUnlikeRequestApi(uri,likeType).apply {

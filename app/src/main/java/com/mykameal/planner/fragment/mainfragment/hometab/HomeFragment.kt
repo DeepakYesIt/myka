@@ -26,6 +26,7 @@ import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.OnItemLongClickListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
+import com.mykameal.planner.adapter.AdapterPlanBreakFast
 import com.mykameal.planner.adapter.AdapterSuperMarket
 import com.mykameal.planner.adapter.RecipeCookedAdapter
 import com.mykameal.planner.apiInterface.BaseUrl
@@ -35,6 +36,9 @@ import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.databinding.FragmentHomeBinding
 import com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.HomeViewModel
 import com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.HomeApiResponse
+import com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.UserDataModel
+import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
+import com.mykameal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import com.mykameal.planner.model.DataModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,6 +57,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private var recySuperMarket:RecyclerView?=null
     private lateinit var sessionManagement: SessionManagement
     private lateinit var viewModel: HomeViewModel
+    private lateinit var userDataLocal: com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.DataModel
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -131,12 +136,14 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private fun showData(data: com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.DataModel?) {
         try {
 
-            if (data?.userData!=null && data.userData.size>0){
+            userDataLocal= data!!
+
+            if (userDataLocal.userData!=null && userDataLocal.userData!!.size>0){
                 binding!!.relPlanMeal.visibility=View.GONE
                 binding!!.imageCookedMeals.visibility=View.GONE
                 binding!!.rlSeeAllBtn.visibility=View.VISIBLE
                 binding!!.llRecipesCooked.visibility=View.VISIBLE
-                recipeCookedAdapter = RecipeCookedAdapter(data.userData,requireActivity(),this)
+                recipeCookedAdapter = RecipeCookedAdapter(userDataLocal.userData,requireActivity(),this)
                 binding!!.rcyRecipesCooked.adapter = recipeCookedAdapter
             }else{
                 binding!!.relPlanMeal.visibility=View.VISIBLE
@@ -145,7 +152,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 binding!!.llRecipesCooked.visibility=View.GONE
             }
 
-            if (data!!.graph_value==0){
+            if (userDataLocal.graph_value==0){
                 binding!!.imagePlanMeal.visibility=View.VISIBLE
                 binding!!.imageCheckSav.visibility=View.GONE
             }else{
@@ -153,35 +160,35 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 binding!!.imageCheckSav.visibility=View.VISIBLE
             }
 
-            if (data.date!=null){
+            if (userDataLocal.date!=null){
                 val name=BaseApplication.getColoredSpanned("Next meal to be cooked on ","#3C4541") + BaseApplication.getColoredSpanned(data.date+".","#06C169")
                 binding!!.tvHomeDesc.text=Html.fromHtml(name)
             }else{
                 binding!!.tvHomeDesc.text="Your cooking schedule is empty! Tap the button below to add a meal and get started."
             }
 
-            if (data.frezzer!=null){
+            if (userDataLocal.frezzer!=null){
 
-                if (data.frezzer.Breakfast!=null){
-                    binding!!.tvfreezerbreakfast.text = ""+data.frezzer.Breakfast
+                if (userDataLocal.frezzer.Breakfast!=null){
+                    binding!!.tvfreezerbreakfast.text = ""+userDataLocal.frezzer.Breakfast
                 }
-                if (data.frezzer.Lunch!=null){
-                    binding!!.tvfreezerlunch.text = ""+data.frezzer.Lunch
+                if (userDataLocal.frezzer.Lunch!=null){
+                    binding!!.tvfreezerlunch.text = ""+userDataLocal.frezzer.Lunch
                 }
-                if (data.frezzer.Dinner!=null){
-                    binding!!.tvfreezerdinner.text = ""+data.frezzer.Dinner
+                if (userDataLocal.frezzer.Dinner!=null){
+                    binding!!.tvfreezerdinner.text = ""+userDataLocal.frezzer.Dinner
                 }
 
-                if (data.frezzer.Snacks!=null){
+                if (userDataLocal.frezzer.Snacks!=null){
                     binding!!.laySnack.visibility=View.VISIBLE
-                    binding!!.tvfreezersnack.text = ""+data.frezzer.Snacks
+                    binding!!.tvfreezersnack.text = ""+userDataLocal.frezzer.Snacks
                 }else{
                     binding!!.tvfreezersnack.visibility=View.GONE
                 }
 
-                if (data.frezzer.Teatime!=null){
+                if (userDataLocal.frezzer.Teatime!=null){
                     binding!!.layTeatime.visibility=View.VISIBLE
-                    binding!!.tvfreezerteatime.text = ""+data.frezzer.Teatime
+                    binding!!.tvfreezerteatime.text = ""+userDataLocal.frezzer.Teatime
                 }else{
                     binding!!.layTeatime.visibility=View.GONE
                 }
@@ -189,27 +196,27 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
             }
 
-            if (data.fridge!=null){
+            if (userDataLocal.fridge!=null){
 
-                if (data.fridge.Breakfast!=null){
-                    binding!!.tvfridgebreakfast.text = ""+data.fridge.Breakfast
+                if (userDataLocal.fridge.Breakfast!=null){
+                    binding!!.tvfridgebreakfast.text = ""+userDataLocal.fridge.Breakfast
                 }
-                if (data.fridge.Lunch!=null){
-                    binding!!.tvfridgelunch.text = ""+data.fridge.Lunch
+                if (userDataLocal.fridge.Lunch!=null){
+                    binding!!.tvfridgelunch.text = ""+userDataLocal.fridge.Lunch
                 }
-                if (data.fridge.Dinner!=null){
-                    binding!!.tvfridgedinner.text = ""+data.fridge.Dinner
+                if (userDataLocal.fridge.Dinner!=null){
+                    binding!!.tvfridgedinner.text = ""+userDataLocal.fridge.Dinner
                 }
-                if (data.fridge.Snacks!=null){
+                if (userDataLocal.fridge.Snacks!=null){
                     binding!!.laySnack.visibility=View.VISIBLE
-                    binding!!.tvfridgesnack.text = ""+data.fridge.Snacks
+                    binding!!.tvfridgesnack.text = ""+userDataLocal.fridge.Snacks
                 }else{
                     binding!!.laySnack.visibility=View.GONE
                 }
 
-                if (data.fridge.Teatime!=null){
+                if (userDataLocal.fridge.Teatime!=null){
                     binding!!.layTeatime.visibility=View.VISIBLE
-                    binding!!.tvfridgeteatime.text = ""+data.fridge.Teatime
+                    binding!!.tvfridgeteatime.text = ""+userDataLocal.fridge.Teatime
                 }else{
                     binding!!.layTeatime.visibility=View.GONE
                 }
@@ -443,9 +450,82 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         }else{
             findNavController().navigate(R.id.recipeDetailsFragment)
         }*/
+
+
+        when (status) {
+            "1" -> {
+
+            }
+            "2" -> {
+
+            }
+            status -> {
+
+            }
+            "4" -> {
+//                addRecipeDialog(position)
+                if (BaseApplication.isOnline(requireActivity())) {
+                    // Safely get the item and position
+                    val newLikeStatus = if (userDataLocal.userData?.get(position!!)?.is_like == 0) "1" else "0"
+                    recipeLikeAndUnlikeData(position, newLikeStatus)
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
+        }
+
     }
 
-    private fun addRecipeDialog(position: Int?, type: String) {
+
+    private fun recipeLikeAndUnlikeData(
+        position: Int?,
+        likeType: String
+    ) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.likeUnlikeRequest({
+                BaseApplication.dismissMe()
+                handleLikeAndUnlikeApiResponse(it,position)
+            }, userDataLocal.userData?.get(position!!)?.recipe?.url!!,likeType,"")
+        }
+    }
+
+    private fun handleLikeAndUnlikeApiResponse(result: NetworkResult<String>, position: Int?) {
+        when (result) {
+            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(result.data.toString(),position)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleLikeAndUnlikeSuccessResponse(data: String,position: Int?) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ Plan List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                // Toggle the is_like value
+                val item = userDataLocal.userData?.getOrNull(position!!) ?: return
+                // Toggle the is_like value
+                item.is_like = if (item.is_like == 0) 1 else 0
+                // Update the list at the specific position
+                userDataLocal.userData!![position!!] = item
+                recipeCookedAdapter?.updateList(userDataLocal.userData)
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+
+
+    private fun addRecipeDialog(position: Int?) {
         val dialogAddRecipe: Dialog = context?.let { Dialog(it) }!!
         dialogAddRecipe.setContentView(R.layout.alert_dialog_add_recipe)
         dialogAddRecipe.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)

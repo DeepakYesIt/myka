@@ -1,52 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragment.mainfragment.hometab.DirectionSteps1RecipeDetailsFragment">
 
+    <RelativeLayout
+        android:id="@+id/relToolbar"
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_marginHorizontal="@dimen/_20sdp"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imgStep1RecipeDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/_5sdp"
+            android:src="@drawable/black_images_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_toEndOf="@+id/imgStep1RecipeDetails"
+            android:fontFamily="@font/montserrat_semibold"
+            android:text="Recipe Details"
+            android:textSize="@dimen/_13sdp" />
+
+    </RelativeLayout>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/relToolbar"
+        android:layout_above="@id/relNextStep"
+        android:layout_marginTop="@dimen/_10sdp"
         android:fillViewport="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/_20sdp"
-            android:layout_marginTop="@dimen/_20sdp">
+            android:layout_marginHorizontal="@dimen/_20sdp">
 
-            <RelativeLayout
-                android:id="@+id/relToolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/imgStep1RecipeDetails"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:padding="@dimen/_5sdp"
-                    android:src="@drawable/black_images_back" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="@dimen/_20sdp"
-                    android:layout_toEndOf="@+id/imgStep1RecipeDetails"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:text="Recipe Details"
-                    android:textSize="@dimen/_13sdp" />
-
-            </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/rlProgressBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/relToolbar"
+               android:visibility="gone"
                 android:layout_marginTop="@dimen/_15sdp">
 
                 <ProgressBar
@@ -57,6 +63,7 @@
                     android:layout_centerHorizontal="true"
                     android:background="@drawable/progress_bar_background"
                     android:indeterminate="false"
+                    android:visibility="gone"
                     android:layout_toStartOf="@+id/tvProgressText"
                     android:layout_marginEnd="@dimen/_10sdp"
                     android:padding="1dp"
@@ -87,11 +94,12 @@
                     android:layout_height="wrap_content">
 
                     <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/imageData"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/_130sdp"
                         android:adjustViewBounds="true"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/boiling_egg_image"
+                        android:src="@drawable/no_image"
                         app:shapeAppearanceOverlay="@style/CornerCut" />
 
                     <LinearLayout
@@ -109,7 +117,8 @@
                             android:paddingStart="@dimen/_10sdp">
 
                             <TextView
-                                android:layout_width="wrap_content"
+                                android:id="@+id/tvTitle"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppins_medium"
                                 android:text="Boiling Egg"
@@ -117,7 +126,7 @@
                                 android:textSize="@dimen/_13sdp" />
 
                             <TextView
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppins_medium"
                                 android:text="By Cotter Crunch"
@@ -126,6 +135,15 @@
                         </LinearLayout>
 
                     </LinearLayout>
+
+                    <include
+                        android:id="@+id/lay_progess"
+                        layout="@layout/progess_loader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"/>
+
+
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
 
@@ -164,25 +182,7 @@
                     android:layout_marginTop="@dimen/_10sdp"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
-                <RelativeLayout
-                    android:id="@+id/relNextStep"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_20sdp"
-                    android:layout_marginBottom="@dimen/_40sdp"
-                    android:background="@drawable/green_btn_background">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:paddingVertical="@dimen/_10sdp"
-                        android:text="Next Step"
-                        android:fontFamily="@font/poppins"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/_13sdp" />
-
-                </RelativeLayout>
 
 
             </LinearLayout>
@@ -191,6 +191,26 @@
         </RelativeLayout>
 
     </ScrollView>
+    <RelativeLayout
+        android:id="@+id/relNextStep"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_marginHorizontal="@dimen/_20sdp"
+        android:layout_marginBottom="@dimen/_20sdp"
+        android:background="@drawable/green_btn_background">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:paddingVertical="@dimen/_10sdp"
+            android:text="Next Step"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_13sdp" />
 
-</FrameLayout>
+    </RelativeLayout>
+
+</RelativeLayout>
