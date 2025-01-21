@@ -247,10 +247,16 @@ interface ApiInterface {
     @POST(ApiEndPoint.addMealUrl)
     suspend fun recipeAddToPlanRequestApi(@Body jsonObject: JsonObject): Response<JsonObject>
 
+    @POST(ApiEndPoint.getCookBookUrl)
+    suspend fun getCookBookRequestApi(): Response<JsonObject>
+
 
     @Multipart
     @POST(ApiEndPoint.createCookBook)
-    suspend fun createCookBook(@Part("name") name:RequestBody?,@Part image: MultipartBody.Part?, @Field("status") status:RequestBody?):Response<JsonObject>
+    suspend fun createCookBook(@Part("name") name:RequestBody?,
+                               @Part image: MultipartBody.Part?,
+                               @Part("status") status:RequestBody?):Response<JsonObject>
+
 
     @POST(ApiEndPoint.getCardBankUrl)
     suspend fun getCardAndBankRequestApi(): Response<JsonObject>
@@ -268,7 +274,7 @@ interface ApiInterface {
     @FormUrlEncoded
     @POST(ApiEndPoint.likeUnlikeUrl)
     suspend fun likeUnlikeRequestApi(
-        @Field("uri") uri: String, @Field("type") type: String
+        @Field("uri") uri: String, @Field("type") type: String, @Field("cook_book") cookbook: String
     ): Response<JsonObject>
 
 

@@ -38,5 +38,10 @@ class PlanViewModel @Inject constructor(private val repository: MainRepository) 
         repository.recipeAddToPlanRequestApi({ successCallback(it) },jsonObject)
     }
 
+    suspend fun getCookBookRequest(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.getCookBookRequestApi { successCallback(it) }
+    }
+
+
 
 }

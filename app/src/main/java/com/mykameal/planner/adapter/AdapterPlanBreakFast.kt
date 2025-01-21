@@ -45,7 +45,7 @@ class AdapterPlanBreakFast(var datalist: MutableList<BreakfastModel>?, private v
         }
 
         if (item?.is_like!=null){
-            if (item?.is_like ==0 ){
+            if (item.is_like ==0 ){
                 holder.binding.imgHeartRed.setImageResource(R.drawable.heart_white_icon)
             }else{
                 holder.binding.imgHeartRed.setImageResource(R.drawable.heart_red_icon)

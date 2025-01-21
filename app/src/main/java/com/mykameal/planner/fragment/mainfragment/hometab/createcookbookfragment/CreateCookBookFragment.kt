@@ -1,13 +1,14 @@
 package com.mykameal.planner.fragment.mainfragment.hometab.createcookbookfragment
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
@@ -27,6 +28,7 @@ import com.mykameal.planner.commonworkutils.CommonWorkUtils
 import com.mykameal.planner.databinding.FragmentCreateCookBookBinding
 import com.mykameal.planner.fragment.mainfragment.hometab.createcookbookfragment.model.CreateCookBookModel
 import com.mykameal.planner.fragment.mainfragment.hometab.createcookbookfragment.viewmodel.CreateCookBookViewModel
+import com.mykameal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -35,7 +37,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.util.regex.Pattern
 
 
 @AndroidEntryPoint
@@ -43,16 +44,14 @@ class CreateCookBookFragment : Fragment() {
     private var binding: FragmentCreateCookBookBinding? = null
     private var isOpened: Boolean? = null
     private var checkType: String? = null
+    private var uri: String? = null
     private var file: File? = null
     private lateinit var commonWorkUtils: CommonWorkUtils
     private lateinit var createCookBookViewModel: CreateCookBookViewModel
     private val selectedButton = arrayOf<RadioButton?>(null)
     private var status:String=""
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         binding = FragmentCreateCookBookBinding.inflate(layoutInflater, container, false)
 
@@ -62,6 +61,7 @@ class CreateCookBookFragment : Fragment() {
 
         if (arguments != null) {
             checkType = requireArguments().getString("value", "")
+            uri = requireArguments().getString("uri", "")
         }
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
@@ -99,6 +99,7 @@ class CreateCookBookFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initialize() {
 
         if (checkType == "New") {
@@ -176,7 +177,6 @@ class CreateCookBookFragment : Fragment() {
 
     /// add validation based on valid email or phone
     private fun validate(): Boolean {
-
         if (file==null) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.cookbookUpload, false)
             return false
@@ -193,43 +193,93 @@ class CreateCookBookFragment : Fragment() {
     private fun createCookBookApi() {
         BaseApplication.showMe(requireActivity())
         lifecycleScope.launch {
+
             val filePart: MultipartBody.Part? = if (file != null) {
                 val requestBody = file?.asRequestBody(file!!.extension.toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("profile_img", file?.name, requestBody!!)
+                MultipartBody.Part.createFormData("image", file?.name, requestBody!!)
             } else {
                 null
             }
+
             val cookBookName = binding!!.etEnterYourNewCookbook.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
             val cookBookStatus = status.toRequestBody("multipart/form-data".toMediaTypeOrNull())
 
             createCookBookViewModel.createCookBookApi({
-                BaseApplication.dismissMe()
+                if (uri.equals("",true)){
+                    BaseApplication.dismissMe()
+                }
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val createCookBookModel =
-                            gson.fromJson(it.data, CreateCookBookModel::class.java)
-                        if (createCookBookModel.code == 200 && createCookBookModel.success) {
-                            findNavController().navigateUp()
-                        } else {
-                            if (createCookBookModel.code == ErrorMessage.code) {
-                                showAlertFunction(createCookBookModel.message, true)
+                        try {
+                            val createCookBookModel = Gson().fromJson(it.data, CreateCookBookModel::class.java)
+                            if (createCookBookModel.code == 200 && createCookBookModel.success) {
+                                if (uri.equals("",true)){
+                                    Toast.makeText(requireContext(),createCookBookModel.message,Toast.LENGTH_LONG).show()
+                                    findNavController().navigateUp()
+                                }else{
+                                    recipeLikeAndUnlikeData(createCookBookModel.data.id.toString(),createCookBookModel.message)
+                                }
                             } else {
-                                showAlertFunction(createCookBookModel.message, false)
+                                if (createCookBookModel.code == ErrorMessage.code) {
+                                    showAlertFunction(createCookBookModel.message, true)
+                                } else {
+                                    showAlertFunction(createCookBookModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            BaseApplication.dismissMe()
+                            showAlertFunction(e.message, false)
                         }
                     }
-
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
-                    }
-
-                    else -> {
+                    }else -> {
                         showAlertFunction(it.message, false)
                     }
                 }
             }, cookBookName, filePart, cookBookStatus)
         }
+    }
+
+    private fun recipeLikeAndUnlikeData(cookbooktype: String, message: String) {
+        lifecycleScope.launch {
+            createCookBookViewModel.likeUnlikeRequest({
+                BaseApplication.dismissMe()
+                handleLikeAndUnlikeApiResponse(it,message)
+            }, uri!!,"1",cookbooktype)
+        }
+    }
+
+    private fun handleLikeAndUnlikeApiResponse(result: NetworkResult<String>, message: String) {
+        when (result) {
+            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(result.data.toString(),message)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleLikeAndUnlikeSuccessResponse(data: String, message: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ Plan List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                Toast.makeText(requireContext(),message,Toast.LENGTH_LONG).show()
+                findNavController().navigateUp()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun showAlert(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {

@@ -111,12 +111,13 @@
                 tools:ignore="RtlSymmetry" />
 
             <TextView
+                android:id="@+id/tv_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:fontFamily="@font/poppins"
-                android:text="Dora’s Nutrition Goals"
+                android:text="Nutrition Goals"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_13ssp"
                 android:textStyle="bold" />

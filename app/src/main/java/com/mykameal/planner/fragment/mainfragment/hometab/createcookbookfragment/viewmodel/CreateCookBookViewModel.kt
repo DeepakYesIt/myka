@@ -15,9 +15,13 @@ import javax.inject.Inject
 class CreateCookBookViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
 
-    suspend fun createCookBookApi(successCallback: (response: NetworkResult<String>) -> Unit, name: RequestBody?, image: MultipartBody.Part?, status: RequestBody?
-    ){
+    suspend fun createCookBookApi(successCallback: (response: NetworkResult<String>) -> Unit, name: RequestBody?, image: MultipartBody.Part?, status: RequestBody?){
         repository.createCookBookApi({ successCallback(it) },name,image, status)
+    }
+
+    suspend fun likeUnlikeRequest(successCallback: (response: NetworkResult<String>) -> Unit,
+                                  uri: String,likeType: String,type:String){
+        repository.likeUnlikeRequestApi({ successCallback(it) },uri,likeType,type)
     }
 
 }

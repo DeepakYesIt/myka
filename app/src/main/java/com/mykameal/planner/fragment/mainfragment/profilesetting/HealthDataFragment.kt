@@ -149,9 +149,7 @@ class HealthDataFragment : Fragment() {
         } else if (binding.spinnerHeight.text.toString().equals("Type", true)) {
             BaseApplication.alertError(requireContext(), ErrorMessage.typeError, false)
             return false
-        } else if (binding.spinnerActivityLevel.text.toString()
-                .equals("Select Your Activity Level", true)
-        ) {
+        } else if (binding.spinnerActivityLevel.text.toString().equals("Select Your Activity Level", true)) {
             BaseApplication.alertError(requireContext(), ErrorMessage.activityTypeError, false)
             return false
         }
@@ -268,33 +266,31 @@ class HealthDataFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun showDataInUi(data: Data) {
 
-        when (data.gender.lowercase()) {
-            "male" -> selectGender(true)
-            "female" -> selectGender(false)
-            else -> resetGenderSelection()
+        if (data.gender!=null){
+            when (data.gender.lowercase()) {
+                "male" -> selectGender(true)
+                "female" -> selectGender(false)
+                else -> resetGenderSelection()
+            }
         }
 
-        if (data.height != null) {
+        if (data.height != null && !data.height.equals("null",true)) {
             binding.etHeight.setText(data.height)
         }
 
 
-        if (data.height_type != null) {
+        if (data.height_type != null && !data.height_type.equals("null",true)) {
             binding.spinnerHeight.text = data.height_type
         }
 
-        if (data.dob != null) {
+        if (data.dob != null && !data.dob.equals("null",true)) {
             binding.etDateOfBirth.text = data.dob
         }
 
-        if (data.activity_level != null) {
+        if (data.activity_level != null && !data.activity_level.equals("null",true)) {
             binding.spinnerActivityLevel.text = data.activity_level
         }
 
-
-        if (data.activity_level != null) {
-            binding.spinnerActivityLevel.text = data.activity_level
-        }
 
         if ((data.calories ?: 0) == 0 && (data.carbs ?: 0) == 0 && (data.fat
                 ?: 0) == 0 && (data.protien ?: 0) == 0

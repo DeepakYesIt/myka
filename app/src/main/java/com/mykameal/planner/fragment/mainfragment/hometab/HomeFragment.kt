@@ -26,7 +26,6 @@ import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.OnItemLongClickListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
-import com.mykameal.planner.adapter.AdapterPlanBreakFast
 import com.mykameal.planner.adapter.AdapterSuperMarket
 import com.mykameal.planner.adapter.RecipeCookedAdapter
 import com.mykameal.planner.apiInterface.BaseUrl
@@ -36,11 +35,11 @@ import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.databinding.FragmentHomeBinding
 import com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.HomeViewModel
 import com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.HomeApiResponse
-import com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.UserDataModel
-import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
+import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
 import com.mykameal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import com.mykameal.planner.model.DataModel
+import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -58,6 +57,9 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private lateinit var sessionManagement: SessionManagement
     private lateinit var viewModel: HomeViewModel
     private lateinit var userDataLocal: com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.DataModel
+    private lateinit var spinnerActivityLevel: PowerSpinnerView
+    var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
+
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -73,6 +75,10 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
 
         (activity as MainActivity?)?.changeBottom("home")
+
+
+        val data= com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favourites",0,"",0)
+        cookbookList.add(0,data)
 
         homeSchDinnerModel()
 //        addSuperMarketDialog()
@@ -403,7 +409,8 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             }
 
             R.id.imageCookedMeals->{
-                binding!!.rlSeeAllBtn.visibility=View.VISIBLE
+                findNavController().navigate(R.id.cookedFragment)
+//                binding!!.rlSeeAllBtn.visibility=View.VISIBLE
             }
 
             R.id.imgBasketIcon->{
@@ -457,34 +464,157 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             "2" -> {
 
             }
-            status -> {
-
-            }
             "4" -> {
-//                addRecipeDialog(position)
                 if (BaseApplication.isOnline(requireActivity())) {
                     // Safely get the item and position
                     val newLikeStatus = if (userDataLocal.userData?.get(position!!)?.is_like == 0) "1" else "0"
-                    recipeLikeAndUnlikeData(position, newLikeStatus)
+                    if (newLikeStatus.equals("0",true)){
+                        recipeLikeAndUnlikeData(position,newLikeStatus,"")
+                    }else{
+                        addFavTypeDialog(position, newLikeStatus)
+                    }
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }
+            "5" -> {
+                val bundle = Bundle().apply {
+                    putString("uri", type)
+                    putString("mealType", userDataLocal.userData?.get(position!!)?.recipe?.type)
+                }
+                findNavController().navigate(R.id.recipeDetailsFragment, bundle)
+            }
+
         }
 
+    }
+
+    private fun addFavTypeDialog(position: Int?, likeType: String) {
+        val dialogAddRecipe: Dialog = context?.let { Dialog(it) }!!
+        dialogAddRecipe.setContentView(R.layout.alert_dialog_add_recipe)
+        dialogAddRecipe.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialogAddRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val rlDoneBtn = dialogAddRecipe.findViewById<RelativeLayout>(R.id.rlDoneBtn)
+        spinnerActivityLevel = dialogAddRecipe.findViewById(R.id.spinnerActivityLevel)
+        val relCreateNewCookBook = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
+        val relFavourites = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relFavourites)
+        val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
+
+        spinnerActivityLevel.setItems(cookbookList.map { it.name })
+
+        dialogAddRecipe.show()
+        dialogAddRecipe.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        getCookBookList()
+
+
+        relCreateNewCookBook.setOnClickListener{
+//            statuses="newCook"
+            relCreateNewCookBook.setBackgroundResource(R.drawable.light_green_rectangular_bg)
+            imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
+            dialogAddRecipe.dismiss()
+            val bundle=Bundle()
+            bundle.putString("value","New")
+            bundle.putString("uri", userDataLocal.userData?.get(position!!)?.recipe?.url)
+            findNavController().navigate(R.id.createCookBookFragment,bundle)
+//            relFavourites.setBackgroundResource(0)
+//            checkStatus=false
+        }
+
+//        imgCheckBoxOrange.setOnClickListener{
+//            if (checkStatus==true){
+//                statuses=""
+//                imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
+//                relFavourites.setBackgroundResource(0)
+//                relCreateNewCookBook.setBackgroundResource(0)
+//                relCreateNewCookBook.background=null
+//                checkStatus=false
+//            }else{
+//                relFavourites.setBackgroundResource(R.drawable.light_green_rectangular_bg)
+//                relCreateNewCookBook.setBackgroundResource(0)
+//                statuses="favourites"
+//                imgCheckBoxOrange.setImageResource(R.drawable.orange_checkbox_images)
+//                checkStatus=true
+//            }
+//        }
+
+
+        rlDoneBtn.setOnClickListener{
+            /* if (statuses==""){
+                 Toast.makeText(requireActivity(),"Please select atleast one of them", Toast.LENGTH_LONG).show()
+             }else if (statuses=="favourites"){
+                 dialogAddRecipe.dismiss()
+             }else{
+                 dialogAddRecipe.dismiss()
+                 val bundle=Bundle()
+                 bundle.putString("value","New")
+                 findNavController().navigate(R.id.createCookBookFragment,bundle)
+             }*/
+
+            if (spinnerActivityLevel.text.toString().equals("",true)){
+                BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
+            }else{
+                val cookbooktype = cookbookList[spinnerActivityLevel.selectedIndex].id
+                recipeLikeAndUnlikeData(position,likeType,cookbooktype.toString())
+            }
+
+        }
+    }
+
+    private fun getCookBookList(){
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.getCookBookRequest {
+                BaseApplication.dismissMe()
+                handleApiCookBookResponse(it)
+            }
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessCookBookResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, CookBookListResponse::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data!=null && apiModel.data.size>0){
+                    cookbookList.retainAll { it == cookbookList[0] }
+                    cookbookList.addAll(apiModel.data)
+                    // OR directly modify the original list
+                    spinnerActivityLevel.setItems(cookbookList.map { it.name })
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun handleApiCookBookResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessCookBookResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
     }
 
 
     private fun recipeLikeAndUnlikeData(
         position: Int?,
-        likeType: String
+        likeType: String,
+        cookbooktype: String
     ) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             viewModel.likeUnlikeRequest({
                 BaseApplication.dismissMe()
                 handleLikeAndUnlikeApiResponse(it,position)
-            }, userDataLocal.userData?.get(position!!)?.recipe?.url!!,likeType,"")
+            }, userDataLocal.userData?.get(position!!)?.recipe?.url!!,likeType,cookbooktype)
         }
     }
 

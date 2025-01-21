@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.WebSettings
+import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
 import android.widget.RelativeLayout
@@ -323,6 +324,8 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             binding!!.textCookWare.setTextColor(Color.parseColor("#3C4541"))
             binding!!.textRecipe.setTextColor(Color.parseColor("#3C4541"))
 
+
+            binding!!.relRecipe.visibility = View.GONE
             binding!!.textStepInstructions.visibility = View.GONE
             binding!!.relTittleList.visibility = View.VISIBLE
             binding!!.relServingsPeople.visibility = View.VISIBLE
@@ -373,6 +376,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             binding!!.textRecipe.setTextColor(Color.parseColor("#FFFFFF"))
 
             binding!!.textStepInstructions.visibility = View.VISIBLE
+            binding!!.relRecipe.visibility = View.VISIBLE
             binding!!.relTittleList.visibility = View.GONE
             binding!!.relServingsPeople.visibility = View.GONE
             binding!!.layBottomPlanBasket.visibility = View.GONE
@@ -420,7 +424,6 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                 ingredientsRecipeAdapter?.updateList(viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients!!)
             }
         }
-
 
         binding!!.layBasket.setOnClickListener {
 
@@ -490,17 +493,32 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             webSettings.allowFileAccess = true
             webSettings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
-            // Set WebViewClient to handle page loading within the WebView
-            binding!!.webView.webViewClient = WebViewClient()
+            /*// Set WebViewClient to handle page loading within the WebView
+            binding!!.webView.webViewClient = WebViewClient()*/
+
+            // Set a WebViewClient to capture URL clicks
+            binding!!.webView.webViewClient = object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                    // Capture the clicked URL
+                    Toast.makeText(requireContext(), "Clicked URL: $url", Toast.LENGTH_SHORT).show()
+                    Log.d("Clicked URL:", "***$url")
+                    // Decide whether to load the URL in the WebView
+                    view.loadUrl(url) // Load the URL in the WebView
+                    return true // Return true if you handle the URL loading
+                }
+            }
 
             // Load the URL if it is not null or empty
             val url = viewModel.getRecipeData()?.get(0)!!.recipe?.url?.replace("http:", "https:")
             Log.d("url", "****$url")
-            if (!url.isNullOrEmpty()) {
-                binding!!.webView.loadUrl(url)
+
+            binding!!.webView.loadUrl("https://www.google.com/")
+
+            /*if (!url.isNullOrEmpty()) {
+                binding!!.webView.loadUrl("www.google.com")
             } else {
                 Log.e("WebViewError", "URL is null or empty")
-            }
+            }*/
 
         }
     }
@@ -577,8 +595,22 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
 
 
         rlDoneBtn.setOnClickListener {
-            dialogChooseDay.dismiss()
-            chooseDayMealTypeDialog()
+            /*dialogChooseDay.dismiss()
+            chooseDayMealTypeDialog()*/
+
+            var status = false
+            for (it in dataList) {
+                if (it.isOpen) {
+                    status = true
+                    break // Exit the loop early
+                }
+            }
+            if (status){
+                chooseDayMealTypeDialog()
+                dialogChooseDay.dismiss()
+            }else{
+                BaseApplication.alertError(requireContext(), ErrorMessage.weekNameError, false)
+            }
 
         }
 
@@ -733,7 +765,11 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
 
         rlDoneBtn.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
-                addToPlan(dialogChooseMealDay, type)
+                if (type.equals("",true)){
+                    BaseApplication.alertError(requireContext(), ErrorMessage.mealTypeError, false)
+                }else {
+                    addToPlan(dialogChooseMealDay, type)
+                }
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
@@ -742,6 +778,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
     }
 
 
+    @SuppressLint("DefaultLocale")
     private fun addToPlan(dialogChooseMealDay: Dialog, selectType: String) {
 
         // Create a JsonObject for the main JSON structure
@@ -749,6 +786,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         if (uri != null) {
             jsonObject.addProperty("type", selectType)
             jsonObject.addProperty("uri", uri)
+            jsonObject.addProperty("serving", binding?.tvValues?.text.toString())
             // Create a JsonArray for ingredients
             val jsonArray = JsonArray()
             val latestList = getDaysBetween(startDate, endDate)

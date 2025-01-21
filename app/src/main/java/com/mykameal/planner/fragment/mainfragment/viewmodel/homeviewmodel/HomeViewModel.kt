@@ -21,5 +21,9 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
         repository.likeUnlikeRequestApi({ successCallback(it) },uri,likeType,type)
     }
 
+    suspend fun getCookBookRequest(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.getCookBookRequestApi { successCallback(it) }
+    }
+
 
 }

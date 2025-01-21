@@ -82,6 +82,8 @@ interface MainRepository {
 
  suspend fun recipeAddToPlanRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)
 
+ suspend fun getCookBookRequestApi(successCallback: (response: NetworkResult<String>) -> Unit)
+
  suspend fun planRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, q: String)
 
  suspend fun planDateRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, date: String,planType:String)

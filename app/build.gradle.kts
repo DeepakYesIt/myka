@@ -109,6 +109,7 @@ dependencies {
     implementation("com.appsflyer:af-android-sdk:6.11.0")*/
 
 
+    implementation ("com.airbnb.android:lottie:3.4.0")
 
     //power spinner
     implementation("com.github.skydoves:powerspinner:1.2.7")
@@ -130,8 +131,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.0")
     implementation("androidx.activity:activity-ktx:1.3.1")
 
-    // progress bar circle
-    implementation("com.github.ybq:Android-SpinKit:1.4.0")
+//    // progress bar circle
+//    implementation("com.github.ybq:Android-SpinKit:1.4.0")
 
     //Stripe SDK
     implementation ("com.stripe:stripe-android:16.3.0")

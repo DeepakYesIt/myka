@@ -60,6 +60,10 @@ class AdapterPrepareCookItem(private var datalist: MutableList<IngredientsModel>
             holder.binding.layProgess.root.visibility= View.GONE
         }
 
+        if (data.food!=null){
+            holder.binding.tvTitleName.text =data.food
+        }
+
         if (data.quantity!=null){
             holder.binding.tvTitleDesc.text =""+data.quantity+" "+data.measure
         }

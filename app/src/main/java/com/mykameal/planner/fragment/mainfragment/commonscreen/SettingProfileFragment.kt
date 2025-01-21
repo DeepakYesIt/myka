@@ -189,8 +189,8 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
         if (data.profile_img!=null){
             Glide.with(this)
                 .load(BaseUrl.imageBaseUrl+data.profile_img)
-                .placeholder(R.drawable.image_not)
-                .error(R.drawable.image_not)
+                .placeholder(R.drawable.mask_group_icon)
+                .error(R.drawable.mask_group_icon)
                 .into(binding?.imageProfile!!)
         }
 

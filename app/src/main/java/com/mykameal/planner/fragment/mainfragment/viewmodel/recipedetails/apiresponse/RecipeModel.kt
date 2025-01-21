@@ -4,6 +4,8 @@ data class RecipeModel(
     val label: String?,
     val source: String?,
     val url: String?,
+    val uri: String?,
+    val type: String?,
     val images: ImagesModel?,
     val totalNutrients: TotalNutrientsModel?,
     val calories: Double?,

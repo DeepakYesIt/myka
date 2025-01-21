@@ -3,5 +3,6 @@ package com.mykameal.planner.fragment.mainfragment.hometab.createcookbookfragmen
 data class CreateCookBookModel(
     val code: Int,
     val message: String,
-    val success: Boolean
+    val success: Boolean,
+    val data: CookBookDataModel
 )

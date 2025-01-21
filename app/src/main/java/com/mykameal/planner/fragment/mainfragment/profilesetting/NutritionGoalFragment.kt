@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
+import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.databinding.FragmentNutritionGoalBinding
 import com.mykameal.planner.fragment.mainfragment.viewmodel.settingviewmodel.SettingViewModel
 import com.mykameal.planner.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.Data
@@ -26,13 +27,15 @@ class NutritionGoalFragment : Fragment() {
 
     private lateinit var binding: FragmentNutritionGoalBinding
     private lateinit var viewModel: SettingViewModel
-
+    private lateinit var sessionManagement: SessionManagement
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentNutritionGoalBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[SettingViewModel::class.java]
+        sessionManagement = SessionManagement(requireContext())
+
 
         setupBackPressHandler()
         initializeUI()
@@ -100,7 +103,7 @@ class NutritionGoalFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun updateUI(data: Data) {
-        if (data.height_protein!=null){
+        if (data.height_protein!=null && !data.height_protein.equals("null",true)){
             binding.spinnerHighProtein.text = data.height_protein
         }
 
@@ -139,6 +142,7 @@ class NutritionGoalFragment : Fragment() {
 
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initializeUI() {
 
         binding.imageBackNutrition.setOnClickListener {
@@ -146,6 +150,10 @@ class NutritionGoalFragment : Fragment() {
         }
 
 
+
+        if (sessionManagement.getUserName()!=null && sessionManagement.getUserName().equals("null")){
+            binding.tvName.text=sessionManagement.getUserName()+"’s Nutrition Goals"
+        }
 
 
 

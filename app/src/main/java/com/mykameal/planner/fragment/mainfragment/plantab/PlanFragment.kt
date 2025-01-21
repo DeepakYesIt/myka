@@ -51,10 +51,12 @@ import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.PlanVi
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.Data
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.RecipesModel
+import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
 import com.mykameal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import com.mykameal.planner.model.CalendarDataModel
 import com.mykameal.planner.model.DataModel
+import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -102,6 +104,9 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     private lateinit var startDate: Date
     private lateinit var endDate: Date
     private var calendarAdapter: CalendarDayDateAdapter? = null
+    private lateinit var spinnerActivityLevel: PowerSpinnerView
+
+    var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
 
 
     @SuppressLint("SetTextI18n")
@@ -124,6 +129,9 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             })
 
         (activity as MainActivity?)?.changeBottom("plan")
+
+        val data= com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favourites",0,"",0)
+        cookbookList.add(0,data)
 
         if (sessionManagement.getImage()!=null){
             Glide.with(requireContext())
@@ -293,6 +301,14 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
     }
 
+    private fun handleApiCookBookResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessCookBookResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
 
     @SuppressLint("SetTextI18n")
     private fun handleSuccessResponse(data: String) {
@@ -360,23 +376,50 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     }
 
     @SuppressLint("SetTextI18n")
+    private fun handleSuccessCookBookResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, CookBookListResponse::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data!=null && apiModel.data.size>0){
+                    cookbookList.retainAll { it == cookbookList[0] }
+                    cookbookList.addAll(apiModel.data)
+                    // OR directly modify the original list
+                    spinnerActivityLevel.setItems(cookbookList.map { it.name })
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
     private fun handleLikeAndUnlikeSuccessResponse(
         data: String,
         item: BreakfastModel,
         adapter: AdapterPlanBreakFast?,
         type: String,
         mealList: MutableList<BreakfastModel>,
-        position: Int?
+        position: Int?,
+        dialogAddRecipe: Dialog?
     ) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ Plan List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
+                dialogAddRecipe?.dismiss()
                 // Toggle the is_like value
                 item.is_like = if (item.is_like == 0) 1 else 0
                 mealList[position!!] = item
                 // Update the adapter
                 adapter?.updateList(mealList, type)
+
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -458,7 +501,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
             // Snacks
             if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
-                snackesAdapter = setupMealAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snacks")
+                snackesAdapter = setupMealAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snack")
                 binding!!.linearSnacks.visibility = View.VISIBLE
             } else {
                 binding!!.linearSnacks.visibility = View.GONE
@@ -550,12 +593,12 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
             // Snacks
             if (recipesDateModel?.Snack != null && recipesDateModel?.Snack?.size!! > 0) {
-                AdaptersnackesByDateFast = setupMealAdapter(data?.Snack, binding!!.rcySnacks, "Snacks")
+                AdaptersnackesByDateFast = setupMealAdapter(data?.Snack, binding!!.rcySnacks, "Snack")
                 binding!!.linearSnacks.visibility = View.VISIBLE
             } else {
                 // Snacks
                 if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
-                    snackesAdapter = setupMealTopAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snacks")
+                    snackesAdapter = setupMealTopAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snack")
                     binding!!.linearSnacks.visibility = View.VISIBLE
                 } else {
                     binding!!.linearSnacks.visibility = View.GONE
@@ -984,8 +1027,22 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
 
         rlDoneBtn.setOnClickListener {
-            chooseDayMealTypeDialog(position,typeAdapter)
-            dialogChooseDay.dismiss()
+
+            var status = false
+            for (it in dataList) {
+                if (it.isOpen) {
+                    status = true
+                    break // Exit the loop early
+                }
+            }
+            if (status){
+                chooseDayMealTypeDialog(position,typeAdapter)
+                dialogChooseDay.dismiss()
+            }else{
+                BaseApplication.alertError(requireContext(), ErrorMessage.weekNameError, false)
+            }
+
+
         }
 
         btnPrevious.setOnClickListener {
@@ -1063,7 +1120,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
         tvSnacks.setOnClickListener {
-            updateSelection("Snacks", tvSnacks, allViews)
+            updateSelection("Snack", tvSnacks, allViews)
         }
 
         tvTeatime.setOnClickListener {
@@ -1073,7 +1130,12 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         rlDoneBtn.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
-                addToPlan(dialogChooseMealDay,type,position,typeAdapter)
+                if (type.equals("",true)){
+                    BaseApplication.alertError(requireContext(), ErrorMessage.mealTypeError, false)
+                }else{
+                    addToPlan(dialogChooseMealDay,type,position,typeAdapter)
+                }
+
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
@@ -1087,7 +1149,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "BreakFast" -> recipesModel?.Breakfast to breakfastAdapter
             "Lunch" -> recipesModel?.Lunch to lunchAdapter
             "Dinner" -> recipesModel?.Dinner to dinnerAdapter
-            "Snacks" -> recipesModel?.Dinner to snackesAdapter
+            "Snack" -> recipesModel?.Dinner to snackesAdapter
             "TeaTime" -> recipesModel?.Dinner to teaTimeAdapter
             else -> null to null
         }
@@ -1220,29 +1282,31 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     override fun itemClick(position: Int?, status: String?, type: String?) {
         when (status) {
             "1" -> {
-                chooseDayDialog(position,type)
+                chooseDayDialog(position, type)
             }
             "2" -> {
                 if (BaseApplication.isOnline(requireActivity())) {
-                    toggleIsLike(type!!,position,"basket")
+                    toggleIsLike(type ?: "", position, "basket")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-            }
-            status -> {
-                val bundle = Bundle()
-                bundle.putString("uri", type)
-                bundle.putString("mealType",status)
-                findNavController().navigate(R.id.recipeDetailsFragment, bundle)
             }
             "4" -> {
                 if (BaseApplication.isOnline(requireActivity())) {
-                    toggleIsLike(type!!,position,"like")
+                    toggleIsLike(type ?: "", position, "like")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }
+            else -> {
+                val bundle = Bundle().apply {
+                    putString("uri", type)
+                    putString("mealType", status)
+                }
+                findNavController().navigate(R.id.recipeDetailsFragment, bundle)
+            }
         }
+
     }
 
     private fun toggleIsLike(type: String, position: Int?, apiType: String) {
@@ -1251,7 +1315,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "BreakFast" -> recipesModel?.Breakfast to breakfastAdapter
             "Lunch" -> recipesModel?.Lunch to lunchAdapter
             "Dinner" -> recipesModel?.Dinner to dinnerAdapter
-            "Snacks" -> recipesModel?.Dinner to snackesAdapter
+            "Snack" -> recipesModel?.Dinner to snackesAdapter
             "TeaTime" -> recipesModel?.Dinner to teaTimeAdapter
             else -> null to null
         }
@@ -1263,12 +1327,124 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                     addBasketData(item.recipe.uri)
                 }else{
                     val newLikeStatus = if (item.is_like == 0) "1" else "0"
-                    recipeLikeAndUnlikeData(item, adapter, type, mealList, position, newLikeStatus)
-                }
+                    if (newLikeStatus.equals("0",true)){
+                        recipeLikeAndUnlikeData(item, adapter, type, mealList, position, newLikeStatus,"",null)
+                    }else{
+                        addFavTypeDialog(item, adapter, type, mealList, position, newLikeStatus)
+                    }
+
+                 }
             }
         }
     }
 
+
+    private fun addFavTypeDialog(item: BreakfastModel,
+                                 adapter: AdapterPlanBreakFast?,
+                                 type: String,
+                                 mealList: MutableList<BreakfastModel>,
+                                 position: Int?,
+                                 likeType: String) {
+        val dialogAddRecipe: Dialog = context?.let { Dialog(it) }!!
+        dialogAddRecipe.setContentView(R.layout.alert_dialog_add_recipe)
+        dialogAddRecipe.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialogAddRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val rlDoneBtn = dialogAddRecipe.findViewById<RelativeLayout>(R.id.rlDoneBtn)
+        spinnerActivityLevel = dialogAddRecipe.findViewById(R.id.spinnerActivityLevel)
+        val relCreateNewCookBook = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
+        val relFavourites = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relFavourites)
+        val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
+
+        spinnerActivityLevel.setItems(cookbookList.map { it.name })
+
+        dialogAddRecipe.show()
+        dialogAddRecipe.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+         getCookBookList()
+
+
+        relCreateNewCookBook.setOnClickListener{
+//            statuses="newCook"
+            relCreateNewCookBook.setBackgroundResource(R.drawable.light_green_rectangular_bg)
+            imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
+            dialogAddRecipe.dismiss()
+            val bundle=Bundle()
+            bundle.putString("value","New")
+            bundle.putString("uri",item.recipe?.uri)
+            findNavController().navigate(R.id.createCookBookFragment,bundle)
+//            relFavourites.setBackgroundResource(0)
+//            checkStatus=false
+        }
+
+//        imgCheckBoxOrange.setOnClickListener{
+//            if (checkStatus==true){
+//                statuses=""
+//                imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
+//                relFavourites.setBackgroundResource(0)
+//                relCreateNewCookBook.setBackgroundResource(0)
+//                relCreateNewCookBook.background=null
+//                checkStatus=false
+//            }else{
+//                relFavourites.setBackgroundResource(R.drawable.light_green_rectangular_bg)
+//                relCreateNewCookBook.setBackgroundResource(0)
+//                statuses="favourites"
+//                imgCheckBoxOrange.setImageResource(R.drawable.orange_checkbox_images)
+//                checkStatus=true
+//            }
+//        }
+
+
+        rlDoneBtn.setOnClickListener{
+           /* if (statuses==""){
+                Toast.makeText(requireActivity(),"Please select atleast one of them", Toast.LENGTH_LONG).show()
+            }else if (statuses=="favourites"){
+                dialogAddRecipe.dismiss()
+            }else{
+                dialogAddRecipe.dismiss()
+                val bundle=Bundle()
+                bundle.putString("value","New")
+                findNavController().navigate(R.id.createCookBookFragment,bundle)
+            }*/
+            if (spinnerActivityLevel.text.toString().equals("",true)){
+                BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
+            }else {
+                val cookbooktype = cookbookList[spinnerActivityLevel.selectedIndex].id
+                recipeLikeAndUnlikeData(
+                    item,
+                    adapter,
+                    type,
+                    mealList,
+                    position,
+                    likeType,
+                    cookbooktype.toString(),
+                    dialogAddRecipe
+                )
+            }
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+    }
+
+    private fun getCookBookList(){
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.getCookBookRequest {
+                BaseApplication.dismissMe()
+                handleApiCookBookResponse(it)
+            }
+        }
+    }
 
 
     private fun recipeLikeAndUnlikeData(
@@ -1277,14 +1453,16 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         type: String,
         mealList: MutableList<BreakfastModel>,
         position: Int?,
-        likeType: String
+        likeType: String,
+        cookbooktype: String,
+        dialogAddRecipe: Dialog?
     ) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             viewModel.likeUnlikeRequest({
                 BaseApplication.dismissMe()
-                handleLikeAndUnlikeApiResponse(it,item,adapter,type,mealList,position)
-            }, item.recipe?.uri!!,likeType,"")
+                handleLikeAndUnlikeApiResponse(it,item,adapter,type,mealList,position,dialogAddRecipe)
+            }, item.recipe?.uri!!,likeType,cookbooktype)
         }
     }
 
@@ -1304,10 +1482,11 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         adapter: AdapterPlanBreakFast?,
         type: String,
         mealList: MutableList<BreakfastModel>,
-        position: Int?
+        position: Int?,
+        dialogAddRecipe: Dialog?
     ) {
         when (result) {
-            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(result.data.toString(),item,adapter,type,mealList,position)
+            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(result.data.toString(),item,adapter,type,mealList,position,dialogAddRecipe)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }

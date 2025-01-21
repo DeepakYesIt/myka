@@ -37,6 +37,7 @@ class RecipeCookedAdapter(var datalist: MutableList<UserDataModel>?, var require
     }
 
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val data= datalist?.get(position)
@@ -88,14 +89,20 @@ class RecipeCookedAdapter(var datalist: MutableList<UserDataModel>?, var require
             }
 
 
-
-
-
+            if (data.recipe?.totalTime!=null){
+                holder.binding.tvTime.text=""+data.recipe?.totalTime
+            }
 
 
 
         }
 
+
+        holder.itemView.setOnClickListener {
+            if (data != null) {
+                onItemClickListener.itemClick(position, "5", data.recipe?.uri)
+            }
+        }
 
 
         holder.binding.imgHeartRed.setOnClickListener {

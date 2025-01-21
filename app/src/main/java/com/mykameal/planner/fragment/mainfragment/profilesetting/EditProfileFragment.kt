@@ -94,29 +94,6 @@ class EditProfileFragment : Fragment() {
 
     fun recognizeImage(base64Image: String) {
 
-        /*val visionApiService = createRetrofit().create(ApiInterface::class.java)
-
-        // Request setup
-        val features = listOf(Feature("WEB_DETECTION ", 1))
-        val image = Image(base64Image)
-        val request = Request(image, features)
-        val visionRequest = VisionRequest(listOf(request))
-        val call = visionApiService.annotateImage("AIzaSyB1WtrB2oHQmyIX1ZpaXzbI9kOA2FlkCXk",visionRequest)
-        call.enqueue(object : retrofit2.Callback<VisionResponse> {
-            override fun onResponse(call: Call<VisionResponse>, response: retrofit2.Response<VisionResponse>) {
-                if (response.isSuccessful) {
-                    val labels = response.body()?.responses?.get(0)?.labelAnnotations
-                    labels?.forEach {
-                        Log.d("Google Vision", "Label: ${it.description}, Confidence: ${it.score}")
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<VisionResponse>, t: Throwable) {
-                Log.e("Google Vision", "API call failed", t)
-            }
-        })*/
-
         BaseApplication.showMe(requireContext())
         val visionApiService = createRetrofit().create(ApiInterface::class.java)
 

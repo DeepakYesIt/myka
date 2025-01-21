@@ -1,9 +1,11 @@
 package com.mykameal.planner.fragment.mainfragment.commonscreen
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,8 +15,11 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.OnItemSelectListener
 import com.mykameal.planner.R
@@ -22,12 +27,21 @@ import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.adapter.AdapterCookBookDetailsItem
 import com.mykameal.planner.adapter.AdapterCookBookItem
 import com.mykameal.planner.adapter.ChooseDayAdapter
+import com.mykameal.planner.basedata.BaseApplication
+import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.databinding.FragmentCookBookBinding
+import com.mykameal.planner.fragment.mainfragment.viewmodel.cookbookviewmodel.CookBookViewModel
+import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
+import com.mykameal.planner.messageclass.ErrorMessage
 import com.mykameal.planner.model.DataModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+
+@AndroidEntryPoint
 class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
 
     private var binding: FragmentCookBookBinding? = null
@@ -39,17 +53,18 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
     private val calendar = Calendar.getInstance()
     private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
     private var chooseDayAdapter: ChooseDayAdapter? = null
+    private lateinit var viewModel: CookBookViewModel
+    var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
 
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         binding = FragmentCookBookBinding.inflate(layoutInflater, container, false)
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
+        viewModel = ViewModelProvider(requireActivity())[CookBookViewModel::class.java]
+
 
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
@@ -59,13 +74,74 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
                 }
             })
 
-        cookBookModel()
+        cookbookList.clear()
+
+        val data1= com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"R.drawable.add_more_cookbook_icon","Add",0,"",R.drawable.add_more_cookbook_icon)
+        val data2= com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"R.drawable.favourites_cookbook_image","Favourites",1,"",R.drawable.favourites_cookbook_image)
+        cookbookList.add(0,data1)
+        cookbookList.add(1,data2)
+
+//        cookBookModel()
 
         cookBookDetailsModel()
 
         initialize()
 
+        if (BaseApplication.isOnline(requireActivity())) {
+            getCookBookList()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+
         return binding!!.root
+    }
+
+    private fun getCookBookList(){
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.getCookBookRequest {
+                BaseApplication.dismissMe()
+                handleApiCookBookResponse(it)
+            }
+        }
+    }
+
+    private fun handleApiCookBookResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessCookBookResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessCookBookResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, CookBookListResponse::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data!=null && apiModel.data.size>0){
+//                    cookbookList.retainAll { it == cookbookList[0] || it == cookbookList[1] }
+                    cookbookList.addAll(apiModel.data)
+                    // OR directly modify the original list
+                    adapterCookBookItem = AdapterCookBookItem(cookbookList, requireActivity(), this)
+                    binding!!.rcyCookBookAdding.adapter = adapterCookBookItem
+
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun showAlert(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
     }
 
     private fun initialize() {
@@ -115,8 +191,8 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         dataList.add(data4)
         dataList.add(data5)
 
-        adapterCookBookItem = AdapterCookBookItem(dataList, requireActivity(), this)
-        binding!!.rcyCookBookAdding.adapter = adapterCookBookItem
+       /* adapterCookBookItem = AdapterCookBookItem(dataList, requireActivity(), this)
+        binding!!.rcyCookBookAdding.adapter = adapterCookBookItem*/
     }
 
     private fun cookBookDetailsModel() {
@@ -418,15 +494,11 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         if (position == 0) {
             val bundle=Bundle()
             bundle.putString("value","New")
+            bundle.putString("uri","")
             findNavController().navigate(R.id.createCookBookFragment,bundle)
-        } else if (position == 1) {
-
-        } else {
-            if (type == "Christmas") {
-                findNavController().navigate(R.id.christmasCollectionFragment)
-            }
+        } else if (position != 1) {
+            findNavController().navigate(R.id.christmasCollectionFragment)
         }
-
     }
 
 

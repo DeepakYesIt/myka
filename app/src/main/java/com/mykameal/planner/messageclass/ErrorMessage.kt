@@ -7,6 +7,9 @@ object ErrorMessage {
      const val amounthightError:String="Please enter it under Available Balance."
      const val amountlowError:String="Please enter valid Balance."
      const val amountError:String="Invalid amount entered."
+     const val mealTypeError:String="Select Meal type."
+     const val weekNameError:String="Select Week Name."
+     const val selectCookBookError:String="Select Cook Book."
      const val ratingError:String="Message can't be empty."
      const val amountEmptyError:String="Amount can't be empty."
      const val code: Int=206

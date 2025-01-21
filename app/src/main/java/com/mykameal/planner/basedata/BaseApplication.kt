@@ -1,5 +1,6 @@
 package com.mykameal.planner.basedata
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.ContentUris
 import android.content.Context
@@ -35,6 +36,7 @@ import java.util.Locale
 object BaseApplication {
 
     private var dialog: Dialog? = null
+
 
     fun getColoredSpanned(text: String, color: String): String {
         return "<font color=" + color.toString() + ">" + text.toString() + "</font>"
@@ -164,6 +166,7 @@ object BaseApplication {
     }
 
 
+    @SuppressLint("SimpleDateFormat")
     fun changeDateFormat(dt: String?): String {
         var outputDateStr = ""
         val inputFormat: DateFormat = SimpleDateFormat("MM/dd/yyyy")
