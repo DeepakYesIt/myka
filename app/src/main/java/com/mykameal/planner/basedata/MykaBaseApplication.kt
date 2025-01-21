@@ -100,7 +100,7 @@ class MykaBaseApplication : Application() {
                 var referrerId: String? = ""
                 val dlData = deepLinkObj.clickEvent
 
-                // ** Next if statement is optional **
+                // * Next if statement is optional *
                 // Our sample app's user-invite carries the referrerID in deep_link_sub2
                 // See the user-invite section in FruitActivity.java
                 if (dlData.has("deep_link_sub2")) {
@@ -163,7 +163,7 @@ class MykaBaseApplication : Application() {
                                     conversionDataMap["fruit_name"]!!
                             }
                             val fruitNameStr = conversionDataMap["deep_link_value"] as String?
-                            val deepLinkData: DeepLink = mapToDeepLinkObject(conversionDataMap)!!
+//                            val deepLinkData: DeepLink = mapToDeepLinkObject(conversionDataMap)!!
                             /*goToFruit(fruitNameStr, deepLinkData)*/
                         }
                     } else {
@@ -202,7 +202,7 @@ class MykaBaseApplication : Application() {
 
     }
 
-    @SuppressLint("RestrictedApi")
+   /* @SuppressLint("RestrictedApi")
     fun mapToDeepLinkObject(conversionDataMap: Map<String, Any>): DeepLink? {
         return try {
             val stringMap = conversionDataMap.mapValues { it.value.toString() }
@@ -211,7 +211,7 @@ class MykaBaseApplication : Application() {
             Log.d(LOG_TAG, "Error when converting map to DeepLink object: ${e}")
             null
         }
-    }
+    }*/
 
 
 

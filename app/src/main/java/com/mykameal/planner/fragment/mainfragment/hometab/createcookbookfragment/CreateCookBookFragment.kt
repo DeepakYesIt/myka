@@ -190,24 +190,6 @@ class CreateCookBookFragment : Fragment() {
         return true
     }
 
-    /*private fun createCookBookApi() {
-        BaseApplication.showMe(requireActivity())
-        lifecycleScope.launch {
-
-            val filePart: MultipartBody.Part? = if (file != null) {
-                val requestBody = file?.asRequestBody(file!!.extension.toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("image", file?.name, requestBody!!)
-            } else {
-                null
-            }
-
-            val cookBookName = binding!!.etEnterYourNewCookbook.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val cookBookStatus = status.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-
-
-        }
-    }*/
-
     private fun createCookBookApi() {
         BaseApplication.showMe(requireActivity())
         lifecycleScope.launch {

@@ -50,11 +50,8 @@
             tools:ignore="AppLinkUrlError">
             <intent-filter android:label="Deep link">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
-
                 <data
                     android:host="//mykaandroidapp.onelink.me"
                     android:scheme="https" />

@@ -46,8 +46,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-
-
             <RelativeLayout
                 android:id="@+id/relCalendarYear"
                 android:layout_width="wrap_content"
@@ -290,12 +288,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:layout_marginBottom="@dimen/_15sdp"
                 android:visibility="visible">
 
                 <RelativeLayout
                     android:id="@+id/rlBreakfast"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
 
                     <TextView
                         android:id="@+id/tvBreakFast"
@@ -310,6 +310,7 @@
                         android:textStyle="bold" />
 
                     <ImageView
+                        android:id="@+id/imageBreakFastCreate"
                         android:layout_width="@dimen/_25sdp"
                         android:layout_height="@dimen/_25sdp"
                         android:layout_alignParentEnd="true"
@@ -331,7 +332,8 @@
                 <RelativeLayout
                     android:id="@+id/rlLunch"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
 
                     <TextView
                         android:id="@+id/tvLunch"
@@ -346,6 +348,7 @@
                         android:textStyle="bold" />
 
                     <ImageView
+                        android:id="@+id/imageLunchCreate"
                         android:layout_width="@dimen/_25sdp"
                         android:layout_height="@dimen/_25sdp"
                         android:layout_alignParentEnd="true"
@@ -367,7 +370,8 @@
                 <RelativeLayout
                     android:id="@+id/relDinner"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
 
                     <TextView
                         android:id="@+id/tvDinner"
@@ -382,6 +386,7 @@
                         android:textStyle="bold" />
 
                     <ImageView
+                        android:id="@+id/imageDinnerCreate"
                         android:layout_width="@dimen/_25sdp"
                         android:layout_height="@dimen/_25sdp"
                         android:layout_alignParentEnd="true"
@@ -395,6 +400,82 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/tvDinner"
+                        android:orientation="horizontal"
+                        tools:listitem="@layout/adapter_layout_food_items_list" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/relSnacks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/tvSnacks"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_15sdp"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:fontFamily="@font/poppins"
+                        android:text="Snacks"
+                        android:textColor="#0A2533"
+                        android:textSize="@dimen/_12ssp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/imageSnacksCreate"
+                        android:layout_width="@dimen/_25sdp"
+                        android:layout_height="@dimen/_25sdp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:layout_marginEnd="@dimen/_10sdp"
+                        android:src="@drawable/add_spoon_and_knife_icon" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rcvSnacks"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvSnacks"
+                        android:orientation="horizontal"
+                        tools:listitem="@layout/adapter_layout_food_items_list" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/relTeaTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/tvTeaTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_15sdp"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:fontFamily="@font/poppins"
+                        android:text="Tea Time"
+                        android:textColor="#0A2533"
+                        android:textSize="@dimen/_12ssp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/imageTeaTimeCreate"
+                        android:layout_width="@dimen/_25sdp"
+                        android:layout_height="@dimen/_25sdp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:layout_marginEnd="@dimen/_10sdp"
+                        android:src="@drawable/add_spoon_and_knife_icon" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rcvTeaTime"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvTeaTime"
                         android:orientation="horizontal"
                         tools:listitem="@layout/adapter_layout_food_items_list" />
 

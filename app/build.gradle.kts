@@ -70,7 +70,10 @@ dependencies {
 
     ///appsflyer sdk for deeplinking
     implementation("com.appsflyer:af-android-sdk:6.12.1")  // Check for the latest version on AppsFlyer's documentation.
-
+    implementation("com.appsflyer:adrevenue:6.9.0")
+    implementation("com.android.installreferrer:installreferrer:2.2")
+    implementation("com.google.android.gms:play-services-ads-identifier:18.2.0")
+    implementation("com.google.code.gson:gson:2.10.1")
 
     //Retrofit for api
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -105,8 +108,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.android.gms:play-services-auth:21.1.1")
 
-/*    ///appsFlyer sdk for deep linking
-    implementation("com.appsflyer:af-android-sdk:6.11.0")*/
+    ///appsFlyer sdk for deep linking
+    implementation("com.appsflyer:af-android-sdk:6.11.0")
 
 
     implementation ("com.airbnb.android:lottie:3.4.0")
