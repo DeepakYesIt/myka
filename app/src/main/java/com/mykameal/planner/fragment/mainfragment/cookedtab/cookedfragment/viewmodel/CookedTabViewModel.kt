@@ -14,4 +14,9 @@ class CookedTabViewModel@Inject constructor(private val repository: MainReposito
         repository.planDateRequestApi({ successCallback(it) },date,planType)
     }
 
+    suspend fun removeMealApi(successCallback: (response: NetworkResult<String>) -> Unit,
+                                cookedId: String){
+        repository.removeMealApi({ successCallback(it) },cookedId)
+    }
+
 }

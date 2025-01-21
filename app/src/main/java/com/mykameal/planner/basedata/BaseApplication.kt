@@ -144,6 +144,11 @@ object BaseApplication {
         return dateFormat.format(date)
     }
 
+    fun currentDateFormat(): String? {
+        val formatter = SimpleDateFormat("yyyy-MM-dd")
+        val date = Date()
+        return formatter.format(date.time)
+    }
 
     fun getFirstLetterOfDay(day: String): String {
         return day.take(1)  // Get the first character of the string

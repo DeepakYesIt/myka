@@ -166,6 +166,14 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 binding!!.imageCheckSav.visibility=View.VISIBLE
             }
 
+       /*     if (userDataLocal.graph_value==0){
+                binding!!.imagePlanMeal.visibility=View.GONE
+                binding!!.imageCheckSav.visibility=View.VISIBLE
+            }else{
+                binding!!.imagePlanMeal.visibility=View.GONE
+                binding!!.imageCheckSav.visibility=View.VISIBLE
+            }*/
+
             if (userDataLocal.date!=null){
                 val name=BaseApplication.getColoredSpanned("Next meal to be cooked on ","#3C4541") + BaseApplication.getColoredSpanned(data.date+".","#06C169")
                 binding!!.tvHomeDesc.text=Html.fromHtml(name)
@@ -412,7 +420,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 findNavController().navigate(R.id.cookedFragment)
 //                binding!!.rlSeeAllBtn.visibility=View.VISIBLE
             }
-
             R.id.imgBasketIcon->{
                 findNavController().navigate(R.id.basketScreenFragment)
             }

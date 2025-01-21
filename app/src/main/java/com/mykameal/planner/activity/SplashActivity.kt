@@ -21,7 +21,7 @@ class SplashActivity : AppCompatActivity() {
     private lateinit var sessionManagement: SessionManagement
 
     companion object {
-        private const val SPLASH_DELAY = 3000L // 3 seconds delay
+        public const val SPLASH_DELAY = 3000L // 3 seconds delay
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,22 +31,11 @@ class SplashActivity : AppCompatActivity() {
         sessionManagement = SessionManagement(this)
         // Initialize screen actions
 
-        // Initialize AppsFlyer SDK
-        AppsFlyerLib.getInstance().init("M57zyjkFgb7nSQwHWN6isW", null, this);
-        AppsFlyerLib.getInstance().start(this)
-
 
         initialize()
     }
 
     private fun initialize() {
-
-        // Register Conversion Listener
-        registerAppsFlyerConversionListener()
-
-        // Subscribe to Deep Links
-        subscribeToAppsFlyerDeepLinks()
-
         navigateNext()
         /*lifecycleScope.launch {
             delay(SPLASH_DELAY)
@@ -60,48 +49,6 @@ class SplashActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }*/
-    }
-
-
-    private fun registerAppsFlyerConversionListener() {
-        AppsFlyerLib.getInstance().registerConversionListener(this, object : AppsFlyerConversionListener {
-            override fun onConversionDataSuccess(conversionData: MutableMap<String, Any>?) {
-                Log.d("AppsFlyer11", "Conversion data: $conversionData")
-            }
-
-            override fun onConversionDataFail(error: String?) {
-                Log.e("AppsFlyer11", "Conversion data error: $error")
-            }
-
-            override fun onAppOpenAttribution(attributionData: MutableMap<String, String>?) {
-                Log.d("AppsFlyer11", "App open attribution: $attributionData")
-            }
-
-            override fun onAttributionFailure(error: String?) {
-                Log.e("AppsFlyer11", "Attribution error: $error")
-            }
-        })
-    }
-
-    private fun subscribeToAppsFlyerDeepLinks() {
-        AppsFlyerLib.getInstance().subscribeForDeepLink { deepLinkResult ->
-            when (deepLinkResult.status) {
-                DeepLinkResult.Status.FOUND -> {
-                    val deepLinkValue = deepLinkResult.deepLink?.getStringValue("deep_link_value")
-                    Log.d("AppsFlyer", "Deep link found: $deepLinkValue")
-                    navigateNext()
-                  /*  handleDeepLink(deepLinkValue)*/
-                }
-                DeepLinkResult.Status.NOT_FOUND -> {
-                    Log.e("AppsFlyer", "Deep link not found")
-                    navigateNext()
-                }
-                DeepLinkResult.Status.ERROR -> {
-                    Log.e("AppsFlyer", "Error in deep link: ${deepLinkResult.error}")
-                    navigateNext()
-                }
-            }
-        }
     }
 
     private fun navigateNext() {
@@ -122,8 +69,6 @@ class SplashActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             }
-
-
 
         }
     }

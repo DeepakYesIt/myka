@@ -18,7 +18,7 @@ import com.mykameal.planner.R
 import com.mykameal.planner.databinding.AdapterLayoutFoodItemsListBinding
 import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.Breakfast
 
-class AdapterFoodListItem(private var itemList: List<Breakfast>, private var requireActivity: FragmentActivity, private var onItemSelectListener: OnItemClickListener) : RecyclerView.Adapter<AdapterFoodListItem.ViewHolder>() {
+class AdapterFoodListItem(private var itemList: MutableList<Breakfast>,private var type:String?,private var requireActivity: FragmentActivity, private var onItemSelectListener: OnItemClickListener) : RecyclerView.Adapter<AdapterFoodListItem.ViewHolder>() {
 
     private var quantity:Int=1
 
@@ -31,7 +31,25 @@ class AdapterFoodListItem(private var itemList: List<Breakfast>, private var req
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         holder.binding.tvBreakfast.text = itemList[position].recipe.label
-//        holder.binding.imageData.setBackgroundResource(datalist[position].image)
+
+        if (itemList[position].is_like!=null){
+            if (itemList[position].is_like ==0 ){
+                holder.binding.imgHeartRed.setImageResource(R.drawable.heart_white_icon)
+            }else{
+                holder.binding.imgHeartRed.setImageResource(R.drawable.heart_red_icon)
+            }
+        }
+
+        if (itemList[position].created_date!=null){
+            if (itemList[position].created_date!=""){
+                holder.binding.textTimeAgo.text=itemList[position].created_date.toString()
+            }
+        }
+
+
+        if (itemList[position].servings!=null){
+            holder.binding.tvServes.text="Serves "+itemList[position].servings.toString()
+        }
 
         if (itemList[position].recipe.images.SMALL.url !=null){
             Glide.with(requireActivity)
@@ -65,9 +83,9 @@ class AdapterFoodListItem(private var itemList: List<Breakfast>, private var req
             holder.binding.layProgess.root.visibility= View.GONE
         }
 
-        holder.binding.cardViews.setOnClickListener{
+      /*  holder.binding.cardViews.setOnClickListener{
             onItemSelectListener.itemClick(position,"","Christmas")
-        }
+        }*/
 
         holder.binding.imageMinusItem.setOnClickListener{
             if (quantity > 1) {
@@ -87,7 +105,7 @@ class AdapterFoodListItem(private var itemList: List<Breakfast>, private var req
         }
 
         holder.binding.imgAppleRemove.setOnClickListener {
-            onItemSelectListener.itemClick(position, "1", "")
+            onItemSelectListener.itemClick(position, type, itemList[position].id.toString())
         }
 
 //        holder.binding.cardViews.setOnClickListener{
@@ -105,6 +123,12 @@ class AdapterFoodListItem(private var itemList: List<Breakfast>, private var req
         return itemList.size
     }
 
+
+    fun removeItem(position: Int) {
+        itemList.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, itemList.size) // Optional, updates the positions of remaining items
+    }
 
     class ViewHolder(var binding: AdapterLayoutFoodItemsListBinding) :
         RecyclerView.ViewHolder(binding.root) {

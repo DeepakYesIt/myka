@@ -12,9 +12,9 @@ import com.mykameal.planner.databinding.AdapterBodyGoalsBinding
 import com.mykameal.planner.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModelData
 
 class MealRoutineAdapter(
-    var mealRoutineModelData: List<MealRoutineModelData>,
+    private var mealRoutineModelData: List<MealRoutineModelData>,
     var requireActivity: FragmentActivity,
-    var onItemClickedListener: OnItemClickedListener
+    private var onItemClickedListener: OnItemClickedListener
 ) : RecyclerView.Adapter<MealRoutineAdapter.ViewHolder>() {
 
     private var selectedIds = mutableListOf<String>()
@@ -36,6 +36,10 @@ class MealRoutineAdapter(
             if (mealRoutineModelData[position].selected) {
                 imageRightTick.visibility = View.VISIBLE
                 relMainLayout.setBackgroundResource(R.drawable.orange_box_bg)
+                if (!selectedIds.contains(mealRoutineModelData[position].id.toString())) {
+                    selectedIds.add(mealRoutineModelData[position].id.toString())
+                }
+                onItemClickedListener.itemClicked(position, selectedIds, "-1", "")
             } else {
                 imageRightTick.visibility = View.GONE
                 relMainLayout.setBackgroundResource(R.drawable.gray_box_border_bg)

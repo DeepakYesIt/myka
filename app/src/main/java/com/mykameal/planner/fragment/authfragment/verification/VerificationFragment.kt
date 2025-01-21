@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -373,43 +374,46 @@ class VerificationFragment : Fragment() {
     }
 
     private fun showDataInSession(signUpVerificationModelData: SignUpVerificationModelData) {
+        try {
+            sessionManagement.setLoginSession(true)
+            if (value!!.contains("@")) {
+                sessionManagement.setEmail(value.toString())
+            } else {
+                sessionManagement.setPhone(value.toString())
+            }
 
-        sessionManagement.setLoginSession(true)
-        if (value!!.contains("@")) {
-            sessionManagement.setEmail(value.toString())
-        } else {
-            sessionManagement.setPhone(value.toString())
+            if (signUpVerificationModelData.name != null) {
+                sessionManagement.setUserName(signUpVerificationModelData.name)
+            }
+
+            if (signUpVerificationModelData.user_type == 1) {
+                sessionManagement.setCookingFor("Myself")
+            }
+
+            if (signUpVerificationModelData.user_type == 2) {
+                sessionManagement.setCookingFor("MyPartner")
+            }
+
+            if (signUpVerificationModelData.user_type == 3) {
+                sessionManagement.setCookingFor("MyFamily")
+            }
+
+            if (signUpVerificationModelData.profile_img != null) {
+                sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
+            }
+
+            if (signUpVerificationModelData.token != null) {
+                sessionManagement.setAuthToken(signUpVerificationModelData.token.toString())
+            }
+
+            if (signUpVerificationModelData.id != null) {
+                sessionManagement.setId(signUpVerificationModelData.id.toString())
+            }
+
+            successDialog()
+        }catch (e:Exception){
+            Log.d("verification","message"+e.message)
         }
-
-        if (signUpVerificationModelData.name != null) {
-            sessionManagement.setUserName(signUpVerificationModelData.name)
-        }
-
-        if (signUpVerificationModelData.user_type == 1) {
-            sessionManagement.setCookingFor("Myself")
-        }
-
-        if (signUpVerificationModelData.user_type == 2) {
-            sessionManagement.setCookingFor("MyPartner")
-        }
-
-        if (signUpVerificationModelData.user_type == 3) {
-            sessionManagement.setCookingFor("MyFamily")
-        }
-
-        if (signUpVerificationModelData.profile_img != null) {
-            sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
-        }
-
-        if (signUpVerificationModelData.token != null) {
-            sessionManagement.setAuthToken(signUpVerificationModelData.token.toString())
-        }
-
-        if (signUpVerificationModelData.id != null) {
-            sessionManagement.setId(signUpVerificationModelData.id.toString())
-        }
-
-        successDialog()
     }
 
     /// implement forgot password verify api
@@ -425,11 +429,13 @@ class VerificationFragment : Fragment() {
                             val forgotOtpModel =
                                 gson.fromJson(it.data, ForgotVerificationModel::class.java)
                             if (forgotOtpModel.code == 200 && forgotOtpModel.success) {
-
-                                val bundle = Bundle()
-                                bundle.putString("value", value)
-                                findNavController().navigate(R.id.resetPasswordFragment, bundle)
-
+                                try {
+                                    val bundle = Bundle()
+                                    bundle.putString("value", value)
+                                    findNavController().navigate(R.id.resetPasswordFragment, bundle)
+                                }catch (e:Exception){
+                                    Log.d("Verification","message"+e.message)
+                                }
                             } else {
                                 if (forgotOtpModel.code == ErrorMessage.code) {
                                     showAlertFunction(forgotOtpModel.message, true)

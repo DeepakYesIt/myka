@@ -35,7 +35,7 @@ import com.yesitlabs.mykaapp.adapter.AdapterPlanBreakByDateFast
 import com.mykameal.planner.adapter.CalendarDayDateAdapter
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.BreakfastModelPlanByDate
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.DataPlayByDate
-import com.yesitlabs.mykaapp.model.DateModel
+import com.mykameal.planner.model.DateModel
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
@@ -83,22 +83,22 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     private var recipesDateModel: DataPlayByDate? = null
 
     // Separate adapter instances for each RecyclerView
-    var breakfastAdapter: AdapterPlanBreakFast? = null
-    var AdapterPlanBreakByDateFast: AdapterPlanBreakByDateFast? = null
-    var lunchAdapter: AdapterPlanBreakFast? = null
-    var AdapterlunchByDateFast: AdapterPlanBreakByDateFast? = null
-    var dinnerAdapter: AdapterPlanBreakFast? = null
-    var AdapterdinnerByDateFast: AdapterPlanBreakByDateFast? = null
-    var snackesAdapter: AdapterPlanBreakFast? = null
-    var AdaptersnackesByDateFast: AdapterPlanBreakByDateFast? = null
-    var teaTimeAdapter: AdapterPlanBreakFast? = null
-    var AdapterteaTimeByDateFast: AdapterPlanBreakByDateFast? = null
+    private var breakfastAdapter: AdapterPlanBreakFast? = null
+    private var AdapterPlanBreakByDateFast: AdapterPlanBreakByDateFast? = null
+    private var lunchAdapter: AdapterPlanBreakFast? = null
+    private var AdapterlunchByDateFast: AdapterPlanBreakByDateFast? = null
+    private var dinnerAdapter: AdapterPlanBreakFast? = null
+    private var AdapterdinnerByDateFast: AdapterPlanBreakByDateFast? = null
+    private var snackesAdapter: AdapterPlanBreakFast? = null
+    private var AdaptersnackesByDateFast: AdapterPlanBreakByDateFast? = null
+    private var teaTimeAdapter: AdapterPlanBreakFast? = null
+    private var AdapterteaTimeByDateFast: AdapterPlanBreakByDateFast? = null
     private lateinit var sessionManagement: SessionManagement
 
     lateinit var adapter: ImageViewPagerAdapter
     val dataList = arrayListOf<DataModel>()
     private lateinit var layonboarding_indicator: LinearLayout
-    var currentDate = Date() // Current date
+    private var currentDate = Date() // Current date
 
     // Define global variables
     private lateinit var startDate: Date
@@ -107,7 +107,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     private lateinit var spinnerActivityLevel: PowerSpinnerView
 
     var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
-
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -163,10 +162,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         )
         adapter = ImageViewPagerAdapter(requireContext(), imageList)
 
-
         // Display current week dates
         showWeekDates()
-
 
         return binding!!.root
     }
@@ -461,10 +458,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         if (recipesModel != null) {
             fun setupMealAdapter(
-                mealRecipes: MutableList<BreakfastModel>?,
-                recyclerView: RecyclerView,
-                type: String
-            ): AdapterPlanBreakFast? {
+                mealRecipes: MutableList<BreakfastModel>?, recyclerView: RecyclerView, type: String): AdapterPlanBreakFast? {
                 return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
                     val adapter = AdapterPlanBreakFast(mealRecipes, requireActivity(), this, type)
                     recyclerView.adapter = adapter
@@ -716,7 +710,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         return Pair(startOfWeek, endOfWeek)
     }
 
-    fun formatDate(date: Date): String {
+    private fun formatDate(date: Date): String {
         val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
         return dateFormat.format(date)
     }
@@ -1022,9 +1016,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             dataList.add(data)
         }
 
-
         rcyChooseDaySch!!.adapter = ChooseDayAdapter(dataList, requireActivity())
-
 
         rlDoneBtn.setOnClickListener {
 
@@ -1066,16 +1058,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             showWeekDates()
         }
 
-
     }
-
-
-
-    private fun cookingScheduleModel() {
-
-    }
-
-
 
     private fun chooseDayMealTypeDialog(position: Int?, typeAdapter: String?) {
         val dialogChooseMealDay: Dialog = context?.let { Dialog(it) }!!
@@ -1190,8 +1173,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 jsonObject.add("slot", jsonArray)
             }
         }
-
-        Log.d("json object ", "******$jsonObject")
 
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {

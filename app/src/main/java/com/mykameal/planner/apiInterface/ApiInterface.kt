@@ -423,6 +423,12 @@ interface ApiInterface {
         @Field("q") q: String?
     ): Response<JsonObject>
 
+    @FormUrlEncoded
+    @POST(ApiEndPoint.removeMeal)
+    suspend fun removeMealApi(
+        @Field("id") id: String?
+    ): Response<JsonObject>
+
 
 
  /*   @POST("v1/images:annotate")

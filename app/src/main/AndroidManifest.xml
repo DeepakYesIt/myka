@@ -54,6 +54,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
+
                 <data
                     android:host="//mykaandroidapp.onelink.me"
                     android:scheme="https" />
@@ -61,13 +62,7 @@
                 />
             </intent-filter>
         </activity>
-        <!--
-     <activity
-            android:name=".activity.MainActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="portrait"
-            android:exported="false" />
-        -->
+
         <activity
             android:name=".activity.AuthActivity"
             android:exported="false"
@@ -127,6 +122,21 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <meta-data
+            android:name="com.appsflyer.devkey"
+            android:value="M57zyjkFgb7nSQwHWN6isW" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <receiver
+            android:name="com.appsflyer.MultipleInstallBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

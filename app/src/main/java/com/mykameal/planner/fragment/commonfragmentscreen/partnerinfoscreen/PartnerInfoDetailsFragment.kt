@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -120,22 +121,26 @@ class PartnerInfoDetailsFragment : Fragment() {
     }
 
     private fun showDataInUi(partnerModelData: PartnerDetail) {
+        try {
+            if (partnerModelData!=null){
 
-        if (partnerModelData!=null){
+                if (partnerModelData.name!=null){
+                    binding!!.etPartnerName.setText(partnerModelData.name.toString())
+                }
 
-            if (partnerModelData.name!=null){
-                binding!!.etPartnerName.setText(partnerModelData.name.toString())
+                if (partnerModelData.age!=null){
+                    binding!!.etPartnerAge.setText(partnerModelData.age.toString())
+                }
+
+                if (partnerModelData.gender!=null){
+                    binding!!.tvChooseGender.text=partnerModelData.gender.toString()
+                }
+
             }
-
-            if (partnerModelData.age!=null){
-                binding!!.etPartnerAge.setText(partnerModelData.age.toString())
-            }
-
-            if (partnerModelData.gender!=null){
-                binding!!.tvChooseGender.text=partnerModelData.gender.toString()
-            }
-
+        }catch (e:Exception){
+            Log.d("PartnerDetail","message:--"+e.message)
         }
+
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {

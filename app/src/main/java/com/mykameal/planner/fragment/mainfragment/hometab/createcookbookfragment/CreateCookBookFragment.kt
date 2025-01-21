@@ -42,7 +42,7 @@ import java.io.File
 @AndroidEntryPoint
 class CreateCookBookFragment : Fragment() {
     private var binding: FragmentCreateCookBookBinding? = null
-    private var isOpened: Boolean? = null
+    private var isOpened: Boolean? = false
     private var checkType: String? = null
     private var uri: String? = null
     private var file: File? = null
@@ -118,7 +118,7 @@ class CreateCookBookFragment : Fragment() {
                 binding!!.cvInfoMessage.visibility = View.GONE
             } else {
                 isOpened = true
-                binding!!.cvInfoMessage.visibility = View.GONE
+                binding!!.cvInfoMessage.visibility = View.VISIBLE
             }
         }
 
@@ -190,7 +190,7 @@ class CreateCookBookFragment : Fragment() {
         return true
     }
 
-    private fun createCookBookApi() {
+    /*private fun createCookBookApi() {
         BaseApplication.showMe(requireActivity())
         lifecycleScope.launch {
 
@@ -204,36 +204,48 @@ class CreateCookBookFragment : Fragment() {
             val cookBookName = binding!!.etEnterYourNewCookbook.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
             val cookBookStatus = status.toRequestBody("multipart/form-data".toMediaTypeOrNull())
 
+
+        }
+    }*/
+
+    private fun createCookBookApi() {
+        BaseApplication.showMe(requireActivity())
+        lifecycleScope.launch {
+            val filePart: MultipartBody.Part? = if (file != null) {
+                val requestBody = file?.asRequestBody(file!!.extension.toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("image", file?.name, requestBody!!)
+            } else {
+                null
+            }
+            val cookBookName = binding!!.etEnterYourNewCookbook.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val cookBookStatus = status.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+
             createCookBookViewModel.createCookBookApi({
-                if (uri.equals("",true)){
-                    BaseApplication.dismissMe()
-                }
+                BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        try {
-                            val createCookBookModel = Gson().fromJson(it.data, CreateCookBookModel::class.java)
-                            if (createCookBookModel.code == 200 && createCookBookModel.success) {
-                                if (uri.equals("",true)){
-                                    Toast.makeText(requireContext(),createCookBookModel.message,Toast.LENGTH_LONG).show()
-                                    findNavController().navigateUp()
-                                }else{
-                                    recipeLikeAndUnlikeData(createCookBookModel.data.id.toString(),createCookBookModel.message)
-                                }
-                            } else {
-                                if (createCookBookModel.code == ErrorMessage.code) {
-                                    showAlertFunction(createCookBookModel.message, true)
-                                } else {
-                                    showAlertFunction(createCookBookModel.message, false)
-                                }
+                        val createCookBookModel = Gson().fromJson(it.data, CreateCookBookModel::class.java)
+                        if (createCookBookModel.code == 200 && createCookBookModel.success) {
+                            if (uri.equals("",true)){
+                                Toast.makeText(requireContext(),createCookBookModel.message,Toast.LENGTH_LONG).show()
+                                findNavController().navigateUp()
+                            }else{
+                                recipeLikeAndUnlikeData(createCookBookModel.data.id.toString(),createCookBookModel.message)
                             }
-                        }catch (e:Exception){
-                            BaseApplication.dismissMe()
-                            showAlertFunction(e.message, false)
+                        } else {
+                            if (createCookBookModel.code == ErrorMessage.code) {
+                                showAlertFunction(createCookBookModel.message, true)
+                            } else {
+                                showAlertFunction(createCookBookModel.message, false)
+                            }
                         }
                     }
+
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
-                    }else -> {
+                    }
+
+                    else -> {
                         showAlertFunction(it.message, false)
                     }
                 }
@@ -285,4 +297,6 @@ class CreateCookBookFragment : Fragment() {
     private fun showAlertFunction(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)
     }
+
+
 }

@@ -35,7 +35,7 @@ import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.databinding.FragmentFullCookedScheduleBinding
 import com.mykameal.planner.model.CalendarDataModel
 import com.mykameal.planner.model.DataModel
-import com.yesitlabs.mykaapp.model.DateModel
+import com.mykameal.planner.model.DateModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -347,14 +347,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
             println("\nAfter clicking 'Next':")
             showWeekDates()
         }
-
-       /* binding!!.imagePrevious.setOnClickListener {
-            changeWeekRange(-1)
-        }
-
-        binding!!.imageNext.setOnClickListener {
-            changeWeekRange(1)
-        }*/
+        
 
         binding!!.rlMainFullCooked.setOnLongClickListener {
             onClickEnabled()

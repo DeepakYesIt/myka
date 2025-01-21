@@ -41,6 +41,7 @@ class AdapterAllergensIngItem(private var allergensIngredientsData: List<Allerge
                 if (!dietaryId.contains(allergensIngredientsData[position].id.toString())) {
                     dietaryId.add(allergensIngredientsData[position].id.toString())
                 }
+                onItemClickedListener.itemClicked(position, dietaryId, "-1", "")
             } else {
                 dietaryId.remove(allergensIngredientsData[position].id.toString())
             }
@@ -68,11 +69,11 @@ class AdapterAllergensIngItem(private var allergensIngredientsData: List<Allerge
                         }
                     } else -> { // Handle individual item selection
                     // Deselect "Select All" if any other item is clicked
-                    if (selectedPositions.contains(0)) {
-                        selectedPositions.remove(0)
+                 /*   if (selectedPositions.contains(0)) {
+                        selectedPositions.remove(0)*/
                         allergensIngredientsData[0].selected = false
                         dietaryId.clear()
-                    }
+                /*    }*/
 
                     // Toggle the current item's selection state
                     allergensIngredientsData[position].selected = !allergensIngredientsData[position].selected

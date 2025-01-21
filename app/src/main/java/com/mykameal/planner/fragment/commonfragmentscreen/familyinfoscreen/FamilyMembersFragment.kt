@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -117,28 +118,32 @@ class FamilyMembersFragment : Fragment() {
     }
 
     private fun showDataInUi(familyModelData: FamilyDetail) {
+        try {
+            if (familyModelData!=null){
 
-        if (familyModelData!=null){
-
-            if (familyModelData.name!=null){
-                binding!!.etMembersName.setText(familyModelData.name.toString())
-            }
-
-            if (familyModelData.age!=null){
-                binding!!.etMemberAge.setText(familyModelData.age.toString())
-            }
-
-            if (familyModelData.status!=null){
-                if (familyModelData.status=="1"){
-                    childFriendlyStatus = "1"
-                    binding!!.checkBoxImages.setImageResource(R.drawable.tick_ckeckbox_images)
-                }else{
-                    childFriendlyStatus = "0"
-                    binding!!.checkBoxImages.setImageResource(R.drawable.uncheck_box_images)
+                if (familyModelData.name!=null){
+                    binding!!.etMembersName.setText(familyModelData.name.toString())
                 }
-            }
 
+                if (familyModelData.age!=null){
+                    binding!!.etMemberAge.setText(familyModelData.age.toString())
+                }
+
+                if (familyModelData.status!=null){
+                    if (familyModelData.status=="1"){
+                        childFriendlyStatus = "1"
+                        binding!!.checkBoxImages.setImageResource(R.drawable.tick_ckeckbox_images)
+                    }else{
+                        childFriendlyStatus = "0"
+                        binding!!.checkBoxImages.setImageResource(R.drawable.uncheck_box_images)
+                    }
+                }
+
+            }
+        }catch (e:Exception){
+            Log.d("FamilyMembers","message"+e.message)
         }
+
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {

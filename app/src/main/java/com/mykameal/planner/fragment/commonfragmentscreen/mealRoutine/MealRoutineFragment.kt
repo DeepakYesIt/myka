@@ -225,14 +225,18 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
     }
 
     private fun showDataInUi(mealRoutineModelsData: MutableList<MealRoutineModelData>) {
-        if (mealRoutineModelsData != null && mealRoutineModelsData.isNotEmpty()) {
-            if (mealRoutineViewModel.getMealRoutineData()==null){
-                // Add "None" option at the first position
-                mealRoutineModelsData.add(0, MealRoutineModelData( id = -1, "Select All",selected = false)) // ID set to -1 as an indicator
+        try {
+            if (mealRoutineModelsData != null && mealRoutineModelsData.isNotEmpty()) {
+                if (mealRoutineViewModel.getMealRoutineData()==null){
+                    // Add "None" option at the first position
+                    mealRoutineModelsData.add(0, MealRoutineModelData( id = -1, "Select All",selected = false)) // ID set to -1 as an indicator
+                }
+                mealRoutineModelData = mealRoutineModelsData
+                mealRoutineAdapter = MealRoutineAdapter(mealRoutineModelsData, requireActivity(), this)
+                binding!!.rcyMealRoutine.adapter = mealRoutineAdapter
             }
-            mealRoutineModelData = mealRoutineModelsData
-            mealRoutineAdapter = MealRoutineAdapter(mealRoutineModelsData, requireActivity(), this)
-            binding!!.rcyMealRoutine.adapter = mealRoutineAdapter
+        }catch (e:Exception){
+            Log.d("MealRoutine","message:---"+e.message)
         }
     }
 

@@ -1284,4 +1284,26 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
     }
 
 
+
+    override suspend fun removeMealApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        cookedId: String?
+    ) {
+        try {
+            api.removeMealApi(cookedId).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error("Something went wrong"))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+
 }

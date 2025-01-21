@@ -156,6 +156,7 @@ interface MainRepository {
     suspend fun updateDislikedIngredientsApi(successCallback: (response: NetworkResult<String>) -> Unit, dislikedId:List<String>?)
 
     suspend fun recipeSearchApi(successCallback: (response: NetworkResult<String>) -> Unit, itemSearch:String?)
+    suspend fun removeMealApi(successCallback: (response: NetworkResult<String>) -> Unit, cookedId:String?)
 
 
 }

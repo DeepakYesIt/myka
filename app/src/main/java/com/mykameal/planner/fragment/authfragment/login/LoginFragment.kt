@@ -339,10 +339,7 @@ class LoginFragment : Fragment() {
                             val loginModel = gson.fromJson(it.data, LoginModel::class.java)
                             if (loginModel.code == 200 && loginModel.success) {
                                 if (checkStatus == true) {
-                                    saveRemember(
-                                        binding!!.etSignEmailPhone.text.toString().trim(),
-                                        binding!!.etSignPassword.text.toString().trim()
-                                    )
+                                    saveRemember(binding!!.etSignEmailPhone.text.toString().trim(), binding!!.etSignPassword.text.toString().trim())
                                 }
                                 showDataInUi(loginModel.data)
                             } else {
@@ -397,49 +394,52 @@ class LoginFragment : Fragment() {
 
     /// handle set session and redirection implement
     private fun showDataInUi(loginModelData: LoginModelData) {
-        sessionManagement.setLoginSession(true)
+        try {
+            sessionManagement.setLoginSession(true)
 
-        if (loginModelData.email != null) {
-            sessionManagement.setEmail(loginModelData.email)
-        }
-
-        if (loginModelData.name != null) {
-            sessionManagement.setUserName(loginModelData.name)
-        }
-
-        val cookingFor = if (loginModelData.cooking_for_type != null) {
-            when (loginModelData.cooking_for_type) {
-                1 -> "Myself"
-                2 -> "MyPartner"
-                3 -> "MyFamily"
-                else -> {
-                    "Not Select"
-                }
+            if (loginModelData.email != null) {
+                sessionManagement.setEmail(loginModelData.email)
             }
-        } else {
-            "Not Select"
+
+            if (loginModelData.name != null) {
+                sessionManagement.setUserName(loginModelData.name)
+            }
+
+            val cookingFor = if (loginModelData.cooking_for_type != null) {
+                when (loginModelData.cooking_for_type) {
+                    1 -> "Myself"
+                    2 -> "MyPartner"
+                    3 -> "MyFamily"
+                    else -> {
+                        "Not Select"
+                    }
+                }
+            } else {
+                "Not Select"
+            }
+
+            sessionManagement.setCookingFor(cookingFor)
+
+            if (loginModelData.profile_img != null) {
+                sessionManagement.setImage(loginModelData.profile_img.toString())
+            }
+
+
+            if (loginModelData.token != null) {
+                sessionManagement.setAuthToken(loginModelData.token.toString())
+            }
+
+            if (loginModelData.id != null) {
+                sessionManagement.setId(loginModelData.id.toString())
+            }
+
+            val intent = Intent(requireActivity(), MainActivity::class.java)
+            startActivity(intent)
+            requireActivity().finish()
+
+        }catch (e:Exception){
+            Log.d("Login","message:---"+e.message)
         }
-
-        sessionManagement.setCookingFor(cookingFor)
-
-        if (loginModelData.profile_img != null) {
-            sessionManagement.setImage(loginModelData.profile_img.toString())
-        }
-
-
-        if (loginModelData.token != null) {
-            sessionManagement.setAuthToken(loginModelData.token.toString())
-        }
-
-        if (loginModelData.id != null) {
-            sessionManagement.setId(loginModelData.id.toString())
-        }
-
-        val intent = Intent(requireActivity(), MainActivity::class.java)
-        startActivity(intent)
-        requireActivity().finish()
-
-
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {
@@ -577,51 +577,55 @@ class LoginFragment : Fragment() {
     }
 
     private fun showDataInSession(signUpVerificationModelData: SocialLoginModelData) {
+        try {
+            sessionManagement.setLoginSession(true)
 
-        sessionManagement.setLoginSession(true)
-
-        if (signUpVerificationModelData.email != null) {
-            sessionManagement.setEmail(signUpVerificationModelData.email)
-        }
-
-        if (signUpVerificationModelData.name != null) {
-            sessionManagement.setUserName(signUpVerificationModelData.name)
-        }
-
-        if (signUpVerificationModelData.profile_img != null) {
-            sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
-        }
-
-        val cookingFor = if (signUpVerificationModelData.cooking_for_type != null) {
-            when (signUpVerificationModelData.cooking_for_type) {
-                1 -> "Myself"
-                2 -> "MyPartner"
-                3 -> "MyFamily"
-                else -> {
-                    "Not Select"
-                }
+            if (signUpVerificationModelData.email != null) {
+                sessionManagement.setEmail(signUpVerificationModelData.email)
             }
-        } else {
-            "Not Select"
+
+            if (signUpVerificationModelData.name != null) {
+                sessionManagement.setUserName(signUpVerificationModelData.name)
+            }
+
+            if (signUpVerificationModelData.profile_img != null) {
+                sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
+            }
+
+            val cookingFor = if (signUpVerificationModelData.cooking_for_type != null) {
+                when (signUpVerificationModelData.cooking_for_type) {
+                    1 -> "Myself"
+                    2 -> "MyPartner"
+                    3 -> "MyFamily"
+                    else -> {
+                        "Not Select"
+                    }
+                }
+            } else {
+                "Not Select"
+            }
+
+            sessionManagement.setCookingFor(cookingFor)
+
+            if (signUpVerificationModelData.profile_img != null) {
+                sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
+            }
+
+            if (signUpVerificationModelData.token != null) {
+                sessionManagement.setAuthToken(signUpVerificationModelData.token.toString())
+            }
+
+            if (signUpVerificationModelData.id != null) {
+                sessionManagement.setId(signUpVerificationModelData.id.toString())
+            }
+
+            val intent = Intent(requireActivity(), MainActivity::class.java)
+            startActivity(intent)
+            requireActivity().finish()
+        }catch (e:Exception){
+            Log.d("login","message:---"+e.message)
         }
 
-        sessionManagement.setCookingFor(cookingFor)
-
-        if (signUpVerificationModelData.profile_img != null) {
-            sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
-        }
-
-        if (signUpVerificationModelData.token != null) {
-            sessionManagement.setAuthToken(signUpVerificationModelData.token.toString())
-        }
-
-        if (signUpVerificationModelData.id != null) {
-            sessionManagement.setId(signUpVerificationModelData.id.toString())
-        }
-
-        val intent = Intent(requireActivity(), MainActivity::class.java)
-        startActivity(intent)
-        requireActivity().finish()
 
     }
 

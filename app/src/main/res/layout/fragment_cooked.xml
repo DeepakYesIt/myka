@@ -239,7 +239,7 @@
                         android:background="@drawable/unselected_button_bg"
                         android:fontFamily="@font/poppins"
                         android:paddingVertical="@dimen/_5sdp"
-                        android:text="Freezer (6)"
+                        android:text="Freezer (0)"
                         android:textAlignment="center"
                         android:textSize="@dimen/_11ssp" />
 

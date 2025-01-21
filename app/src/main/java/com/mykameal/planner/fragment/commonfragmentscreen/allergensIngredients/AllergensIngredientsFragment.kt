@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -277,7 +278,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                         val dietaryModel =
                             gson.fromJson(it.data, AllergensIngredientModel::class.java)
                         if (dietaryModel.code == 200 && dietaryModel.success) {
-                            showDataInUi(dietaryModel.data)
+                            showDataFirstUi(dietaryModel.data)
                         } else {
                             if (dietaryModel.code == ErrorMessage.code) {
                                 showAlertFunction(dietaryModel.message, true)
@@ -299,17 +300,47 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         }
     }
 
-    private fun showDataInUi(allergensModelData: MutableList<AllergensIngredientModelData>) {
-        if (allergensModelData != null && allergensModelData.isNotEmpty()) {
-            if (allergenIngredientViewModel.getAllergensData() == null) {
-                allergensModelData.add(
-                    0,
-                    AllergensIngredientModelData(id = -1, selected = false, "None")
-                ) // ID set to -1 as an indicator
+    private fun showDataFirstUi(allergensModelData: MutableList<AllergensIngredientModelData>) {
+        try {
+            if (allergensModelData != null && allergensModelData.isNotEmpty()) {
+                if (allergenIngredientViewModel.getAllergensData() == null) {
+                    allergensModelData.add(
+                        0,
+                        AllergensIngredientModelData(id = -1, selected = false, "None")
+                    ) // ID set to -1 as an indicator
+                }
+                allergenIngModelData = allergensModelData.toMutableList()
+                allergenIngAdapter = AdapterAllergensIngItem(allergensModelData, requireActivity(), this)
+                binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
             }
-            allergenIngModelData = allergensModelData.toMutableList()
-            allergenIngAdapter = AdapterAllergensIngItem(allergensModelData, requireActivity(), this)
-            binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
+        }catch (e:Exception){
+            Log.d("allergens","message:--"+e.message)
+        }
+
+    }
+
+
+    private fun showDataInUi(allergensModelData: MutableList<AllergensIngredientModelData>) {
+        try {
+            if (allergensModelData != null && allergensModelData.isNotEmpty()) {
+                if (allergenIngredientViewModel.getAllergensData() == null) {
+                    allergensModelData.add(0, AllergensIngredientModelData(id = -1, selected = false, "None")
+                    ) // ID set to -1 as an indicator
+                }
+                var selected = false
+                allergensModelData.forEach {
+                    if(it.selected) selected = true
+                }
+                if(!selected){
+                    allergensModelData.set(0, AllergensIngredientModelData(id = -1, selected = true, "None")
+                    )
+                }
+                allergenIngModelData = allergensModelData.toMutableList()
+                allergenIngAdapter = AdapterAllergensIngItem(allergensModelData, requireActivity(), this)
+                binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
+            }
+        }catch (e:Exception){
+            Log.d("allergens","message:---"+e.message)
         }
     }
 
@@ -346,7 +377,8 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
     override fun itemClicked(position: Int?, list: MutableList<String>?, status1: String?, type: String?) {
             if (status1.equals("-1")) {
                 if (position==0){
-                    allergensSelectedId.clear()
+                    allergensSelectedId = mutableListOf()
+
                 }else{
                     allergensSelectedId = list!!
                 }
@@ -365,6 +397,5 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 status = ""
                 binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             }
-
     }
 }

@@ -3,6 +3,7 @@ package com.mykameal.planner.fragment.mainfragment.profilesetting.privacypolicy
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -55,8 +56,6 @@ class PrivacyPolicyFragment : Fragment() {
 
         initialize()
 
-//        privacyPolicyModel()
-
         return binding!!.root
     }
 
@@ -77,21 +76,25 @@ class PrivacyPolicyFragment : Fragment() {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val termConditionModel = gson.fromJson(it.data, TermsConditionModel::class.java)
-                        if (termConditionModel.code == 200 && termConditionModel.success) {
-                            val termsText = termConditionModel.data.description
-                            binding!!.descText.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                Html.fromHtml(termsText, Html.FROM_HTML_MODE_LEGACY)
+                        try {
+                            val gson = Gson()
+                            val termConditionModel = gson.fromJson(it.data, TermsConditionModel::class.java)
+                            if (termConditionModel.code == 200 && termConditionModel.success) {
+                                val termsText = termConditionModel.data.description
+                                binding!!.descText.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    Html.fromHtml(termsText, Html.FROM_HTML_MODE_LEGACY)
+                                } else {
+                                    Html.fromHtml(termsText)
+                                }
                             } else {
-                                Html.fromHtml(termsText)
+                                if (termConditionModel.code == ErrorMessage.code) {
+                                    showAlertFunction(termConditionModel.message, true)
+                                } else {
+                                    showAlertFunction(termConditionModel.message, false)
+                                }
                             }
-                        } else {
-                            if (termConditionModel.code == ErrorMessage.code) {
-                                showAlertFunction(termConditionModel.message, true)
-                            } else {
-                                showAlertFunction(termConditionModel.message, false)
-                            }
+                        }catch (e:Exception){
+                            Log.d("PrivacyPolicy","message:--"+e.message)
                         }
                     }
 
@@ -111,36 +114,5 @@ class PrivacyPolicyFragment : Fragment() {
     private fun showAlertFunction(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)
     }
-
-    /*   private fun privacyPolicyModel() {
-           val dataList = ArrayList<DataModel>()
-           val data1 = DataModel()
-           val data2 = DataModel()
-           val data3 = DataModel()
-
-           data1.title = "1. Introduction"
-           data1.description ="We take the security of your data seriously. We use industry-standard encryption and security measures to protect your information. However, no method of transmission over the internet or electronic storage is completely secure, and we cannot guarantee absolute security"
-           data1.isOpen = false
-           data1.type = "PrivacyPolicy"
-
-           data2.title = ""
-           data2.description="We take the security of your data seriously. We use industry-standard encryption and security measures to protect your information. However, no method of transmission over the internet or electronic storage is completely secure, and we cannot guarantee absolute security"
-           data2.isOpen = false
-           data2.type = "PrivacyPolicy"
-
-           data3.title = ""
-           data3.description="We take the security of your data seriously. We use industry-standard encryption and security measures to protect your information. However, no method of transmission over the internet or electronic storage is completely secure, and we cannot guarantee absolute security"
-           data3.isOpen = false
-           data3.type = "PrivacyPolicy"
-
-
-           dataList.add(data1)
-           dataList.add(data2)
-           dataList.add(data3)
-
-           adapterPrivacyPolicy = AdapterTermsCondition(dataList, requireActivity())
-           binding!!.rcyPrivacyPolicy.adapter = adapterPrivacyPolicy
-
-       }*/
 
 }

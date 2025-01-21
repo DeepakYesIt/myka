@@ -9,10 +9,10 @@ data class CookedTabModel(
 
 data class CookedTabModelData(
     val Breakfast: MutableList<Breakfast>?,
-    val Dinner: MutableList<Dinner>?,
-    val Lunch: MutableList<Lunch>?,
-    val Snacks: MutableList<Snacks>?,
-    val Teatime: MutableList<Teatime>?,
+    val Dinner: MutableList<Breakfast>?,
+    val Lunch: MutableList<Breakfast>?,
+    val Snacks: MutableList<Breakfast>?,
+    val Teatime: MutableList<Breakfast>?,
     val fridge:Int,
     val freezer:Int
 )
@@ -23,6 +23,9 @@ data class Breakfast(
     val day: Any,
     val deleted_at: Any,
     val id: Int,
+    val servings: Int,
+    val is_like: Int,
+    val created_date: String,
     val plan_type: Int,
     val recipe: Recipe,
     val status: Int,

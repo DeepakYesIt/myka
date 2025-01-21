@@ -1,4 +1,4 @@
-package com.yesitlabs.mykaapp.model
+package com.mykameal.planner.model
 
 class DateModel {
     lateinit var date:String

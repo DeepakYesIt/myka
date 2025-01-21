@@ -36,7 +36,6 @@ import com.mykameal.planner.OnItemSelectListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.adapter.AdapterRecipeItem
-import com.mykameal.planner.adapter.CalendarDayDateAdapter
 import com.mykameal.planner.adapter.ChooseDayAdapter
 import com.mykameal.planner.adapter.CookWareAdapter
 import com.mykameal.planner.adapter.IngredientsRecipeAdapter
@@ -49,7 +48,7 @@ import com.mykameal.planner.fragment.mainfragment.viewmodel.recipedetails.apires
 import com.mykameal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import com.mykameal.planner.model.DataModel
-import com.yesitlabs.mykaapp.model.DateModel
+import com.mykameal.planner.model.DateModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
