@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -200,11 +201,16 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
     }
 
     private fun showDataInUi(bodyModelData: MutableList<BodyGoalModelData>) {
-        if (bodyModelData != null && bodyModelData.size > 0) {
-            bodyModelData1 = bodyModelData
-            bodyGoalAdapter = BodyGoalAdapter(bodyModelData, requireActivity(), this)
-            binding!!.rcyBodyGoals.adapter = bodyGoalAdapter
+        try {
+            if (bodyModelData != null && bodyModelData.size > 0) {
+                bodyModelData1 = bodyModelData
+                bodyGoalAdapter = BodyGoalAdapter(bodyModelData, requireActivity(), this)
+                binding!!.rcyBodyGoals.adapter = bodyGoalAdapter
+            }
+        }catch (e:Exception){
+            Log.d("bodyGoal","message"+e.message)
         }
+
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {

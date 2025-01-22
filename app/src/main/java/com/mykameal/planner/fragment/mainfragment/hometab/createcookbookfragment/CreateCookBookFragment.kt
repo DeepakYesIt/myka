@@ -41,7 +41,7 @@ import java.util.regex.Pattern
 @AndroidEntryPoint
 class CreateCookBookFragment : Fragment() {
     private var binding: FragmentCreateCookBookBinding? = null
-    private var isOpened: Boolean? = null
+    private var isOpened: Boolean? = false
     private var checkType: String? = null
     private var file: File? = null
     private lateinit var commonWorkUtils: CommonWorkUtils
@@ -117,7 +117,7 @@ class CreateCookBookFragment : Fragment() {
                 binding!!.cvInfoMessage.visibility = View.GONE
             } else {
                 isOpened = true
-                binding!!.cvInfoMessage.visibility = View.GONE
+                binding!!.cvInfoMessage.visibility = View.VISIBLE
             }
         }
 
@@ -195,7 +195,7 @@ class CreateCookBookFragment : Fragment() {
         lifecycleScope.launch {
             val filePart: MultipartBody.Part? = if (file != null) {
                 val requestBody = file?.asRequestBody(file!!.extension.toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("profile_img", file?.name, requestBody!!)
+                MultipartBody.Part.createFormData("image", file?.name, requestBody!!)
             } else {
                 null
             }
@@ -207,8 +207,7 @@ class CreateCookBookFragment : Fragment() {
                 when (it) {
                     is NetworkResult.Success -> {
                         val gson = Gson()
-                        val createCookBookModel =
-                            gson.fromJson(it.data, CreateCookBookModel::class.java)
+                        val createCookBookModel = gson.fromJson(it.data, CreateCookBookModel::class.java)
                         if (createCookBookModel.code == 200 && createCookBookModel.success) {
                             findNavController().navigateUp()
                         } else {

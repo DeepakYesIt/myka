@@ -77,10 +77,10 @@ class EditProfileFragment : Fragment() {
                 /*processImage(bitmap)*/
 // Now you can send the image URI to Vision API for processing
                 // Convert image to Base64
-                val base64Image = convertImageToBase64(uri)
+               /* val base64Image = convertImageToBase64(uri)
 
                 // Call Vision API to recognize the image
-                recognizeImage(base64Image)
+                recognizeImage(base64Image)*/
 
                 Glide.with(this)
                     .load(uri)

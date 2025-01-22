@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -122,17 +123,20 @@ class SpendingOnGroceriesFragment : Fragment() {
     }
 
     private fun showDataInUi(groceriesExercise: GrocereisExpenses) {
+        try {
+            if (groceriesExercise!=null){
 
-        if (groceriesExercise!=null){
+                if (groceriesExercise.amount!=null){
+                    binding!!.etSpendingAmount.setText(groceriesExercise.amount.toString())
+                }
 
-            if (groceriesExercise.amount!=null){
-                binding!!.etSpendingAmount.setText(groceriesExercise.amount.toString())
+                if (groceriesExercise.duration!=null){
+                    binding!!.tvChooseDuration.text = groceriesExercise.duration.toString()
+                }
+
             }
-
-            if (groceriesExercise.duration!=null){
-                binding!!.tvChooseDuration.text = groceriesExercise.duration.toString()
-            }
-
+        }catch (e:Exception){
+            Log.d("SpendingGroceries","message:--"+e.message)
         }
     }
 

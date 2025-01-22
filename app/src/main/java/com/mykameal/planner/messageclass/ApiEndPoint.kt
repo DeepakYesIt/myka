@@ -58,5 +58,6 @@ object ApiEndPoint {
 
     const val createCookBook="add-cook-book"
 
+    const val removeMeal="remove-meal"
 
 }

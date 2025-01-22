@@ -100,7 +100,7 @@ class NutritionGoalFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun updateUI(data: Data) {
-        if (data.height_protein!=null){
+        if (data.height_protein!=null && !data.height_protein.equals("null",true)){
             binding.spinnerHighProtein.text = data.height_protein
         }
 

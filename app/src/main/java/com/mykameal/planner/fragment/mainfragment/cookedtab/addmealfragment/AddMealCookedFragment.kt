@@ -2,6 +2,7 @@ package com.mykameal.planner.fragment.mainfragment.cookedtab.addmealfragment
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -25,7 +26,10 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.R
+import com.mykameal.planner.activity.IntroPageActivity
+import com.mykameal.planner.activity.LetsStartOptionActivity
 import com.mykameal.planner.activity.MainActivity
+import com.mykameal.planner.activity.SplashActivity
 import com.mykameal.planner.adapter.SearchAdapterItem
 import com.mykameal.planner.apiInterface.BaseUrl
 import com.mykameal.planner.basedata.BaseApplication
@@ -38,6 +42,7 @@ import com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen.model.S
 import com.mykameal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -58,6 +63,9 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
     private var recipeUri:String=""
     private var planType:String="1"
 
+    companion object {
+        private const val SPLASH_DELAY = 3000L // 3 seconds delay
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -192,9 +200,15 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
     private fun handleSuccessAddToPlanResponse(data: String) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
-            Log.d("@@@ addMea List ", "message :- $data")
+            Log.d("@@@ addMeal List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                findNavController().navigate(R.id.cookedFragment)
+                binding!!.imageLogo.setImageResource(R.drawable.add_meal_icon_success)
+
+                lifecycleScope.launch {
+                    delay(SplashActivity.SPLASH_DELAY)
+                    findNavController().navigate(R.id.cookedFragment)
+                }
+
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlertFunction(apiModel.message, true)
@@ -241,7 +255,7 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
 
             selectedDate=formattedDateApi
             // Format the date to "17 January 2025"
-            val dateFormatForShow = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
+            val dateFormatForShow = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
             val formattedDateShow = dateFormatForShow.format(calendar.time)
 
             binding!!.tvDateCooked.text=formattedDateShow
@@ -299,17 +313,21 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
     }
 
     private fun showDataInUi(searchModelData: SearchModelData) {
-        if (searchModelData!=null){
-            if (searchModelData.recipes!=null && searchModelData.recipes.size>0){
-                recipes=searchModelData.recipes
-                binding!!.rcySearchCooked.visibility=View.VISIBLE
-                binding!!.tvNoData.visibility=View.GONE
-                searchAdapterItem = SearchAdapterItem(searchModelData.recipes, requireActivity(),this)
-                binding!!.rcySearchCooked.adapter = searchAdapterItem
-            }else{
-                binding!!.rcySearchCooked.visibility=View.GONE
-                binding!!.tvNoData.visibility=View.VISIBLE
+        try {
+            if (searchModelData!=null){
+                if (searchModelData.recipes!=null && searchModelData.recipes.size>0){
+                    recipes=searchModelData.recipes
+                    binding!!.rcySearchCooked.visibility=View.VISIBLE
+                    binding!!.tvNoData.visibility=View.GONE
+                    searchAdapterItem = SearchAdapterItem(searchModelData.recipes, requireActivity(),this)
+                    binding!!.rcySearchCooked.adapter = searchAdapterItem
+                }else{
+                    binding!!.rcySearchCooked.visibility=View.GONE
+                    binding!!.tvNoData.visibility=View.VISIBLE
+                }
             }
+        }catch (e:Exception){
+            Log.d("AddMeal","message:--"+e.message)
         }
     }
 
@@ -325,10 +343,10 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
         binding!!.cardViewSearchRecipe.visibility=View.GONE
         binding!!.cardViewRecipe.visibility=View.VISIBLE
 
-
         if (recipes!![position!!].recipe.images.SMALL.url!=null){
+            val imageUrl = recipes!![position].recipe.images.SMALL.url
             Glide.with(requireActivity())
-                .load(recipes!![position].recipe.images.SMALL.url)
+                .load(imageUrl)
                 .error(R.drawable.no_image)
                 .placeholder(R.drawable.no_image)
                 .listener(object : RequestListener<Drawable> {
@@ -354,11 +372,18 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
                     }
                 })
                 .into(binding!!.imgIngRecipe)
+
+
+            Glide.with(requireActivity())
+                .load(imageUrl)
+                .error(R.drawable.add_meal_icon)
+                .placeholder(R.drawable.add_meal_icon)
+                .into(binding!!.imageLogo)
         }else{
             binding!!.layProgess.root.visibility= View.GONE
         }
 
-        binding!!.tvTitleName.text=recipes!![position].recipe.label.toString()
+        binding!!.tvTitleName.text=type.toString()
 
         checkable()
 

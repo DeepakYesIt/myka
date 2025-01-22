@@ -1,19 +1,29 @@
 package com.mykameal.planner.fragment.mainfragment.commonscreen
 
 
+import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.PackageManagerCompat.LOG_TAG
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.appsflyer.AppsFlyerLib
 import com.appsflyer.deeplink.DeepLinkResult
+import com.appsflyer.share.LinkGenerator
+import com.appsflyer.share.ShareInviteHelper
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -22,8 +32,6 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.customview.SpendingChartView
-
-import com.mykameal.planner.commonworkutils.shareApp
 import com.mykameal.planner.databinding.FragmentStatisticsGraphBinding
 
 class StatisticsGraphFragment : Fragment() {
@@ -85,7 +93,7 @@ class StatisticsGraphFragment : Fragment() {
     }
 
     private fun initialize() {
-        Log.d("AppsFlyer22", "Deep link found, store")
+      /*  Log.d("AppsFlyer22", "Deep link found, store")
 
         AppsFlyerLib.getInstance().subscribeForDeepLink { deepLinkResult ->
             when (deepLinkResult.status) {
@@ -111,7 +119,7 @@ class StatisticsGraphFragment : Fragment() {
                     Log.d("AppsFlyer22", "Error in deep link: ${deepLinkResult.error}")
                 }
             }
-        }
+        }*/
 
         binding!!.imgBackStats.setOnClickListener {
             findNavController().navigateUp()
@@ -140,7 +148,9 @@ class StatisticsGraphFragment : Fragment() {
         xAxis.granularity = 1f
 
         binding!!.textInviteFriends.setOnClickListener {
-            shareApp(requireActivity())
+            /*shareApp(requireActivity())*/
+
+            copyShareInviteLink()
            /* val appPackageName: String = requireActivity().packageName
             val myIntent = Intent(Intent.ACTION_SEND)
             myIntent.type = "text/plain"
@@ -155,7 +165,43 @@ class StatisticsGraphFragment : Fragment() {
         binding!!.barChart.setOnClickListener{
             findNavController().navigate(R.id.statisticsWeekYearFragment)
         }
+    }
 
+    @SuppressLint("RestrictedApi")
+    private fun copyShareInviteLink() {
+        val currentCampaign = "user_invite"
+        val currentChannel = "mobile_share"
+        val currentReferrerId = "THIS_USER_ID"
+        val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity())
+        /*linkGenerator.addParameter("deep_link_value", this.fruitName)
+        linkGenerator.addParameter("deep_link_sub1", this.fruitAmountStr)*/
+        linkGenerator.addParameter("deep_link_sub2", currentReferrerId)
+        linkGenerator.campaign = currentCampaign
+        linkGenerator.channel = currentChannel
+        Log.d(LOG_TAG, "Link params:" + linkGenerator.userParams.toString())
+        val listener: LinkGenerator.ResponseListener = object : LinkGenerator.ResponseListener {
+            override fun onResponse(s: String) {
+                Log.d(LOG_TAG, "Share invite link: $s")
+                //Copy the share invite link to clipboard and indicate it with a toast
+                requireActivity().runOnUiThread(Runnable {
+                    val clipboard = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("Share invite link", s)
+                    clipboard.setPrimaryClip(clip)
+                    val toast = Toast.makeText(requireActivity(), "Link copied to clipboard", Toast.LENGTH_SHORT)
+                    toast.setGravity(Gravity.TOP or Gravity.CENTER_HORIZONTAL, 0, 20)
+                    toast.show()
+                })
+                val logInviteMap = HashMap<String, String>()
+                logInviteMap["referrerId"] = currentReferrerId
+                logInviteMap["campaign"] = currentCampaign
+                ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
+            }
+
+            override fun onResponseError(s: String) {
+                Log.d(LOG_TAG, "onResponseError called")
+            }
+        }
+        linkGenerator.generateLink(requireActivity(), listener)
     }
 
     private fun redirectToPlayStore() {

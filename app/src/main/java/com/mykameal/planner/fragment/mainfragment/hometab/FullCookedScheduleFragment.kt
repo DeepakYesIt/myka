@@ -347,14 +347,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemClickListener, OnItemLongCl
             println("\nAfter clicking 'Next':")
             showWeekDates()
         }
-
-       /* binding!!.imagePrevious.setOnClickListener {
-            changeWeekRange(-1)
-        }
-
-        binding!!.imageNext.setOnClickListener {
-            changeWeekRange(1)
-        }*/
+        
 
         binding!!.rlMainFullCooked.setOnLongClickListener {
             onClickEnabled()

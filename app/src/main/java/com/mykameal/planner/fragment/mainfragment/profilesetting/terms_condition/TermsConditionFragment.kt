@@ -3,6 +3,7 @@ package com.mykameal.planner.fragment.mainfragment.profilesetting.terms_conditio
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,13 +25,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-
 class TermsConditionFragment : Fragment() {
 
     private var binding: FragmentTermsConditionBinding? = null
     private var adapterTermsCondition: AdapterTermsCondition? = null
     private lateinit var termsConditionViewModel: TermsConditionViewModel
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,7 +42,6 @@ class TermsConditionFragment : Fragment() {
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
 
         termsConditionViewModel = ViewModelProvider(this)[TermsConditionViewModel::class.java]
-
 
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
@@ -59,9 +57,6 @@ class TermsConditionFragment : Fragment() {
         }
 
         initialize()
-
-
-
 
         return binding!!.root
     }
@@ -85,21 +80,25 @@ class TermsConditionFragment : Fragment() {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val termConditionModel = gson.fromJson(it.data, TermsConditionModel::class.java)
-                        if (termConditionModel.code == 200 && termConditionModel.success) {
-                            val termsText = termConditionModel.data.description
-                            binding!!.descText.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                Html.fromHtml(termsText, Html.FROM_HTML_MODE_LEGACY)
+                        try {
+                            val gson = Gson()
+                            val termConditionModel = gson.fromJson(it.data, TermsConditionModel::class.java)
+                            if (termConditionModel.code == 200 && termConditionModel.success) {
+                                val termsText = termConditionModel.data.description
+                                binding!!.descText.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    Html.fromHtml(termsText, Html.FROM_HTML_MODE_LEGACY)
+                                } else {
+                                    Html.fromHtml(termsText)
+                                }
                             } else {
-                                Html.fromHtml(termsText)
+                                if (termConditionModel.code == ErrorMessage.code) {
+                                    showAlertFunction(termConditionModel.message, true)
+                                } else {
+                                    showAlertFunction(termConditionModel.message, false)
+                                }
                             }
-                        } else {
-                            if (termConditionModel.code == ErrorMessage.code) {
-                                showAlertFunction(termConditionModel.message, true)
-                            } else {
-                                showAlertFunction(termConditionModel.message, false)
-                            }
+                        }catch (e:Exception){
+                            Log.d("TermsCondition","message:---"+e.message)
                         }
                     }
 

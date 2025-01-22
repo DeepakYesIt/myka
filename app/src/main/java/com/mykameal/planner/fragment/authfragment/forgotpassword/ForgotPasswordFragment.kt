@@ -1,6 +1,7 @@
 package com.mykameal.planner.fragment.authfragment.forgotpassword
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -88,14 +89,18 @@ class ForgotPasswordFragment : Fragment() {
                         val gson = Gson()
                         val forgotModel = gson.fromJson(it.data, ForgotPasswordModel::class.java)
                         if (forgotModel.code == 200 && forgotModel.success) {
-                            val bundle = Bundle()
-                            bundle.putString("screenType", "forgot")
-                            bundle.putString("chooseType", chooseType)
-                            bundle.putString(
-                                "value",
-                                binding!!.etRegEmailPhone.text.toString().trim()
-                            )
-                            findNavController().navigate(R.id.verificationFragment, bundle)
+                            try {
+                                val bundle = Bundle()
+                                bundle.putString("screenType", "forgot")
+                                bundle.putString("chooseType", chooseType)
+                                bundle.putString(
+                                    "value",
+                                    binding!!.etRegEmailPhone.text.toString().trim()
+                                )
+                                findNavController().navigate(R.id.verificationFragment, bundle)
+                            }catch (e:Exception){
+                                Log.d("Forgot password","message:-- "+e.message)
+                            }
                         } else {
                             if (forgotModel.code == ErrorMessage.code) {
                                 showAlertFunction(forgotModel.message, true)

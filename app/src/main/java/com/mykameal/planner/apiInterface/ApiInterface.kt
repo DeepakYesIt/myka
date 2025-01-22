@@ -250,7 +250,7 @@ interface ApiInterface {
 
     @Multipart
     @POST(ApiEndPoint.createCookBook)
-    suspend fun createCookBook(@Part("name") name:RequestBody?,@Part image: MultipartBody.Part?, @Field("status") status:RequestBody?):Response<JsonObject>
+    suspend fun createCookBook(@Part("name") name:RequestBody?,@Part image: MultipartBody.Part?, @Part("status") status:RequestBody?):Response<JsonObject>
 
     @POST(ApiEndPoint.getCardBankUrl)
     suspend fun getCardAndBankRequestApi(): Response<JsonObject>
@@ -415,6 +415,12 @@ interface ApiInterface {
     @POST(ApiEndPoint.recipeSearch)
     suspend fun recipeSearchApi(
         @Field("q") q: String?
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.removeMeal)
+    suspend fun removeMealApi(
+        @Field("id") id: String?
     ): Response<JsonObject>
 
 

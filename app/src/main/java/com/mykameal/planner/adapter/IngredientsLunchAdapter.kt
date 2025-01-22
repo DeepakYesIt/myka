@@ -33,7 +33,7 @@ class IngredientsLunchAdapter(private var datalist: List<DataModel>, private var
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         holder.binding.tvBreakfast.text=datalist[position].title
-        holder.binding.relBreakfast.setBackgroundResource(datalist[position].image)
+//        holder.binding.relBreakfast.setBackgroundResource(datalist[position].image)
 
         if (isZiggleEnabled) {
             holder.binding.imageMinus.visibility= View.VISIBLE

@@ -152,9 +152,17 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 binding!!.llRecipesCooked.visibility=View.GONE
             }
 
-            if (userDataLocal.graph_value==0){
+         /*   if (userDataLocal.graph_value==0){
                 binding!!.imagePlanMeal.visibility=View.VISIBLE
                 binding!!.imageCheckSav.visibility=View.GONE
+            }else{
+                binding!!.imagePlanMeal.visibility=View.GONE
+                binding!!.imageCheckSav.visibility=View.VISIBLE
+            }*/
+
+            if (userDataLocal.graph_value==0){
+                binding!!.imagePlanMeal.visibility=View.GONE
+                binding!!.imageCheckSav.visibility=View.VISIBLE
             }else{
                 binding!!.imagePlanMeal.visibility=View.GONE
                 binding!!.imageCheckSav.visibility=View.VISIBLE
@@ -403,9 +411,9 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             }
 
             R.id.imageCookedMeals->{
-                binding!!.rlSeeAllBtn.visibility=View.VISIBLE
+                findNavController().navigate(R.id.cookedFragment)
+//                binding!!.rlSeeAllBtn.visibility=View.VISIBLE
             }
-
             R.id.imgBasketIcon->{
                 findNavController().navigate(R.id.basketScreenFragment)
             }

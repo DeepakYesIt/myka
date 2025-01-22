@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -250,7 +251,10 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
                         val dietaryModel =
                             gson.fromJson(it.data, FavouriteCuisinesModel::class.java)
                         if (dietaryModel.code == 200 && dietaryModel.success) {
+/*
                             showDataInUi(dietaryModel.data)
+*/
+                            showDataInFirstUi(dietaryModel.data)
                         } else {
                             if (dietaryModel.code == ErrorMessage.code) {
                                 showAlertFunction(dietaryModel.message, true)
@@ -273,18 +277,47 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
     }
 
     private fun showDataInUi(favouriteModelData: MutableList<FavouriteCuisinesModelData>) {
+        try {
+            if (favouriteModelData != null && favouriteModelData.isNotEmpty()) {
+                if (favouriteCuisineViewModel.getFavouriteCuiData() == null) {
 
-        if (favouriteModelData != null && favouriteModelData.isNotEmpty()) {
-            if (favouriteCuisineViewModel.getFavouriteCuiData() == null) {
-                favouriteModelData.add(
-                    0,
-                    FavouriteCuisinesModelData(id = -1, selected = false, "None")
-                ) // ID set to -1 as an indicator
+                    favouriteModelData.add(0, FavouriteCuisinesModelData(id = -1, selected = false, "None")
+                    ) // ID set to -1 as an indicator
+                }
+                var selected = false
+                favouriteModelData.forEach {
+                    if(it.selected) selected = true
+                }
+                if(!selected){
+                    favouriteModelData.set(0, FavouriteCuisinesModelData(id = -1, selected = true, "None")
+                    )
+                }
+                favouriteCuiModelData = favouriteModelData
+                adapterFavouriteCuisinesItem =
+                    AdapterFavouriteCuisinesItem(favouriteModelData, requireActivity(), this)
+                binding!!.rcyFavCuisines.adapter = adapterFavouriteCuisinesItem
             }
-            favouriteCuiModelData = favouriteModelData
-            adapterFavouriteCuisinesItem =
-                AdapterFavouriteCuisinesItem(favouriteModelData, requireActivity(), this)
-            binding!!.rcyFavCuisines.adapter = adapterFavouriteCuisinesItem
+        }catch (e:Exception){
+            Log.d("FavouriteCuisines","message"+e.message)
+        }
+
+    }
+
+    private fun showDataInFirstUi(favouriteModelData: MutableList<FavouriteCuisinesModelData>) {
+        try {
+            if (favouriteModelData != null && favouriteModelData.isNotEmpty()) {
+                if (favouriteCuisineViewModel.getFavouriteCuiData() == null) {
+
+                    favouriteModelData.add(0, FavouriteCuisinesModelData(id = -1, selected = false, "None")
+                    ) // ID set to -1 as an indicator
+                }
+
+                favouriteCuiModelData = favouriteModelData
+                adapterFavouriteCuisinesItem = AdapterFavouriteCuisinesItem(favouriteModelData, requireActivity(), this)
+                binding!!.rcyFavCuisines.adapter = adapterFavouriteCuisinesItem
+            }
+        }catch (e:Exception){
+            Log.d("FavouriteCuisines","message"+e.message)
         }
     }
 
@@ -297,7 +330,8 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
 
         if (status1.equals("-1")) {
             if (position==0){
-                favouriteSelectId.clear()
+                favouriteSelectId = mutableListOf()
+              /*  favouriteSelectId.clear()*/
             }else{
                 favouriteSelectId = list!!
             }

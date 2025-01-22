@@ -137,14 +137,23 @@
 
             </RelativeLayout>
 
-
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/imageLogo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/_150sdp"
+                android:layout_height="@dimen/_150sdp"
+                android:layout_centerHorizontal="true"
                 android:layout_below="@+id/relCookedMeals"
                 android:layout_marginTop="@dimen/_30sdp"
-                android:src="@drawable/add_meal_icon" />
+                android:src="@drawable/add_meal_icon"/>
+
+         <!--   <ImageView
+                android:id="@+id/imageLogo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/relCookedMeals"
+                android:layout_marginTop="@dimen/_30sdp"
+                android:src="@drawable/add_meal_icon" />-->
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardViewDateCooked"

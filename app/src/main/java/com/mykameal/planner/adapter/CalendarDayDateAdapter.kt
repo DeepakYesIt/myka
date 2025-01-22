@@ -53,9 +53,6 @@ class CalendarDayDateAdapter(var days: MutableList<DateModel>, private val onDay
             notifyDataSetChanged()
             onDaySelected(position)
         }
-
-
-
     }
 
 

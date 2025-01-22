@@ -41,6 +41,7 @@ class AdapterDislikeIngredientItem(private var dislikeIngredientsData: List<Disl
                 if (!dietaryId.contains(dislikeIngredientsData[position].id.toString())) {
                     dietaryId.add(dislikeIngredientsData[position].id.toString())
                 }
+                onItemClickedListener.itemClicked(position, dietaryId, "-1", "")
             } else {
                 dietaryId.remove(dislikeIngredientsData[position].id.toString())
             }
@@ -68,11 +69,11 @@ class AdapterDislikeIngredientItem(private var dislikeIngredientsData: List<Disl
                         }
                     } else -> { // Handle individual item selection
                         // Deselect "Select All" if any other item is clicked
-                        if (selectedPositions.contains(0)) {
-                            selectedPositions.remove(0)
+                      /*  if (selectedPositions.contains(0)) {
+                            selectedPositions.remove(0)*/
                             dislikeIngredientsData[0].selected = false
                             dietaryId.clear()
-                        }
+                      /*  }*/
 
                         // Toggle the current item's selection state
                         dislikeIngredientsData[position].selected = !dislikeIngredientsData[position].selected

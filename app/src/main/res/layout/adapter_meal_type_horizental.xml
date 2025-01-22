@@ -95,7 +95,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/_8sdp"
                     android:fontFamily="@font/poppins_medium"
-                    android:text="2 servings"
+                    android:text="1 servings"
                     android:textColor="#000000"
                     android:textSize="@dimen/_10sdp" />
                 <ImageView

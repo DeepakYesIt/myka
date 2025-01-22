@@ -266,16 +266,19 @@ class SignUpFragment : Fragment() {
                             val gson = Gson()
                             val signUpModel = gson.fromJson(it.data, SignUpModel::class.java)
                             if (signUpModel.code == 200 && signUpModel.success) {
-                                val bundle = Bundle()
-                                bundle.putString("screenType", "signup")
-                                bundle.putString("chooseType", chooseType)
-                                bundle.putString("userId", signUpModel.data.id.toString())
-                                bundle.putString(
-                                    "value",
-                                    binding!!.etSignUpEmailPhone.text.toString().trim()
-                                )
-                                findNavController().navigate(R.id.verificationFragment, bundle)
-
+                                try {
+                                    val bundle = Bundle()
+                                    bundle.putString("screenType", "signup")
+                                    bundle.putString("chooseType", chooseType)
+                                    bundle.putString("userId", signUpModel.data.id.toString())
+                                    bundle.putString(
+                                        "value",
+                                        binding!!.etSignUpEmailPhone.text.toString().trim()
+                                    )
+                                    findNavController().navigate(R.id.verificationFragment, bundle)
+                                }catch (e:Exception){
+                                    Log.d("signup","message:---"+e.message)
+                                }
                             } else {
                                 if (signUpModel.code == ErrorMessage.code) {
                                     showAlertFunction(signUpModel.message, true)
@@ -411,49 +414,51 @@ class SignUpFragment : Fragment() {
     }
 
     private fun showDataInSession(signUpVerificationModelData: SignUpVerificationModelData, personEmail: String?) {
+        try {
+            sessionManagement.setLoginSession(true)
+            sessionManagement.setEmail(personEmail!!)
 
-        sessionManagement.setLoginSession(true)
-        sessionManagement.setEmail(personEmail!!)
-
-        if (signUpVerificationModelData.name != null) {
-            sessionManagement.setUserName(signUpVerificationModelData.name)
-        }
-
-        if (signUpVerificationModelData.profile_img != null) {
-            sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
-        }
-
-        val cookingFor = if (signUpVerificationModelData.cooking_for_type != null) {
-            when (signUpVerificationModelData.cooking_for_type) {
-                1 -> "Myself"
-                2 -> "MyPartner"
-                3 -> "MyFamily"
-                else -> {
-                    "Not Select"
-                }
+            if (signUpVerificationModelData.name != null) {
+                sessionManagement.setUserName(signUpVerificationModelData.name)
             }
-        } else {
-            "Not Select"
+
+            if (signUpVerificationModelData.profile_img != null) {
+                sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
+            }
+
+            val cookingFor = if (signUpVerificationModelData.cooking_for_type != null) {
+                when (signUpVerificationModelData.cooking_for_type) {
+                    1 -> "Myself"
+                    2 -> "MyPartner"
+                    3 -> "MyFamily"
+                    else -> {
+                        "Not Select"
+                    }
+                }
+            } else {
+                "Not Select"
+            }
+
+            sessionManagement.setCookingFor(cookingFor)
+
+            if (signUpVerificationModelData.profile_img != null) {
+                sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
+            }
+
+            if (signUpVerificationModelData.token != null) {
+                sessionManagement.setAuthToken(signUpVerificationModelData.token.toString())
+            }
+
+            if (signUpVerificationModelData.id != null) {
+                sessionManagement.setId(signUpVerificationModelData.id.toString())
+            }
+
+            val intent = Intent(requireActivity(), MainActivity::class.java)
+            startActivity(intent)
+            requireActivity().finish()
+        }catch (e:Exception){
+            Log.d("Signup","message:---"+e.message)
         }
-
-        sessionManagement.setCookingFor(cookingFor)
-
-        if (signUpVerificationModelData.profile_img != null) {
-            sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
-        }
-
-        if (signUpVerificationModelData.token != null) {
-            sessionManagement.setAuthToken(signUpVerificationModelData.token.toString())
-        }
-
-        if (signUpVerificationModelData.id != null) {
-            sessionManagement.setId(signUpVerificationModelData.id.toString())
-        }
-
-        val intent = Intent(requireActivity(), MainActivity::class.java)
-        startActivity(intent)
-        requireActivity().finish()
-
     }
 
     override fun onStart() {

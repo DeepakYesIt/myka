@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -199,11 +200,14 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
     }
 
     private fun showDataInUi(bodyModelData: List<BodyGoalModelData>) {
-
-        if (bodyModelData!=null && bodyModelData.isNotEmpty()){
-            eatingOutModelsData=bodyModelData
-            bodyGoalAdapter = BodyGoalAdapter(bodyModelData, requireActivity(), this)
-            binding!!.rcyEatingOut.adapter = bodyGoalAdapter
+        try {
+            if (bodyModelData!=null && bodyModelData.isNotEmpty()){
+                eatingOutModelsData=bodyModelData
+                bodyGoalAdapter = BodyGoalAdapter(bodyModelData, requireActivity(), this)
+                binding!!.rcyEatingOut.adapter = bodyGoalAdapter
+            }
+        }catch (e:Exception){
+            Log.d("EatingOut","message"+e.message)
         }
     }
 

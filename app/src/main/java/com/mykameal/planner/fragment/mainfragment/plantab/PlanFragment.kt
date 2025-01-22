@@ -81,16 +81,16 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     private var recipesDateModel: DataPlayByDate? = null
 
     // Separate adapter instances for each RecyclerView
-    var breakfastAdapter: AdapterPlanBreakFast? = null
-    var AdapterPlanBreakByDateFast: AdapterPlanBreakByDateFast? = null
-    var lunchAdapter: AdapterPlanBreakFast? = null
-    var AdapterlunchByDateFast: AdapterPlanBreakByDateFast? = null
-    var dinnerAdapter: AdapterPlanBreakFast? = null
-    var AdapterdinnerByDateFast: AdapterPlanBreakByDateFast? = null
-    var snackesAdapter: AdapterPlanBreakFast? = null
-    var AdaptersnackesByDateFast: AdapterPlanBreakByDateFast? = null
-    var teaTimeAdapter: AdapterPlanBreakFast? = null
-    var AdapterteaTimeByDateFast: AdapterPlanBreakByDateFast? = null
+    private var breakfastAdapter: AdapterPlanBreakFast? = null
+    private var AdapterPlanBreakByDateFast: AdapterPlanBreakByDateFast? = null
+    private var lunchAdapter: AdapterPlanBreakFast? = null
+    private var AdapterlunchByDateFast: AdapterPlanBreakByDateFast? = null
+    private var dinnerAdapter: AdapterPlanBreakFast? = null
+    private var AdapterdinnerByDateFast: AdapterPlanBreakByDateFast? = null
+    private var snackesAdapter: AdapterPlanBreakFast? = null
+    private var AdaptersnackesByDateFast: AdapterPlanBreakByDateFast? = null
+    private var teaTimeAdapter: AdapterPlanBreakFast? = null
+    private var AdapterteaTimeByDateFast: AdapterPlanBreakByDateFast? = null
     private lateinit var sessionManagement: SessionManagement
 
     lateinit var adapter: ImageViewPagerAdapter
@@ -102,7 +102,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     private lateinit var startDate: Date
     private lateinit var endDate: Date
     private var calendarAdapter: CalendarDayDateAdapter? = null
-
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -416,10 +415,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         if (recipesModel != null) {
             fun setupMealAdapter(
-                mealRecipes: MutableList<BreakfastModel>?,
-                recyclerView: RecyclerView,
-                type: String
-            ): AdapterPlanBreakFast? {
+                mealRecipes: MutableList<BreakfastModel>?, recyclerView: RecyclerView, type: String): AdapterPlanBreakFast? {
                 return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
                     val adapter = AdapterPlanBreakFast(mealRecipes, requireActivity(), this, type)
                     recyclerView.adapter = adapter
@@ -977,9 +973,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             dataList.add(data)
         }
 
-
         rcyChooseDaySch!!.adapter = ChooseDayAdapter(dataList, requireActivity())
-
 
         rlDoneBtn.setOnClickListener {
             chooseDayMealTypeDialog(position,typeAdapter)
@@ -1007,16 +1001,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             showWeekDates()
         }
 
-
     }
-
-
-
-    private fun cookingScheduleModel() {
-
-    }
-
-
 
     private fun chooseDayMealTypeDialog(position: Int?, typeAdapter: String?) {
         val dialogChooseMealDay: Dialog = context?.let { Dialog(it) }!!
@@ -1127,8 +1112,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             }
         }
 
-        Log.d("json object ", "******$jsonObject")
-
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             viewModel.recipeAddToPlanRequest({
@@ -1218,29 +1201,31 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     override fun itemClick(position: Int?, status: String?, type: String?) {
         when (status) {
             "1" -> {
-                chooseDayDialog(position,type)
+                chooseDayDialog(position, type)
             }
             "2" -> {
                 if (BaseApplication.isOnline(requireActivity())) {
-                    toggleIsLike(type!!,position,"basket")
+                    toggleIsLike(type ?: "", position, "basket")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-            }
-            status -> {
-                val bundle = Bundle()
-                bundle.putString("uri", type)
-                bundle.putString("mealType",status)
-                findNavController().navigate(R.id.recipeDetailsFragment, bundle)
             }
             "4" -> {
                 if (BaseApplication.isOnline(requireActivity())) {
-                    toggleIsLike(type!!,position,"like")
+                    toggleIsLike(type ?: "", position, "like")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }
+            else -> {
+                val bundle = Bundle().apply {
+                    putString("uri", type)
+                    putString("mealType", status)
+                }
+                findNavController().navigate(R.id.recipeDetailsFragment, bundle)
+            }
         }
+
     }
 
     private fun toggleIsLike(type: String, position: Int?, apiType: String) {

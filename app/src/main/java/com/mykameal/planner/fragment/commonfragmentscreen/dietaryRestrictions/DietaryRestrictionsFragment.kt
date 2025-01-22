@@ -28,6 +28,7 @@ import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.UpdatePref
 import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModel
 import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.model.DietaryRestrictionsModelData
 import com.mykameal.planner.fragment.commonfragmentscreen.dietaryRestrictions.viewmodel.DietaryRestrictionsViewModel
+import com.mykameal.planner.fragment.commonfragmentscreen.favouriteCuisines.model.FavouriteCuisinesModelData
 import com.mykameal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -149,7 +150,8 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                         val gson = Gson()
                         val dietaryModel = gson.fromJson(it.data, DietaryRestrictionsModel::class.java)
                         if (dietaryModel.code == 200 && dietaryModel.success) {
-                            showDataInUi(dietaryModel.data)
+//                            showDataInUi(dietaryModel.data)
+                            showDataFirstUi(dietaryModel.data)
                         } else {
                             if (dietaryModel.code == ErrorMessage.code) {
                                 showAlertFunction(dietaryModel.message, true)
@@ -170,17 +172,45 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
     }
 
     private fun showDataInUi(dietaryModelData: MutableList<DietaryRestrictionsModelData>) {
+        try {
+            if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
+                if (dietaryRestrictionsViewModel.getDietaryResData()==null){
+                    // Add "None" option at the first position
+                    dietaryModelData.add(0, DietaryRestrictionsModelData( id = -1, selected = false,"None")) // ID set to -1 as an indicator
+                }
 
-        if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
-            if (dietaryRestrictionsViewModel.getDietaryResData()==null){
-                // Add "None" option at the first position
-                dietaryModelData.add(0, DietaryRestrictionsModelData( id = -1, selected = false,"None")) // ID set to -1 as an indicator
+                var selected = false
+                dietaryModelData.forEach {
+                    if(it.selected) selected = true
+                }
+                if(!selected){
+                    dietaryModelData.set(0, DietaryRestrictionsModelData(id = -1, selected = true, "None")
+                    )
+                }
+                dietaryModelsData=dietaryModelData
+                dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
+                binding!!.rcyDietaryRestrictions.adapter = dietaryRestrictionsAdapter
             }
-            dietaryModelsData=dietaryModelData
-            dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
-            binding!!.rcyDietaryRestrictions.adapter = dietaryRestrictionsAdapter
+        }catch (e:Exception){
+            Log.d("DietaryRestriction","message"+e.message)
         }
+    }
 
+
+    private fun showDataFirstUi(dietaryModelData: MutableList<DietaryRestrictionsModelData>) {
+        try {
+            if (dietaryModelData!=null && dietaryModelData.isNotEmpty()){
+                if (dietaryRestrictionsViewModel.getDietaryResData()==null){
+                    // Add "None" option at the first position
+                    dietaryModelData.add(0, DietaryRestrictionsModelData( id = -1, selected = false,"None")) // ID set to -1 as an indicator
+                }
+                dietaryModelsData=dietaryModelData
+                dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
+                binding!!.rcyDietaryRestrictions.adapter = dietaryRestrictionsAdapter
+            }
+        }catch (e:Exception){
+            Log.d("Dietary Restrictions","message"+e.message)
+        }
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {
@@ -286,7 +316,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
 
             if (status1.equals("-1")) {
                 if (position==0){
-                    dietarySelectedId.clear()
+                    dietarySelectedId = mutableListOf()
                 }else{
                     dietarySelectedId=list!!
                 }
