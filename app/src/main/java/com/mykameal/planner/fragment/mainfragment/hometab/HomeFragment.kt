@@ -152,21 +152,21 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 binding!!.llRecipesCooked.visibility=View.GONE
             }
 
-         /*   if (userDataLocal.graph_value==0){
+            if (userDataLocal.graph_value==0){
                 binding!!.imagePlanMeal.visibility=View.VISIBLE
                 binding!!.imageCheckSav.visibility=View.GONE
             }else{
                 binding!!.imagePlanMeal.visibility=View.GONE
                 binding!!.imageCheckSav.visibility=View.VISIBLE
-            }*/
+            }
 
-            if (userDataLocal.graph_value==0){
+       /*     if (userDataLocal.graph_value==0){
                 binding!!.imagePlanMeal.visibility=View.GONE
                 binding!!.imageCheckSav.visibility=View.VISIBLE
             }else{
                 binding!!.imagePlanMeal.visibility=View.GONE
                 binding!!.imageCheckSav.visibility=View.VISIBLE
-            }
+            }*/
 
             if (userDataLocal.date!=null){
                 val name=BaseApplication.getColoredSpanned("Next meal to be cooked on ","#3C4541") + BaseApplication.getColoredSpanned(data.date+".","#06C169")
