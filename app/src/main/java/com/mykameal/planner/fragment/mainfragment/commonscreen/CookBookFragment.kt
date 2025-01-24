@@ -235,9 +235,7 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
                     findNavController().navigate(R.id.recipeDetailsFragment, bundle)
                 }catch (e:Exception){
                     BaseApplication.alertError(requireContext(),e.message.toString(), false)
-
                 }
-
             }
             "5" -> {
                 moveRecipeDialog(position)
