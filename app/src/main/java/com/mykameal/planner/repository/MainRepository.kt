@@ -105,7 +105,6 @@ interface MainRepository {
 
  suspend fun transferAmountRequest(successCallback: (response: NetworkResult<String>) -> Unit,amount: String,destination: String)
 
-
  suspend fun addBankRequestApi(
      successCallback: (response: NetworkResult<String>) -> Unit,
      filePartFront: MultipartBody.Part?,

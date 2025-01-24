@@ -111,11 +111,14 @@ dependencies {
     ///appsFlyer sdk for deep linking
     implementation("com.appsflyer:af-android-sdk:6.11.0")
 
-
+    ///app lottie for android
     implementation ("com.airbnb.android:lottie:3.4.0")
 
     //power spinner
     implementation("com.github.skydoves:powerspinner:1.2.7")
+
+    ///for recycler view layout fix
+    implementation ("com.google.android.flexbox:flexbox:3.0.0")
 
     // Dagger - Hilt
     implementation("com.google.dagger:hilt-android:2.47")
