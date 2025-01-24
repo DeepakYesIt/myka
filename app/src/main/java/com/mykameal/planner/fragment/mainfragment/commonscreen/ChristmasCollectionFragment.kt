@@ -98,6 +98,10 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                sessionManagement.setCookBookId("")
+                sessionManagement.setCookBookName("")
+                sessionManagement.setCookBookImage("")
+                sessionManagement.setCookBookType("")
                 findNavController().navigateUp()
             }
         })
@@ -178,6 +182,7 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
             val apiModel = Gson().fromJson(data, CookBookListApiResponse::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
+                localData.clear()
                 apiModel.data?.let { localData.addAll(it) }
                 if (localData.size>0){
                     adapterCookBookDetailsItem = AdapterCookBookDetailsItem(localData, requireActivity(),this)
@@ -209,6 +214,10 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         }
 
         binding!!.imgBackChristmas.setOnClickListener{
+            sessionManagement.setCookBookId("")
+            sessionManagement.setCookBookName("")
+            sessionManagement.setCookBookImage("")
+            sessionManagement.setCookBookType("")
             findNavController().navigateUp()
         }
 
@@ -408,11 +417,6 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         dialogMoveRecipe.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
         dialogMoveRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val rlMove = dialogMoveRecipe.findViewById<RelativeLayout>(R.id.rlMove)
-        val rlSelectChristmas = dialogMoveRecipe.findViewById<RelativeLayout>(R.id.rlSelectChristmas)
-        val relSelectedSnack = dialogMoveRecipe.findViewById<RelativeLayout>(R.id.relSelectedSnack)
-        val tvChristmas = dialogMoveRecipe.findViewById<TextView>(R.id.tvChristmas)
-        val rlSelectBirthday = dialogMoveRecipe.findViewById<RelativeLayout>(R.id.rlSelectBirthday)
-        val rlSelectParty = dialogMoveRecipe.findViewById<RelativeLayout>(R.id.rlSelectParty)
         val imgCrossDiscardChanges = dialogMoveRecipe.findViewById<ImageView>(R.id.imgCrossDiscardChanges)
 
         spinnerActivityLevel = dialogMoveRecipe.findViewById(R.id.spinnerActivityLevel)

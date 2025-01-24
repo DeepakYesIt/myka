@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -61,6 +63,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private var planType: String = "1"
     private val calendar = Calendar.getInstance()
     private var currentDate = Date() // Current date
+    private var currentDateLocal = Date() // Current date
     private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
 
     // Define global variables
@@ -73,6 +76,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -103,11 +107,14 @@ class CookedFragment : Fragment(), OnItemClickListener {
         return binding!!.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun initialize() {
 
         toggleFridgeToFreezer()
 
-        updateWeek()
+
+        // Display current week dates
+        showWeekDates()
 
         binding!!.imageBreakFastCreate.setOnClickListener {
             findNavController().navigate(R.id.addMealCookedFragment)
@@ -160,19 +167,16 @@ class CookedFragment : Fragment(), OnItemClickListener {
         binding!!.relCalendarYear.setOnClickListener {
             if (binding!!.llCalendarViewEvents.visibility == View.VISIBLE) {
                 binding!!.llCalendarViewEvents.visibility = View.GONE
+                binding!!.dropdown.setBackgroundResource(R.drawable.drop_down_small_icon)
             } else {
                 binding!!.llCalendarViewEvents.visibility = View.VISIBLE
+                binding!!.dropdown.setBackgroundResource(R.drawable.drop_up_small_icon)
             }
         }
 
         binding!!.textAddMeals.setOnClickListener {
             findNavController().navigate(R.id.addMealCookedFragment)
         }
-
-        // Display current week dates
-        showWeekDates()
-
-
 
 
         if (BaseApplication.isOnline(requireActivity())) {
@@ -183,13 +187,9 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
 
 
-
-
-
-
-
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     fun showWeekDates() {
         val (startDate, endDate) = getWeekDates(currentDate)
@@ -202,8 +202,21 @@ class CookedFragment : Fragment(), OnItemClickListener {
         daysBetween.forEach { println(it) }
         binding!!.textMonthAndYear.text = BaseApplication.formatonlyMonthYear(startDate)
         binding!!.textWeekRange.text = "" + formatDate(startDate) + "-" + formatDate(endDate)
+
+
         // Update the RecyclerView
-        calendarAdapter = CalendarDayDateAdapter(getDaysBetween(startDate, endDate)) {
+        val dateListLocal = getDaysBetween(startDate, endDate)
+
+        dateListLocal.forEach { dateModel ->
+            val date=BaseApplication.formatDate(currentDateLocal.toString())
+            if (date == dateModel.date){
+                dateModel.status=true
+            }else{
+                dateModel.status=false
+            }
+        }
+
+        calendarAdapter = CalendarDayDateAdapter(dateListLocal) {
             // Handle item click if needed
             val dateList = getDaysBetween(startDate, endDate)
             // Update the status of the item at the target position
@@ -223,20 +236,6 @@ class CookedFragment : Fragment(), OnItemClickListener {
         // Update the RecyclerView
         binding!!.recyclerViewWeekDays.adapter = calendarAdapter
 
-        /*       binding!!.recyclerViewWeekDays.adapter = CalendarDayDateAdapter(getDaysBetween(startDate, endDate)) {
-                   val dateList = getDaysBetween(startDate, endDate)
-                   // Update the status of the item at the target position
-                   dateList.forEachIndexed { index, dateModel ->
-                       if (index==it){
-                           dateModel.status=true
-                       }else{
-                           dateModel.status=false
-                       }
-                   }
-                   // Handle item click if needed
-                   currentDateSelected= dateList[it].date
-                   calendarAdapter!!.updateList(dateList)
-               }*/
     }
 
     private fun getWeekDates(currentDate: Date): Pair<Date, Date> {
@@ -261,8 +260,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private fun getDaysBetween(startDate: Date, endDate: Date): MutableList<DateModel> {
         val dateList = mutableListOf<DateModel>()
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // Format for the date
-        val dayFormat =
-            SimpleDateFormat("EEEE", Locale.getDefault()) // Format for the day name (e.g., Monday)
+        val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault()) // Format for the day name (e.g., Monday)
 
         val calendar = Calendar.getInstance()
         calendar.time = startDate
@@ -425,22 +423,6 @@ class CookedFragment : Fragment(), OnItemClickListener {
     }
 
 
-    @SuppressLint("SetTextI18n")
-    private fun updateWeek() {
-        val startOfWeek = calendar.apply {
-            set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-        }.time
-
-        val endOfWeek = calendar.apply {
-            add(Calendar.DAY_OF_WEEK, 6)
-        }.time
-
-        binding!!.textWeekRange.text = "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
-        binding!!.recyclerViewWeekDays.adapter = calendarDayAdapter
-        binding!!.recyclerViewWeekDays.adapter = CalendarDayIndicatorAdapter(getDaysOfWeek()) {
-        }
-    }
-
     private fun getDaysOfWeek(): List<CalendarDataModel.Day> {
 
         val days = mutableListOf<CalendarDataModel.Day>()
@@ -495,6 +477,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
+
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {

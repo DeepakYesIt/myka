@@ -329,6 +329,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             binding!!.relTittleList.visibility = View.VISIBLE
             binding!!.relServingsPeople.visibility = View.VISIBLE
             binding!!.layBottomPlanBasket.visibility = View.VISIBLE
+            binding!!.relIngSelectAll.visibility = View.VISIBLE
             binding!!.webView.visibility = View.GONE
             if (viewModel.getRecipeData()?.size!! > 0) {
                 // Update the drawable based on the selectAll state

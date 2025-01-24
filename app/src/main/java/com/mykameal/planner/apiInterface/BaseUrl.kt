@@ -1,7 +1,9 @@
 package com.mykameal.planner.apiInterface
 
+import com.mykameal.planner.BuildConfig
+
 object BaseUrl {
-    const val  baseUrl="https://myka.tgastaging.com/api/"
-    const val  imageBaseUrl="https://myka.tgastaging.com"
+    const val  baseUrl=BuildConfig.BASE_URL
+    const val  imageBaseUrl=BuildConfig.IMAGE_BASE_URL
 
 }

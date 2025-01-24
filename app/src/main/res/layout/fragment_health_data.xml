@@ -6,47 +6,52 @@
     android:layout_height="match_parent"
     tools:context=".fragment.mainfragment.profilesetting.HealthDataFragment">
 
+    <RelativeLayout
+        android:id="@+id/relToolbar"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="@dimen/_16sdp"
+        android:layout_marginTop="@dimen/_25sdp"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imgBackHealthData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/_5sdp"
+            android:src="@drawable/black_images_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:fontFamily="@font/montserrat_semibold"
+            android:text="Health Data"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_13sdp" />
+
+    </RelativeLayout>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/relToolbar"
+        android:layout_marginHorizontal="@dimen/_16sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:paddingBottom="@dimen/_10sdp"
         android:fillViewport="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/_16sdp"
-            android:layout_marginTop="@dimen/_25sdp">
+            android:layout_height="wrap_content">
 
-            <RelativeLayout
-                android:id="@+id/relToolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/imgBackHealthData"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:padding="@dimen/_5sdp"
-                    android:src="@drawable/black_images_back" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:layout_marginStart="@dimen/_20sdp"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:text="Health Data"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_13sdp" />
-
-            </RelativeLayout>
 
             <TextView
                 android:id="@+id/tvGeneral"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/relToolbar"
                 android:layout_marginTop="@dimen/_20sdp"
                 android:fontFamily="@font/poppins_medium"
                 android:text="General"
@@ -332,10 +337,97 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/relActivityLevel"
+                android:id="@+id/relweight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/relEnterHeight"
+                android:layout_marginTop="@dimen/_15sdp">
+
+                <ImageView
+                    android:id="@+id/imgweight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/height_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_toEndOf="@+id/imgweight"
+                    android:text="Weight "
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_14sdp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/relEnterweight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relweight"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:background="@drawable/circular_edittext_bg">
+
+                <EditText
+                    android:id="@+id/etweight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:background="@null"
+                    android:fontFamily="@font/poppins"
+                    android:gravity="center_vertical"
+                    android:hint="Enter Weight"
+                    android:paddingVertical="@dimen/_10sdp"
+                    android:paddingStart="@dimen/_15sdp"
+                    android:paddingEnd="@dimen/_15sdp"
+                    android:singleLine="true"
+                    android:text=""
+                    android:inputType="numberDecimal"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/light_black"
+                    android:textSize="@dimen/_12sdp" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/height_type_bg"
+                    android:layout_margin="@dimen/_5sdp"
+                    android:layout_alignParentEnd="true">
+
+                    <com.skydoves.powerspinner.PowerSpinnerView
+                        android:id="@+id/spinnerweight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:text="Type"
+                        android:padding="10dp"
+                        android:paddingStart="@dimen/_20sdp"
+                        android:textColor="#3C4541"
+                        android:textColorHint="#3C4541"
+                        android:textSize="14.5sp"
+                        app:spinner_arrow_gravity="end"
+                        app:spinner_arrow_padding="8dp"
+                        app:spinner_arrow_show="true"
+                        app:spinner_arrow_tint="#000"
+                        app:spinner_divider_show="false"
+                        app:spinner_popup_background="@drawable/bg_cover"
+                        app:spinner_item_height="46dp"
+                        app:spinner_popup_animation="fade"
+                        app:spinner_popup_elevation="14dp"
+                        tools:ignore="RtlSymmetry" />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/relActivityLevel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/relEnterweight"
                 android:layout_marginTop="@dimen/_15sdp">
 
 
