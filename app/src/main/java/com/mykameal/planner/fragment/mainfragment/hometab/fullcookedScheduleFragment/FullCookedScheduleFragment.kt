@@ -25,12 +25,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
-import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.OnItemLongClickListener
 import com.mykameal.planner.OnItemSelectUnSelectListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
-import com.mykameal.planner.adapter.AdapterFoodListItem
 import com.mykameal.planner.adapter.CalendarDayAdapter
 import com.mykameal.planner.adapter.CalendarDayDateAdapter
 import com.mykameal.planner.adapter.IngredientsBreakFastAdapter
@@ -44,8 +42,7 @@ import com.mykameal.planner.databinding.FragmentFullCookedScheduleBinding
 import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.Breakfast
 import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.CookedTabModel
 import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.CookedTabModelData
-import com.mykameal.planner.fragment.mainfragment.hometab.fullcookedScheduleFragment.viewmodel.FUllCookingScheduleViewModel
-import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.DataPlayByDate
+import com.mykameal.planner.fragment.mainfragment.hometab.fullcookedScheduleFragment.viewmodel.FullCookingScheduleViewModel
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
 import com.mykameal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykameal.planner.messageclass.ErrorMessage
@@ -76,11 +73,9 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
     private var dataList3: MutableList<DataModel> = mutableListOf()
     private var calendarDayAdapter: CalendarDayAdapter? = null
     private var calendarAdapter: CalendarDayDateAdapter? = null
-    private var statuses: String? = ""
-    private var checkStatus: Boolean? = false
 
     private var recipesDateModel: CookedTabModelData? = null
-    private lateinit var fUllCookingScheduleViewModel: FUllCookingScheduleViewModel
+    private lateinit var fUllCookingScheduleViewModel: FullCookingScheduleViewModel
     private val calendar = Calendar.getInstance()
     private val dateFormat1 = SimpleDateFormat("dd MMM", Locale.getDefault())
 
@@ -106,7 +101,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         currentDateSelected = BaseApplication.currentDateFormat().toString()
 
         fUllCookingScheduleViewModel =
-            ViewModelProvider(requireActivity())[FUllCookingScheduleViewModel::class.java]
+            ViewModelProvider(requireActivity())[FullCookingScheduleViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(),
             object : OnBackPressedCallback(true) {
@@ -130,9 +125,9 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         }
 
         onClickFalseEnabled()
-        fullCookSchBreakFastModel()
+   /*     fullCookSchBreakFastModel()
         fullCookSchLunchModel()
-        fullCookSchDinnerModel()
+        fullCookSchDinnerModel()*/
         initialize()
 
         // Display current week dates
@@ -645,8 +640,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                 DragEvent.ACTION_DROP -> {
                     // Retrieve the dragged data
                     val clipData = dragEvent.clipData
-                    val draggedItem =
-                        clipData.getItemAt(0).text.toString() // Assuming text represents the dragged item
+                    val draggedItem = clipData.getItemAt(0).text.toString() // Assuming text represents the dragged item
 
                     // Find the target position in RecyclerView
                     val recyclerView = view as RecyclerView // Cast the view to RecyclerView
@@ -931,6 +925,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                 BaseApplication.dismissMe()
                 handleLikeAndUnlikeApiResponse(it, item, type, mealList, position, dialogAddRecipe)
             }, item.recipe?.uri.toString(), likeType, cookBookType)
+
         }
     }
 

@@ -123,11 +123,13 @@
         android:name="com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen.SearchFragment"
         android:label="SearchFragment"
         tools:layout="@layout/fragment_search"/>
+
     <fragment
-        android:id="@+id/addRecipeFragment"
-        android:name="com.mykameal.planner.fragment.mainfragment.addrecipetab.AddRecipeFragment"
-        android:label="fragment_add_recipe"
-        tools:layout="@layout/fragment_add_recipe" />
+        android:id="@+id/createRecipeImageFragment"
+        android:name="com.mykameal.planner.fragment.mainfragment.addrecipetab.createrecipefromimage.CreateRecipeImageFragment"
+        android:label="fragment_create_recipe_image"
+        tools:layout="@layout/fragment_create_recipe_image" />
+
     <fragment
         android:id="@+id/planFragment"
         android:name="com.mykameal.planner.fragment.mainfragment.plantab.PlanFragment"
@@ -348,6 +350,5 @@
         android:name="com.mykameal.planner.fragment.mainfragment.commonscreen.PaymentMethodFragment"
         android:label="fragment_payment_method"
         tools:layout="@layout/fragment_payment_method" />
-
 
 </navigation>

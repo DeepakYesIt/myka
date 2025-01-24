@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         binding!!.llCooked.setOnClickListener(this)
         binding!!.relAddRecipeWeb.setOnClickListener(this)
         binding!!.relCreateNewRecipe.setOnClickListener(this)
+        binding!!.relRecipeImage.setOnClickListener(this)
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
             != PackageManager.PERMISSION_GRANTED) {
@@ -276,6 +277,11 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             R.id.relCreateNewRecipe -> {
                 binding!!.cardViewAddRecipe.visibility = View.GONE
                 findNavController(R.id.frameContainerMain).navigate(R.id.createRecipeFragment)
+            }
+
+            R.id.relRecipeImage->{
+                findNavController(R.id.frameContainerMain).navigate(R.id.createRecipeImageFragment)
+                binding!!.cardViewAddRecipe.visibility = View.GONE
             }
         }
     }

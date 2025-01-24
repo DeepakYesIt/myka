@@ -812,6 +812,27 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
         }
     }
 
+
+    override suspend fun getScheduleApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        date: String,planType:String
+    ) {
+        try {
+            api.getScheduleApi(date,planType).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
     override suspend fun likeUnlikeRequestApi(
         successCallback: (response: NetworkResult<String>) -> Unit,
         uri: String,

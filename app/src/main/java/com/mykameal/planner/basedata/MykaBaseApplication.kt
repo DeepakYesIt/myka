@@ -49,92 +49,142 @@ class MykaBaseApplication : Application() {
         dexOutputDir.setReadOnly()
 
         val afDevKey: String = AppsFlyerConstants.afDevKey
-        // Make sure you remove the following line when building to production
+
+        // Initialize AppsFlyer
+        AppsFlyerLib.getInstance().init(afDevKey, object : AppsFlyerConversionListener {
+                override fun onConversionDataSuccess(data: Map<String, Any>) {
+                    Log.d("AppsFlyer", "Conversion Data: $data")
+                }
+
+                override fun onConversionDataFail(error: String) {
+                    Log.e("AppsFlyer", "Conversion Data Error: $error")
+                }
+
+                override fun onAppOpenAttribution(data: Map<String, String>) {
+                    Log.d("AppsFlyer", "App Open Attribution: $data")
+                }
+
+                override fun onAttributionFailure(error: String) {
+                    Log.e("AppsFlyer", "Attribution Error: $error")
+                }
+            }, this)
+
+        // Enable debugging during development (disable in production)
         AppsFlyerLib.getInstance().setDebugLog(true)
-        AppsFlyerLib.getInstance().setMinTimeBetweenSessions(0)
-        //set the OneLink template id for share invite links
+
+        // Start AppsFlyer
+        AppsFlyerLib.getInstance().start(this)
         AppsFlyerLib.getInstance().setAppInviteOneLink("LQhk")
 
-        val afRevenueBuilder: AppsFlyerAdRevenue.Builder = AppsFlyerAdRevenue.Builder(this)
-        AppsFlyerAdRevenue.initialize(afRevenueBuilder.build())
+        // Listen for deep links
+        AppsFlyerLib.getInstance().subscribeForDeepLink { deepLinkResult ->
+            when (deepLinkResult.status) {
+                DeepLinkResult.Status.FOUND -> {
+                    val deepLink = deepLinkResult.deepLink
+                    Log.d("AppsFlyer", "Deep link: ${deepLink?.deepLinkValue}")
+                }
 
-        AppsFlyerLib.getInstance().subscribeForDeepLink(DeepLinkListener { deepLinkResult ->
-            val dlStatus = deepLinkResult.status
-            if (dlStatus == DeepLinkResult.Status.FOUND) {
-                Log.d(LOG_TAG,"Deep link found"
-                )
-            } else if (dlStatus == DeepLinkResult.Status.NOT_FOUND) {
-                Log.d(LOG_TAG, "Deep link not found")
-                return@DeepLinkListener
-            } else {
-                // dlStatus == DeepLinkResult.Status.ERROR
-                val dlError = deepLinkResult.error
-                Log.d(LOG_TAG, "There was an error getting Deep Link data: $dlError")
-                return@DeepLinkListener
-            }
-            val deepLinkObj = deepLinkResult.deepLink
-            try {
-                Log.d(LOG_TAG, "The DeepLink data is: $deepLinkObj")
-            } catch (e: Exception) {
-                Log.d(LOG_TAG, "DeepLink data came back null")
-                return@DeepLinkListener
-            }
-            // An example for using is_deferred
-            if (deepLinkObj.isDeferred!!) {
-                Log.d(LOG_TAG, "This is a deferred deep link")
-                if (deferred_deep_link_processed_flag == true) {
-                    Log.d(LOG_TAG,
-                        "Deferred deep link was already processed by GCD. This iteration can be skipped.")
-                    deferred_deep_link_processed_flag = false
-                    return@DeepLinkListener
+                DeepLinkResult.Status.NOT_FOUND -> {
+                    Log.d("AppsFlyer", "Deep link not found.")
                 }
-            } else {
-                Log.d(LOG_TAG,
-                    "This is a direct deep link"
-                )
-            }
-            // An example for getting deep_link_value
-            var fruitName: String? = ""
-            try {
-                fruitName = deepLinkObj.deepLinkValue
-                var referrerId: String? = ""
-                val dlData = deepLinkObj.clickEvent
 
-                // * Next if statement is optional *
-                // Our sample app's user-invite carries the referrerID in deep_link_sub2
-                // See the user-invite section in FruitActivity.java
-                if (dlData.has("deep_link_sub2")) {
-                    referrerId = deepLinkObj.getStringValue("deep_link_sub2")
-                    Log.d(LOG_TAG, "The referrerID is: $referrerId"
-                    )
-                } else {
-                    Log.d(LOG_TAG, "deep_link_sub2/Referrer ID not found")
+                DeepLinkResult.Status.ERROR -> {
+                    Log.e("AppsFlyer", "Deep link error: ${deepLinkResult.error}")
                 }
-                if (fruitName == null || fruitName == "") {
-                    Log.d(LOG_TAG,
-                        "deep_link_value returned null"
-                    )
-                    fruitName = deepLinkObj.getStringValue("fruit_name")
-                    if (fruitName == null || fruitName == "") {
-                        Log.d(LOG_TAG, "could not find fruit name")
-                        return@DeepLinkListener
-                    }
-                    Log.d(LOG_TAG,
-                        "fruit_name is $fruitName. This is an old link"
-                    )
-                }
-                Log.d(LOG_TAG,
-                    "The DeepLink will route to: $fruitName"
-                )
-                // This marks to GCD that UDL already processed this deep link.
-                // It is marked to both DL and DDL, but GCD is relevant only for DDL
-                deferred_deep_link_processed_flag = true
-            } catch (e: Exception) {
-                Log.d(LOG_TAG, "There's been an error: $e"
-                )
-                return@DeepLinkListener
             }
-            /*goToFruit(fruitName, deepLinkObj)*/
+        }
+    }
+
+
+    /* val afDevKey: String = AppsFlyerConstants.afDevKey
+     // Make sure you remove the following line when building to production
+     AppsFlyerLib.getInstance().setDebugLog(true)
+     AppsFlyerLib.getInstance().setMinTimeBetweenSessions(0)
+     //set the OneLink template id for share invite links
+     AppsFlyerLib.getInstance().setAppInviteOneLink("LQhk")
+
+
+
+     val afRevenueBuilder: AppsFlyerAdRevenue.Builder = AppsFlyerAdRevenue.Builder(this)
+     AppsFlyerAdRevenue.initialize(afRevenueBuilder.build())
+
+     AppsFlyerLib.getInstance().subscribeForDeepLink(DeepLinkListener { deepLinkResult ->
+         val dlStatus = deepLinkResult.status
+         if (dlStatus == DeepLinkResult.Status.FOUND) {
+             Log.d(LOG_TAG,"Deep link found"
+             )
+         } else if (dlStatus == DeepLinkResult.Status.NOT_FOUND) {
+             Log.d(LOG_TAG, "Deep link not found")
+             return@DeepLinkListener
+         } else {
+             // dlStatus == DeepLinkResult.Status.ERROR
+             val dlError = deepLinkResult.error
+             Log.d(LOG_TAG, "There was an error getting Deep Link data: $dlError")
+             return@DeepLinkListener
+         }
+         val deepLinkObj = deepLinkResult.deepLink
+         try {
+             Log.d(LOG_TAG, "The DeepLink data is: $deepLinkObj")
+         } catch (e: Exception) {
+             Log.d(LOG_TAG, "DeepLink data came back null")
+             return@DeepLinkListener
+         }
+         // An example for using is_deferred
+         if (deepLinkObj.isDeferred!!) {
+             Log.d(LOG_TAG, "This is a deferred deep link")
+             if (deferred_deep_link_processed_flag == true) {
+                 Log.d(LOG_TAG,
+                     "Deferred deep link was already processed by GCD. This iteration can be skipped.")
+                 deferred_deep_link_processed_flag = false
+                 return@DeepLinkListener
+             }
+         } else {
+             Log.d(LOG_TAG,
+                 "This is a direct deep link"
+             )
+         }
+         // An example for getting deep_link_value
+         var fruitName: String? = ""
+         try {
+             fruitName = deepLinkObj.deepLinkValue
+             var referrerId: String? = ""
+             val dlData = deepLinkObj.clickEvent
+
+             // * Next if statement is optional *
+             // Our sample app's user-invite carries the referrerID in deep_link_sub2
+             // See the user-invite section in FruitActivity.java
+             if (dlData.has("deep_link_sub2")) {
+                 referrerId = deepLinkObj.getStringValue("deep_link_sub2")
+                 Log.d(LOG_TAG, "The referrerID is: $referrerId"
+                 )
+             } else {
+                 Log.d(LOG_TAG, "deep_link_sub2/Referrer ID not found")
+             }
+             if (fruitName == null || fruitName == "") {
+                 Log.d(LOG_TAG,
+                     "deep_link_value returned null"
+                 )
+                 fruitName = deepLinkObj.getStringValue("fruit_name")
+                 if (fruitName == null || fruitName == "") {
+                     Log.d(LOG_TAG, "could not find fruit name")
+                     return@DeepLinkListener
+                 }
+                 Log.d(LOG_TAG,
+                     "fruit_name is $fruitName. This is an old link"
+                 )
+             }
+             Log.d(LOG_TAG,
+                 "The DeepLink will route to: $fruitName"
+             )
+             // This marks to GCD that UDL already processed this deep link.
+             // It is marked to both DL and DDL, but GCD is relevant only for DDL
+             deferred_deep_link_processed_flag = true
+         } catch (e: Exception) {
+             Log.d(LOG_TAG, "There's been an error: $e"
+             )
+             return@DeepLinkListener
+         }
+         *//*goToFruit(fruitName, deepLinkObj)*//*
         })
 
         val conversionListener: AppsFlyerConversionListener = object : AppsFlyerConversionListener {
@@ -162,8 +212,8 @@ class MykaBaseApplication : Application() {
                                     conversionDataMap["fruit_name"]!!
                             }
                             val fruitNameStr = conversionDataMap["deep_link_value"] as String?
-//                            val deepLinkData: DeepLink = mapToDeepLinkObject(conversionDataMap)!!
-                            /*goToFruit(fruitNameStr, deepLinkData)*/
+                            val deepLinkData: DeepLink = mapToDeepLinkObject(conversionDataMap)!!
+                            *//*goToFruit(fruitNameStr, deepLinkData)*//*
                         }
                     } else {
                         Log.d(LOG_TAG,
@@ -198,9 +248,5 @@ class MykaBaseApplication : Application() {
         }
         AppsFlyerLib.getInstance().init(afDevKey, conversionListener, this)
         AppsFlyerLib.getInstance().start(this)
-
-    }
-
-
-
+*/
 }

@@ -277,6 +277,10 @@ interface ApiInterface {
     @POST(ApiEndPoint.getMealsUrl)
     suspend fun planDateRequestApi(@Field("date") date: String,@Field("plan_type") planType:String): Response<JsonObject>
 
+    @FormUrlEncoded
+    @POST(ApiEndPoint.getSchedule)
+    suspend fun getScheduleApi(@Field("date") date: String,@Field("plan_type") planType:String): Response<JsonObject>
+
 
     @FormUrlEncoded
     @POST(ApiEndPoint.likeUnlikeUrl)
