@@ -36,11 +36,13 @@ class AdapterPlanBreakFast(var datalist: MutableList<BreakfastModel>?, private v
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         try {
+
             val item= datalist?.get(position)
 
             if (item?.recipe?.label!=null){
                 holder.binding.tvBreakfast.text = item.recipe.label
             }
+
             if (item?.recipe?.totalTime!=null){
                 holder.binding.tvTime.text = ""+ item.recipe.totalTime +" min "
             }

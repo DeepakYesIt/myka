@@ -930,7 +930,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             fUllCookingScheduleViewModel.likeUnlikeRequest({
                 BaseApplication.dismissMe()
                 handleLikeAndUnlikeApiResponse(it, item, type, mealList, position, dialogAddRecipe)
-            }, item.recipe.uri.toString(), likeType, cookBookType)
+            }, item.recipe?.uri.toString(), likeType, cookBookType)
         }
     }
 

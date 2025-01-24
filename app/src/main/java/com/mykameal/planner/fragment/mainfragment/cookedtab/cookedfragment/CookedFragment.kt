@@ -527,7 +527,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
         val item = mealList?.get(position!!)
         if (item != null) {
-            if (item.recipe.uri !=null){
+            if (item.recipe?.uri !=null){
                 if (apiType.equals("like",true)){
                     val newLikeStatus = if (item.is_like == 0) "1" else "0"
                     if (newLikeStatus.equals("0",true)){

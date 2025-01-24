@@ -60,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_semibold"
-                android:text="Pasta"
+                android:text=""
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_marginEnd="@dimen/_5sdp"
                 android:singleLine="true"

@@ -32,7 +32,10 @@ class AdapterFoodListItem(var itemList: MutableList<Breakfast>,var type:String?,
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.tvBreakfast.text = itemList[position].recipe.label
+        if (itemList[position].recipe?.label!=null){
+            holder.binding.tvBreakfast.text = itemList[position].recipe?.label
+        }
+
 
         if (itemList[position].is_like!=null){
             if (itemList[position].is_like ==0 ){
@@ -55,9 +58,9 @@ class AdapterFoodListItem(var itemList: MutableList<Breakfast>,var type:String?,
             holder.binding.tvServes.text="Serves "+itemList[position].servings.toString()
         }
 
-        if (itemList[position].recipe.images.SMALL.url !=null){
+        if (itemList[position].recipe?.images?.SMALL?.url !=null){
             Glide.with(requireActivity)
-                .load(itemList[position].recipe.images.SMALL.url)
+                .load(itemList[position].recipe?.images?.SMALL?.url)
                 .error(R.drawable.no_image)
                 .placeholder(R.drawable.no_image)
                 .listener(object : RequestListener<Drawable> {
