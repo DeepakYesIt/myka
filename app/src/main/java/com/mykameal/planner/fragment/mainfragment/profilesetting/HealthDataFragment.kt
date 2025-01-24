@@ -74,6 +74,8 @@ class HealthDataFragment : Fragment() {
 
         binding.spinnerHeight.setItems(listOf("Inch", "Centimeter", "Feet"))
 
+        binding.spinnerweight.setItems(listOf("Kilograms", "Grams","Milligrams","Pounds","Ounces","Stones"))
+
         binding.imgBackHealthData.setOnClickListener {
             viewModel.clearData()
             findNavController().navigateUp()
@@ -126,7 +128,9 @@ class HealthDataFragment : Fragment() {
                 viewModel.getProfileData()?.calories.toString(),
                 viewModel.getProfileData()?.fat.toString(),
                 viewModel.getProfileData()?.carbs.toString(),
-                viewModel.getProfileData()?.protien.toString()
+                viewModel.getProfileData()?.protien.toString(),
+                binding.etweight.text.toString(),
+                binding.spinnerweight.text.toString().trim()
             )
         }
     }
@@ -279,9 +283,17 @@ class HealthDataFragment : Fragment() {
             binding.etHeight.setText(data.height)
         }
 
+        if (data.weight != null && !data.weight.equals("null",true)) {
+            binding.etweight.setText(data.weight)
+        }
+
 
         if (data.height_type != null && !data.height_type.equals("null",true)) {
             binding.spinnerHeight.text = data.height_type
+        }
+
+        if (data.weight_type != null && !data.weight_type.equals("null",true)) {
+            binding.spinnerweight.text = data.weight_type
         }
 
         if (data.dob != null && !data.dob.equals("null",true)) {

@@ -33,6 +33,20 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
+    }
+
+    android {
+        buildTypes {
+            all {
+                buildConfigField("String", "BASE_URL", "\"https://myka.tgastaging.com/api/\"")
+                buildConfigField("String", "IMAGE_BASE_URL", "\"https://myka.tgastaging.com\"")
+            }
+        }
+    }
+
+
+    buildFeatures {
         viewBinding = true
         dataBinding= true
     }

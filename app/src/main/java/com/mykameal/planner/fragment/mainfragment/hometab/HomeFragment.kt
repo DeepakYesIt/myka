@@ -76,6 +76,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         (activity as MainActivity?)?.changeBottom("home")
 
 
+        cookbookList.clear()
         val data= com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favourites",0,"",0)
         cookbookList.add(0,data)
 
@@ -144,15 +145,11 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
             if (userDataLocal.userData!=null && userDataLocal.userData!!.size>0){
                 binding!!.relPlanMeal.visibility=View.GONE
-                binding!!.imageCookedMeals.visibility=View.GONE
-                binding!!.rlSeeAllBtn.visibility=View.VISIBLE
                 binding!!.llRecipesCooked.visibility=View.VISIBLE
                 recipeCookedAdapter = RecipeCookedAdapter(userDataLocal.userData,requireActivity(),this)
                 binding!!.rcyRecipesCooked.adapter = recipeCookedAdapter
             }else{
                 binding!!.relPlanMeal.visibility=View.VISIBLE
-                binding!!.imageCookedMeals.visibility=View.VISIBLE
-                binding!!.rlSeeAllBtn.visibility=View.GONE
                 binding!!.llRecipesCooked.visibility=View.GONE
             }
 
@@ -164,20 +161,13 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 binding!!.imageCheckSav.visibility=View.VISIBLE
             }
 
-       /*     if (userDataLocal.graph_value==0){
-                binding!!.imagePlanMeal.visibility=View.GONE
-                binding!!.imageCheckSav.visibility=View.VISIBLE
-            }else{
-                binding!!.imagePlanMeal.visibility=View.GONE
-                binding!!.imageCheckSav.visibility=View.VISIBLE
-            }*/
-
             if (userDataLocal.date!=null){
                 val name=BaseApplication.getColoredSpanned("Next meal to be cooked on ","#3C4541") + BaseApplication.getColoredSpanned(data.date+".","#06C169")
                 binding!!.tvHomeDesc.text=Html.fromHtml(name)
             }else{
                 binding!!.tvHomeDesc.text="Your cooking schedule is empty! Tap the button below to add a meal and get started."
             }
+
 
             if (userDataLocal.frezzer!=null){
 
@@ -230,7 +220,17 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 }else{
                     binding!!.layTeatime.visibility=View.GONE
                 }
+
             }
+
+
+            /*if (allZero) {
+                binding!!.rlSeeAllBtn.visibility=View.VISIBLE
+                binding!!.imageCookedMeals.visibility=View.GONE
+            }else{
+                binding!!.imageCookedMeals.visibility=View.VISIBLE
+                binding!!.rlSeeAllBtn.visibility=View.GONE
+            }*/
 
         }catch (e:Exception){
             showAlert(e.message, false)
@@ -392,22 +392,12 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
     override fun onClick(item: View?) {
         when (item!!.id) {
-
             R.id.textSeeAll->{
                 findNavController().navigate(R.id.fullCookedScheduleFragment)
             }
-
             R.id.rlSeeAllBtn -> {
                 findNavController().navigate(R.id.cookedFragment)
-//                findNavController().navigate(R.id.cookedFragment)
             }
-
-          /*  R.id.relMonthlySavings->{
-                binding!!.imagePlanMeal.visibility=View.GONE
-                binding!!.imageCheckSav.visibility=View.VISIBLE
-
-            }
-*/
             R.id.imageCheckSav->{
                 findNavController().navigate(R.id.statisticsGraphFragment)
             }
@@ -417,7 +407,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
             R.id.imageCookedMeals->{
                 findNavController().navigate(R.id.cookedFragment)
-//                binding!!.rlSeeAllBtn.visibility=View.VISIBLE
             }
             R.id.imgBasketIcon->{
                 findNavController().navigate(R.id.basketScreenFragment)
@@ -426,31 +415,20 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             R.id.imgHearRedIcons->{
                 findNavController().navigate(R.id.cookBookFragment)
             }
-
             R.id.imageProfile->{
                 findNavController().navigate(R.id.settingProfileFragment)
             }
-
             R.id.rlPlanAMealBtn->{
                 findNavController().navigate(R.id.planFragment)
             }
-
             R.id.imgFreeTrial->{
                 findNavController().navigate(R.id.homeSubscriptionFragment)
             }
-
             ///for checking purpose only
             R.id.tv_name->{
                 findNavController().navigate(R.id.statisticsGraphFragment)
             }
 
-          /*  R.id.imageRecipeSeeAll->{
-                binding!!.tvHomeDesc.text=getString(R.string.sept_meal_planner)
-                binding!!.relPlanMeal.visibility=View.GONE
-                binding!!.llRecipesCooked.visibility=View.VISIBLE
-                binding!!.tvHomeDesc.visibility=View.GONE
-                binding!!.tvHomeSeptDate.visibility=View.VISIBLE
-            }*/
         }
     }
 
@@ -466,7 +444,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         }else{
             findNavController().navigate(R.id.recipeDetailsFragment)
         }*/
-
 
         when (status) {
             "1" -> {
@@ -518,9 +495,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
         getCookBookList()
 
-
         relCreateNewCookBook.setOnClickListener{
-//            statuses="newCook"
             relCreateNewCookBook.setBackgroundResource(R.drawable.light_green_rectangular_bg)
             imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
             dialogAddRecipe.dismiss()
@@ -528,26 +503,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             bundle.putString("value","New")
             bundle.putString("uri", userDataLocal.userData?.get(position!!)?.recipe?.url)
             findNavController().navigate(R.id.createCookBookFragment,bundle)
-//            relFavourites.setBackgroundResource(0)
-//            checkStatus=false
         }
-
-//        imgCheckBoxOrange.setOnClickListener{
-//            if (checkStatus==true){
-//                statuses=""
-//                imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
-//                relFavourites.setBackgroundResource(0)
-//                relCreateNewCookBook.setBackgroundResource(0)
-//                relCreateNewCookBook.background=null
-//                checkStatus=false
-//            }else{
-//                relFavourites.setBackgroundResource(R.drawable.light_green_rectangular_bg)
-//                relCreateNewCookBook.setBackgroundResource(0)
-//                statuses="favourites"
-//                imgCheckBoxOrange.setImageResource(R.drawable.orange_checkbox_images)
-//                checkStatus=true
-//            }
-//        }
 
 
         rlDoneBtn.setOnClickListener{

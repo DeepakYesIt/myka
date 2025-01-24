@@ -4,13 +4,13 @@
     android:id="@+id/cardViews"
     android:layout_width="@dimen/_130sdp"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/_8sdp"
+    android:layout_margin="@dimen/_7sdp"
     android:elevation="@dimen/_10sdp"
     app:cardCornerRadius="@dimen/_10sdp">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/_7sdp">
+        android:layout_margin="@dimen/_5sdp">
         <RelativeLayout
             android:id="@+id/relBreakfast"
             android:layout_width="match_parent"
@@ -74,31 +74,36 @@
                 app:cardCornerRadius="@dimen/_8sdp"
                 android:layout_alignParentEnd="true"
                 android:visibility="gone"
-                android:layout_marginEnd="@dimen/_6sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_3sdp"
                 android:layout_below="@id/imgThreeDot"
                 app:cardBackgroundColor="@color/white">
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingVertical="@dimen/_5sdp"
-                    android:paddingHorizontal="@dimen/_5sdp">
+                    android:paddingVertical="@dimen/_2sdp"
+                    android:paddingHorizontal="@dimen/_2sdp">
 
                     <TextView
                         android:id="@+id/tvRemoveRecipe"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawablePadding="@dimen/_5sdp"
                         android:text="Remove Recipe"
+                        android:textSize="@dimen/_10sdp"
+                        android:layout_margin="@dimen/_5sdp"
                         app:drawableStartCompat="@drawable/remove_recipe_icon" />
 
                     <TextView
                         android:id="@+id/tvMoveRecipe"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/tvRemoveRecipe"
                         android:drawablePadding="@dimen/_5sdp"
+                        android:layout_margin="@dimen/_5sdp"
                         android:text="Move Recipe"
+                        android:textSize="@dimen/_10sdp"
                         app:drawableStartCompat="@drawable/move_icon" />
 
                 </RelativeLayout>

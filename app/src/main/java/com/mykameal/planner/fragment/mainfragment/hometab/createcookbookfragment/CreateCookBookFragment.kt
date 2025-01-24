@@ -22,6 +22,7 @@ import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.gson.Gson
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
+import com.mykameal.planner.apiInterface.BaseUrl
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.basedata.SessionManagement
@@ -100,6 +101,7 @@ class CreateCookBookFragment : Fragment() {
                 binding!!.llAddImages.visibility=View.GONE
                 binding!!.llAddImage.background=null
                 file = commonWorkUtils.getPath(requireContext(), uri)?.let { File(it) }
+                image=file.toString()
                 Glide.with(this)
                     .load(uri)
                     .placeholder(R.drawable.mask_group_icon)
@@ -121,6 +123,15 @@ class CreateCookBookFragment : Fragment() {
 
         if (!name.equals("",true)){
             binding!!.etEnterYourNewCookbook.setText(name)
+        }
+
+        if (!image.equals("")){
+
+            Glide.with(this)
+                .load(BaseUrl.imageBaseUrl+image)
+                .placeholder(R.drawable.mask_group_icon)
+                .error(R.drawable.mask_group_icon)
+                .into(binding!!.imageCookBook)
         }
 
         if (!status.equals("",true)){
@@ -207,7 +218,7 @@ class CreateCookBookFragment : Fragment() {
 
     /// add validation based on valid email or phone
     private fun validate(): Boolean {
-        if (file==null) {
+        if (image.equals("")) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.cookbookUpload, false)
             return false
         } else if (binding!!.etEnterYourNewCookbook.text.toString().trim().isEmpty()) {

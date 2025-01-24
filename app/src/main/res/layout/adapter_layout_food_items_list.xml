@@ -60,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_semibold"
-                android:text="Pasta"
+                android:text=""
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_marginEnd="@dimen/_5sdp"
                 android:singleLine="true"
@@ -79,11 +79,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_2sdp"
                     android:fontFamily="@font/poppins"
-                    android:drawableStart="@drawable/ic_food_clock"
+                    android:drawablePadding="@dimen/_8sdp"
                     android:singleLine="true"
-                    android:text="2 days ago"
+                    android:text="0 days ago"
                     android:textColor="#3C4541"
-                    android:textSize="@dimen/_10sdp" />
+                    android:textSize="@dimen/_10sdp"
+                    app:drawableStartCompat="@drawable/ic_food_clock" />
 
             </RelativeLayout>
 

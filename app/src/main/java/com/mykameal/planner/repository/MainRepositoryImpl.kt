@@ -519,8 +519,8 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
 
     override suspend fun upDateProfileRequestApi(
         successCallback: (response: NetworkResult<String>) -> Unit,
-        name:String,
-        bio:String,
+        name: String,
+        bio: String,
         genderType: String,
         dob: String,
         height: String,
@@ -530,11 +530,13 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
         calories: String,
         fat: String,
         carbs: String,
-        protien: String
+        protien: String,
+        weight: String,
+        weightType: String
     ) {
         try {
             api.userProfileUpdateApi(name,bio,genderType,dob,height,heightType,activityLevel,
-                heightProtein,calories,fat,carbs,protien).apply {
+                heightProtein,calories,fat,carbs,protien,weight,weightType).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

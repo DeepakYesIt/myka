@@ -22,6 +22,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mykameal.planner.R
@@ -143,6 +144,26 @@ object BaseApplication {
         val dateFormat = SimpleDateFormat("MMM, yyyy", Locale.getDefault())
         return dateFormat.format(date)
     }
+
+    fun formatDate(input: String): String? {
+        return try {
+            // Define the format of the input date string
+            val inputFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
+
+            // Define the desired output date format
+            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+            // Parse the input date string into a Date object
+            val date: Date? = inputFormat.parse(input)
+
+            // Format the Date object into the desired output format
+            date?.let { outputFormat.format(it) }
+        } catch (e: Exception) {
+            // Log or handle the exception as needed
+            "" // Return null if parsing fails
+        }
+    }
+
 
     fun currentDateFormat(): String? {
         val formatter = SimpleDateFormat("yyyy-MM-dd")

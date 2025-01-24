@@ -223,6 +223,10 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             binding!!.layProgess.root.visibility = View.GONE
         }
 
+        if (viewModel.getRecipeData()?.get(0)!!.review!=null){
+            binding!!.tvRating.text = ""+viewModel.getRecipeData()?.get(0)!!.review+"("+viewModel.getRecipeData()?.get(0)!!.review_number+")"
+        }
+
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.label != null) {
             binding!!.tvTitle.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.label
         }
@@ -329,6 +333,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             binding!!.relTittleList.visibility = View.VISIBLE
             binding!!.relServingsPeople.visibility = View.VISIBLE
             binding!!.layBottomPlanBasket.visibility = View.VISIBLE
+            binding!!.relIngSelectAll.visibility = View.VISIBLE
             binding!!.webView.visibility = View.GONE
             if (viewModel.getRecipeData()?.size!! > 0) {
                 // Update the drawable based on the selectAll state

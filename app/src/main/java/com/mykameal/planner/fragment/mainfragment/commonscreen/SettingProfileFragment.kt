@@ -366,21 +366,24 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     private fun upDateProfile() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            viewModel.upDateProfileRequest({
-                BaseApplication.dismissMe()
-                handleApiUpdateResponse(it)
-            }, viewModel.getProfileData()?.name.toString()
-                ,binding?.tvBio?.text.toString()
-                ,viewModel.getProfileData()?.gender.toString()
-                ,viewModel.getProfileData()?.dob.toString()
-                ,viewModel.getProfileData()?.height.toString(),
+            viewModel.upDateProfileRequest(
+                {
+                    BaseApplication.dismissMe()
+                    handleApiUpdateResponse(it)
+                }, viewModel.getProfileData()?.name.toString()
+                , binding?.tvBio?.text.toString()
+                , viewModel.getProfileData()?.gender.toString()
+                , viewModel.getProfileData()?.dob.toString()
+                , viewModel.getProfileData()?.height.toString(),
                 viewModel.getProfileData()?.height_type.toString(),
                 viewModel.getProfileData()?.activity_level.toString(),
                 viewModel.getProfileData()?.height_protein.toString()
-                ,viewModel.getProfileData()?.calories.toString(),
+                , viewModel.getProfileData()?.calories.toString(),
                 viewModel.getProfileData()?.fat.toString()
-                ,viewModel.getProfileData()?.carbs.toString(),
-                viewModel.getProfileData()?.protien.toString()
+                , viewModel.getProfileData()?.carbs.toString(),
+                viewModel.getProfileData()?.protien.toString(),
+                viewModel.getProfileData()?.weight.toString(),
+                viewModel.getProfileData()?.weight_type.toString()
             )
         }
     }

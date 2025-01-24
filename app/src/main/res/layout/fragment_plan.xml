@@ -194,16 +194,16 @@
                 android:layout_below="@+id/llCalendarViewEvents"
                 android:layout_marginTop="@dimen/_15sdp">
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/llCalculateBmr"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     android:layout_marginHorizontal="@dimen/_16sdp"
                     android:background="@drawable/calendar_events_bg"
                     android:orientation="vertical">
-
                     <LinearLayout
+                        android:id="@+id/tv_heading"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
@@ -225,11 +225,11 @@
                             android:textSize="@dimen/_15sdp" />
 
                     </LinearLayout>
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:layout_below="@id/tv_heading"
                         android:layout_marginHorizontal="@dimen/_25sdp"
                         android:layout_marginBottom="@dimen/_15sdp"
                         android:gravity="center"
@@ -270,7 +270,7 @@
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
-                                    android:text="25"
+                                    android:text="0"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
@@ -310,7 +310,7 @@
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
-                                    android:text="25"
+                                    android:text="0"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
@@ -350,7 +350,7 @@
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
-                                    android:text="35"
+                                    android:text="0"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
@@ -390,15 +390,21 @@
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
-                                    android:text="45"
+                                    android:text="0"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
                         </LinearLayout>
 
                     </LinearLayout>
-
-                </LinearLayout>
+                    <ImageView
+                        android:id="@+id/img_bmr"
+                        android:layout_width="match_parent"
+                        android:src="@drawable/bmr_no_add"
+                        android:layout_centerInParent="true"
+                        android:scaleType="centerCrop"
+                        android:layout_height="match_parent"/>
+                </RelativeLayout>
 
                 <LinearLayout
                     android:id="@+id/linearBreakfast"

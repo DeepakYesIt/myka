@@ -57,8 +57,24 @@ interface MainRepository {
     suspend fun userLogOutDataApi(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun userDeleteDataApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
-    suspend fun upDateProfileRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,name:String,bio:String, genderType: String,dob:String,height:String
-                                        ,heightType:String,activityLevel:String,heightProtein:String,calories:String,fat:String,carbs:String,protien:String)
+    suspend fun upDateProfileRequestApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        name: String,
+        bio: String,
+        genderType: String,
+        dob: String,
+        height: String
+        ,
+        heightType: String,
+        activityLevel: String,
+        heightProtein: String,
+        calories: String,
+        fat: String,
+        carbs: String,
+        protien: String,
+        weight: String,
+        weightType: String
+    )
 
  suspend fun upDateImageNameRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, Image: MultipartBody.Part?, name: RequestBody)
 

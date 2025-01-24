@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:text="Step 1:"
                 android:textColor="@color/light_orange"
-                android:fontFamily="@font/poppins"/>
+                android:fontFamily="@font/poppins_bold"/>
 
             <TextView
                 android:id="@+id/tvTitleDescriptions"
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvTitleName"
                 android:layout_marginTop="@dimen/_3sdp"
-                android:text="Lorem ispum Lorem ispumLorem ispum Lorem ispum Lorem ispumLorem ispum Lorem ispumLorem ispum Lorem ispum Lorem ispumLorem ispum"
+                android:text=""
                 android:textColor="@color/light_black"
                 android:fontFamily="@font/poppins"/>
 

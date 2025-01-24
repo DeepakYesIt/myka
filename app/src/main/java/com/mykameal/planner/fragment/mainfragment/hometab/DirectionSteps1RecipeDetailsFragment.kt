@@ -58,7 +58,7 @@ class DirectionSteps1RecipeDetailsFragment : Fragment() {
         totalProgressValue=2
         updateProgress(1)
 
-        ingredientsModel()
+
 
         initialize()
 
@@ -142,45 +142,7 @@ class DirectionSteps1RecipeDetailsFragment : Fragment() {
         binding!!.tvProgressText.text = "$progress /$totalProgressValue"
     }
 
-    private fun ingredientsModel() {
-        val dataList = ArrayList<DataModel>()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
 
-        data1.title = "Olive Oil"
-        data1.description = "1 Tbsp"
-        data1.isOpen = false
-        data1.type = "PrepareCook"
-        data1.image = R.drawable.olive_image
-
-        data2.title = "Garlic Mayo"
-        data2.description = "3 Tbsp"
-        data2.isOpen = false
-        data2.type = "PrepareCook"
-        data2.image = R.drawable.garlic_mayo_image
-
-        data3.title = "Olive Oil"
-        data3.description = "3 Tbsp"
-        data3.isOpen = false
-        data3.type = "PrepareCook"
-        data3.image = R.drawable.olive_oil_image2
-
-        data4.title = "Olive Oil"
-        data4.description = "1 kg"
-        data4.isOpen = false
-        data4.type = "PrepareCook"
-        data4.image = R.drawable.olive_chicken_image
-
-        dataList.add(data1)
-        dataList.add(data2)
-        dataList.add(data3)
-        dataList.add(data4)
-
-        /*adapterPrepareCookItem = AdapterPrepareCookItem(dataList, requireActivity())
-        binding!!.rcyPrepareToCook.adapter = adapterPrepareCookItem*/
-    }
 
 
 }

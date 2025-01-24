@@ -106,7 +106,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/_5sdp"
                                 android:fontFamily="@font/poppins_medium"
-                                android:text="By Price per serving"
+                                android:text="Price per serving"
                                 android:textColor="#FFFFFF"
                                 android:textSize="@dimen/_10sdp" />
                         </LinearLayout>
@@ -118,6 +118,7 @@
                             android:gravity="center|bottom">
 
                             <TextView
+                                android:id="@+id/tv_rating"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/_5sdp"
@@ -565,20 +566,58 @@
                             android:textColor="#000000"
                             android:textSize="@dimen/_15sdp" />
 
-                        <TextView
-                            android:id="@+id/tvSelectAllBtn"
+
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:layout_centerInParent="true"
-                            android:background="@drawable/unselect_bg"
-                            android:drawablePadding="@dimen/_10sdp"
-                            android:padding="@dimen/_5sdp"
-                            android:fontFamily="@font/poppins_medium"
-                            android:text="Select all"
-                            android:textColor="#000000"
-                            android:textSize="@dimen/_13sdp"
-                            app:drawableEndCompat="@drawable/unselect_checkbox" />
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawablePadding="@dimen/_10sdp"
+                                android:padding="@dimen/_5sdp"
+                                android:text="Servings"
+                                android:textColor="#3C4541"
+                                android:textSize="@dimen/_13sdp"
+                                app:drawableStartCompat="@drawable/servings_icon" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:id="@+id/imgMinusValue"
+                                    android:layout_width="@dimen/_15sdp"
+                                    android:layout_height="@dimen/_15sdp"
+                                    android:layout_gravity="center_vertical"
+                                    android:src="@drawable/minus_food_item_icon" />
+
+                                <TextView
+                                    android:id="@+id/tvValues"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/_5sdp"
+                                    android:layout_marginEnd="@dimen/_5sdp"
+                                    android:text="01"
+                                    android:textColor="#000000"
+                                    android:textSize="@dimen/_13sdp"
+                                    android:textStyle="bold" />
+
+                                <ImageView
+                                    android:id="@+id/imgPlusValue"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/add_image" />
+
+
+                            </LinearLayout>
+                        </LinearLayout>
+
+
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -645,56 +684,20 @@
                     android:visibility="visible"
                     android:layout_marginHorizontal="@dimen/_15sdp"
                     android:layout_marginTop="@dimen/_10sdp">
-
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/tvSelectAllBtn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawablePadding="@dimen/_10sdp"
-                            android:padding="@dimen/_5sdp"
-                            android:text="Servings"
-                            android:textColor="#3C4541"
-                            android:textSize="@dimen/_13sdp"
-                            app:drawableStartCompat="@drawable/servings_icon" />
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:id="@+id/imgMinusValue"
-                                android:layout_width="@dimen/_15sdp"
-                                android:layout_height="@dimen/_15sdp"
-                                android:layout_gravity="center_vertical"
-                                android:src="@drawable/minus_food_item_icon" />
-
-                            <TextView
-                                android:id="@+id/tvValues"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/_5sdp"
-                                android:layout_marginEnd="@dimen/_5sdp"
-                                android:text="01"
-                                android:textColor="#000000"
-                                android:textSize="@dimen/_13sdp"
-                                android:textStyle="bold" />
-
-                            <ImageView
-                                android:id="@+id/imgPlusValue"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/add_image" />
-
-
-                        </LinearLayout>
-                    </LinearLayout>
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/unselect_bg"
+                        android:drawablePadding="@dimen/_10sdp"
+                        android:padding="@dimen/_5sdp"
+                        android:fontFamily="@font/poppins_medium"
+                        android:text="Select all"
+                        android:textColor="#000000"
+                        android:textSize="@dimen/_13sdp"
+                        app:drawableEndCompat="@drawable/unselect_checkbox" />
                 </RelativeLayout>
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rcyIngCookWareRecipe"
