@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -32,13 +33,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class CookingFrequencyFragment : Fragment(),OnItemClickListener {
+class CookingFrequencyFragment : Fragment(), OnItemClickListener {
 
     private var binding: FragmentCookingFrequencyBinding? = null
     private var bodyGoalAdapter: BodyGoalAdapter? = null
     private lateinit var sessionManagement: SessionManagement
-    private var totalProgressValue:Int=0
-    private var status:String?=null
+    private var totalProgressValue: Int = 0
+    private var status: String? = null
     private var cookingSelect: String? = null
     private lateinit var cookingFrequencyViewModel: CookingFrequencyViewModel
     private var cookingFreqModelData: List<BodyGoalModelData>? = null
@@ -53,39 +54,39 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
         cookingFrequencyViewModel = ViewModelProvider(this)[CookingFrequencyViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
-        if (sessionManagement.getCookingFor().equals("Myself")){
-            binding!!.tvCookFreqDesc.text="How often do you cook meals at home?"
-            binding!!.progressBar7.max=10
-            totalProgressValue=10
+        if (sessionManagement.getCookingFor().equals("Myself")) {
+            binding!!.tvCookFreqDesc.text = "How often do you cook meals at home?"
+            binding!!.progressBar7.max = 10
+            totalProgressValue = 10
             updateProgress(7)
-        } else if (sessionManagement.getCookingFor().equals("MyPartner")){
-            binding!!.tvCookFreqDesc.text="How often do you cook meals at home?"
-            binding!!.progressBar7.max=11
-            totalProgressValue=11
+        } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
+            binding!!.tvCookFreqDesc.text = "How often do you cook meals at home?"
+            binding!!.progressBar7.max = 11
+            totalProgressValue = 11
             updateProgress(8)
         } else {
-            binding!!.tvCookFreqDesc.text="How often do you cook meals for your family?" 
-            binding!!.progressBar7.max=11
-            totalProgressValue=11
+            binding!!.tvCookFreqDesc.text = "How often do you cook meals for your family?"
+            binding!!.progressBar7.max = 11
+            totalProgressValue = 11
             updateProgress(8)
         }
 
-        if (sessionManagement.getCookingScreen().equals("Profile")){
-            binding!!.llBottomBtn.visibility=View.GONE
-            binding!!.rlUpdateCookingFrequency.visibility=View.VISIBLE
+        if (sessionManagement.getCookingScreen().equals("Profile")) {
+            binding!!.llBottomBtn.visibility = View.GONE
+            binding!!.rlUpdateCookingFrequency.visibility = View.VISIBLE
 
             if (BaseApplication.isOnline(requireActivity())) {
                 cookingFrequencySelectApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        }else{
-            binding!!.llBottomBtn.visibility=View.VISIBLE
-            binding!!.rlUpdateCookingFrequency.visibility=View.GONE
+        } else {
+            binding!!.llBottomBtn.visibility = View.VISIBLE
+            binding!!.rlUpdateCookingFrequency.visibility = View.GONE
 
-            if (cookingFrequencyViewModel.getCookingFreqData()!=null){
-                showDataInUi(cookingFrequencyViewModel.getCookingFreqData() !!)
-            }else{
+            if (cookingFrequencyViewModel.getCookingFreqData() != null) {
+                showDataInUi(cookingFrequencyViewModel.getCookingFreqData()!!)
+            } else {
                 ///checking the device of mobile data in online and offline(show network error message)
                 if (BaseApplication.isOnline(requireActivity())) {
                     cookingFrequencyApi()
@@ -95,11 +96,13 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
             }
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(
+            requireActivity(),
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
 
 
         initialize()
@@ -114,19 +117,19 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
 
     private fun initialize() {
 
-        binding!!.imgBackCookingFreq.setOnClickListener{
+        binding!!.imgBackCookingFreq.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.tvSkipBtn.setOnClickListener{
+        binding!!.tvSkipBtn.setOnClickListener {
             stillSkipDialog()
         }
 
-        binding!!.tvNextBtn.setOnClickListener{
-            if (status=="2"){
+        binding!!.tvNextBtn.setOnClickListener {
+            if (status == "2") {
                 cookingFrequencyViewModel.setCookingFreqData(cookingFreqModelData!!.toMutableList())
                 sessionManagement.setCookingFrequency(cookingSelect.toString())
-                if (sessionManagement.getCookingFor().equals("Myself")){
+                if (sessionManagement.getCookingFor().equals("Myself")) {
                     findNavController().navigate(R.id.spendingOnGroceriesFragment)
 //                    findNavController().navigate(R.id.cookingScheduleFragment)
                 } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
@@ -138,7 +141,7 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
             }
         }
 
-        binding!!.rlUpdateCookingFrequency.setOnClickListener{
+        binding!!.rlUpdateCookingFrequency.setOnClickListener {
             ///checking the device of mobile data in online and offline(show network error message)
             if (BaseApplication.isOnline(requireActivity())) {
                 updateCookFrequencyApi()
@@ -155,21 +158,28 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
-                        if (updateModel.code == 200 && updateModel.success) {
-                            findNavController().navigateUp()
-                        } else {
-                            if (updateModel.code == ErrorMessage.code) {
-                                showAlertFunction(updateModel.message, true)
-                            }else{
-                                showAlertFunction(updateModel.message, false)
+                        try {
+                            val gson = Gson()
+                            val updateModel =
+                                gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                            if (updateModel.code == 200 && updateModel.success) {
+                                findNavController().navigateUp()
+                            } else {
+                                if (updateModel.code == ErrorMessage.code) {
+                                    showAlertFunction(updateModel.message, true)
+                                } else {
+                                    showAlertFunction(updateModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("cookingFrequency@@@@", "message" + e.message)
                         }
                     }
+
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
+
                     else -> {
                         showAlertFunction(it.message, false)
                     }
@@ -194,7 +204,7 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
         tvDialogSkipBtn.setOnClickListener {
             dialogStillSkip.dismiss()
             sessionManagement.setCookingFrequency("")
-            if (sessionManagement.getCookingFor().equals("Myself")){
+            if (sessionManagement.getCookingFor().equals("Myself")) {
                 findNavController().navigate(R.id.spendingOnGroceriesFragment)
             } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
                 findNavController().navigate(R.id.spendingOnGroceriesFragment)
@@ -211,21 +221,27 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
-                        if (bodyModel.code == 200 && bodyModel.success) {
-                            showDataInUi(bodyModel.data.cookingfrequency)
-                        } else {
-                            if (bodyModel.code == ErrorMessage.code) {
-                                showAlertFunction(bodyModel.message, true)
-                            }else{
-                                showAlertFunction(bodyModel.message, false)
+                        try {
+                            val gson = Gson()
+                            val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                            if (bodyModel.code == 200 && bodyModel.success) {
+                                showDataInUi(bodyModel.data.cookingfrequency)
+                            } else {
+                                if (bodyModel.code == ErrorMessage.code) {
+                                    showAlertFunction(bodyModel.message, true)
+                                } else {
+                                    showAlertFunction(bodyModel.message, false)
+                                }
                             }
+                        } catch (e: Exception) {
+                            Log.d("cookingFrequency@@@", "message" + e.message)
                         }
                     }
+
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
+
                     else -> {
                         showAlertFunction(it.message, false)
                     }
@@ -241,21 +257,27 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val bodyGoalModel = gson.fromJson(it.data, BodyGoalModel::class.java)
-                        if (bodyGoalModel.code == 200 && bodyGoalModel.success) {
-                            showDataInUi(bodyGoalModel.data)
-                        } else {
-                            if (bodyGoalModel.code == ErrorMessage.code) {
-                                showAlertFunction(bodyGoalModel.message, true)
-                            }else{
-                                showAlertFunction(bodyGoalModel.message, false)
+                        try {
+                            val gson = Gson()
+                            val bodyGoalModel = gson.fromJson(it.data, BodyGoalModel::class.java)
+                            if (bodyGoalModel.code == 200 && bodyGoalModel.success) {
+                                showDataInUi(bodyGoalModel.data)
+                            } else {
+                                if (bodyGoalModel.code == ErrorMessage.code) {
+                                    showAlertFunction(bodyGoalModel.message, true)
+                                } else {
+                                    showAlertFunction(bodyGoalModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("cookingFrequency@@@@", "message" + e.message)
                         }
                     }
+
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
+
                     else -> {
                         showAlertFunction(it.message, false)
                     }
@@ -265,11 +287,14 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
     }
 
     private fun showDataInUi(bodyGoalModelData: List<BodyGoalModelData>) {
-
-        if (bodyGoalModelData!=null && bodyGoalModelData.size>0){
-            cookingFreqModelData=bodyGoalModelData
-            bodyGoalAdapter = BodyGoalAdapter(bodyGoalModelData, requireActivity(), this)
-            binding!!.rcyCookingFreq.adapter = bodyGoalAdapter
+        try {
+            if (bodyGoalModelData != null && bodyGoalModelData.size > 0) {
+                cookingFreqModelData = bodyGoalModelData
+                bodyGoalAdapter = BodyGoalAdapter(bodyGoalModelData, requireActivity(), this)
+                binding!!.rcyCookingFreq.adapter = bodyGoalAdapter
+            }
+        } catch (e: Exception) {
+            Log.d("cookingFrequency@@@@", "message" + e.message)
         }
 
     }
@@ -284,7 +309,7 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
             status = "2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            cookingSelect=selectItem.toString()
+            cookingSelect = selectItem.toString()
             return
         }
 
@@ -292,7 +317,7 @@ class CookingFrequencyFragment : Fragment(),OnItemClickListener {
             status = "2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            cookingSelect=selectItem.toString()
+            cookingSelect = selectItem.toString()
         } else {
             status = ""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)

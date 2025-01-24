@@ -89,7 +89,6 @@ class LoginFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentLoginBinding.inflate(inflater, container, false)
 
-
         (activity as AuthActivity).type
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
@@ -335,19 +334,23 @@ class LoginFragment : Fragment() {
                     BaseApplication.dismissMe()
                     when (it) {
                         is NetworkResult.Success -> {
-                            val gson = Gson()
-                            val loginModel = gson.fromJson(it.data, LoginModel::class.java)
-                            if (loginModel.code == 200 && loginModel.success) {
-                                if (checkStatus == true) {
-                                    saveRemember(binding!!.etSignEmailPhone.text.toString().trim(), binding!!.etSignPassword.text.toString().trim())
-                                }
-                                showDataInUi(loginModel.data)
-                            } else {
-                                if (loginModel.code == ErrorMessage.code) {
-                                    showAlertFunction(loginModel.message, true)
+                            try {
+                                val gson = Gson()
+                                val loginModel = gson.fromJson(it.data, LoginModel::class.java)
+                                if (loginModel.code == 200 && loginModel.success) {
+                                    if (checkStatus == true) {
+                                        saveRemember(binding!!.etSignEmailPhone.text.toString().trim(), binding!!.etSignPassword.text.toString().trim())
+                                    }
+                                    showDataInUi(loginModel.data)
                                 } else {
-                                    showAlertFunction(loginModel.message, false)
+                                    if (loginModel.code == ErrorMessage.code) {
+                                        showAlertFunction(loginModel.message, true)
+                                    } else {
+                                        showAlertFunction(loginModel.message, false)
+                                    }
                                 }
+                            }catch (e:Exception){
+                                Log.d("Login","message:---"+e.message)
                             }
                         }
 

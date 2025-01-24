@@ -1,4 +1,4 @@
-package com.yesitlabs.mykaapp.adapter
+package com.mykameal.planner.adapter
 
 import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
@@ -14,10 +14,11 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.mykameal.planner.R
 import com.mykameal.planner.databinding.AdapterMealTypeHorizentalBinding
-import com.yesitlabs.mykaapp.OnItemSelectPlanTypeListener
+import com.mykameal.planner.OnItemSelectPlanTypeListener
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.BreakfastModelPlanByDate
 
-class AdapterPlanBreakByDateFast(var datalist: MutableList<BreakfastModelPlanByDate>?, var requireActivity: FragmentActivity, private var onItemClickListener: OnItemSelectPlanTypeListener, var type:String): RecyclerView.Adapter<AdapterPlanBreakByDateFast.ViewHolder>() {
+class AdapterPlanBreakByDateFast(var datalist: MutableList<BreakfastModelPlanByDate>?, var requireActivity: FragmentActivity,
+                                 private var onItemClickListener: OnItemSelectPlanTypeListener, var type:String): RecyclerView.Adapter<AdapterPlanBreakByDateFast.ViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

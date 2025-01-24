@@ -86,30 +86,33 @@ class ForgotPasswordFragment : Fragment() {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val forgotModel = gson.fromJson(it.data, ForgotPasswordModel::class.java)
-                        if (forgotModel.code == 200 && forgotModel.success) {
-                            try {
-                                val bundle = Bundle()
-                                bundle.putString("screenType", "forgot")
-                                bundle.putString("chooseType", chooseType)
-                                bundle.putString(
-                                    "value",
-                                    binding!!.etRegEmailPhone.text.toString().trim()
-                                )
-                                findNavController().navigate(R.id.verificationFragment, bundle)
-                            }catch (e:Exception){
-                                Log.d("Forgot password","message:-- "+e.message)
-                            }
-                        } else {
-                            if (forgotModel.code == ErrorMessage.code) {
-                                showAlertFunction(forgotModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val forgotModel = gson.fromJson(it.data, ForgotPasswordModel::class.java)
+                            if (forgotModel.code == 200 && forgotModel.success) {
+                                try {
+                                    val bundle = Bundle()
+                                    bundle.putString("screenType", "forgot")
+                                    bundle.putString("chooseType", chooseType)
+                                    bundle.putString(
+                                        "value",
+                                        binding!!.etRegEmailPhone.text.toString().trim()
+                                    )
+                                    findNavController().navigate(R.id.verificationFragment, bundle)
+                                }catch (e:Exception){
+                                    Log.d("Forgot password","message:-- "+e.message)
+                                }
                             } else {
-                                showAlertFunction(forgotModel.message, false)
+                                if (forgotModel.code == ErrorMessage.code) {
+                                    showAlertFunction(forgotModel.message, true)
+                                } else {
+                                    showAlertFunction(forgotModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("Forgot password","message:-- "+e.message)
                         }
                     }
-
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }

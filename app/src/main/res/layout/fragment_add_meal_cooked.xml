@@ -16,57 +16,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardViewSearchRecipe"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_200sdp"
-                android:layout_below="@+id/relCookedMeals"
-                android:layout_marginHorizontal="@dimen/_20sdp"
-                android:visibility="gone">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <include
-                        android:id="@+id/layProgress"
-                        layout="@layout/progess_loader"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:visibility="visible" />
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/rcySearchCooked"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:visibility="visible"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-                        <TextView
-                            android:id="@+id/tvNoData"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-
-                            android:fontFamily="@font/montserrat_medium"
-                            android:text="No cooked dishes"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/_12ssp"
-                            android:visibility="gone" />
-
-                    </RelativeLayout>
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
-
-
             <RelativeLayout
                 android:id="@+id/rlHeader"
                 android:layout_width="match_parent"
@@ -137,6 +86,57 @@
 
             </RelativeLayout>
 
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardViewSearchRecipe"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_200sdp"
+                android:layout_below="@+id/relCookedMeals"
+                android:layout_marginHorizontal="@dimen/_20sdp"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <include
+                        android:id="@+id/layProgress"
+                        layout="@layout/progess_loader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:visibility="visible" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rcySearchCooked"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:visibility="visible"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                        <TextView
+                            android:id="@+id/tvNoData"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+
+                            android:fontFamily="@font/montserrat_medium"
+                            android:text="No cooked dishes"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_12ssp"
+                            android:visibility="gone" />
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/imageLogo"
                 android:layout_width="@dimen/_150sdp"
@@ -145,15 +145,6 @@
                 android:layout_below="@+id/relCookedMeals"
                 android:layout_marginTop="@dimen/_30sdp"
                 android:src="@drawable/add_meal_icon"/>
-
-         <!--   <ImageView
-                android:id="@+id/imageLogo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_below="@+id/relCookedMeals"
-                android:layout_marginTop="@dimen/_30sdp"
-                android:src="@drawable/add_meal_icon" />-->
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardViewDateCooked"

@@ -18,6 +18,8 @@ class AppConstant {
         const val RememberMe:String="RememberMe"
         val Id: String?="ID"
         val NAME: String? ="NAME"
+
+        val userId: String? ="UserId"
         val CookBookName: String? ="CookBookName"
         val CookBookId: String? ="CookBookId"
         val CookBookImage: String? ="CookBookImage"

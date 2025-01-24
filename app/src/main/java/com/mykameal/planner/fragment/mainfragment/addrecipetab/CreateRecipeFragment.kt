@@ -1,6 +1,8 @@
 package com.mykameal.planner.fragment.mainfragment.addrecipetab
 
+import android.app.Activity
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -13,21 +15,36 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.github.dhaval2404.imagepicker.ImagePicker
+import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
+import com.mykameal.planner.adapter.AdapterCookIngredientsItem
+import com.mykameal.planner.adapter.AdapterCreateIngredientsItem
+import com.mykameal.planner.commonworkutils.MediaUtility
 import com.mykameal.planner.databinding.FragmentCreateRecipeBinding
+import java.io.File
 
-class CreateRecipeFragment : Fragment() {
+class CreateRecipeFragment : Fragment(), OnItemClickListener {
 
     private var binding: FragmentCreateRecipeBinding? = null
     private var quantity:Int=1
+    private var file: File? = null
+    private val ingredientList = mutableListOf<String>()
+    private val cookList = mutableListOf<String>()
+    private var adapter:AdapterCreateIngredientsItem?=null
+    private var adapterCook: AdapterCookIngredientsItem?=null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+
         // Inflate the layout for this fragment
         binding = FragmentCreateRecipeBinding.inflate(layoutInflater, container, false)
 
@@ -45,7 +62,57 @@ class CreateRecipeFragment : Fragment() {
         return binding!!.root
     }
 
+
+    private val pickImageLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+
+                // val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, uri)
+                file = MediaUtility.getPath(requireContext(), uri)?.let { File(it) }
+                /*processImage(bitmap)*/
+                  // Now you can send the image URI to Vision API for processing
+                // Convert image to Base64
+
+                binding!!.addImageIcon.visibility=View.GONE
+                Glide.with(this)
+                    .load(uri)
+                    .placeholder(R.drawable.no_image)
+                    .error(R.drawable.no_image)
+                    .into(binding!!.addImages)
+
+            }
+        }
+    }
+
     private fun initialize() {
+
+        // Add the first blank EditText item
+        ingredientList.add("")
+
+        // Set up RecyclerView and Adapter
+        adapter = AdapterCreateIngredientsItem(ingredientList,requireActivity(),this)
+        binding!!.rcyCreateIngredients.adapter = adapter
+
+        // Handle "+" button click
+        binding!!.imageCrtIngPlus.setOnClickListener {
+            adapter!!.addNewItem()
+            binding!!.rcyCreateIngredients.scrollToPosition(ingredientList.size - 1) // Scroll to the new item
+        }
+
+        // Add the first blank EditText item
+        cookList.add("")
+
+        // Set up RecyclerView and Adapter
+        adapterCook = AdapterCookIngredientsItem(cookList,requireActivity(),this)
+        binding!!.rcyCookInstructions.adapter = adapterCook
+
+        // Handle "+" button click
+        binding!!.imageCookIns.setOnClickListener {
+            adapterCook!!.addNewItem()
+            binding!!.rcyCookInstructions.scrollToPosition(cookList.size - 1) // Scroll to the new item
+        }
 
         binding!!.spinnerCookBook.setItems(
             listOf("Christmas", "Favourite","Birthday", "Party", "Coriander"))
@@ -94,6 +161,15 @@ class CreateRecipeFragment : Fragment() {
             binding!!.textPrivate.setCompoundDrawables(drawableStart1, null, null, null)
 
         }
+
+        binding!!.addImages.setOnClickListener {
+            ImagePicker.with(this)
+                .crop() // Crop image (Optional)
+                .compress(1024 * 5) // Compress the image to less than 5 MB
+                .maxResultSize(250, 250) // Set max resolution
+                .createIntent { intent -> pickImageLauncher.launch(intent) }
+        }
+
     }
 
     private fun updateValue() {
@@ -133,6 +209,10 @@ class CreateRecipeFragment : Fragment() {
             dialogSuccess.dismiss()
             findNavController().navigate(R.id.planFragment)
         }
+
+    }
+
+    override fun itemClick(position: Int?, status: String?, type: String?) {
 
     }
 

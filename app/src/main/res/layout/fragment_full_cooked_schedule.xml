@@ -5,48 +5,49 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:id="@+id/rlMainFullCooked"
-    tools:context=".fragment.mainfragment.hometab.FullCookedScheduleFragment">
+    tools:context=".fragment.mainfragment.hometab.fullcookedScheduleFragment.FullCookedScheduleFragment">
+
+    <RelativeLayout
+        android:id="@+id/rlToolbar"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="@dimen/_16sdp"
+        android:layout_marginTop="@dimen/_25sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imgBackCookingSchedule"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/black_images_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="@font/montserrat_semibold"
+            android:text="Full Cooking Schedule"
+            android:textSize="@dimen/_13sdp" />
+
+    </RelativeLayout>
 
     <ScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/rlToolbar"
         android:fillViewport="true">
 
         <RelativeLayout
+            android:id="@+id/rlMainFullCooked"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_25sdp"
-            android:layout_marginBottom="@dimen/_30sdp">
-
-            <RelativeLayout
-                android:id="@+id/rlToolbar"
-                android:layout_width="match_parent"
-                android:layout_marginHorizontal="@dimen/_16sdp"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/imgBackCookingSchedule"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/black_images_back" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:text="Full Cooking Schedule"
-                    android:textSize="@dimen/_13sdp" />
-
-            </RelativeLayout>
+            android:layout_marginBottom="@dimen/_50sdp">
 
             <RelativeLayout
                 android:id="@+id/relWeekDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/rlToolbar"
                 android:layout_marginHorizontal="@dimen/_16sdp"
                 android:layout_marginTop="@dimen/_15sdp">
 
@@ -152,7 +153,7 @@
                 android:layout_marginHorizontal="@dimen/_20sdp"
                 android:layout_marginBottom="@dimen/_10sdp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/green_btn_background">
+                android:background="@drawable/gray_btn_unselect_background">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -228,7 +229,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/llLunch"
                 android:layout_marginTop="@dimen/_18sdp"
-                android:layout_marginBottom="@dimen/_30sdp"
                 android:orientation="vertical">
 
                 <TextView
@@ -251,6 +251,61 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/llSnacks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/llDinner"
+                android:layout_marginTop="@dimen/_18sdp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Snacks"
+                    android:textColor="@color/black"
+                    android:layout_marginStart="@dimen/_20sdp"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:textSize="@dimen/_14sdp"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcySearchSnacks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="@dimen/_12sdp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:layout_marginTop="@dimen/_10sdp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llTeaTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/llSnacks"
+                android:layout_marginTop="@dimen/_18sdp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tea Time"
+                    android:textColor="@color/black"
+                    android:layout_marginStart="@dimen/_20sdp"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:textSize="@dimen/_14sdp"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcySearchTeaTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="@dimen/_12sdp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:layout_marginTop="@dimen/_10sdp" />
+
+            </LinearLayout>
 
         </RelativeLayout>
 

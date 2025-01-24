@@ -30,8 +30,8 @@ import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.yesitlabs.mykaapp.OnItemSelectPlanTypeListener
-import com.yesitlabs.mykaapp.adapter.AdapterPlanBreakByDateFast
+import com.mykameal.planner.OnItemSelectPlanTypeListener
+import com.mykameal.planner.adapter.AdapterPlanBreakByDateFast
 import com.mykameal.planner.adapter.CalendarDayDateAdapter
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.BreakfastModelPlanByDate
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.DataPlayByDate
@@ -65,7 +65,6 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-
 @AndroidEntryPoint
 class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListener {
 
@@ -75,7 +74,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     private var dataList2: MutableList<DataModel> = mutableListOf()
     private var dataList3: MutableList<DataModel> = mutableListOf()
     private var tvWeekRange: TextView? = null
-    private var planBreakFastAdapter: AdapterPlanBreakFast? = null
     private var status: Boolean = true
     private var clickable: String? = ""
     private lateinit var viewModel: PlanViewModel
@@ -106,7 +104,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     private var calendarAdapter: CalendarDayDateAdapter? = null
     private lateinit var spinnerActivityLevel: PowerSpinnerView
 
-    var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
+    private var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -146,10 +144,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             binding?.tvName?.text =sessionManagement.getUserName()+"’s week"
         }
 
-
-        planBreakFastModel()
-        planLunchModel()
-        planDinnerModel()
 
         setUpListener()
 
@@ -328,7 +322,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             showAlert(e.message, false)
         }
     }
-
 
     @SuppressLint("SetTextI18n")
     private fun handleSuccessPlanDateResponse(data: String) {
@@ -511,9 +504,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             }
 
         }
-
     }
-
 
     private fun showDataAccordingDate(data: DataPlayByDate?) {
 
@@ -825,8 +816,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
     }
 
-
-
     private fun setUpOnBoardingIndicator() {
         val indicator = arrayOfNulls<ImageView>(adapter!!.getItemCount())
         val layoutParams = LinearLayout.LayoutParams(
@@ -868,127 +857,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 )
             }
         }
-    }
-
-    private fun getDaysOfWeek(): List<CalendarDataModel.Day> {
-
-        val days = mutableListOf<CalendarDataModel.Day>()
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-
-        for (i in 0..6) {
-            days.add(
-                CalendarDataModel.Day(
-                    dayName = SimpleDateFormat("E", Locale.getDefault()).format(calendar.time),
-                    date = calendar.get(Calendar.DAY_OF_MONTH)
-                )
-            )
-            calendar.add(Calendar.DAY_OF_WEEK, 1)
-        }
-
-        calendar.add(Calendar.DAY_OF_WEEK, -7) // Reset to start of week
-        return days
-
-    }
-
-    private fun planBreakFastModel() {
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-
-        data1.title = "Bread"
-        data1.isOpen = false
-        data1.rating = "4.1(121)"
-        data1.price = "3.2"
-        data1.type = "BreakFastPlan"
-        data1.image = R.drawable.bread_breakfast_image
-
-        data2.title = "Juice"
-        data2.isOpen = false
-        data2.rating = "4.4(128)"
-        data2.price = "3.4"
-        data2.type = "BreakFastPlan"
-        data2.image = R.drawable.fresh_juice_glass_image
-
-        data3.title = "Bar-B-Q"
-        data3.isOpen = false
-        data3.rating = "4.3(125)"
-        data3.price = "3.5"
-        data3.type = "BreakFastPlan"
-        data3.image = R.drawable.bar_b_q_breakfast_image
-
-        dataList1.add(data1)
-        dataList1.add(data2)
-        dataList1.add(data3)
-
-
-    }
-
-    private fun planLunchModel() {
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-
-        data1.title = "Bread"
-        data1.isOpen = false
-        data1.rating = "4.1(121)"
-        data1.price = "3.2"
-        data1.type = "BreakFastPlan"
-        data1.image = R.drawable.bread_lunch_image
-
-        data2.title = "Juice"
-        data2.isOpen = false
-        data2.rating = "4.4(128)"
-        data2.price = "3.4"
-        data2.type = "BreakFastPlan"
-        data2.image = R.drawable.bar_b_q_breakfast_image
-
-        data3.title = "Bar-B-Q"
-        data3.isOpen = false
-        data3.rating = "4.3(125)"
-        data3.price = "3.5"
-        data3.type = "BreakFastPlan"
-        data3.image = R.drawable.bar_b_q_breakfast_image
-
-        dataList2.add(data1)
-        dataList2.add(data2)
-        dataList2.add(data3)
-
-//        planBreakFastAdapter = AdapterPlanBreakFast(dataList2, requireActivity(),this)
-//        binding!!.rcyLunch.adapter = planBreakFastAdapter
-    }
-
-    private fun planDinnerModel() {
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-
-        data1.title = "Bread"
-        data1.isOpen = false
-        data1.rating = "4.1(121)"
-        data1.price = "3.4"
-        data1.type = "BreakFastPlan"
-        data1.image = R.drawable.bread_dinner_image
-
-        data2.title = "Juice"
-        data2.isOpen = false
-        data2.rating = "4.4(128)"
-        data2.price = "3.5"
-        data2.type = "BreakFastPlan"
-        data2.image = R.drawable.fresh_juice_glass_image
-
-        data3.title = "Bar-B-Q"
-        data3.isOpen = false
-        data3.rating = "4.3(125)"
-        data3.price = "3.2"
-        data3.type = "BreakFastPlan"
-        data3.image = R.drawable.bar_b_q_breakfast_image
-
-        dataList3.add(data1)
-        dataList3.add(data2)
-        dataList3.add(data3)
-
-//        planBreakFastAdapter = AdapterPlanBreakFast(dataList3, requireActivity(),this)
-//        binding!!.rcyDinner.adapter = planBreakFastAdapter
     }
 
     @SuppressLint("SetTextI18n")
@@ -1321,12 +1189,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     }
 
 
-    private fun addFavTypeDialog(item: BreakfastModel,
-                                 adapter: AdapterPlanBreakFast?,
-                                 type: String,
-                                 mealList: MutableList<BreakfastModel>,
-                                 position: Int?,
-                                 likeType: String) {
+    private fun addFavTypeDialog(item: BreakfastModel, adapter: AdapterPlanBreakFast?, type: String,
+                                 mealList: MutableList<BreakfastModel>, position: Int?, likeType: String) {
         val dialogAddRecipe: Dialog = context?.let { Dialog(it) }!!
         dialogAddRecipe.setContentView(R.layout.alert_dialog_add_recipe)
         dialogAddRecipe.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
@@ -1344,9 +1208,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
          getCookBookList()
 
-
         relCreateNewCookBook.setOnClickListener{
-//            statuses="newCook"
             relCreateNewCookBook.setBackgroundResource(R.drawable.light_green_rectangular_bg)
             imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
             dialogAddRecipe.dismiss()
@@ -1402,11 +1264,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                     dialogAddRecipe
                 )
             }
-
-
-
         }
-
 
     }
 

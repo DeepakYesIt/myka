@@ -53,7 +53,7 @@ class MykaBaseApplication : Application() {
         AppsFlyerLib.getInstance().setDebugLog(true)
         AppsFlyerLib.getInstance().setMinTimeBetweenSessions(0)
         //set the OneLink template id for share invite links
-        AppsFlyerLib.getInstance().setAppInviteOneLink("EXLx")
+        AppsFlyerLib.getInstance().setAppInviteOneLink("LQhk")
 
         val afRevenueBuilder: AppsFlyerAdRevenue.Builder = AppsFlyerAdRevenue.Builder(this)
         AppsFlyerAdRevenue.initialize(afRevenueBuilder.build())
@@ -105,8 +105,7 @@ class MykaBaseApplication : Application() {
                 // See the user-invite section in FruitActivity.java
                 if (dlData.has("deep_link_sub2")) {
                     referrerId = deepLinkObj.getStringValue("deep_link_sub2")
-                    Log.d(LOG_TAG,
-                        "The referrerID is: $referrerId"
+                    Log.d(LOG_TAG, "The referrerID is: $referrerId"
                     )
                 } else {
                     Log.d(LOG_TAG, "deep_link_sub2/Referrer ID not found")
@@ -201,17 +200,6 @@ class MykaBaseApplication : Application() {
         AppsFlyerLib.getInstance().start(this)
 
     }
-
-   /* @SuppressLint("RestrictedApi")
-    fun mapToDeepLinkObject(conversionDataMap: Map<String, Any>): DeepLink? {
-        return try {
-            val stringMap = conversionDataMap.mapValues { it.value.toString() }
-            DeepLink.values(stringMap)
-        } catch (e: org.json.JSONException) {
-            Log.d(LOG_TAG, "Error when converting map to DeepLink object: ${e}")
-            null
-        }
-    }*/
 
 
 

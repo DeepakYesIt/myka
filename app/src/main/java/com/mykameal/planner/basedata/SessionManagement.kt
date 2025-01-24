@@ -130,6 +130,7 @@ class SessionManagement(var context: Context) {
         return pref?.getString(AppConstant.NAME, "")
     }
 
+
     fun setGender(gender: String) {
         editor!!.putString(AppConstant.Gender, gender)
         editor!!.commit()

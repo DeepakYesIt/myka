@@ -208,7 +208,6 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
                     delay(SplashActivity.SPLASH_DELAY)
                     findNavController().navigate(R.id.cookedFragment)
                 }
-
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlertFunction(apiModel.message, true)
@@ -279,7 +278,6 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
         }else{
             binding!!.testAddMeals.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
-
     }
 
     private fun searchRecipeApi() {

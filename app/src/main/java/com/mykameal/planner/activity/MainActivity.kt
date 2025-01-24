@@ -74,7 +74,6 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         binding!!.relAddRecipeWeb.setOnClickListener(this)
         binding!!.relCreateNewRecipe.setOnClickListener(this)
 
-
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
             != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
@@ -88,8 +87,6 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         startDestination()
 
     }
-
-
 
         private fun handleDeepLink(intent: Intent?) {
             intent?.data?.let { uri ->

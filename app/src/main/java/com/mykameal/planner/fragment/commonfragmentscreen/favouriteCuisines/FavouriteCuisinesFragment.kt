@@ -154,17 +154,21 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val updateModel =
-                            gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
-                        if (updateModel.code == 200 && updateModel.success) {
-                            findNavController().navigateUp()
-                        } else {
-                            if (updateModel.code == ErrorMessage.code) {
-                                showAlertFunction(updateModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val updateModel =
+                                gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                            if (updateModel.code == 200 && updateModel.success) {
+                                findNavController().navigateUp()
                             } else {
-                                showAlertFunction(updateModel.message, false)
+                                if (updateModel.code == ErrorMessage.code) {
+                                    showAlertFunction(updateModel.message, true)
+                                } else {
+                                    showAlertFunction(updateModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("FavouriteCuisines@@@@", "message" + e.message)
                         }
                     }
 
@@ -214,16 +218,20 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
-                        if (bodyModel.code == 200 && bodyModel.success) {
-                            showDataInUi(bodyModel.data.favouritcuisine)
-                        } else {
-                            if (bodyModel.code == ErrorMessage.code) {
-                                showAlertFunction(bodyModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                            if (bodyModel.code == 200 && bodyModel.success) {
+                                showDataInUi(bodyModel.data.favouritcuisine)
                             } else {
-                                showAlertFunction(bodyModel.message, false)
+                                if (bodyModel.code == ErrorMessage.code) {
+                                    showAlertFunction(bodyModel.message, true)
+                                } else {
+                                    showAlertFunction(bodyModel.message, false)
+                                }
                             }
+                        } catch (e: Exception) {
+                            Log.d("FavouriteCuisines@@@", "message" + e.message)
                         }
                     }
 
@@ -247,20 +255,21 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val dietaryModel =
-                            gson.fromJson(it.data, FavouriteCuisinesModel::class.java)
-                        if (dietaryModel.code == 200 && dietaryModel.success) {
-/*
-                            showDataInUi(dietaryModel.data)
-*/
-                            showDataInFirstUi(dietaryModel.data)
-                        } else {
-                            if (dietaryModel.code == ErrorMessage.code) {
-                                showAlertFunction(dietaryModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val dietaryModel =
+                                gson.fromJson(it.data, FavouriteCuisinesModel::class.java)
+                            if (dietaryModel.code == 200 && dietaryModel.success) {
+                                showDataInFirstUi(dietaryModel.data)
                             } else {
-                                showAlertFunction(dietaryModel.message, false)
+                                if (dietaryModel.code == ErrorMessage.code) {
+                                    showAlertFunction(dietaryModel.message, true)
+                                } else {
+                                    showAlertFunction(dietaryModel.message, false)
+                                }
                             }
+                        } catch (e: Exception) {
+                            Log.d("FavouriteCuisines", "message" + e.message)
                         }
                     }
 
@@ -281,15 +290,17 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
             if (favouriteModelData != null && favouriteModelData.isNotEmpty()) {
                 if (favouriteCuisineViewModel.getFavouriteCuiData() == null) {
 
-                    favouriteModelData.add(0, FavouriteCuisinesModelData(id = -1, selected = false, "None")
+                    favouriteModelData.add(
+                        0, FavouriteCuisinesModelData(id = -1, selected = false, "None")
                     ) // ID set to -1 as an indicator
                 }
                 var selected = false
                 favouriteModelData.forEach {
-                    if(it.selected) selected = true
+                    if (it.selected) selected = true
                 }
-                if(!selected){
-                    favouriteModelData.set(0, FavouriteCuisinesModelData(id = -1, selected = true, "None")
+                if (!selected) {
+                    favouriteModelData.set(
+                        0, FavouriteCuisinesModelData(id = -1, selected = true, "None")
                     )
                 }
                 favouriteCuiModelData = favouriteModelData
@@ -297,8 +308,8 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
                     AdapterFavouriteCuisinesItem(favouriteModelData, requireActivity(), this)
                 binding!!.rcyFavCuisines.adapter = adapterFavouriteCuisinesItem
             }
-        }catch (e:Exception){
-            Log.d("FavouriteCuisines","message"+e.message)
+        } catch (e: Exception) {
+            Log.d("FavouriteCuisines", "message" + e.message)
         }
 
     }
@@ -308,16 +319,18 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
             if (favouriteModelData != null && favouriteModelData.isNotEmpty()) {
                 if (favouriteCuisineViewModel.getFavouriteCuiData() == null) {
 
-                    favouriteModelData.add(0, FavouriteCuisinesModelData(id = -1, selected = false, "None")
+                    favouriteModelData.add(
+                        0, FavouriteCuisinesModelData(id = -1, selected = false, "None")
                     ) // ID set to -1 as an indicator
                 }
 
                 favouriteCuiModelData = favouriteModelData
-                adapterFavouriteCuisinesItem = AdapterFavouriteCuisinesItem(favouriteModelData, requireActivity(), this)
+                adapterFavouriteCuisinesItem =
+                    AdapterFavouriteCuisinesItem(favouriteModelData, requireActivity(), this)
                 binding!!.rcyFavCuisines.adapter = adapterFavouriteCuisinesItem
             }
-        }catch (e:Exception){
-            Log.d("FavouriteCuisines","message"+e.message)
+        } catch (e: Exception) {
+            Log.d("FavouriteCuisines", "message" + e.message)
         }
     }
 
@@ -326,13 +339,18 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
     }
 
 
-    override fun itemClicked(position: Int?, list: MutableList<String>?, status1: String?, type: String?) {
+    override fun itemClicked(
+        position: Int?,
+        list: MutableList<String>?,
+        status1: String?,
+        type: String?
+    ) {
 
         if (status1.equals("-1")) {
-            if (position==0){
+            if (position == 0) {
                 favouriteSelectId = mutableListOf()
-              /*  favouriteSelectId.clear()*/
-            }else{
+                /*  favouriteSelectId.clear()*/
+            } else {
                 favouriteSelectId = list!!
             }
             status = "2"

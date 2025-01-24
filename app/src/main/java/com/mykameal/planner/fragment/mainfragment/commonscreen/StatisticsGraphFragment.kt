@@ -31,14 +31,14 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
+import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.customview.SpendingChartView
 import com.mykameal.planner.databinding.FragmentStatisticsGraphBinding
 
 class StatisticsGraphFragment : Fragment() {
 
     private var binding:FragmentStatisticsGraphBinding?=null
-
-
+    private lateinit var sessionManagement: SessionManagement
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,6 +49,8 @@ class StatisticsGraphFragment : Fragment() {
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
+
+        sessionManagement = SessionManagement(requireActivity())
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -171,7 +173,7 @@ class StatisticsGraphFragment : Fragment() {
     private fun copyShareInviteLink() {
         val currentCampaign = "user_invite"
         val currentChannel = "mobile_share"
-        val currentReferrerId = "THIS_USER_ID"
+        val currentReferrerId = sessionManagement.getId().toString()
         val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity())
         /*linkGenerator.addParameter("deep_link_value", this.fruitName)
         linkGenerator.addParameter("deep_link_sub1", this.fruitAmountStr)*/
@@ -202,13 +204,6 @@ class StatisticsGraphFragment : Fragment() {
             }
         }
         linkGenerator.generateLink(requireActivity(), listener)
-    }
-
-    private fun redirectToPlayStore() {
-        val playStoreIntent = Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse("https://play.google.com/store/apps/details?id=com.yesitlabs.luvu")
-        }
-        startActivity(playStoreIntent)
     }
 
 

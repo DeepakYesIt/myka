@@ -99,17 +99,22 @@ class SpendingOnGroceriesFragment : Fragment() {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
-                        if (bodyModel.code == 200 && bodyModel.success) {
-                            showDataInUi(bodyModel.data.grocereisExpenses)
-                        } else {
-                            if (bodyModel.code == ErrorMessage.code) {
-                                showAlertFunction(bodyModel.message, true)
-                            }else{
-                                showAlertFunction(bodyModel.message, false)
+                        try {
+                            val gson = Gson()
+                            val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                            if (bodyModel.code == 200 && bodyModel.success) {
+                                showDataInUi(bodyModel.data.grocereisExpenses)
+                            } else {
+                                if (bodyModel.code == ErrorMessage.code) {
+                                    showAlertFunction(bodyModel.message, true)
+                                }else{
+                                    showAlertFunction(bodyModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("SpendingGroceries@@@","message:--"+e.message)
                         }
+
                     }
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)

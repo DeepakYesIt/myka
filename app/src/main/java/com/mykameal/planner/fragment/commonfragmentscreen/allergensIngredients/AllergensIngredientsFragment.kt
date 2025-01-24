@@ -137,16 +137,20 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
-                        if (bodyModel.code == 200 && bodyModel.success) {
-                            showDataInUi(bodyModel.data.allergesingredient)
-                        } else {
-                            if (bodyModel.code == ErrorMessage.code) {
-                                showAlertFunction(bodyModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                            if (bodyModel.code == 200 && bodyModel.success) {
+                                showDataInUi(bodyModel.data.allergesingredient)
                             } else {
-                                showAlertFunction(bodyModel.message, false)
+                                if (bodyModel.code == ErrorMessage.code) {
+                                    showAlertFunction(bodyModel.message, true)
+                                } else {
+                                    showAlertFunction(bodyModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("allergens@@","message:---"+e.message)
                         }
                     }
 
@@ -224,17 +228,21 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val updateModel =
-                            gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
-                        if (updateModel.code == 200 && updateModel.success) {
-                            findNavController().navigateUp()
-                        } else {
-                            if (updateModel.code == ErrorMessage.code) {
-                                showAlertFunction(updateModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val updateModel =
+                                gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                            if (updateModel.code == 200 && updateModel.success) {
+                                findNavController().navigateUp()
                             } else {
-                                showAlertFunction(updateModel.message, false)
+                                if (updateModel.code == ErrorMessage.code) {
+                                    showAlertFunction(updateModel.message, true)
+                                } else {
+                                    showAlertFunction(updateModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("allergens@@","message:---"+e.message)
                         }
                     }
 
@@ -274,17 +282,20 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val dietaryModel =
-                            gson.fromJson(it.data, AllergensIngredientModel::class.java)
-                        if (dietaryModel.code == 200 && dietaryModel.success) {
-                            showDataFirstUi(dietaryModel.data)
-                        } else {
-                            if (dietaryModel.code == ErrorMessage.code) {
-                                showAlertFunction(dietaryModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val dietaryModel = gson.fromJson(it.data, AllergensIngredientModel::class.java)
+                            if (dietaryModel.code == 200 && dietaryModel.success) {
+                                showDataFirstUi(dietaryModel.data)
                             } else {
-                                showAlertFunction(dietaryModel.message, false)
+                                if (dietaryModel.code == ErrorMessage.code) {
+                                    showAlertFunction(dietaryModel.message, true)
+                                } else {
+                                    showAlertFunction(dietaryModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("allergens","message:--"+e.message)
                         }
                     }
 

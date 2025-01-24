@@ -4,20 +4,30 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.ClipData
 import android.content.ClipDescription
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.OnItemLongClickListener
+import com.mykameal.planner.OnItemSelectUnSelectListener
+import com.mykameal.planner.R
 import com.mykameal.planner.databinding.AdapterIngredientsItemBinding
+import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.Breakfast
+import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
+import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.BreakfastModelPlanByDate
 import com.mykameal.planner.model.DataModel
 import java.util.Collections
 
-
-class IngredientsBreakFastAdapter( var datalist: List<DataModel>, private var requireActivity: FragmentActivity,
-                                  private var onItemClickListener: OnItemClickListener, private var onItemLongClickListener: OnItemLongClickListener): RecyclerView.Adapter<IngredientsBreakFastAdapter.ViewHolder>() {
+class IngredientsBreakFastAdapter(var datalist:MutableList<Breakfast>?, private var requireActivity: FragmentActivity,
+                                  private var onItemClickListener: OnItemSelectUnSelectListener, private var onItemLongClickListener: OnItemLongClickListener, var type:String): RecyclerView.Adapter<IngredientsBreakFastAdapter.ViewHolder>() {
 
     private var checkStatus:String?=null
     private var checkTypeStatus: String? = null
@@ -45,8 +55,44 @@ class IngredientsBreakFastAdapter( var datalist: List<DataModel>, private var re
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.tvBreakfast.text=datalist[position].title
-//        holder.binding.relBreakfast.setBackgroundResource(datalist[position].image)
+        val item= datalist?.get(position)
+
+        if (item?.recipe?.label!=null){
+            holder.binding.tvBreakfast.text = item.recipe.label
+        }
+
+        if (item?.recipe?.totalTime!=null){
+            holder.binding.tvTime.text = ""+ item.recipe.totalTime +" min "
+        }
+
+        if (item?.is_like!=null){
+            if (item.is_like ==0 ){
+                holder.binding.imgHeartRed.setImageResource(R.drawable.heart_white_icon)
+            }else{
+                holder.binding.imgHeartRed.setImageResource(R.drawable.heart_red_icon)
+            }
+        }
+
+        if (item?.recipe?.images?.SMALL?.url != null) {
+            Glide.with(requireActivity)
+                .load(item.recipe.images.SMALL.url)
+                .error(R.drawable.no_image)
+                .placeholder(R.drawable.no_image)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                        holder.binding.layProgess.root.visibility = View.GONE
+                        return false
+                    }
+
+                    override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                        holder.binding.layProgess.root.visibility = View.GONE
+                        return false
+                    }
+                })
+                .into(holder.binding.imageData)
+        } else {
+            holder.binding.layProgess.root.visibility = View.GONE
+        }
 
         if (isZiggleEnabled) {
             holder.binding.imageMinus.visibility= View.VISIBLE
@@ -60,49 +106,51 @@ class IngredientsBreakFastAdapter( var datalist: List<DataModel>, private var re
             stopZiggle(holder.itemView)
         }
 
-        if (datalist[position].isOpen){
+    /*    if (datalist[position].isOpen){
             holder.binding.missingIngredientsImg.visibility=View.VISIBLE
             holder.binding.checkBoxImg.visibility=View.GONE
         }else{
             holder.binding.missingIngredientsImg.visibility=View.GONE
             holder.binding.checkBoxImg.visibility=View.VISIBLE
-        }
+        }*/
 
         holder.binding.missingIngredientsImg.setOnClickListener{
             checkTypeStatus="missingIng"
-            onItemClickListener.itemClick(position, checkStatus, checkTypeStatus)
+            onItemClickListener.itemSelectUnSelect(position,checkTypeStatus,"BreakFast",position)
+            /*onItemClickListener.itemClick(position, checkStatus, checkTypeStatus)*/
         }
 
         holder.binding.imgHeartRed.setOnClickListener{
             checkTypeStatus="heart"
-            onItemClickListener.itemClick(position, checkStatus, checkTypeStatus)
+            onItemClickListener.itemSelectUnSelect(position,checkTypeStatus,"BreakFast",position)
         }
 
         holder.binding.relMainLayouts.setOnClickListener{
             checkTypeStatus="recipeDetails"
-            onItemClickListener.itemClick(position, checkStatus, checkTypeStatus)
+            onItemClickListener.itemSelectUnSelect(position,checkTypeStatus,"BreakFast",position)
         }
 
         holder.binding.imageMinus.setOnClickListener {
             checkTypeStatus="minus"
-            if (datalist[position].isOpen) {
+           /* if (datalist[position].isOpen) {
                 checkStatus = "1"
             } else {
                 checkStatus = "0"
-            }
-            onItemClickListener.itemClick(position, checkStatus,checkTypeStatus)
+            }*/
+            onItemClickListener.itemSelectUnSelect(datalist?.get(position)!!.id,checkTypeStatus,"BreakFast",position)
+
         }
 
         holder.itemView.setOnLongClickListener{
             val clipData = ClipData(
-                datalist[position].title, // Use the title as the drag data
+                item?.recipe?.label, // Use the title as the drag data
                 arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
-                ClipData.Item(datalist[position].title)
+                ClipData.Item(item?.recipe?.label)
             )
 
             val shadowBuilder = View.DragShadowBuilder(holder.itemView)
             holder.itemView.startDragAndDrop(clipData, shadowBuilder, null, 0)
-            onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
+            onItemLongClickListener.itemLongClick(position, checkStatus, type)
             true
             /*onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
             true*/
@@ -115,7 +163,7 @@ class IngredientsBreakFastAdapter( var datalist: List<DataModel>, private var re
     }
 
     override fun getItemCount(): Int {
-        return datalist.size
+        return datalist!!.size
     }
 
     class ViewHolder(var binding: AdapterIngredientsItemBinding) : RecyclerView.ViewHolder(binding.root){
@@ -132,11 +180,37 @@ class IngredientsBreakFastAdapter( var datalist: List<DataModel>, private var re
         ziggleAnimation!!.start()
     }
 
+  /*  private fun stopZiggle(view: View) {
+        // Ensure the animation is properly canceled and the object is reset.
+        ziggleAnimation?.cancel()
+        ziggleAnimation = null
+
+        // Reset the rotation of the view to 0f
+        view.rotation = 0f
+
+        // Optionally set the view to be static again if needed (especially if other properties change).
+        view.clearAnimation()
+
+        // Ensure the "isZiggleEnabled" flag is updated.
+        isZiggleEnabled = false
+    }*/
+
     private fun stopZiggle(view: View) {
         ziggleAnimation?.cancel()
         ziggleAnimation = null
         view.rotation = 0f
         isZiggleEnabled = false
+    }
+
+    fun updateList(mealList: MutableList<Breakfast>) {
+        this.datalist=mealList
+        notifyDataSetChanged()
+    }
+
+    fun removeItem(position: Int) {
+        datalist?.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, datalist!!.size) // Optional, updates the positions of remaining items
     }
 
 }

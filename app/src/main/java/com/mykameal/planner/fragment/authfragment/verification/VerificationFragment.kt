@@ -250,19 +250,23 @@ class VerificationFragment : Fragment() {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val resendSignUpModel =
-                            gson.fromJson(it.data, ResendSignUpOtpModel::class.java)
-                        if (resendSignUpModel.code == 200 && resendSignUpModel.success) {
-                            binding!!.relResendVerificationTimer.visibility = View.VISIBLE
-                            binding!!.textResend.isEnabled = false
-                            startTime()
-                        } else {
-                            if (resendSignUpModel.code == ErrorMessage.code) {
-                                showAlertFunction(resendSignUpModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val resendSignUpModel =
+                                gson.fromJson(it.data, ResendSignUpOtpModel::class.java)
+                            if (resendSignUpModel.code == 200 && resendSignUpModel.success) {
+                                binding!!.relResendVerificationTimer.visibility = View.VISIBLE
+                                binding!!.textResend.isEnabled = false
+                                startTime()
                             } else {
-                                showAlertFunction(resendSignUpModel.message, false)
+                                if (resendSignUpModel.code == ErrorMessage.code) {
+                                    showAlertFunction(resendSignUpModel.message, true)
+                                } else {
+                                    showAlertFunction(resendSignUpModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("verification@@","message"+e.message)
                         }
                     }
 
@@ -287,18 +291,23 @@ class VerificationFragment : Fragment() {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val forgotModel = gson.fromJson(it.data, ForgotPasswordModel::class.java)
-                        if (forgotModel.code == 200 && forgotModel.success) {
-                            binding!!.relResendVerificationTimer.visibility = View.VISIBLE
-                            binding!!.textResend.isEnabled = false
-                            startTime()
-                        } else {
-                            if (forgotModel.code == ErrorMessage.code) {
-                                showAlertFunction(forgotModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val forgotModel = gson.fromJson(it.data, ForgotPasswordModel::class.java)
+                            if (forgotModel.code == 200 && forgotModel.success) {
+                                binding!!.relResendVerificationTimer.visibility = View.VISIBLE
+                                binding!!.textResend.isEnabled = false
+                                startTime()
                             } else {
-                                showAlertFunction(forgotModel.message, false)
+                                if (forgotModel.code == ErrorMessage.code) {
+                                    showAlertFunction(forgotModel.message, true)
+                                } else {
+                                    showAlertFunction(forgotModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("verification@@@","message"+e.message)
+
                         }
                     }
 
@@ -323,16 +332,20 @@ class VerificationFragment : Fragment() {
                     BaseApplication.dismissMe()
                     when (it) {
                         is NetworkResult.Success -> {
-                            val gson = Gson()
-                            val signUpVerificationModel = gson.fromJson(it.data, SignUpVerificationModel::class.java)
-                            if (signUpVerificationModel.code == 200 && signUpVerificationModel.success) {
-                                showDataInSession(signUpVerificationModel.data)
-                            } else {
-                                if (signUpVerificationModel.code == ErrorMessage.code) {
-                                    showAlertFunction(signUpVerificationModel.message, true)
+                            try {
+                                val gson = Gson()
+                                val signUpVerificationModel = gson.fromJson(it.data, SignUpVerificationModel::class.java)
+                                if (signUpVerificationModel.code == 200 && signUpVerificationModel.success) {
+                                    showDataInSession(signUpVerificationModel.data)
                                 } else {
-                                    showAlertFunction(signUpVerificationModel.message, false)
+                                    if (signUpVerificationModel.code == ErrorMessage.code) {
+                                        showAlertFunction(signUpVerificationModel.message, true)
+                                    } else {
+                                        showAlertFunction(signUpVerificationModel.message, false)
+                                    }
                                 }
+                            }catch (e:Exception){
+                                Log.d("verification@@@","message"+e.message)
                             }
                         }
 
@@ -425,23 +438,28 @@ class VerificationFragment : Fragment() {
                     BaseApplication.dismissMe()
                     when (it) {
                         is NetworkResult.Success -> {
-                            val gson = Gson()
-                            val forgotOtpModel =
-                                gson.fromJson(it.data, ForgotVerificationModel::class.java)
-                            if (forgotOtpModel.code == 200 && forgotOtpModel.success) {
-                                try {
-                                    val bundle = Bundle()
-                                    bundle.putString("value", value)
-                                    findNavController().navigate(R.id.resetPasswordFragment, bundle)
-                                }catch (e:Exception){
-                                    Log.d("Verification","message"+e.message)
-                                }
-                            } else {
-                                if (forgotOtpModel.code == ErrorMessage.code) {
-                                    showAlertFunction(forgotOtpModel.message, true)
+                            try {
+                                val gson = Gson()
+                                val forgotOtpModel =
+                                    gson.fromJson(it.data, ForgotVerificationModel::class.java)
+                                if (forgotOtpModel.code == 200 && forgotOtpModel.success) {
+                                    try {
+                                        val bundle = Bundle()
+                                        bundle.putString("value", value)
+                                        findNavController().navigate(R.id.resetPasswordFragment, bundle)
+                                    }catch (e:Exception){
+                                        Log.d("Verification","message"+e.message)
+                                    }
                                 } else {
-                                    showAlertFunction(forgotOtpModel.message, false)
+                                    if (forgotOtpModel.code == ErrorMessage.code) {
+                                        showAlertFunction(forgotOtpModel.message, true)
+                                    } else {
+                                        showAlertFunction(forgotOtpModel.message, false)
+                                    }
                                 }
+                            }catch (e:Exception){
+                                Log.d("Verification@@@","message"+e.message)
+
                             }
                         }
 

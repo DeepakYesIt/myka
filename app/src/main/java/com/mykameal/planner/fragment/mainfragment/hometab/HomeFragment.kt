@@ -58,8 +58,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private lateinit var viewModel: HomeViewModel
     private lateinit var userDataLocal: com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.DataModel
     private lateinit var spinnerActivityLevel: PowerSpinnerView
-    var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
-
+    private var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -142,7 +141,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     @SuppressLint("SetTextI18n")
     private fun showData(data: com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.DataModel?) {
         try {
-
             userDataLocal= data!!
 
             if (userDataLocal.userData!=null && userDataLocal.userData!!.size>0){
@@ -379,6 +377,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         binding!!.imageCookedMeals.setOnClickListener(this)
         binding!!.imgFreeTrial.setOnClickListener(this)
         binding!!.imgBasketIcon.setOnClickListener(this)
+        binding!!.tvName.setOnClickListener(this)
 
         binding!!.imageProfile.setOnClickListener(this)
 
@@ -439,6 +438,11 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
             R.id.imgFreeTrial->{
                 findNavController().navigate(R.id.homeSubscriptionFragment)
+            }
+
+            ///for checking purpose only
+            R.id.tv_name->{
+                findNavController().navigate(R.id.statisticsGraphFragment)
             }
 
           /*  R.id.imageRecipeSeeAll->{
@@ -601,20 +605,25 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     }
 
 
+
+
     private fun recipeLikeAndUnlikeData(
         position: Int?,
         likeType: String,
         cookbooktype: String,
         dialogAddRecipe: Dialog?
     ) {
+
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             viewModel.likeUnlikeRequest({
                 BaseApplication.dismissMe()
-                handleLikeAndUnlikeApiResponse(it,position,dialogAddRecipe)
-            }, userDataLocal.userData?.get(position!!)?.recipe?.uri!!,likeType,cookbooktype)
+
+                handleLikeAndUnlikeApiResponse(it, position, dialogAddRecipe)
+            }, userDataLocal.userData?.get(position!!)?.recipe?.uri!!, likeType, cookbooktype)
         }
     }
+
 
     private fun handleLikeAndUnlikeApiResponse(
         result: NetworkResult<String>,
@@ -658,61 +667,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         }
     }
 
-
-
-    private fun addRecipeDialog(position: Int?) {
-        val dialogAddRecipe: Dialog = context?.let { Dialog(it) }!!
-        dialogAddRecipe.setContentView(R.layout.alert_dialog_add_recipe)
-        dialogAddRecipe.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
-        dialogAddRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val rlDoneBtn = dialogAddRecipe.findViewById<RelativeLayout>(R.id.rlDoneBtn)
-        val relCreateNewCookBook = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
-        val relFavourites = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relFavourites)
-        val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
-
-        dialogAddRecipe.show()
-        dialogAddRecipe.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-
-        relCreateNewCookBook.setOnClickListener{
-            statuses="newCook"
-            relCreateNewCookBook.setBackgroundResource(R.drawable.light_green_rectangular_bg)
-            imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
-            relFavourites.setBackgroundResource(0)
-            checkStatus=false
-        }
-
-        imgCheckBoxOrange.setOnClickListener{
-            if (checkStatus==true){
-                statuses=""
-                imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
-                relFavourites.setBackgroundResource(0)
-                relCreateNewCookBook.setBackgroundResource(0)
-                relCreateNewCookBook.background=null
-                checkStatus=false
-            }else{
-                relFavourites.setBackgroundResource(R.drawable.light_green_rectangular_bg)
-                relCreateNewCookBook.setBackgroundResource(0)
-                statuses="favourites"
-                imgCheckBoxOrange.setImageResource(R.drawable.orange_checkbox_images)
-                checkStatus=true
-            }
-        }
-
-
-        rlDoneBtn.setOnClickListener{
-            if (statuses==""){
-                Toast.makeText(requireActivity(),"Please select atleast one of them", Toast.LENGTH_LONG).show()
-            }else if (statuses=="favourites"){
-                dialogAddRecipe.dismiss()
-            }else{
-                dialogAddRecipe.dismiss()
-                val bundle=Bundle()
-                bundle.putString("value","New")
-                findNavController().navigate(R.id.createCookBookFragment,bundle)
-            }
-        }
-
-    }
 
     private fun removeDayDialog(position: Int?, type: String?) {
         val dialogRemoveDay: Dialog = context?.let { Dialog(it) }!!

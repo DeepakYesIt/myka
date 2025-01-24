@@ -19,6 +19,7 @@
             android:id="@+id/relBreakfast"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imageData"
                 android:layout_width="match_parent"
@@ -107,7 +108,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/_10sdp"
                     android:fontFamily="@font/montserrat_medium"
-                    android:text="Serves 1"
+                    android:text="Serves 01"
                     android:textSize="@dimen/_11sdp" />
 
                 <ImageView
