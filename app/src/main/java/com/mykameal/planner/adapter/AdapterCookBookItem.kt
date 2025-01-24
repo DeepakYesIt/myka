@@ -34,7 +34,7 @@ class AdapterCookBookItem(var datalist: MutableList<Data>, private var requireAc
         try {
             holder.binding.textTittles.text = datalist[position].name
 
-            if (datalist[position].status==1){
+            if (datalist[position].image.equals("001",true)){
                 holder.binding.cardViews.setBackgroundResource(R.drawable.cardview_border_active)
             }else{
                 holder.binding.cardViews.setBackgroundResource(R.drawable.cardview_border)
@@ -53,6 +53,7 @@ class AdapterCookBookItem(var datalist: MutableList<Data>, private var requireAc
                             isFirstResource: Boolean
                         ): Boolean {
                             Log.e("GlideError", "Image Load Failed: ${e?.message}", e)
+                            holder.binding.layProgess.root.visibility= View.GONE
                             return false
                         }
 
@@ -64,11 +65,11 @@ class AdapterCookBookItem(var datalist: MutableList<Data>, private var requireAc
                             isFirstResource: Boolean
                         ): Boolean {
                             Log.d("GlideSuccess", "Image Loaded Successfully")
+                            holder.binding.layProgess.root.visibility= View.GONE
                             return false
                         }
                     })
                     .into(holder.binding.imageShapeable)
-
 
             }else{
                 Glide.with(requireActivity)
@@ -76,16 +77,18 @@ class AdapterCookBookItem(var datalist: MutableList<Data>, private var requireAc
                     .error(R.drawable.mask_group_icon)
                     .placeholder(R.drawable.mask_group_icon)
                     .listener(object : RequestListener<Drawable> {
+                        @SuppressLint("SuspiciousIndentation")
                         override fun onLoadFailed(
                             e: GlideException?,
                             model: Any?,
                             target: Target<Drawable>?,
                             isFirstResource: Boolean
                         ): Boolean {
-//                        holder.binding.layProgess.root.visibility= View.GONE
+                        holder.binding.layProgess.root.visibility= View.GONE
                             return false
                         }
 
+                        @SuppressLint("SuspiciousIndentation")
                         override fun onResourceReady(
                             resource: Drawable?,
                             model: Any?,
@@ -93,7 +96,7 @@ class AdapterCookBookItem(var datalist: MutableList<Data>, private var requireAc
                             dataSource: DataSource?,
                             isFirstResource: Boolean
                         ): Boolean {
-//                        holder.binding.layProgess.root.visibility= View.GONE
+                        holder.binding.layProgess.root.visibility= View.GONE
                             return false
                         }
                     })
@@ -105,16 +108,9 @@ class AdapterCookBookItem(var datalist: MutableList<Data>, private var requireAc
                 onItemSelectListener.itemSelect(position,"","Christmas")
             }
 
-
-
         }catch (e:Exception){
             Log.d("@Error ","*****"+e.message)
         }
-
-
-//        holder.binding.cardViews.setOnClickListener{
-//            holder.binding.cardViews.setBackgroundResource(R.drawable.outline_green_box_bg)
-//        }
 
     }
 

@@ -14,12 +14,15 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.OnItemSelectListener
 import com.mykameal.planner.R
@@ -29,15 +32,22 @@ import com.mykameal.planner.adapter.AdapterCookBookItem
 import com.mykameal.planner.adapter.ChooseDayAdapter
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
+import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.databinding.FragmentCookBookBinding
 import com.mykameal.planner.fragment.mainfragment.viewmodel.cookbookviewmodel.CookBookViewModel
+import com.mykameal.planner.fragment.mainfragment.viewmodel.cookbookviewmodel.apiresponse.CookBookDataModel
+import com.mykameal.planner.fragment.mainfragment.viewmodel.cookbookviewmodel.apiresponse.CookBookListApiResponse
 import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
+import com.mykameal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import com.mykameal.planner.model.DataModel
+import com.mykameal.planner.model.DateModel
+import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 
@@ -47,20 +57,23 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
     private var binding: FragmentCookBookBinding? = null
     private var adapterCookBookItem: AdapterCookBookItem? = null
     private var adapterCookBookDetailsItem: AdapterCookBookDetailsItem? = null
-    private var status: Boolean? = null
-    private var rcyChooseDaySch: RecyclerView? = null
     private var tvWeekRange: TextView? = null
-    private val calendar = Calendar.getInstance()
-    private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
-    private var chooseDayAdapter: ChooseDayAdapter? = null
     private lateinit var viewModel: CookBookViewModel
-    var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
-
+    private var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
+    private var cookbookListLocal: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
+    private var localData: MutableList<CookBookDataModel> = mutableListOf()
+    private var currentDate = Date() // Current date
+    // Define global variables
+    private lateinit var startDate: Date
+    private lateinit var endDate: Date
+    val dataList = arrayListOf<DataModel>()
+    private lateinit var spinnerActivityLevel: PowerSpinnerView
+    private lateinit var sessionManagement: SessionManagement
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         binding = FragmentCookBookBinding.inflate(layoutInflater, container, false)
-
+        sessionManagement = SessionManagement(requireContext())
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
         viewModel = ViewModelProvider(requireActivity())[CookBookViewModel::class.java]
@@ -76,14 +89,10 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
 
         cookbookList.clear()
 
-        val data1= com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"R.drawable.add_more_cookbook_icon","Add",0,"",R.drawable.add_more_cookbook_icon)
-        val data2= com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"R.drawable.favourites_cookbook_image","Favourites",1,"",R.drawable.favourites_cookbook_image)
+        val data1= com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"000","Add",0,"",R.drawable.add_more_cookbook_icon)
+        val data2= com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"001","Favourites",0,"",R.drawable.favourites_cookbook_image)
         cookbookList.add(0,data1)
         cookbookList.add(1,data2)
-
-//        cookBookModel()
-
-        cookBookDetailsModel()
 
         initialize()
 
@@ -106,11 +115,48 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         }
     }
 
+    private fun handleApiCookBookListResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessCookBookListResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
     private fun handleApiCookBookResponse(result: NetworkResult<String>) {
         when (result) {
             is NetworkResult.Success -> handleSuccessCookBookResponse(result.data.toString())
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessCookBookListResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, CookBookListApiResponse::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                localData.clear()
+                apiModel.data?.let { localData.addAll(it) }
+                if (localData.size>0){
+                    adapterCookBookDetailsItem = AdapterCookBookDetailsItem(localData, requireActivity(),this)
+                    binding!!.rcyCookBookDetails.adapter = adapterCookBookDetailsItem
+                    binding!!.rcyCookBookDetails.visibility=View.VISIBLE
+                    binding!!.tvnoData.visibility=View.GONE
+                }else{
+                    binding!!.rcyCookBookDetails.visibility=View.GONE
+                    binding!!.tvnoData.visibility=View.VISIBLE
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
         }
     }
 
@@ -121,12 +167,11 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 if (apiModel.data!=null && apiModel.data.size>0){
-//                    cookbookList.retainAll { it == cookbookList[0] || it == cookbookList[1] }
                     cookbookList.addAll(apiModel.data)
                     // OR directly modify the original list
                     adapterCookBookItem = AdapterCookBookItem(cookbookList, requireActivity(), this)
                     binding!!.rcyCookBookAdding.adapter = adapterCookBookItem
-
+                    getCookBookTypeList()
                 }
             } else {
                 if (apiModel.code == ErrorMessage.code) {
@@ -150,203 +195,217 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
             findNavController().navigateUp()
         }
 
+
+        binding!!.rlAddRecipes.setOnClickListener {
+            findNavController().navigate(R.id.createRecipeFragment)
+        }
+
     }
 
-    private fun cookBookModel() {
-        val dataList = ArrayList<DataModel>()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-
-        data1.title = "Add"
-        data1.isOpen = false
-        data1.image = R.drawable.add_more_cookbook_icon
-        data1.type = "CookBook"
-
-        data2.title = "Favourites"
-        data2.isOpen = false
-        data2.image = R.drawable.favourites_cookbook_image
-        data2.type = "CookBook"
-
-        data3.title = "Christmas"
-        data3.isOpen = false
-        data3.image = R.drawable.christmas_cookbook_image
-        data3.type = "CookBook"
-
-        data4.title = "Party"
-        data4.isOpen = false
-        data4.image = R.drawable.party_cookbook_image
-        data4.type = "CookBook"
-
-        data5.title = "Coriander"
-        data5.isOpen = false
-        data5.image = R.drawable.coriander_cookbook_image
-        data5.type = "CookBook"
-
-        dataList.add(data1)
-        dataList.add(data2)
-        dataList.add(data3)
-        dataList.add(data4)
-        dataList.add(data5)
-
-       /* adapterCookBookItem = AdapterCookBookItem(dataList, requireActivity(), this)
-        binding!!.rcyCookBookAdding.adapter = adapterCookBookItem*/
-    }
-
-    private fun cookBookDetailsModel() {
-        val dataList = ArrayList<DataModel>()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-
-        data1.title = "Bread"
-        data1.isOpen = false
-        data1.image = R.drawable.bread_breakfast_image
-        data1.type = "CookBookDetails"
-
-        data2.title = "Bar BQ"
-        data2.isOpen = false
-        data2.image = R.drawable.bbq_image
-        data2.type = "CookBookDetails"
-
-        data3.title = "Salad"
-        data3.isOpen = false
-        data3.image = R.drawable.salaad_image
-        data3.type = "CookBookDetails"
-
-        data4.title = "Sandwich"
-        data4.isOpen = false
-        data4.image = R.drawable.bbq_image
-        data4.type = "CookBookDetails"
-
-        dataList.add(data1)
-        dataList.add(data2)
-        dataList.add(data3)
-        dataList.add(data4)
-
-        adapterCookBookDetailsItem = AdapterCookBookDetailsItem(dataList, requireActivity(), this)
-        binding!!.rcyCookBookDetails.adapter = adapterCookBookDetailsItem
-    }
-
-    override fun itemClick(position: Int?, status: String?, type: String?) {
-        if (type == "remove") {
-            removeRecipeDialog()
-        } else if (type == "move") {
-            moveRecipeDialog()
-        } else if (type == "plan") {
-            chooseDayDialog()
-
-//            findNavController().navigate(R.id.planFragment)
-        } else {
-            findNavController().navigate(R.id.basketScreenFragment)
-
+    private fun getCookBookTypeList(){
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.getCookBookTypeRequest( {
+                BaseApplication.dismissMe()
+                handleApiCookBookListResponse(it)
+            },"0")
         }
     }
 
-    private fun chooseDayDialog() {
+    override fun itemClick(position: Int?, status: String?, type: String?) {
+        when (status) {
+            "1" -> {
+                chooseDayDialog(position)
+            }
+            "2" -> {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    addBasketData(localData[position!!].data?.recipe!!.uri!!)
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
+            "4" -> {
+                val bundle = Bundle().apply {
+                    putString("uri", localData[position!!].data?.recipe!!.uri!!)
+                    putString("mealType", status)
+                }
+                findNavController().navigate(R.id.recipeDetailsFragment, bundle)
+            }
+            "5" -> {
+                moveRecipeDialog(position)
+            }else -> {
+                removeRecipeDialog(position)
+            }
+        }
+
+    }
+
+    private fun addBasketData(uri: String) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.addBasketRequest({
+                BaseApplication.dismissMe()
+                handleBasketApiResponse(it)
+            }, uri,"")
+        }
+    }
+
+    private fun handleBasketApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleBasketSuccessResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleBasketSuccessResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ Plan List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                Toast.makeText(requireContext(),apiModel.message, Toast.LENGTH_LONG).show()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun chooseDayDialog(position: Int?) {
         val dialogChooseDay: Dialog = context?.let { Dialog(it) }!!
         dialogChooseDay.setContentView(R.layout.alert_dialog_choose_day)
-        dialogChooseDay.window!!.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
+        dialogChooseDay.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
         dialogChooseDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        rcyChooseDaySch = dialogChooseDay.findViewById(R.id.rcyChooseDaySch)
+        val rcyChooseDaySch = dialogChooseDay.findViewById<RecyclerView>(R.id.rcyChooseDaySch)
         tvWeekRange = dialogChooseDay.findViewById(R.id.tvWeekRange)
         val rlDoneBtn = dialogChooseDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         val btnPrevious = dialogChooseDay.findViewById<ImageView>(R.id.btnPrevious)
         val btnNext = dialogChooseDay.findViewById<ImageView>(R.id.btnNext)
         dialogChooseDay.show()
-        updateWeekRange()
         dialogChooseDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        cookingScheduleModel()
+        showWeekDates()
+        dataList.clear()
+        val daysOfWeek = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        for (day in daysOfWeek) {
+            val data = DataModel().apply {
+                title = day
+                isOpen = false
+                type = "CookingSchedule"
+                date = ""
+            }
+            dataList.add(data)
+        }
+
+        rcyChooseDaySch!!.adapter = ChooseDayAdapter(dataList, requireActivity())
 
         rlDoneBtn.setOnClickListener {
-            chooseDayMealTypeDialog()
-            dialogChooseDay.dismiss()
+
+            var status = false
+            for (it in dataList) {
+                if (it.isOpen) {
+                    status = true
+                    break // Exit the loop early
+                }
+            }
+            if (status){
+                chooseDayMealTypeDialog(position)
+                dialogChooseDay.dismiss()
+            }else{
+                BaseApplication.alertError(requireContext(), ErrorMessage.weekNameError, false)
+            }
+
+
         }
 
         btnPrevious.setOnClickListener {
-            changeWeek(-1)
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+            currentDate = calendar.time
+            // Display next week dates
+            println("\nAfter clicking 'Next':")
+            showWeekDates()
         }
 
         btnNext.setOnClickListener {
-            changeWeek(1)
+            // Simulate clicking the "Next" button to move to the next week
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            calendar.add(Calendar.WEEK_OF_YEAR, 1) // Move to next week
+            currentDate = calendar.time
+            // Display next week dates
+            println("\nAfter clicking 'Next':")
+            showWeekDates()
         }
+
     }
 
-    private fun changeWeek(weeks: Int) {
-        calendar.add(Calendar.WEEK_OF_YEAR, weeks)
-        updateWeekRange()
+    @SuppressLint("SetTextI18n")
+    fun showWeekDates() {
+        Log.d("currentDate :- ", "******$currentDate")
+        val (startDate, endDate) = getWeekDates(currentDate)
+        this.startDate=startDate
+        this.endDate=endDate
+        println("Week Start Date: ${formatDate(startDate)}")
+        println("Week End Date: ${formatDate(endDate)}")
+        // Get all dates between startDate and endDate
+        val daysBetween = getDaysBetween(startDate, endDate)
+        // Print the dates
+        println("Days between $startDate and ${endDate}:")
+        daysBetween.forEach { println(it) }
+        tvWeekRange?.text = ""+formatDate(startDate)+"-"+formatDate(endDate)
+
     }
 
-    private fun cookingScheduleModel() {
-        val dataList = ArrayList<DataModel>()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-        val data6 = DataModel()
-        val data7 = DataModel()
+    private fun getDaysBetween(startDate: Date, endDate: Date): MutableList<DateModel> {
+        val dateList = mutableListOf<DateModel>()
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // Format for the date
+        val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault()) // Format for the day name (e.g., Monday)
+        val calendar = Calendar.getInstance()
+        calendar.time = startDate
+        while (!calendar.time.after(endDate)) {
+            val date = dateFormat.format(calendar.time)  // Get the formatted date (yyyy-MM-dd)
+            val dayName = dayFormat.format(calendar.time)  // Get the day name (Monday, Tuesday, etc.)
+            val localDate= DateModel()
+            localDate.day=dayName
+            localDate.date=date
+            // Combine both the day name and the date
+            dateList.add(localDate)
+            // Move to the next day
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
 
-        data1.title = "Monday"
-        data1.isOpen = false
-        data1.type = "CookingSchedule"
-
-        data2.title = "Tuesday"
-        data2.isOpen = false
-        data2.type = "CookingSchedule"
-
-        data3.title = "Wednesday"
-        data3.isOpen = false
-        data3.type = "CookingSchedule"
-
-        data4.title = "Thursday"
-        data4.isOpen = false
-        data4.type = "CookingSchedule"
-
-        data5.title = "Friday"
-        data5.isOpen = false
-        data5.type = "CookingSchedule"
-
-        data6.title = "Saturday"
-        data6.isOpen = false
-        data6.type = "CookingSchedule"
-
-        data7.title = "Sunday"
-        data7.isOpen = false
-        data7.type = "CookingSchedule"
-
-        dataList.add(data1)
-        dataList.add(data2)
-        dataList.add(data3)
-        dataList.add(data4)
-        dataList.add(data5)
-        dataList.add(data6)
-        dataList.add(data7)
-
-        chooseDayAdapter = ChooseDayAdapter(dataList, requireActivity())
-        rcyChooseDaySch!!.adapter = chooseDayAdapter
+        return dateList
     }
 
-    private fun updateWeekRange() {
-        val startOfWeek = calendar.apply {
-            set(Calendar.DAY_OF_WEEK, firstDayOfWeek)
-        }.time
-
-        val endOfWeek = calendar.apply {
-            add(Calendar.DAY_OF_WEEK, 6)
-        }.time
-
-        tvWeekRange!!.text = "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
-        calendar.add(Calendar.DAY_OF_WEEK, -6) // Reset endOfWeek calculation
+    private fun formatDate(date: Date): String {
+        val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+        return dateFormat.format(date)
     }
 
-    private fun chooseDayMealTypeDialog() {
+    private fun getWeekDates(currentDate: Date): Pair<Date, Date> {
+        val calendar = Calendar.getInstance()
+        calendar.time = currentDate
+        // Set the calendar to the start of the week (Monday)
+        calendar.firstDayOfWeek = Calendar.MONDAY
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val startOfWeek = calendar.time
+
+        // Set the calendar to the end of the week (Saturday)
+        calendar.add(Calendar.DAY_OF_WEEK, 6)
+        val endOfWeek = calendar.time
+        return Pair(startOfWeek, endOfWeek)
+    }
+
+
+    private fun chooseDayMealTypeDialog(position: Int?) {
         val dialogChooseMealDay: Dialog = context?.let { Dialog(it) }!!
         dialogChooseMealDay.setContentView(R.layout.alert_dialog_choose_day_meal_type)
         dialogChooseMealDay.window!!.setLayout(
@@ -354,24 +413,14 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         dialogChooseMealDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        tvWeekRange = dialogChooseMealDay.findViewById(R.id.tvWeekRange)
         val rlDoneBtn = dialogChooseMealDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
-        val btnPrevious = dialogChooseMealDay.findViewById<ImageView>(R.id.btnPrevious)
-
-        val btnNext = dialogChooseMealDay.findViewById<ImageView>(R.id.btnNext)
         // button event listener
         val tvBreakfast = dialogChooseMealDay.findViewById<TextView>(R.id.tvBreakfast)
         val tvLunch = dialogChooseMealDay.findViewById<TextView>(R.id.tvLunch)
         val tvDinner = dialogChooseMealDay.findViewById<TextView>(R.id.tvDinner)
         val tvSnacks = dialogChooseMealDay.findViewById<TextView>(R.id.tvSnacks)
         val tvTeatime = dialogChooseMealDay.findViewById<TextView>(R.id.tvTeatime)
-
-
-
-
-
         dialogChooseMealDay.show()
-        updateWeekRange()
         dialogChooseMealDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
         var type = ""
@@ -399,34 +448,109 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         }
 
         tvSnacks.setOnClickListener {
-            updateSelection("Snacks", tvSnacks, allViews)
+            updateSelection("Snack", tvSnacks, allViews)
         }
 
         tvTeatime.setOnClickListener {
             updateSelection("Teatime", tvTeatime, allViews)
         }
 
+
         rlDoneBtn.setOnClickListener {
+            if (BaseApplication.isOnline(requireActivity())) {
+                if (type.equals("",true)){
+                    BaseApplication.alertError(requireContext(), ErrorMessage.mealTypeError, false)
+                }else{
+                    addToPlan(dialogChooseMealDay,type,position)
+                }
 
-            dialogChooseMealDay.dismiss()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
 
-        btnPrevious.setOnClickListener {
-            changeWeek(-1)
+    }
+
+    private fun addToPlan(dialogChooseMealDay: Dialog, selectType: String, position: Int?) {
+        // Create a JsonObject for the main JSON structure
+        val jsonObject = JsonObject()
+        // Safely get the item and position
+        val item = localData[position!!]
+        if (item != null) {
+            if (item.data?.recipe?.uri!=null){
+                jsonObject.addProperty("type", selectType)
+                jsonObject.addProperty("uri", item.data.recipe.uri)
+                // Create a JsonArray for ingredients
+                val jsonArray = JsonArray()
+                val latestList=getDaysBetween(startDate, endDate)
+                for (i in dataList.indices) {
+                    val data=DataModel()
+                    data.isOpen=dataList[i].isOpen
+                    data.title=dataList[i].title
+                    data.date=latestList[i].date
+                    dataList[i] = data
+                }
+                // Iterate through the ingredients and add them to the array if status is true
+                dataList.forEach { data ->
+                    if (data.isOpen) {
+                        // Create a JsonObject for each ingredient
+                        val ingredientObject = JsonObject()
+                        ingredientObject.addProperty("date", data.date)
+
+                        ingredientObject.addProperty("day", data.title)
+                        // Add the ingredient object to the array
+                        jsonArray.add(ingredientObject)
+                    }
+                }
+
+                // Add the ingredients array to the main JSON object
+                jsonObject.add("slot", jsonArray)
+            }
         }
 
-        btnNext.setOnClickListener {
-            changeWeek(1)
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.recipeAddToPlanRequest({
+                BaseApplication.dismissMe()
+                handleApiAddToPlanResponse(it,dialogChooseMealDay)
+            }, jsonObject)
         }
     }
 
-    private fun removeRecipeDialog() {
+
+    private fun handleApiAddToPlanResponse(result: NetworkResult<String>, dialogChooseMealDay: Dialog) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessAddToPlanResponse(result.data.toString(),dialogChooseMealDay)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessAddToPlanResponse(data: String, dialogChooseMealDay: Dialog) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                dataList.clear()
+                dialogChooseMealDay.dismiss()
+                Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun removeRecipeDialog(position: Int?) {
         val dialogRemoveRecipe: Dialog = context?.let { Dialog(it) }!!
         dialogRemoveRecipe.setContentView(R.layout.alert_dialog_remove_recipe)
-        dialogRemoveRecipe.window!!.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
+        dialogRemoveRecipe.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
         dialogRemoveRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val tvDialogCancelBtn = dialogRemoveRecipe.findViewById<TextView>(R.id.tvDialogCancelBtn)
         val tvDialogRemoveBtn = dialogRemoveRecipe.findViewById<TextView>(R.id.tvDialogRemoveBtn)
@@ -438,56 +562,104 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         }
 
         tvDialogRemoveBtn.setOnClickListener {
-            dialogRemoveRecipe.dismiss()
+            if (BaseApplication.isOnline(requireActivity())) {
+                recipeLikeAndUnlikeData(position,dialogRemoveRecipe)
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
     }
 
-    private fun moveRecipeDialog() {
+    private fun recipeLikeAndUnlikeData(position: Int?, dialogRemoveRecipe: Dialog) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.likeUnlikeRequest({
+                BaseApplication.dismissMe()
+                handleLikeAndUnlikeApiResponse(it,position,dialogRemoveRecipe)
+            }, localData[position!!].data?.recipe!!.uri!!,"0","")
+        }
+    }
+
+    private fun handleLikeAndUnlikeApiResponse(result: NetworkResult<String>, position: Int?, dialogRemoveRecipe: Dialog) {
+        when (result) {
+            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(result.data.toString(),position,dialogRemoveRecipe)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleLikeAndUnlikeSuccessResponse(data: String, position: Int?, dialogRemoveRecipe: Dialog) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ Api Response ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                // Toggle the is_like value
+                localData.removeAt(position ?: return) // Safely handle null position, return if null
+                if (localData.size>0){
+                    adapterCookBookDetailsItem?.updateList(localData)
+                    binding!!.rcyCookBookDetails.visibility=View.VISIBLE
+                    binding!!.tvnoData.visibility=View.GONE
+                }else{
+                    binding!!.rcyCookBookDetails.visibility=View.GONE
+                    binding!!.tvnoData.visibility=View.VISIBLE
+                }
+                dialogRemoveRecipe.dismiss()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun moveRecipeDialog(position: Int?) {
         val dialogMoveRecipe: Dialog = context?.let { Dialog(it) }!!
         dialogMoveRecipe.setContentView(R.layout.alert_dialog_move_dialog)
-        dialogMoveRecipe.window!!.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
+        dialogMoveRecipe.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
         dialogMoveRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val rlMove = dialogMoveRecipe.findViewById<RelativeLayout>(R.id.rlMove)
-        val rlSelectChristmas =
-            dialogMoveRecipe.findViewById<RelativeLayout>(R.id.rlSelectChristmas)
-        val relSelectedSnack = dialogMoveRecipe.findViewById<RelativeLayout>(R.id.relSelectedSnack)
-        val tvChristmas = dialogMoveRecipe.findViewById<TextView>(R.id.tvChristmas)
-        val rlSelectBirthday = dialogMoveRecipe.findViewById<RelativeLayout>(R.id.rlSelectBirthday)
-        val rlSelectParty = dialogMoveRecipe.findViewById<RelativeLayout>(R.id.rlSelectParty)
+        val imgCrossDiscardChanges = dialogMoveRecipe.findViewById<ImageView>(R.id.imgCrossDiscardChanges)
+        spinnerActivityLevel = dialogMoveRecipe.findViewById(R.id.spinnerActivityLevel)
+        cookbookListLocal.clear()
+        cookbookListLocal.addAll(cookbookList)
+        cookbookListLocal.removeFirst()
+        cookbookListLocal.removeIf {
+            it.id== id
+        }
+        spinnerActivityLevel.setItems(cookbookListLocal.map { it.name })
+
         dialogMoveRecipe.show()
         dialogMoveRecipe.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-
         rlMove.setOnClickListener {
-            dialogMoveRecipe.dismiss()
-        }
-
-        rlSelectChristmas.setOnClickListener {
-            if (status == true) {
-                status = false
-                relSelectedSnack.visibility = View.VISIBLE
-            } else {
-                status = true
-
-                relSelectedSnack.visibility = View.GONE
+            if (spinnerActivityLevel.text.toString().equals(ErrorMessage.cookBookSelectError,true)){
+                BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
+            }else {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    val cookBookType = cookbookListLocal[spinnerActivityLevel.selectedIndex].id
+                    recipeMove(position,dialogMoveRecipe,cookBookType)
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
-
-        rlSelectBirthday.setOnClickListener {
-            tvChristmas.text = "Birthday"
-            relSelectedSnack.visibility = View.GONE
-            status = true
+        imgCrossDiscardChanges.setOnClickListener {
+            dialogMoveRecipe.dismiss()
         }
+    }
 
-        rlSelectParty.setOnClickListener {
-            tvChristmas.text = "Party"
-            relSelectedSnack.visibility = View.GONE
-            status = true
+    private fun recipeMove(position: Int?, dialogRemoveRecipe: Dialog, cookbooktype: Int) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.moveRecipeRequest({
+                BaseApplication.dismissMe()
+                handleLikeAndUnlikeApiResponse(it,position,dialogRemoveRecipe)
+            }, localData[position!!].id.toString(),cookbooktype.toString())
         }
-
-
     }
 
     override fun itemSelect(position: Int?, status: String?, type: String?) {
@@ -497,9 +669,12 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
             bundle.putString("uri","")
             findNavController().navigate(R.id.createCookBookFragment,bundle)
         } else if (position != 1) {
+            sessionManagement.setCookBookId(cookbookList[position!!].id.toString())
+            sessionManagement.setCookBookName(cookbookList[position].name)
+            sessionManagement.setCookBookImage(cookbookList[position].image)
+            sessionManagement.setCookBookType(cookbookList[position].status.toString())
             findNavController().navigate(R.id.christmasCollectionFragment)
         }
     }
-
 
 }

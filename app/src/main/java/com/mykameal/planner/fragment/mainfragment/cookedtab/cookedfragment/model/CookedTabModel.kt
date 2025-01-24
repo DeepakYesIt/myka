@@ -2,7 +2,7 @@ package com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.mode
 
 data class CookedTabModel(
     val code: Int,
-    val `data`: CookedTabModelData,
+    val `data`: CookedTabModelData?,
     val message: String,
     val success: Boolean
 )
@@ -13,8 +13,8 @@ data class CookedTabModelData(
     val Lunch: MutableList<Breakfast>?,
     val Snacks: MutableList<Breakfast>?,
     val Teatime: MutableList<Breakfast>?,
-    val fridge:Int,
-    val freezer:Int
+    val fridge:Int?,
+    val freezer:Int?
 )
 
 data class Breakfast(
@@ -22,10 +22,10 @@ data class Breakfast(
     val date: String,
     val day: Any,
     val deleted_at: Any,
-    val id: Int,
-    val servings: Int,
-    val is_like: Int,
-    val created_date: String,
+    val id: Int?,
+    var servings: Int,
+    var is_like: Int?,
+    val created_date: String?,
     val plan_type: Int,
     val recipe: Recipe,
     val status: Int,
@@ -117,7 +117,7 @@ data class Recipe(
     val totalNutrients: Any?,
     val totalTime: Int,
     val totalWeight: Double,
-    val uri: String,
+    val uri: String?,
     val url: String,
     val yield: Int
 )
@@ -204,7 +204,7 @@ data class REGULAR(
 
 data class SMALL(
     val height: Int,
-    val url: String,
+    val url: String?,
     val width: Int
 )
 

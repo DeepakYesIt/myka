@@ -47,11 +47,12 @@
                     android:src="@drawable/watch_white_icon" />
 
                 <TextView
+                    android:id="@+id/tv_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/_4sdp"
                     android:layout_toEndOf="@+id/imgWatch"
-                    android:text="45 min"
+                    android:text="0 min"
                     android:textColor="@color/white"
                     android:textSize="@dimen/_10sdp" />
 
@@ -121,7 +122,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/montserrat_semibold"
-                    android:text="Bread"
+                    android:text=""
                     android:singleLine="true"
                     android:textSize="@dimen/_13sdp" />
 

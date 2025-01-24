@@ -46,6 +46,8 @@ object ApiEndPoint {
     const val allRecipeUrl="all-recipe"
     const val getMealsUrl="get-meals"
     const val likeUnlikeUrl="add-to-favorite"
+    const val moveRecipeUrl="move-recipe"
+    const val removeCookBookUrl="remove-cook-book"
     const val addBasketeUrl="add-to-basket"
     const val addBasketeDetailsUrl="ingredient-basket"
 
@@ -56,6 +58,7 @@ object ApiEndPoint {
 
     const val addMealUrl="add-meal"
     const val getCookBookUrl="get-cook-book"
+    const val cookBookTypeListUrl="cook-book-type-list"
 
     const val createCookBook="add-cook-book"
 

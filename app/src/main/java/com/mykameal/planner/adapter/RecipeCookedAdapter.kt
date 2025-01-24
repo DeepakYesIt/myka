@@ -45,6 +45,7 @@ class RecipeCookedAdapter(var datalist: MutableList<UserDataModel>?, var require
         holder.binding.imageMinus.visibility=View.GONE
 
         if (data != null) {
+
             holder.binding.tvBreakfast.text=data.recipe?.label
 
             if (data.recipe?.images?.SMALL?.url!=null){

@@ -84,6 +84,7 @@
                     android:layout_marginTop="@dimen/_13sdp"
                     android:fontFamily="@font/poppins"
                     android:text="Not now"
+                    android:visibility="gone"
                     android:textColor="@color/black" />
 
             </RelativeLayout>

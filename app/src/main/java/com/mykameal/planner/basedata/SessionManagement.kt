@@ -93,6 +93,39 @@ class SessionManagement(var context: Context) {
         editor!!.commit()
     }
 
+    fun setCookBookName(name: String) {
+        editor!!.putString(AppConstant.CookBookName, name)
+        editor!!.commit()
+    }
+    fun setCookBookId(name: String) {
+        editor!!.putString(AppConstant.CookBookId, name)
+        editor!!.commit()
+    }
+    fun setCookBookImage(name: String) {
+        editor!!.putString(AppConstant.CookBookImage, name)
+        editor!!.commit()
+    }
+    fun setCookBookType(name: String) {
+        editor!!.putString(AppConstant.CookBookType, name)
+        editor!!.commit()
+    }
+
+    fun getCookBookName():String? {
+        return pref?.getString(AppConstant.CookBookName, "")
+    }
+
+    fun getCookBookId():String? {
+        return pref?.getString(AppConstant.CookBookId, "")
+    }
+
+    fun getCookBookImage():String? {
+        return pref?.getString(AppConstant.CookBookImage, "")
+    }
+
+    fun getCookBookType():String? {
+        return pref?.getString(AppConstant.CookBookType, "")
+    }
+
     fun getUserName(): String? {
         return pref?.getString(AppConstant.NAME, "")
     }

@@ -729,15 +729,36 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
         }
     }
 
+    override suspend fun getCookBookTypeRequestApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        id: String?
+    ) {
+        try {
+            api.getCookBookTypeRequestApi(id).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
 
     override suspend fun createCookBookApi(
         successCallback: (response: NetworkResult<String>) -> Unit,
         name: RequestBody?,
         image: MultipartBody.Part?,
-        status:RequestBody?
+        status: RequestBody?,
+        id: RequestBody?
     ) {
         try {
-            api.createCookBook(name,image, status).apply {
+            api.createCookBook(name,image, status,id).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -797,6 +818,43 @@ class MainRepositoryImpl  @Inject constructor(private val api: ApiInterface) : M
     ) {
         try {
             api.likeUnlikeRequestApi(uri,likeType,cookboodtype).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun moveRecipeRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, id: String, cook_book: String) {
+        try {
+            api.moveRecipeRequestApi(id,cook_book).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                }else{
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        }
+        catch (e: HttpException) {
+            successCallback(NetworkResult.Error(e.message()))
+        }
+    }
+
+    override suspend fun deleteCookBookRequestApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        id: String
+    ) {
+        try {
+            api.deleteCookBookRequestApi(id).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

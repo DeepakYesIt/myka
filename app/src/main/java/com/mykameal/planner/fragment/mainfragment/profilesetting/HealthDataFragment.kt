@@ -69,7 +69,8 @@ class HealthDataFragment : Fragment() {
             binding?.llBottomNavigation?.visibility = View.VISIBLE
         }
 
-        binding.spinnerActivityLevel.setItems(listOf("High Protein", "Low Carb", "Balanced"))
+//        binding.spinnerActivityLevel.setItems(listOf("High Protein", "Low Carb", "Balanced"))
+        binding.spinnerActivityLevel.setItems(listOf("Sedentary", "Lightly active", "Moderately active", "Very active", "Super active"))
 
         binding.spinnerHeight.setItems(listOf("Inch", "Centimeter", "Feet"))
 

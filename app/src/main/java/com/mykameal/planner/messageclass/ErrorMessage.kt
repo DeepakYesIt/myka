@@ -1,6 +1,8 @@
 package com.mykameal.planner.messageclass
 
 object ErrorMessage {
+
+
      const val networkError:String="Please check your internet connection"
      const val apiError:String="Something went wrong"
      const val amountNoError:String="Your wallet is empty."
@@ -9,8 +11,9 @@ object ErrorMessage {
      const val amountError:String="Invalid amount entered."
      const val mealTypeError:String="Select Meal type."
      const val weekNameError:String="Select Week Name."
-     const val selectCookBookError:String="Select Cook Book."
+     const val selectCookBookError:String="Please Select Cook Book."
      const val ratingError:String="Message can't be empty."
+     const val cookBookSelectError:String="Select Cook Book"
      const val amountEmptyError:String="Amount can't be empty."
      const val code: Int=206
 

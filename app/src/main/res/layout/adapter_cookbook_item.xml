@@ -17,13 +17,24 @@
         android:orientation="vertical"
         android:gravity="center"
         android:layout_margin="@dimen/_8sdp">
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/imageShapeable"
+        <RelativeLayout
             android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:src="@drawable/mask_group_icon"
-            android:layout_marginTop="@dimen/_2sdp"
-            android:layout_centerHorizontal="true" />
+            android:layout_height="@dimen/_40sdp">
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/imageShapeable"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/mask_group_icon"
+                android:layout_marginTop="@dimen/_2sdp"
+                android:layout_centerHorizontal="true" />
+            <include
+                android:id="@+id/lay_progess"
+                layout="@layout/progess_loader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+
         <TextView
             android:id="@+id/textTittles"
             android:layout_width="wrap_content"
