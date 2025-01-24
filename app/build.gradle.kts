@@ -84,8 +84,6 @@ dependencies {
     implementation("com.intuit.ssp:ssp-android:1.0.5")
     implementation("com.intuit.sdp:sdp-android:1.0.6")
 
-    
-
     //otpView
     implementation("com.github.aabhasr1:OtpView:v1.1.2-ktx")
 
@@ -147,4 +145,15 @@ dependencies {
     implementation ("com.github.dewinjm:monthyear-picker:1.0.2")
 
     implementation ("com.github.jaiselrahman:FilePicker:1.3.2")
+
+
+    //cameraX
+    implementation ("androidx.camera:camera-core:1.4.1")
+    implementation ("androidx.camera:camera-camera2:1.4.1")
+    implementation ("androidx.camera:camera-lifecycle:1.4.1")
+    implementation ("androidx.camera:camera-video:1.4.1")
+
+    implementation ("androidx.camera:camera-view:1.4.1")
+    implementation ("androidx.camera:camera-extensions:1.4.1")
+    implementation ("com.google.guava:guava:32.0.1-jre")
 }
