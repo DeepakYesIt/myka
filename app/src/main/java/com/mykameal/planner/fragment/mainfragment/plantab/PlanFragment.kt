@@ -189,11 +189,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             val dateList = getDaysBetween(startDate, endDate)
             // Update the status of the item at the target position
             dateList.forEachIndexed { index, dateModel ->
-                if (index==it){
-                    dateModel.status=true
-                }else{
-                    dateModel.status=false
-                }
+                dateModel.status = index==it
             }
             Log.d("Date ", "*****$dateList")
             // Notify the adapter to refresh the changed position
@@ -618,13 +614,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             addAnotherMealDialog()
         }
 
-        binding!!.tvSwap.setOnClickListener {
-            dialogDailyInspiration()
-        }
 
-        binding!!.tvSwap2.setOnClickListener {
-            dialogDailyInspiration()
-        }
 
         binding!!.imageProfile.setOnClickListener {
             findNavController().navigate(R.id.settingProfileFragment)
@@ -654,6 +644,10 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             binding!!.rcyLunch.visibility = View.GONE*/
         }
 
+
+        /*binding!!.imgBmr.setOnClickListener {
+            findNavController().navigate(R.id.healthDataFragment)
+        }*/
 
 
         binding!!.relMonthYear.setOnClickListener {
@@ -1335,10 +1329,9 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     }
 
     override fun itemSelectPlayByDate(position: Int?, status: String?, type: String?) {
-        dialogDailyInspiration()
         when (status) {
             "1" -> {
-                dialogDailyInspiration()
+//                dialogDailyInspiration()
             }
         }
     }

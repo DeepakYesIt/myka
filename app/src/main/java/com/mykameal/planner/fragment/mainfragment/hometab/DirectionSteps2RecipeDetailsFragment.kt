@@ -48,7 +48,7 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
 
     private var binding:FragmentDirectionSteps2RecipeDetailsFragmentBinding?=null
     private var totalProgressValue:Int=0
-    private val START_TIME_IN_MILLIS: Long = 1520000
+    private val START_TIME_IN_MILLIS: Long = 30000
     private var mTimeLeftInMillis = START_TIME_IN_MILLIS
     private lateinit var viewModel: RecipeDetailsViewModel
     private var mealType: String = ""
@@ -73,7 +73,6 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-//              findNavController().navigate(R.id.directionSteps1RecipeDetailsFragment)
                 findNavController().navigateUp()
             }
 
@@ -85,28 +84,20 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
         updateProgress(1)
 
         binding!!.imgStep2RecipeDetails.setOnClickListener{
-//            findNavController().navigate(R.id.directionSteps1RecipeDetailsFragment)
             findNavController().navigateUp()
         }
 
         binding!!.textStartTimer.setOnClickListener{
             binding!!.textStartTimer.isEnabled = false
+            mTimeLeftInMillis= convertTimeToMillis(viewModel.getRecipeData()?.get(0)!!.recipe?.totalTime.toString())
             startTime()
         }
 
         binding!!.tvPreviousBtn.setOnClickListener{
-
             if (totalProgressValue>=count){
                 count -= 1
                 updateProgress(count)
             }
-
-//            findNavController().navigateUp()
-//            findNavController().navigate(R.id.directionSteps1RecipeDetailsFragment)
-
-
-
-
         }
 
         binding!!.tvNextStepBtn.setOnClickListener{
@@ -116,7 +107,6 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
             }else{
                 cookedMealsDialog()
             }
-//            cookedMealsDialog()
         }
 
 
@@ -125,6 +115,38 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
 
         return binding!!.root
     }
+
+    private fun convertTimeToMillis(time: String): Long {
+        val timeParts = time.split(":")
+
+        // Initialize hours, minutes, and seconds to default values
+        var hours = 0
+        var minutes = 0
+        var seconds = 0
+
+        // Handle different cases based on the number of parts
+        when (timeParts.size) {
+            3 -> {
+                // Format is HH:MM:SS
+                hours = timeParts[0].toInt()
+                minutes = timeParts[1].toInt()
+                seconds = timeParts[2].toInt()
+            }
+            2 -> {
+                // Format is MM:SS
+                minutes = timeParts[0].toInt()
+                seconds = timeParts[1].toInt()
+            }
+            1 -> {
+                // Format is HH (or single value as minutes or seconds)
+                minutes = timeParts[0].toInt()
+            }
+        }
+
+        // Convert time to milliseconds and return as Long
+        return (hours * 60 * 60 * 1000).toLong() + (minutes * 60 * 1000).toLong() + (seconds * 1000).toLong()
+    }
+
 
     @SuppressLint("SetTextI18n")
     private fun setData() {
@@ -164,6 +186,22 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.label != null) {
             binding!!.tvTitle.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.label
             binding!!.textPrepare.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.label +":"
+        }
+
+        if (viewModel.getRecipeData()?.get(0)!!.recipe?.totalTime!=null){
+            if (viewModel.getRecipeData()?.get(0)!!.recipe?.totalTime!=0) {
+                binding!!.layTimmer.visibility=View.VISIBLE
+                binding!!.tvTiming.text =
+                    "" + viewModel.getRecipeData()?.get(0)!!.recipe?.totalTime?.let {
+                        formatToHHMMSS(
+                            it
+                        )
+                    }
+            }else{
+                binding!!.layTimmer.visibility=View.GONE
+            }
+        }else{
+            binding!!.layTimmer.visibility=View.GONE
         }
 
 
@@ -343,6 +381,16 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
                 binding!!.textStartTimer.isEnabled = true
             }
         }.start()
+    }
+
+    private fun formatToHHMMSS(timeInSeconds: Int): String {
+        // Convert time in seconds to hours, minutes, and seconds
+        val hours = timeInSeconds / 3600
+        val minutes = (timeInSeconds % 3600) / 60
+        val seconds = timeInSeconds % 60
+
+        // Format the time in HH:MM:SS format
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
     }
 
     @SuppressLint("SetTextI18n")

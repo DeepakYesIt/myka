@@ -195,10 +195,11 @@
                 </androidx.cardview.widget.CardView>
 
                 <RelativeLayout
+                    android:id="@+id/lay_timmer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     android:background="@drawable/rectangular_orange_bg">
 
                     <androidx.cardview.widget.CardView
@@ -217,7 +218,7 @@
                             android:fontFamily="@font/sarabun"
                             android:paddingHorizontal="@dimen/_15sdp"
                             android:paddingVertical="@dimen/_7sdp"
-                            android:text="00 : 25 : 20"
+                            android:text="00 : 00 : 00"
                             android:textColor="@color/black" />
 
                     </androidx.cardview.widget.CardView>

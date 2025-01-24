@@ -21,6 +21,7 @@ class AdapterCookBookDetailsItem(var datalist: MutableList<CookBookDataModel>?, 
     : RecyclerView.Adapter<AdapterCookBookDetailsItem.ViewHolder>() {
 
     private var isOpened:Boolean?=false
+    private var lastIndex:Int=-1
 
 
     @SuppressLint("NotifyDataSetChanged")
@@ -36,61 +37,28 @@ class AdapterCookBookDetailsItem(var datalist: MutableList<CookBookDataModel>?, 
         return ViewHolder(binding)
     }
 
-    @SuppressLint("MissingInflatedId", "SetTextI18n")
+    @SuppressLint("MissingInflatedId", "SetTextI18n", "NotifyDataSetChanged")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val data= datalist?.get(position)
 
-       /* if (datalist[position].type=="ChristmasCollection"){
-            holder.binding.imgThreeDot.visibility=View.GONE
+        if (lastIndex == position){
+            holder.binding.cardViewItems.visibility=View.VISIBLE
         }else{
-            holder.binding.imgThreeDot.visibility=View.VISIBLE
-
-        }*/
-
-        /*holder.binding.tvBreakfast.text = datalist[position].title
-
-        holder.binding.imgThreeDot.setOnClickListener{
-            if (isOpened==true){
-                isOpened=false
-                holder.binding.cardViewItems.visibility=View.GONE
-            }else{
-                isOpened=true
-                holder.binding.cardViewItems.visibility=View.VISIBLE
-            }
+            holder.binding.cardViewItems.visibility=View.GONE
         }
-
-        holder.binding.tvRemoveRecipe.setOnClickListener{
-            onItemClickListener.itemClick(position,"","remove")
-        }
-
-        holder.binding.tvMoveRecipe.setOnClickListener{
-            onItemClickListener.itemClick(position,"","move")
-
-        }
-
-
-
-
-        holder.binding.tvAddToPlan.setOnClickListener{
-            onItemClickListener.itemClick(position,"","plan")
-        }
-
-        holder.binding.basketImg.setOnClickListener{
-            onItemClickListener.itemClick(position,"","basket")
-        }*/
 
         if (data?.data?.recipe?.label!=null){
             holder.binding.tvBreakfast.text= data?.data?.recipe.label
         }
 
         if (data?.data?.recipe?.totalTime!=null){
-            holder.binding.tvTime.text=""+data?.data?.recipe.totalTime+" min"
+            holder.binding.tvTime.text=""+ data.data.recipe.totalTime+" min"
         }
 
         if (data?.data?.recipe?.images?.SMALL?.url!=null){
             Glide.with(requireActivity)
-                .load(data?.data?.recipe.images.SMALL.url)
+                .load(data.data.recipe.images.SMALL.url)
                 .error(R.drawable.no_image)
                 .placeholder(R.drawable.no_image)
                 .listener(object : RequestListener<Drawable> {
@@ -147,13 +115,15 @@ class AdapterCookBookDetailsItem(var datalist: MutableList<CookBookDataModel>?, 
         }
 
         holder.binding.imgThreeDot.setOnClickListener{
-            if (isOpened==true){
-                isOpened=false
-                holder.binding.cardViewItems.visibility=View.GONE
-            }else{
-                isOpened=true
-                holder.binding.cardViewItems.visibility=View.VISIBLE
+            // Update lastIndex to the current position
+            lastIndex = if (lastIndex == position) {
+                -1  // Close the view if the same position is clicked again
+            } else {
+                position  // Open the view for the new position
             }
+
+            // Notify the adapter to refresh the views
+            notifyDataSetChanged()
         }
 
 

@@ -43,20 +43,24 @@ class SettingViewModel @Inject constructor(private val repository: MainRepositor
     }
 
 
-    suspend fun upDateProfileRequest(successCallback: (response: NetworkResult<String>) -> Unit,
-                                      name: String
-                                     ,bio:String
-                                     ,genderType: String
-                                     ,dob:String
-                                     ,height:String
-                                     ,heightType:String,
-                                     activityLevel:String
-                                     ,heightProtein:String
-                                     ,calories:String
-                                     ,fat:String
-                                     ,carbs:String
-                                     ,protien:String){
-        repository.upDateProfileRequestApi({ successCallback(it) },  name,bio,genderType,dob,height,heightType,activityLevel,heightProtein,calories,fat,carbs,protien)
+    suspend fun upDateProfileRequest(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        name: String
+        , bio: String
+        , genderType: String
+        , dob: String
+        , height: String
+        , heightType: String,
+        activityLevel: String
+        , heightProtein: String
+        , calories: String
+        , fat: String
+        , carbs: String
+        , protien: String
+        , weight: String
+        , weightType: String
+    ){
+        repository.upDateProfileRequestApi({ successCallback(it) },  name,bio,genderType,dob,height,heightType,activityLevel,heightProtein,calories,fat,carbs,protien,weight,weightType)
     }
 
     suspend fun upDateImageNameRequest(successCallback: (response: NetworkResult<String>) -> Unit,

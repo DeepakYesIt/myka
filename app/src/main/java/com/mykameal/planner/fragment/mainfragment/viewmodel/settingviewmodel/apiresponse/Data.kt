@@ -9,9 +9,11 @@ data class Data(
     var fat: Int?=0,
     val gender: String,
     val height: String?,
+    val weight: String?,
     val dob: String?,
     var height_protein: String?,
     val height_type: String?,
+    val weight_type: String?,
     var name: String?,
     val profile_img: String?,
     var protien: Int?=0

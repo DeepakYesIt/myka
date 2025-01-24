@@ -328,6 +328,7 @@
                     app:spinner_divider_show="false"
                     app:spinner_popup_background="@drawable/bg_cover"
                     app:spinner_item_height="46dp"
+                    app:spinner_popup_max_height="@dimen/_200sdp"
                     app:spinner_popup_animation="fade"
                     app:spinner_popup_elevation="14dp"
                     tools:ignore="RtlSymmetry" />
@@ -416,6 +417,7 @@
                         app:spinner_popup_background="@drawable/bg_cover"
                         app:spinner_item_height="46dp"
                         app:spinner_popup_animation="fade"
+                        app:spinner_popup_max_height="@dimen/_200sdp"
                         app:spinner_popup_elevation="14dp"
                         tools:ignore="RtlSymmetry" />
 

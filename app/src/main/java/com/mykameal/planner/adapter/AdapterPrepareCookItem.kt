@@ -1,5 +1,6 @@
 package com.mykameal.planner.adapter
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,7 @@ class AdapterPrepareCookItem(private var datalist: MutableList<IngredientsModel>
         return ViewHolder(binding)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val data=datalist!![position]
@@ -61,11 +63,20 @@ class AdapterPrepareCookItem(private var datalist: MutableList<IngredientsModel>
         }
 
         if (data.food!=null){
-            holder.binding.tvTitleName.text =data.food
+            val foodName = data.food
+            val formattedFoodName = foodName.let {
+                // Capitalize the first letter and make the rest lowercase
+                it.replaceFirstChar { char -> char.uppercase() } + it.drop(1).lowercase()
+            }
+            holder.binding.tvTitleName.text =formattedFoodName
         }
 
         if (data.quantity!=null){
-            holder.binding.tvTitleDesc.text =""+data.quantity+" "+data.measure
+            if (!data.measure.equals("<unit>")){
+                holder.binding.tvTitleDesc.text =""+data.quantity+" "+data.measure
+            }else{
+                holder.binding.tvTitleDesc.text =""+data.quantity
+            }
         }
 
     }

@@ -197,7 +197,9 @@ interface ApiInterface {
         @Field("calories") calories: String,
         @Field("fat") fat: String,
         @Field("carbs") carbs: String,
-        @Field("protien") protien: String
+        @Field("protien") protien: String,
+        @Field("weight") weight: String,
+        @Field("weight_type") weightType: String
     ): Response<JsonObject>
 
     @Multipart
