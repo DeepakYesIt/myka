@@ -19,7 +19,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.mykameal.planner.OnItemClickListener
@@ -29,6 +28,7 @@ import com.mykameal.planner.adapter.AdapterCookIngredientsItem
 import com.mykameal.planner.adapter.AdapterCreateIngredientsItem
 import com.mykameal.planner.commonworkutils.MediaUtility
 import com.mykameal.planner.databinding.FragmentCreateRecipeBinding
+import com.mykameal.planner.fragment.mainfragment.addrecipetab.createrecipefromimage.model.RecyclerViewItemModel
 import java.io.File
 
 class CreateRecipeFragment : Fragment(), OnItemClickListener {
@@ -36,14 +36,13 @@ class CreateRecipeFragment : Fragment(), OnItemClickListener {
     private var binding: FragmentCreateRecipeBinding? = null
     private var quantity:Int=1
     private var file: File? = null
-    private val ingredientList = mutableListOf<String>()
+    private val ingredientList = mutableListOf<RecyclerViewItemModel>()
     private val cookList = mutableListOf<String>()
     private var adapter:AdapterCreateIngredientsItem?=null
     private var adapterCook: AdapterCookIngredientsItem?=null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
 
         // Inflate the layout for this fragment
         binding = FragmentCreateRecipeBinding.inflate(layoutInflater, container, false)
@@ -89,7 +88,7 @@ class CreateRecipeFragment : Fragment(), OnItemClickListener {
     private fun initialize() {
 
         // Add the first blank EditText item
-        ingredientList.add("")
+        ingredientList.add(RecyclerViewItemModel("","",false))
 
         // Set up RecyclerView and Adapter
         adapter = AdapterCreateIngredientsItem(ingredientList,requireActivity(),this)

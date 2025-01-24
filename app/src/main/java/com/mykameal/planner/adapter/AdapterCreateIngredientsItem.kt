@@ -1,13 +1,16 @@
 package com.mykameal.planner.adapter
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.mykameal.planner.OnItemClickListener
+import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.databinding.AdapterCreateIngredientsItemBinding
+import com.mykameal.planner.fragment.mainfragment.addrecipetab.createrecipefromimage.model.RecyclerViewItemModel
 
-class AdapterCreateIngredientsItem(private var datalist: MutableList<String>, private var requireActivity: FragmentActivity, private var onItemClickListener: OnItemClickListener
+class AdapterCreateIngredientsItem(private var datalist: MutableList<RecyclerViewItemModel>, private var requireActivity: FragmentActivity, private var onItemClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<AdapterCreateIngredientsItem.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -18,6 +21,15 @@ class AdapterCreateIngredientsItem(private var datalist: MutableList<String>, pr
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = datalist[position]
+
+        holder.binding.etAddIngredients.setText(item.ingredientName.toString())
+
+/*
+        // Load the image if it exists
+        item.uri.let {
+            holder.binding.imageData.setImageURI(Uri.parse(it))
+        }*/
 
 
     }
@@ -27,7 +39,7 @@ class AdapterCreateIngredientsItem(private var datalist: MutableList<String>, pr
     }
 
     fun addNewItem() {
-        datalist.add("") // Add a blank item
+        datalist.add(RecyclerViewItemModel("","",false)) // Add a blank item
         notifyItemInserted(datalist.size - 1)
     }
 

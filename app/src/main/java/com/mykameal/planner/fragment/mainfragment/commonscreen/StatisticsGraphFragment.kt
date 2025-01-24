@@ -174,29 +174,92 @@ class StatisticsGraphFragment : Fragment() {
         val currentCampaign = "user_invite"
         val currentChannel = "mobile_share"
         val currentReferrerId = sessionManagement.getId().toString()
+
+        // Ensure the generated URL has the right structure
         val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity())
-        /*linkGenerator.addParameter("deep_link_value", this.fruitName)
-        linkGenerator.addParameter("deep_link_sub1", this.fruitAmountStr)*/
         linkGenerator.addParameter("deep_link_sub2", currentReferrerId)
         linkGenerator.campaign = currentCampaign
         linkGenerator.channel = currentChannel
-        Log.d(LOG_TAG, "Link params:" + linkGenerator.userParams.toString())
+
+        Log.d(LOG_TAG, "Link params: ${linkGenerator.userParams.toString()}")
+
+        val listener: LinkGenerator.ResponseListener = object : LinkGenerator.ResponseListener {
+            override fun onResponse(s: String) {
+                Log.d(LOG_TAG, "Hi, I am inviting you to download My-kai app! $s")
+
+                val message = "Hi, I am inviting you to download My-kai app!\n\n$s"
+
+
+                // Ensure the URL has the correct deep link format
+                requireActivity().runOnUiThread {
+                    // Create an intent for sharing the deep link
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, message) // Add the invite link
+                    }
+
+                    // Show the chooser dialog
+                    val chooser = Intent.createChooser(shareIntent, "Share invite link via")
+                    requireActivity().startActivity(chooser)
+
+                    // Log the invite data
+                    val logInviteMap = HashMap<String, String>()
+                    logInviteMap["referrerId"] = currentReferrerId
+                    logInviteMap["campaign"] = currentCampaign
+                    ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
+                }
+            }
+
+            override fun onResponseError(s: String) {
+                Log.d(LOG_TAG, "onResponseError called")
+            }
+        }
+
+        // Generate the deep link URL
+        linkGenerator.generateLink(requireActivity(), listener)
+    }
+
+
+
+    /* @SuppressLint("RestrictedApi")
+     private fun copyShareInviteLink() {
+         val currentCampaign = "user_invite"
+         val currentChannel = "mobile_share"
+         val currentReferrerId = sessionManagement.getId().toString()
+         val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity())
+         *//*linkGenerator.addParameter("deep_link_value", this.fruitName)
+        linkGenerator.addParameter("deep_link_sub1", this.fruitAmountStr)*//*
+        *//*linkGenerator.addParameter("deep_link_sub2", currentReferrerId)
+        linkGenerator.campaign = currentCampaign
+        linkGenerator.channel = currentChannel
+        Log.d(LOG_TAG, "Link params:" + linkGenerator.userParams.toString())*//*
+
+        linkGenerator.addParameter("deep_link_sub2", currentReferrerId)
+        linkGenerator.campaign = currentCampaign
+        linkGenerator.channel = currentChannel
+
         val listener: LinkGenerator.ResponseListener = object : LinkGenerator.ResponseListener {
             override fun onResponse(s: String) {
                 Log.d(LOG_TAG, "Share invite link: $s")
-                //Copy the share invite link to clipboard and indicate it with a toast
-                requireActivity().runOnUiThread(Runnable {
-                    val clipboard = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    val clip = ClipData.newPlainText("Share invite link", s)
-                    clipboard.setPrimaryClip(clip)
-                    val toast = Toast.makeText(requireActivity(), "Link copied to clipboard", Toast.LENGTH_SHORT)
-                    toast.setGravity(Gravity.TOP or Gravity.CENTER_HORIZONTAL, 0, 20)
-                    toast.show()
-                })
-                val logInviteMap = HashMap<String, String>()
-                logInviteMap["referrerId"] = currentReferrerId
-                logInviteMap["campaign"] = currentCampaign
-                ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
+               // Run on the main thread
+                requireActivity().runOnUiThread {
+                    // Create an intent for sharing
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain" // Indicate you're sharing plain text
+                        putExtra(Intent.EXTRA_TEXT, s) // Add the invite link
+                    }
+
+                    // Show the chooser dialog
+                    val chooser = Intent.createChooser(shareIntent, "Share invite link via")
+                    requireActivity().startActivity(chooser)
+
+                    // Log the invite data
+                    val logInviteMap = HashMap<String, String>()
+                    logInviteMap["referrerId"] = currentReferrerId
+                    logInviteMap["campaign"] = currentCampaign
+                    ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
+                }
+
             }
 
             override fun onResponseError(s: String) {
@@ -204,7 +267,7 @@ class StatisticsGraphFragment : Fragment() {
             }
         }
         linkGenerator.generateLink(requireActivity(), listener)
-    }
+    }*/
 
 
 }
