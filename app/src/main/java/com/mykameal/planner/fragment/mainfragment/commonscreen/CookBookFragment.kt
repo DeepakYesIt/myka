@@ -225,11 +225,19 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
                 }
             }
             "4" -> {
-                val bundle = Bundle().apply {
-                    putString("uri", localData[position!!].data?.recipe!!.uri!!)
-                    putString("mealType", status)
+                try {
+                    val bundle = Bundle().apply {
+                        val data= localData[position!!].data?.recipe!!.mealType?.get(0)?.split("/")
+                        val formattedFoodName = data?.get(0)!!.replaceFirstChar { it.uppercase() }
+                        putString("uri", localData[position].data?.recipe!!.uri!!)
+                        putString("mealType", formattedFoodName)
+                    }
+                    findNavController().navigate(R.id.recipeDetailsFragment, bundle)
+                }catch (e:Exception){
+                    BaseApplication.alertError(requireContext(),e.message.toString(), false)
+
                 }
-                findNavController().navigate(R.id.recipeDetailsFragment, bundle)
+
             }
             "5" -> {
                 moveRecipeDialog(position)

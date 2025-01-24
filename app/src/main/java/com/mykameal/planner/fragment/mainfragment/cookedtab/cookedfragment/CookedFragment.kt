@@ -353,6 +353,8 @@ class CookedFragment : Fragment(), OnItemClickListener {
                     binding!!.llFilledFridge.visibility = View.GONE
                 }
 
+
+
                 fun setupMealAdapter(mealRecipes: MutableList<Breakfast>?, recyclerView: RecyclerView, type: String): AdapterFoodListItem? {
                     return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
                         val adapter = AdapterFoodListItem(mealRecipes,type, requireActivity(), this)

@@ -6,6 +6,7 @@ data class RecipeModel(
     val url: String?,
     val uri: String?,
     val type: String?,
+    val mealType: MutableList<String>?,
     val images: ImagesModel?,
     val totalNutrients: TotalNutrientsModel?,
     val calories: Double?,
