@@ -167,16 +167,20 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val mealRoutineModel = gson.fromJson(it.data, MealRoutineModel::class.java)
-                        if (mealRoutineModel.code == 200 && mealRoutineModel.success) {
-                            showDataInUi(mealRoutineModel.data)
-                        } else {
-                            if (mealRoutineModel.code == ErrorMessage.code) {
-                                showAlertFunction(mealRoutineModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val mealRoutineModel = gson.fromJson(it.data, MealRoutineModel::class.java)
+                            if (mealRoutineModel.code == 200 && mealRoutineModel.success) {
+                                showDataInUi(mealRoutineModel.data)
                             } else {
-                                showAlertFunction(mealRoutineModel.message, false)
+                                if (mealRoutineModel.code == ErrorMessage.code) {
+                                    showAlertFunction(mealRoutineModel.message, true)
+                                } else {
+                                    showAlertFunction(mealRoutineModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("MealRoutine@@@","message:---"+e.message)
                         }
                     }
 
@@ -199,16 +203,20 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
-                        if (bodyModel.code == 200 && bodyModel.success) {
-                            showDataInUi(bodyModel.data.mealroutine)
-                        } else {
-                            if (bodyModel.code == ErrorMessage.code) {
-                                showAlertFunction(bodyModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                            if (bodyModel.code == 200 && bodyModel.success) {
+                                showDataInUi(bodyModel.data.mealroutine)
                             } else {
-                                showAlertFunction(bodyModel.message, false)
+                                if (bodyModel.code == ErrorMessage.code) {
+                                    showAlertFunction(bodyModel.message, true)
+                                } else {
+                                    showAlertFunction(bodyModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("MealRoutine@@","message:---"+e.message)
                         }
                     }
 
@@ -280,17 +288,20 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val updateModel =
-                            gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
-                        if (updateModel.code == 200 && updateModel.success) {
-                            findNavController().navigateUp()
-                        } else {
-                            if (updateModel.code == ErrorMessage.code) {
-                                showAlertFunction(updateModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                            if (updateModel.code == 200 && updateModel.success) {
+                                findNavController().navigateUp()
                             } else {
-                                showAlertFunction(updateModel.message, false)
+                                if (updateModel.code == ErrorMessage.code) {
+                                    showAlertFunction(updateModel.message, true)
+                                } else {
+                                    showAlertFunction(updateModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("MealRoutine@@@","message:---"+e.message)
                         }
                     }
 

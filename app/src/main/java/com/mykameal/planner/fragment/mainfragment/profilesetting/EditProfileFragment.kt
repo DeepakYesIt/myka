@@ -133,7 +133,7 @@ class EditProfileFragment : Fragment() {
     }
 
     // Retrofit setup
-    fun createRetrofit(): Retrofit {
+    private fun createRetrofit(): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://vision.googleapis.com/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -146,11 +146,6 @@ class EditProfileFragment : Fragment() {
         val bytes = inputStream?.readBytes()
         return Base64.encodeToString(bytes, Base64.DEFAULT)
     }
-
-
-
-
-
 
 
     private fun getPath(context: Context, uri: Uri): String? {

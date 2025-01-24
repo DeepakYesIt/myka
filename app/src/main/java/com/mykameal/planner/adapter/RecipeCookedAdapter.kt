@@ -92,9 +92,6 @@ class RecipeCookedAdapter(var datalist: MutableList<UserDataModel>?, var require
             if (data.recipe?.totalTime!=null){
                 holder.binding.tvTime.text=""+data.recipe?.totalTime
             }
-
-
-
         }
 
 
@@ -110,9 +107,6 @@ class RecipeCookedAdapter(var datalist: MutableList<UserDataModel>?, var require
                 onItemClickListener.itemClick(position,"4", data.is_like.toString())
             }
         }
-
-
-
 
 
     }

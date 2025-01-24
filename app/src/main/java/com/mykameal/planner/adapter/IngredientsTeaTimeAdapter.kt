@@ -21,24 +21,34 @@ import com.mykameal.planner.OnItemSelectUnSelectListener
 import com.mykameal.planner.R
 import com.mykameal.planner.databinding.AdapterIngredientsItemBinding
 import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.Breakfast
-import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.BreakfastModelPlanByDate
-import com.mykameal.planner.model.DataModel
+import java.util.Collections
 
-class IngredientsLunchAdapter(private var datalist:MutableList<Breakfast>?, private var requireActivity: FragmentActivity,
-                              private var onItemClickListener: OnItemSelectUnSelectListener, private var onItemLongClickListener: OnItemLongClickListener,
-                              var type:String
-): RecyclerView.Adapter<IngredientsLunchAdapter.ViewHolder>() {
+class IngredientsTeaTimeAdapter(var datalist:MutableList<Breakfast>?, private var requireActivity: FragmentActivity,
+                                private var onItemClickListener: OnItemSelectUnSelectListener, private var onItemLongClickListener: OnItemLongClickListener,
+                                var type:String): RecyclerView.Adapter<IngredientsTeaTimeAdapter.ViewHolder>() {
 
     private var checkStatus:String?=null
     private var checkTypeStatus: String? = null
     private var ziggleAnimation: ObjectAnimator? = null
     private  var isZiggleEnabled = false
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding: AdapterIngredientsItemBinding = AdapterIngredientsItemBinding.inflate(inflater, parent,false);
         return ViewHolder(binding)
+    }
+
+    fun moveItem(fromPosition: Int, toPosition: Int) {
+        if (fromPosition < toPosition) {
+            for (i in fromPosition until toPosition) {
+                Collections.swap(datalist, i, i + 1)
+            }
+        } else {
+            for (i in fromPosition downTo toPosition + 1) {
+                Collections.swap(datalist, i, i - 1)
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -94,53 +104,52 @@ class IngredientsLunchAdapter(private var datalist:MutableList<Breakfast>?, priv
             stopZiggle(holder.itemView)
         }
 
-      /*  if (datalist[position].isOpen){
-            holder.binding.missingIngredientsImg.visibility=View.VISIBLE
-            holder.binding.checkBoxImg.visibility=View.GONE
-        }else{
-            holder.binding.missingIngredientsImg.visibility=View.GONE
-            holder.binding.checkBoxImg.visibility=View.VISIBLE
-        }*/
+        /*    if (datalist[position].isOpen){
+                holder.binding.missingIngredientsImg.visibility=View.VISIBLE
+                holder.binding.checkBoxImg.visibility=View.GONE
+            }else{
+                holder.binding.missingIngredientsImg.visibility=View.GONE
+                holder.binding.checkBoxImg.visibility=View.VISIBLE
+            }*/
 
         holder.binding.missingIngredientsImg.setOnClickListener{
             checkTypeStatus="missingIng"
-            onItemClickListener.itemSelectUnSelect(position,checkTypeStatus,"Lunch",position)
+            onItemClickListener.itemSelectUnSelect(position,checkTypeStatus,"TeaTime",position)
         }
 
         holder.binding.imgHeartRed.setOnClickListener{
             checkTypeStatus="heart"
-            onItemClickListener.itemSelectUnSelect(position,checkTypeStatus,"Lunch",position)
+            onItemClickListener.itemSelectUnSelect(position,checkTypeStatus,"TeaTime",position)
         }
 
         holder.binding.relMainLayouts.setOnClickListener{
             checkTypeStatus="recipeDetails"
-            onItemClickListener.itemSelectUnSelect(position,checkTypeStatus,"Lunch",position)
+            onItemClickListener.itemSelectUnSelect(position,checkTypeStatus,"TeaTime",position)
         }
 
-        holder.binding.imageMinus.setOnClickListener {
-            checkTypeStatus="minus"
-          /*  if (datalist[position].isOpen) {
-                checkStatus = "1"
-            } else {
-                checkStatus = "0"
-            }*/
-            onItemClickListener.itemSelectUnSelect(datalist?.get(position)!!.id,checkTypeStatus,"Lunch",position)
-
-        }
+         holder.binding.imageMinus.setOnClickListener {
+             checkTypeStatus="minus"
+           /*  if (datalist[position].isOpen) {
+                 checkStatus = "1"
+             } else {
+                 checkStatus = "0"
+             }*/
+             onItemClickListener.itemSelectUnSelect(datalist?.get(position)!!.id,checkTypeStatus,"TeaTime",position)
+         }
 
         holder.itemView.setOnLongClickListener{
             val clipData = ClipData(
-                item!!.recipe!!.label, // Use the title as the drag data
+                item?.recipe?.label, // Use the title as the drag data
                 arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
-                ClipData.Item(item.recipe!!.label)
+                ClipData.Item(item?.recipe?.label)
             )
 
             val shadowBuilder = View.DragShadowBuilder(holder.itemView)
             holder.itemView.startDragAndDrop(clipData, shadowBuilder, null, 0)
             onItemLongClickListener.itemLongClick(position, checkStatus, type)
             true
-          /*  onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)*/
-            true
+            /*onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
+            true*/
         }
     }
 
@@ -154,14 +163,6 @@ class IngredientsLunchAdapter(private var datalist:MutableList<Breakfast>?, priv
     }
 
     class ViewHolder(var binding: AdapterIngredientsItemBinding) : RecyclerView.ViewHolder(binding.root){
-
-    }
-
-    private fun stopZiggle(view: View) {
-        ziggleAnimation?.cancel()
-        ziggleAnimation = null
-        view.rotation = 0f
-        isZiggleEnabled = false
     }
 
     private fun startZiggleAnimation(holder: ViewHolder) {
@@ -175,10 +176,16 @@ class IngredientsLunchAdapter(private var datalist:MutableList<Breakfast>?, priv
         ziggleAnimation!!.start()
     }
 
-    fun updateList(mealList: MutableList<Breakfast>?) {
+    private fun stopZiggle(view: View) {
+        ziggleAnimation?.cancel()
+        ziggleAnimation = null
+        view.rotation = 0f
+        isZiggleEnabled = false
+    }
+
+    fun updateList(mealList: MutableList<Breakfast>) {
         this.datalist=mealList
         notifyDataSetChanged()
-
     }
 
     fun removeItem(position: Int) {

@@ -117,7 +117,6 @@ class SignUpFragment : Fragment() {
             partnerName = sessionManagement.getPartnerName()
         }
 
-
         if (sessionManagement.getPartnerAge() != "") {
             partnerAge = sessionManagement.getPartnerAge()
         }
@@ -263,28 +262,32 @@ class SignUpFragment : Fragment() {
                     BaseApplication.dismissMe()
                     when (it) {
                         is NetworkResult.Success -> {
-                            val gson = Gson()
-                            val signUpModel = gson.fromJson(it.data, SignUpModel::class.java)
-                            if (signUpModel.code == 200 && signUpModel.success) {
-                                try {
-                                    val bundle = Bundle()
-                                    bundle.putString("screenType", "signup")
-                                    bundle.putString("chooseType", chooseType)
-                                    bundle.putString("userId", signUpModel.data.id.toString())
-                                    bundle.putString(
-                                        "value",
-                                        binding!!.etSignUpEmailPhone.text.toString().trim()
-                                    )
-                                    findNavController().navigate(R.id.verificationFragment, bundle)
-                                }catch (e:Exception){
-                                    Log.d("signup","message:---"+e.message)
-                                }
-                            } else {
-                                if (signUpModel.code == ErrorMessage.code) {
-                                    showAlertFunction(signUpModel.message, true)
+                            try {
+                                val gson = Gson()
+                                val signUpModel = gson.fromJson(it.data, SignUpModel::class.java)
+                                if (signUpModel.code == 200 && signUpModel.success) {
+                                    try {
+                                        val bundle = Bundle()
+                                        bundle.putString("screenType", "signup")
+                                        bundle.putString("chooseType", chooseType)
+                                        bundle.putString("userId", signUpModel.data.id.toString())
+                                        bundle.putString(
+                                            "value",
+                                            binding!!.etSignUpEmailPhone.text.toString().trim()
+                                        )
+                                        findNavController().navigate(R.id.verificationFragment, bundle)
+                                    }catch (e:Exception){
+                                        Log.d("signup","message:---"+e.message)
+                                    }
                                 } else {
-                                    showAlertFunction(signUpModel.message, false)
+                                    if (signUpModel.code == ErrorMessage.code) {
+                                        showAlertFunction(signUpModel.message, true)
+                                    } else {
+                                        showAlertFunction(signUpModel.message, false)
+                                    }
                                 }
+                            }catch (e:Exception){
+                                Log.d("signup","message:---"+e.message)
                             }
                         }
 

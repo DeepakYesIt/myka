@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/_40sdp"
+    android:layout_marginVertical="@dimen/_5sdp"
+    android:background="@drawable/create_unselect_bg">
+
+    <EditText
+        android:id="@+id/etAddIngredients"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@null"
+        android:fontFamily="@font/poppins"
+        android:gravity="center|start"
+        android:hint="Pizza"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:textSize="@dimen/_13sdp" />
+
+</RelativeLayout>

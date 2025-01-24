@@ -117,16 +117,20 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
-                        if (bodyModel.code == 200 && bodyModel.success) {
-                            showDataInUi(bodyModel.data.dietaryrestriction)
-                        } else {
-                            if (bodyModel.code == ErrorMessage.code) {
-                                showAlertFunction(bodyModel.message, true)
-                            }else{
-                                showAlertFunction(bodyModel.message, false)
+                        try {
+                            val gson = Gson()
+                            val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                            if (bodyModel.code == 200 && bodyModel.success) {
+                                showDataInUi(bodyModel.data.dietaryrestriction)
+                            } else {
+                                if (bodyModel.code == ErrorMessage.code) {
+                                    showAlertFunction(bodyModel.message, true)
+                                }else{
+                                    showAlertFunction(bodyModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("DietaryRestriction","message"+e.message)
                         }
                     }
                     is NetworkResult.Error -> {
@@ -147,17 +151,21 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val dietaryModel = gson.fromJson(it.data, DietaryRestrictionsModel::class.java)
-                        if (dietaryModel.code == 200 && dietaryModel.success) {
+                        try {
+                            val gson = Gson()
+                            val dietaryModel = gson.fromJson(it.data, DietaryRestrictionsModel::class.java)
+                            if (dietaryModel.code == 200 && dietaryModel.success) {
 //                            showDataInUi(dietaryModel.data)
-                            showDataFirstUi(dietaryModel.data)
-                        } else {
-                            if (dietaryModel.code == ErrorMessage.code) {
-                                showAlertFunction(dietaryModel.message, true)
-                            }else{
-                                showAlertFunction(dietaryModel.message, false)
+                                showDataFirstUi(dietaryModel.data)
+                            } else {
+                                if (dietaryModel.code == ErrorMessage.code) {
+                                    showAlertFunction(dietaryModel.message, true)
+                                }else{
+                                    showAlertFunction(dietaryModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("DietaryRestriction@@","message"+e.message)
                         }
                     }
                     is NetworkResult.Error -> {
@@ -262,16 +270,20 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
-                        if (updateModel.code == 200 && updateModel.success) {
-                            findNavController().navigateUp()
-                        } else {
-                            if (updateModel.code == ErrorMessage.code) {
-                                showAlertFunction(updateModel.message, true)
-                            }else{
-                                showAlertFunction(updateModel.message, false)
+                        try {
+                            val gson = Gson()
+                            val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                            if (updateModel.code == 200 && updateModel.success) {
+                                findNavController().navigateUp()
+                            } else {
+                                if (updateModel.code == ErrorMessage.code) {
+                                    showAlertFunction(updateModel.message, true)
+                                }else{
+                                    showAlertFunction(updateModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("Dietary Restrictions@@@","message"+e.message)
                         }
                     }
                     is NetworkResult.Error -> {

@@ -143,16 +143,20 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
-                        if (bodyModel.code == 200 && bodyModel.success) {
-                            showDataInUi(bodyModel.data.bodygoal)
-                        } else {
-                            if (bodyModel.code == ErrorMessage.code) {
-                                showAlertFunction(bodyModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                            if (bodyModel.code == 200 && bodyModel.success) {
+                                showDataInUi(bodyModel.data.bodygoal)
                             } else {
-                                showAlertFunction(bodyModel.message, false)
+                                if (bodyModel.code == ErrorMessage.code) {
+                                    showAlertFunction(bodyModel.message, true)
+                                } else {
+                                    showAlertFunction(bodyModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("bodyGoal@@","message"+e.message)
                         }
                     }
 
@@ -175,16 +179,21 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val bodyModel = gson.fromJson(it.data, BodyGoalModel::class.java)
-                        if (bodyModel.code == 200 && bodyModel.success) {
-                            showDataInUi(bodyModel.data)
-                        } else {
-                            if (bodyModel.code == ErrorMessage.code) {
-                                showAlertFunction(bodyModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val bodyModel = gson.fromJson(it.data, BodyGoalModel::class.java)
+                            if (bodyModel.code == 200 && bodyModel.success) {
+                                showDataInUi(bodyModel.data)
                             } else {
-                                showAlertFunction(bodyModel.message, false)
+                                if (bodyModel.code == ErrorMessage.code) {
+                                    showAlertFunction(bodyModel.message, true)
+                                } else {
+                                    showAlertFunction(bodyModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("bodyGoal@@@@","message"+e.message)
+
                         }
                     }
 
@@ -270,17 +279,21 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val updateModel =
-                            gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
-                        if (updateModel.code == 200 && updateModel.success) {
-                            findNavController().navigateUp()
-                        } else {
-                            if (updateModel.code == ErrorMessage.code) {
-                                showAlertFunction(updateModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val updateModel =
+                                gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
+                            if (updateModel.code == 200 && updateModel.success) {
+                                findNavController().navigateUp()
                             } else {
-                                showAlertFunction(updateModel.message, false)
+                                if (updateModel.code == ErrorMessage.code) {
+                                    showAlertFunction(updateModel.message, true)
+                                } else {
+                                    showAlertFunction(updateModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            Log.d("bodyGoal@@@","message"+e.message)
                         }
                     }
 

@@ -140,7 +140,7 @@
         tools:layout="@layout/fragment_cooked" />
     <fragment
         android:id="@+id/fullCookedScheduleFragment"
-        android:name="com.mykameal.planner.fragment.mainfragment.hometab.FullCookedScheduleFragment"
+        android:name="com.mykameal.planner.fragment.mainfragment.hometab.fullcookedScheduleFragment.FullCookedScheduleFragment"
         android:label="fragment_full_cooked_schedule"
         tools:layout="@layout/fragment_full_cooked_schedule" />
     <fragment

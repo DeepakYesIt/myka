@@ -1,4 +1,4 @@
-package com.yesitlabs.mykaapp
+package com.mykameal.planner
 
 interface OnItemSelectPlanTypeListener {
 

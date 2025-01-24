@@ -55,8 +55,9 @@
                 android:layout_height="wrap_content">
 
                 <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/addImages"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/_150sdp"
                     android:layout_marginStart="@dimen/_5sdp"
                     android:layout_marginTop="@dimen/_5sdp"
                     android:layout_marginEnd="@dimen/_5sdp"
@@ -67,6 +68,7 @@
                     app:shapeAppearanceOverlay="@style/CornerCut" />
 
                 <ImageView
+                    android:id="@+id/addImageIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
@@ -184,6 +186,7 @@
                     android:textStyle="bold" />
 
                 <ImageView
+                    android:id="@+id/imageCrtIngPlus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -192,22 +195,12 @@
                     android:src="@drawable/add_image" />
             </RelativeLayout>
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcyCreateIngredients"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_40sdp"
-                android:background="@drawable/create_unselect_bg">
-
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center|start"
-                    android:paddingHorizontal="@dimen/_10sdp"
-                    android:fontFamily="@font/poppins"
-                    android:background="@null"
-                    android:text="Pizza"
-                    android:textSize="@dimen/_13sdp" />
-
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:orientation="vertical"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -228,6 +221,7 @@
                     android:textStyle="bold" />
 
                 <ImageView
+                    android:id="@+id/imageCookIns"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -236,22 +230,12 @@
                     android:src="@drawable/add_image" />
             </RelativeLayout>
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcyCookInstructions"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_40sdp"
-                android:background="@drawable/create_unselect_bg">
-
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center|start"
-                    android:fontFamily="@font/poppins"
-                    android:background="@null"
-                    android:paddingHorizontal="@dimen/_10sdp"
-                    android:text="Pizza"
-                    android:textSize="@dimen/_13sdp" />
-
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:orientation="vertical"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"

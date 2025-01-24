@@ -18,6 +18,7 @@ class AppConstant {
         const val RememberMe:String="RememberMe"
         val Id: String?="ID"
         val NAME: String? ="NAME"
+        val userId: String? ="UserId"
         const val Gender: String ="Gender"
         const val EMAIL :String ="Email"
         const val PHONE :String ="Phone"

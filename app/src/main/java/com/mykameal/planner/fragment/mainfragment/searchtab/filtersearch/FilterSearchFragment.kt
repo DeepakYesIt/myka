@@ -8,13 +8,16 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.adapter.AdapterFilterSearchItem
 import com.mykameal.planner.databinding.FragmentFilterSearchBinding
 import com.mykameal.planner.model.DataModel
-
 
 class FilterSearchFragment : Fragment(),OnItemClickListener {
 
@@ -97,7 +100,6 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
         data9.title = "Cocktails"
         data9.isOpen = false
 
-
         dataList.add(data1)
         dataList.add(data2)
         dataList.add(data3)
@@ -108,22 +110,19 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
         dataList.add(data8)
         dataList.add(data9)
 
-        val gridLayoutManager = GridLayoutManager(requireActivity(), 4)
+        val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+            flexDirection = FlexDirection.ROW
+            flexWrap = FlexWrap.WRAP
+            justifyContent = JustifyContent.FLEX_START
+        }
+
 //        adjustSpanCount(gridLayoutManager)// Default: 2 items per row
         adapterFilterSearchItem = AdapterFilterSearchItem(dataList, requireActivity(),this)
-        binding!!.rcyMealType.layoutManager = gridLayoutManager
+        binding!!.rcyMealType.layoutManager = flexboxLayoutManager
         binding!!.rcyMealType.adapter = adapterFilterSearchItem
-
-//        // FlexboxLayoutManager
-//        val flexboxLayoutManager = FlexboxLayoutManager(this).apply {
-//            flexWrap = FlexWrap.WRAP // Allow wrapping to the next line
-//            justifyContent = JustifyContent.FLEX_START // Align items to the start
-//        }
-//
-//        recyclerView.layoutManager = flexboxLayoutManager
-
-
     }
+
+
     private fun dietModel() {
         val dataList = ArrayList<DataModel>()
         val data1 = DataModel()
