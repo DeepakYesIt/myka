@@ -255,7 +255,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginTop="@dimen/_10sdp"
         android:gravity="center"
-        android:layout_marginBottom="@dimen/_10sdp">
+        android:layout_marginBottom="@dimen/_20sdp">
 
         <TextView
             android:id="@+id/tvPreviousBtn"

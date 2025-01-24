@@ -1,5 +1,6 @@
 package com.mykameal.planner.adapter
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
@@ -19,8 +20,13 @@ import com.mykameal.planner.R
 import com.mykameal.planner.databinding.AdapterLayoutFoodItemsListBinding
 import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.Breakfast
 
+
 class AdapterFoodListItem(private var itemList: MutableList<Breakfast>,private var type:String?,private var requireActivity: FragmentActivity,
                           private var onItemSelectListener: OnItemSelectUnSelectListener) : RecyclerView.Adapter<AdapterFoodListItem.ViewHolder>() {
+
+class AdapterFoodListItem(var itemList: MutableList<Breakfast>,var type:String?,private var requireActivity: FragmentActivity,
+                          private var onItemSelectListener: OnItemClickListener) : RecyclerView.Adapter<AdapterFoodListItem.ViewHolder>() {
+
 
     private var quantity:Int=1
 
@@ -30,6 +36,7 @@ class AdapterFoodListItem(private var itemList: MutableList<Breakfast>,private v
         return ViewHolder(binding)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         holder.binding.tvBreakfast.text = itemList[position].recipe.label
@@ -40,6 +47,8 @@ class AdapterFoodListItem(private var itemList: MutableList<Breakfast>,private v
             }else{
                 holder.binding.imgHeartRed.setImageResource(R.drawable.heart_red_icon)
             }
+        }else{
+            holder.binding.imgHeartRed.setImageResource(R.drawable.heart_white_icon)
         }
 
         if (itemList[position].created_date!=null){
@@ -114,8 +123,35 @@ class AdapterFoodListItem(private var itemList: MutableList<Breakfast>,private v
             if (itemList[position]!= null) {
                 onItemSelectListener.itemSelectUnSelect(itemList[position].is_like,"2",type,position)
             }
+            if (itemList[position].servings.toString().toInt() > 1) {
+                onItemSelectListener.itemClick(position, "4", type)
+            }else{
+                Toast.makeText(requireActivity,"Minimum serving at least value is one", Toast.LENGTH_LONG).show()
+            }
         }
 
+        holder.binding.imagePlusItem.setOnClickListener{
+            if (itemList[position].servings.toString().toInt()  < 99) {
+                onItemSelectListener.itemClick(position, "2", type)
+            }
+        }
+
+        holder.binding.imgHeartRed.setOnClickListener{
+            onItemSelectListener.itemClick(position, "1", type)
+        }
+
+        holder.binding.imgAppleRemove.setOnClickListener {
+            onItemSelectListener.itemClick(position, "3", type)
+        }
+
+
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(itemListdata: MutableList<Breakfast>, typechange: String){
+        itemList=itemListdata
+        type=typechange
+        notifyDataSetChanged()
     }
 
   /*  private fun updateValue(tvServes: TextView) {

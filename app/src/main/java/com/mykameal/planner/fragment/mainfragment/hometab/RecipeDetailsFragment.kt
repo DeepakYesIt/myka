@@ -376,8 +376,10 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
 
             binding!!.textStepInstructions.visibility = View.VISIBLE
             binding!!.relRecipe.visibility = View.VISIBLE
-            binding!!.relTittleList.visibility = View.GONE
+            binding!!.relTittleList.visibility = View.VISIBLE
             binding!!.relServingsPeople.visibility = View.GONE
+            binding!!.relIngSelectAll.visibility = View.GONE
+            binding!!.relCookware.visibility = View.GONE
             binding!!.layBottomPlanBasket.visibility = View.GONE
 
             if (viewModel.getRecipeData()?.size!!  > 0) {

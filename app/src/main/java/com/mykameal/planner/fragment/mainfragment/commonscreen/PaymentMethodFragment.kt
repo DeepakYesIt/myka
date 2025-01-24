@@ -950,11 +950,7 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
 
     private fun handleApiTransferResponse(result: NetworkResult<String>, dialog: Dialog?) {
         when (result) {
-            is NetworkResult.Success -> handleTransferSuccessResponse(
-                result.data.toString(),
-                dialog
-            )
-
+            is NetworkResult.Success -> handleTransferSuccessResponse(result.data.toString(), dialog)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
@@ -1056,11 +1052,16 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
         try {
             val apiModelCountry = Gson().fromJson(data, TransferModel::class.java)
             Log.d("@@@ Add Card", "message :- $data")
-            if (apiModelCountry.code == 200 && apiModelCountry.success) {
-                if (apiModelCountry.data != null) {
+            // api response change deepak
+            if (/*apiModelCountry.code == 200 &&*/ apiModelCountry.success) {
+                /*if (apiModelCountry.data != null) {
                     dialog?.dismiss()
+                    Toast.makeText(requireContext(),apiModelCountry.message,Toast.LENGTH_SHORT).show()
                     findNavController().navigateUp()
-                }
+                }*/
+                dialog?.dismiss()
+                Toast.makeText(requireContext(),apiModelCountry.message,Toast.LENGTH_SHORT).show()
+                findNavController().navigateUp()
             } else {
                 if (apiModelCountry.code == ErrorMessage.code) {
                     showAlert(apiModelCountry.message, true)

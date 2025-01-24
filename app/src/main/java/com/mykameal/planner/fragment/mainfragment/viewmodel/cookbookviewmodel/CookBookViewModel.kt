@@ -13,4 +13,35 @@ class CookBookViewModel @Inject constructor(private val repository: MainReposito
         repository.getCookBookRequestApi { successCallback(it) }
     }
 
+    suspend fun getCookBookTypeRequest(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        id: String?
+    ){
+        repository.getCookBookTypeRequestApi ({ successCallback(it) },id)
+    }
+
+    suspend fun addBasketRequest(successCallback: (response: NetworkResult<String>) -> Unit,
+                                 uri: String,quantity: String){
+        repository.addBasketRequestApi({ successCallback(it) },uri,quantity)
+    }
+
+    suspend fun recipeAddToPlanRequest(successCallback: (response: NetworkResult<String>) -> Unit, jsonObject: JsonObject
+    ){
+        repository.recipeAddToPlanRequestApi({ successCallback(it) },jsonObject)
+    }
+
+    suspend fun likeUnlikeRequest(successCallback: (response: NetworkResult<String>) -> Unit,
+                                  uri: String,likeType: String,type:String){
+        repository.likeUnlikeRequestApi({ successCallback(it) },uri,likeType,type)
+    }
+
+    suspend fun moveRecipeRequest(successCallback: (response: NetworkResult<String>) -> Unit, id: String,cook_book:String){
+        repository.moveRecipeRequestApi({ successCallback(it) },id,cook_book)
+    }
+
+    suspend fun deleteCookBookRequest(successCallback: (response: NetworkResult<String>) -> Unit, id: String){
+        repository.deleteCookBookRequestApi({ successCallback(it) },id)
+    }
+
+
 }

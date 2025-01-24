@@ -480,7 +480,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                     // Safely get the item and position
                     val newLikeStatus = if (userDataLocal.userData?.get(position!!)?.is_like == 0) "1" else "0"
                     if (newLikeStatus.equals("0",true)){
-                        recipeLikeAndUnlikeData(position,newLikeStatus,"")
+                        recipeLikeAndUnlikeData(position, newLikeStatus, "", null)
                     }else{
                         addFavTypeDialog(position, newLikeStatus)
                     }
@@ -551,22 +551,11 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
 
         rlDoneBtn.setOnClickListener{
-            /* if (statuses==""){
-                 Toast.makeText(requireActivity(),"Please select atleast one of them", Toast.LENGTH_LONG).show()
-             }else if (statuses=="favourites"){
-                 dialogAddRecipe.dismiss()
-             }else{
-                 dialogAddRecipe.dismiss()
-                 val bundle=Bundle()
-                 bundle.putString("value","New")
-                 findNavController().navigate(R.id.createCookBookFragment,bundle)
-             }*/
-
-            if (spinnerActivityLevel.text.toString().equals("",true)){
+            if (spinnerActivityLevel.text.toString().equals(ErrorMessage.cookBookSelectError,true)){
                 BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
-            }else{
+            }else {
                 val cookbooktype = cookbookList[spinnerActivityLevel.selectedIndex].id
-                recipeLikeAndUnlikeData(position,likeType,cookbooktype.toString())
+                recipeLikeAndUnlikeData(position,likeType,cookbooktype.toString(),dialogAddRecipe)
             }
 
         }
@@ -615,26 +604,44 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     }
 
 
-    private fun recipeLikeAndUnlikeData(position: Int?, likeType: String, cookbookType: String) {
+
+
+    private fun recipeLikeAndUnlikeData(
+        position: Int?,
+        likeType: String,
+        cookbooktype: String,
+        dialogAddRecipe: Dialog?
+    ) {
+
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             viewModel.likeUnlikeRequest({
                 BaseApplication.dismissMe()
-                handleLikeAndUnlikeApiResponse(it,position)
-            }, userDataLocal.userData?.get(position!!)?.recipe?.url!!,likeType,cookbookType)
+
+                handleLikeAndUnlikeApiResponse(it, position, dialogAddRecipe)
+            }, userDataLocal.userData?.get(position!!)?.recipe?.uri!!, likeType, cookbooktype)
         }
     }
 
-    private fun handleLikeAndUnlikeApiResponse(result: NetworkResult<String>, position: Int?) {
+
+    private fun handleLikeAndUnlikeApiResponse(
+        result: NetworkResult<String>,
+        position: Int?,
+        dialogAddRecipe: Dialog?
+    ) {
         when (result) {
-            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(result.data.toString(),position)
+            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(result.data.toString(),position,dialogAddRecipe)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleLikeAndUnlikeSuccessResponse(data: String,position: Int?) {
+    private fun handleLikeAndUnlikeSuccessResponse(
+        data: String,
+        position: Int?,
+        dialogAddRecipe: Dialog?
+    ) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ Plan List ", "message :- $data")
@@ -646,6 +653,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 // Update the list at the specific position
                 userDataLocal.userData!![position!!] = item
                 recipeCookedAdapter?.updateList(userDataLocal.userData)
+                dialogAddRecipe?.dismiss()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)

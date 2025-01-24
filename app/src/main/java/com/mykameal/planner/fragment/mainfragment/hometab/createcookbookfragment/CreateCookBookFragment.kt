@@ -24,6 +24,7 @@ import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
+import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.commonworkutils.CommonWorkUtils
 import com.mykameal.planner.databinding.FragmentCreateCookBookBinding
 import com.mykameal.planner.fragment.mainfragment.hometab.createcookbookfragment.model.CreateCookBookModel
@@ -49,12 +50,16 @@ class CreateCookBookFragment : Fragment() {
     private lateinit var commonWorkUtils: CommonWorkUtils
     private lateinit var createCookBookViewModel: CreateCookBookViewModel
     private val selectedButton = arrayOf<RadioButton?>(null)
-    private var status:String=""
+    private var status:String?=""
+    private var id:String?=""
+    private var name:String?=""
+    private var image:String?=""
+    private lateinit var sessionManagement: SessionManagement
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         binding = FragmentCreateCookBookBinding.inflate(layoutInflater, container, false)
-
+        sessionManagement = SessionManagement(requireContext())
         createCookBookViewModel = ViewModelProvider(this)[CreateCookBookViewModel::class.java]
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
@@ -63,6 +68,11 @@ class CreateCookBookFragment : Fragment() {
             checkType = requireArguments().getString("value", "")
             uri = requireArguments().getString("uri", "")
         }
+
+        id=sessionManagement.getCookBookId()
+        name=sessionManagement.getCookBookName()
+        image=sessionManagement.getCookBookImage()
+        status=sessionManagement.getCookBookType()
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
@@ -108,6 +118,27 @@ class CreateCookBookFragment : Fragment() {
             binding!!.tvToolbar.text = "Edit Cookbook"
         }
 
+
+        if (!name.equals("",true)){
+            binding!!.etEnterYourNewCookbook.setText(name)
+        }
+
+        if (!status.equals("",true)){
+             if (status.equals("0",true)){
+                 // Select the RadioButton and update the selected reference
+                 binding!!.radioPrivate.isChecked = true
+                 binding!!.radioPublic.isChecked = false
+                 selectedButton[0] = binding!!.radioPrivate
+                 status="0"
+             }else{
+                 // Select the RadioButton and update the selected reference
+                 binding!!.radioPublic.isChecked = true
+                 binding!!.radioPrivate.isChecked = false
+                 selectedButton[0] = binding!!.radioPublic
+                 status="1"
+             }
+        }
+
         binding!!.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()
         }
@@ -135,7 +166,7 @@ class CreateCookBookFragment : Fragment() {
         }
 
          // Set listeners for each RadioButton
-        binding!!.radioPrivate.setOnClickListener { v: View? ->
+        binding!!.radioPrivate.setOnClickListener {
             if (selectedButton[0] === binding!!.radioPrivate) {
                 // If already selected, deselect it
                 binding!!.radioPrivate.isChecked = false
@@ -150,7 +181,7 @@ class CreateCookBookFragment : Fragment() {
             }
         }
 
-        binding!!.radioPublic.setOnClickListener { v: View? ->
+        binding!!.radioPublic.setOnClickListener {
             if (selectedButton[0] === binding!!.radioPublic) {
                 // If already selected, deselect it
                 binding!!.radioPublic.isChecked = false
@@ -164,7 +195,6 @@ class CreateCookBookFragment : Fragment() {
                 status="1"
             }
         }
-
 
         binding!!.llAddImage.setOnClickListener {
             ImagePicker.with(this)
@@ -200,7 +230,8 @@ class CreateCookBookFragment : Fragment() {
                 null
             }
             val cookBookName = binding!!.etEnterYourNewCookbook.text.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val cookBookStatus = status.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val cookBookStatus = status?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val idStatus = id?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
 
             createCookBookViewModel.createCookBookApi({
                 BaseApplication.dismissMe()
@@ -210,6 +241,10 @@ class CreateCookBookFragment : Fragment() {
                         if (createCookBookModel.code == 200 && createCookBookModel.success) {
                             if (uri.equals("",true)){
                                 Toast.makeText(requireContext(),createCookBookModel.message,Toast.LENGTH_LONG).show()
+                                sessionManagement.setCookBookId(createCookBookModel.data.id.toString())
+                                sessionManagement.setCookBookName(binding!!.etEnterYourNewCookbook.text.toString())
+//                                sessionManagement.setCookBookImage()
+                                sessionManagement.setCookBookType(status!!)
                                 findNavController().navigateUp()
                             }else{
                                 recipeLikeAndUnlikeData(createCookBookModel.data.id.toString(),createCookBookModel.message)
@@ -231,7 +266,7 @@ class CreateCookBookFragment : Fragment() {
                         showAlertFunction(it.message, false)
                     }
                 }
-            }, cookBookName, filePart, cookBookStatus)
+            }, cookBookName, filePart, cookBookStatus,idStatus)
         }
     }
 

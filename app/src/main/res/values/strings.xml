@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Myka App</string>
+    <string name="app_name">My-Kai App</string>
     <string name="my_kitchen_assistant">My Kitchen Assistant</string>
     <string name="publish_key">pk_test_51PdDwn2MfdrjGdokeRO8ulheGv5oP8xXkvE7izmXQbSrmXPO2g6S9x0QoiafnAi3F52AwyC1NHJWOOJqPpcmNbuw00Q2OcA9nr</string>
 
@@ -16,7 +16,7 @@
     <string name="partner_age">Partner\'s age</string>
     <string name="select_gender">Select Gender</string>
 
-    <string name="myka_meal_planner"> <font color="#06C169">Myka</font><font color="#FE9F45"> Meal Planner</font></string>
+    <string name="myka_meal_planner"> <font color="#06C169">My-Kai</font><font color="#FE9F45"> Meal Planner</font></string>
     <string name="sept_meal_planner"> <font color="#3C4541">Next meal to be cooked on </font><font color="#06C169">20 Sept.</font></string>
     <string name="login_to_your_account"><font color="#000000">Login to Your</font><font color="#06C169"> Account</font></string>
     <string name="forgot_password"><font color="#000000">Forgot</font><font color="#06C169"> Password</font></string>
@@ -110,6 +110,7 @@
     <string name="enable_all_notification">Enable all notification</string>
     <string name="are_you_sure_to_remove_this_account">Are you sure to remove this account ?</string>
     <string name="rate_your_recipe">Rate your recipe</string>
+    <string name="no_data_found">No Data Found</string>
 
 
 </resources>

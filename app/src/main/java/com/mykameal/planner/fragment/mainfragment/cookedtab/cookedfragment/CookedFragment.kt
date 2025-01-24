@@ -10,14 +10,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.mykameal.planner.OnItemClickListener
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
@@ -27,12 +30,16 @@ import com.mykameal.planner.adapter.CalendarDayIndicatorAdapter
 import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.databinding.FragmentCookedBinding
+import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.Breakfast
 import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.CookedTabModel
 import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.CookedTabModelData
 import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.viewmodel.CookedTabViewModel
+import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
+import com.mykameal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import com.mykameal.planner.model.CalendarDataModel
 import com.mykameal.planner.model.DateModel
+import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -53,7 +60,6 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private var calendarDayAdapter: CalendarDayIndicatorAdapter? = null
     private var planType: String = "1"
     private val calendar = Calendar.getInstance()
-    private var isOpened: Boolean? = null
     private var currentDate = Date() // Current date
     private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
 
@@ -62,11 +68,15 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private lateinit var endDate: Date
     private var currentDateSelected: String = ""
     private var calendarAdapter: CalendarDayDateAdapter? = null
+    private var recipesModel: CookedTabModelData? = null
+    private lateinit var spinnerActivityLevel: PowerSpinnerView
+    private var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentCookedBinding.inflate(inflater, container, false)
         (activity as MainActivity?)?.changeBottom("cooked")
@@ -76,7 +86,10 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
         currentDateSelected = BaseApplication.currentDateFormat().toString()
         cookedTabViewModel = ViewModelProvider(this)[CookedTabViewModel::class.java]
+        cookbookList.clear()
 
+        val data= com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favourites",0,"",0)
+        cookbookList.add(0,data)
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
             object : OnBackPressedCallback(true) {
@@ -109,6 +122,14 @@ class CookedFragment : Fragment(), OnItemClickListener {
             findNavController().navigate(R.id.addMealCookedFragment)
         }
 
+        binding!!.imageSnacksCreate.setOnClickListener {
+            findNavController().navigate(R.id.addMealCookedFragment)
+        }
+
+        binding!!.imageTeaTimeCreate.setOnClickListener {
+            findNavController().navigate(R.id.addMealCookedFragment)
+        }
+
         binding!!.imagePrevious.setOnClickListener {
             val calendar = Calendar.getInstance()
             calendar.time = currentDate
@@ -137,12 +158,10 @@ class CookedFragment : Fragment(), OnItemClickListener {
         }
 
         binding!!.relCalendarYear.setOnClickListener {
-            if (isOpened == true) {
+            if (binding!!.llCalendarViewEvents.visibility == View.VISIBLE) {
                 binding!!.llCalendarViewEvents.visibility = View.GONE
-                isOpened = false
             } else {
                 binding!!.llCalendarViewEvents.visibility = View.VISIBLE
-                isOpened = true
             }
         }
 
@@ -153,11 +172,22 @@ class CookedFragment : Fragment(), OnItemClickListener {
         // Display current week dates
         showWeekDates()
 
+
+
+
         if (BaseApplication.isOnline(requireActivity())) {
             cookedTabApi(currentDateSelected)
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
+
+
+
+
+
+
+
+
     }
 
     @SuppressLint("SetTextI18n")
@@ -178,11 +208,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
             val dateList = getDaysBetween(startDate, endDate)
             // Update the status of the item at the target position
             dateList.forEachIndexed { index, dateModel ->
-                if (index == it) {
-                    dateModel.status = true
-                } else {
-                    dateModel.status = false
-                }
+                dateModel.status = index == it
             }
             currentDateSelected = dateList[it].date
             Log.d("Date ", "*****$dateList")
@@ -268,17 +294,22 @@ class CookedFragment : Fragment(), OnItemClickListener {
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val cookedModel = gson.fromJson(it.data, CookedTabModel::class.java)
-                        if (cookedModel.code == 200 && cookedModel.success) {
-                            showDataInUi(cookedModel.data)
-                        } else {
-                            if (cookedModel.code == ErrorMessage.code) {
-                                showAlertFunction(cookedModel.message, true)
+                        try {
+                            val gson = Gson()
+                            val cookedModel = gson.fromJson(it.data, CookedTabModel::class.java)
+                            if (cookedModel.code == 200 && cookedModel.success) {
+                                showDataInUi(cookedModel.data)
                             } else {
-                                showAlertFunction(cookedModel.message, false)
+                                if (cookedModel.code == ErrorMessage.code) {
+                                    showAlertFunction(cookedModel.message, true)
+                                } else {
+                                    showAlertFunction(cookedModel.message, false)
+                                }
                             }
+                        }catch (e:Exception){
+                            showAlertFunction(e.message, false)
                         }
+
                     }
 
                     is NetworkResult.Error -> {
@@ -294,84 +325,94 @@ class CookedFragment : Fragment(), OnItemClickListener {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun showDataInUi(cookedTabModelData: CookedTabModelData) {
+    private fun showDataInUi(cookedTabModelData: CookedTabModelData?) {
         try {
             if (cookedTabModelData != null) {
-
+                recipesModel = cookedTabModelData
                 if (cookedTabModelData.fridge != null && cookedTabModelData.freezer != null) {
-                    if (cookedTabModelData.fridge == 0 && cookedTabModelData.freezer == 0) {
-                        binding!!.llEmptyFridge.visibility = View.VISIBLE
-                        binding!!.llFilledFridge.visibility = View.GONE
-                    } else {
-                        binding!!.llEmptyFridge.visibility = View.GONE
-                        binding!!.llFilledFridge.visibility = View.VISIBLE
 
+                    fun updateFridgeVisibility(condition: Boolean) {
+                        if (condition) {
+                            binding!!.llEmptyFridge.visibility = View.VISIBLE
+                            binding!!.llFilledFridge.visibility = View.GONE
+                        } else {
+                            binding!!.llEmptyFridge.visibility = View.GONE
+                            binding!!.llFilledFridge.visibility = View.VISIBLE
+                        }
                     }
-                    binding!!.textFreezer.text =
-                        "Freezer (" + cookedTabModelData.freezer.toString() + ")"
+
+                    if (planType.equals("1", true)) {
+                        updateFridgeVisibility(cookedTabModelData.fridge == 0)
+                    } else {
+                        updateFridgeVisibility(cookedTabModelData.freezer == 0)
+                    }
+
+                    binding!!.textFreezer.text = "Freezer (" + cookedTabModelData.freezer.toString() + ")"
                     binding!!.textFridge.text = "Fridge (" + cookedTabModelData.fridge.toString() + ")"
+
+                }else{
+                    binding!!.llEmptyFridge.visibility = View.VISIBLE
+                    binding!!.llFilledFridge.visibility = View.GONE
                 }
 
-                if (cookedTabModelData.Breakfast != null && cookedTabModelData.Breakfast.size > 0) {
+                fun setupMealAdapter(mealRecipes: MutableList<Breakfast>?, recyclerView: RecyclerView, type: String): AdapterFoodListItem? {
+                    return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
+                        val adapter = AdapterFoodListItem(mealRecipes,type, requireActivity(), this)
+                        recyclerView.adapter = adapter
+                        adapter
+                    } else {
+                        null
+                    }
+                }
+
+                // Breakfast
+                if (cookedTabModelData.Breakfast != null && cookedTabModelData.Breakfast.size >0) {
+                    foodListBreakFastAdapter = setupMealAdapter(cookedTabModelData.Breakfast, binding!!.rcvBreakfast, "BreakFast")
                     binding!!.rlBreakfast.visibility = View.VISIBLE
-                    foodListBreakFastAdapter = AdapterFoodListItem(cookedTabModelData.Breakfast, "Breakfast", requireActivity(), this)
-                    binding!!.rcvBreakfast.adapter = foodListBreakFastAdapter
                 } else {
                     binding!!.rlBreakfast.visibility = View.GONE
                 }
 
-                if (cookedTabModelData.Lunch != null && cookedTabModelData.Lunch.size > 0) {
+                // Lunch
+                if (cookedTabModelData.Lunch != null && cookedTabModelData.Lunch.size >0) {
+                    foodListLunchAdapter = setupMealAdapter(cookedTabModelData.Lunch, binding!!.rcvLunch, "Lunch")
                     binding!!.rlLunch.visibility = View.VISIBLE
-                    foodListLunchAdapter =
-                        AdapterFoodListItem(cookedTabModelData.Lunch, "Lunch", requireActivity(), this)
-                    binding!!.rcvLunch.adapter = foodListLunchAdapter
                 } else {
                     binding!!.rlLunch.visibility = View.GONE
                 }
 
-                if (cookedTabModelData.Dinner != null && cookedTabModelData.Dinner.size > 0) {
+                // Dinner
+                if (cookedTabModelData.Dinner != null && cookedTabModelData.Dinner.size >0) {
+                    foodListDinnerAdapter = setupMealAdapter(cookedTabModelData.Dinner, binding!!.rcvDinner, "Dinner")
                     binding!!.relDinner.visibility = View.VISIBLE
-                    foodListDinnerAdapter = AdapterFoodListItem(
-                        cookedTabModelData.Dinner,
-                        "Dinner",
-                        requireActivity(),
-                        this
-                    )
-                    binding!!.rcvDinner.adapter = foodListDinnerAdapter
                 } else {
                     binding!!.relDinner.visibility = View.GONE
                 }
 
-
-                if (cookedTabModelData.Snacks != null) {
-                    if (cookedTabModelData.Snacks!!.size != null && cookedTabModelData.Snacks.size > 0) {
-                        binding!!.relSnacks.visibility = View.VISIBLE
-                        foodListSnacksAdapter = AdapterFoodListItem(
-                            cookedTabModelData.Snacks,
-                            "Snacks",
-                            requireActivity(),
-                            this
-                        )
-                        binding!!.rcvSnacks.adapter = foodListSnacksAdapter
-                    } else {
-                        binding!!.relSnacks.visibility = View.GONE
-                    }
+                // Snacks
+                if (cookedTabModelData.Snacks != null && cookedTabModelData.Snacks.size >0) {
+                    foodListSnacksAdapter = setupMealAdapter(cookedTabModelData.Snacks, binding!!.rcvSnacks, "Snack")
+                    binding!!.relSnacks.visibility = View.VISIBLE
+                } else {
+                    binding!!.relSnacks.visibility = View.GONE
                 }
 
-                if (cookedTabModelData.Teatime != null) {
-                    if (cookedTabModelData.Teatime!!.size != null && cookedTabModelData.Teatime.size > 0) {
-                        binding!!.relTeaTime.visibility = View.VISIBLE
-                        foodListTeaTimeAdapter = AdapterFoodListItem(
-                            cookedTabModelData.Teatime,
-                            "Teatime",
-                            requireActivity(),
-                            this
-                        )
-                        binding!!.rcvTeaTime.adapter = foodListTeaTimeAdapter
-                    } else {
-                        binding!!.relTeaTime.visibility = View.GONE
-                    }
+                // Snacks
+                if (cookedTabModelData.Snacks != null && cookedTabModelData.Snacks.size >0) {
+                    foodListSnacksAdapter = setupMealAdapter(cookedTabModelData.Snacks, binding!!.rcvSnacks, "Snacks")
+                    binding!!.relSnacks.visibility = View.VISIBLE
+                } else {
+                    binding!!.relSnacks.visibility = View.GONE
                 }
+
+                // Teatime
+                if (cookedTabModelData.Teatime != null && cookedTabModelData.Teatime.size >0) {
+                    foodListTeaTimeAdapter = setupMealAdapter(cookedTabModelData.Teatime, binding!!.rcvTeaTime, "Teatime")
+                    binding!!.relTeaTime.visibility = View.VISIBLE
+                } else {
+                    binding!!.relTeaTime.visibility = View.GONE
+                }
+
             }
         }catch (e:Exception){
             Log.d("CookedScreen","message:--"+e.message)
@@ -384,6 +425,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private fun updateWeek() {
         val startOfWeek = calendar.apply {
             set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
@@ -393,8 +435,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
             add(Calendar.DAY_OF_WEEK, 6)
         }.time
 
-        binding!!.textWeekRange.text =
-            "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
+        binding!!.textWeekRange.text = "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
         binding!!.recyclerViewWeekDays.adapter = calendarDayAdapter
         binding!!.recyclerViewWeekDays.adapter = CalendarDayIndicatorAdapter(getDaysOfWeek()) {
         }
@@ -419,7 +460,6 @@ class CookedFragment : Fragment(), OnItemClickListener {
         return days
 
     }
-
 
     private fun toggleFridgeToFreezer() {
 
@@ -457,13 +497,346 @@ class CookedFragment : Fragment(), OnItemClickListener {
         }
     }
 
-    override fun itemClick(position: Int?, status: String?, cookedId: String?) {
-        Toast.makeText(requireActivity(), "Typessss:---  " + status, Toast.LENGTH_LONG).show()
-        removeMealDialog(cookedId, position, status)
+    override fun itemClick(position: Int?, status: String?, type: String?) {
+        when (status) {
+            "1" -> {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddServing(type ?: "", position, "like")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
+            "2" -> {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddServing(type ?: "", position, "add")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
+            "3" -> {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddServing(type ?: "", position, "remove")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
+            "4" -> {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddServing(type ?: "", position, "minus")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    private fun removeAddServing(type: String, position: Int?, apiType: String) {
+        // Map the type to the corresponding list and adapter
+        val (mealList, adapter) = when (type) {
+            "BreakFast" -> recipesModel?.Breakfast to foodListBreakFastAdapter
+            "Lunch" -> recipesModel?.Lunch to foodListLunchAdapter
+            "Dinner" -> recipesModel?.Dinner to foodListDinnerAdapter
+            "Snack" -> recipesModel?.Dinner to foodListSnacksAdapter
+            "TeaTime" -> recipesModel?.Dinner to foodListTeaTimeAdapter
+            else -> null to null
+        }
+
+        val item = mealList?.get(position!!)
+        if (item != null) {
+            if (item.recipe.uri !=null){
+                if (apiType.equals("like",true)){
+                    val newLikeStatus = if (item.is_like == 0) "1" else "0"
+                    if (newLikeStatus.equals("0",true)){
+                        recipeLikeAndUnlikeData(item, adapter, type, mealList, position, newLikeStatus,"",null)
+                    }else{
+                        addFavTypeDialog(item, adapter, type, mealList, position, newLikeStatus)
+                    }
+                }
+                if (apiType.equals("remove",true)){
+                    removeMealDialog(item, adapter, type, mealList, position)
+                }
+
+                if (apiType.equals("add",true) || apiType.equals("minus",true)) {
+                    var count = item.servings
+                    count = when (apiType.lowercase()) {
+                        "add" -> count + 1
+                        "minus" -> count - 1
+                        else -> count // No change if `apiType` doesn't match
+                    }
+                    // Create a JsonObject for the main JSON structure
+                    val jsonObject = JsonObject()
+                    jsonObject.addProperty("type", type)
+                    jsonObject.addProperty("plan_type", planType)
+                    jsonObject.addProperty("uri", item.recipe.uri)
+                    jsonObject.addProperty("date", item.date)
+                    jsonObject.addProperty("servings", String.format("%02d", count))
+
+                    Log.d("json object ", "******$jsonObject")
+
+                    recipeServingCountData(item, adapter, type, mealList, position, count.toString(),jsonObject)
+                }
+            }
+        }
+    }
+
+    private fun recipeLikeAndUnlikeData(
+        item: Breakfast?,
+        adapter: AdapterFoodListItem?,
+        type: String,
+        mealList: MutableList<Breakfast>?,
+        position: Int?,
+        likeType: String,
+        cookbooktype: String,
+        dialogAddRecipe: Dialog?
+    ) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            cookedTabViewModel?.likeUnlikeRequest({
+                BaseApplication.dismissMe()
+                handleLikeAndUnlikeApiResponse(it,item,adapter,type,mealList,position,dialogAddRecipe)
+            }, item?.recipe?.uri!!,likeType,cookbooktype)
+        }
+    }
+
+
+    private fun recipeServingCountData(
+        item: Breakfast?,
+        adapter: AdapterFoodListItem?,
+        type: String,
+        mealList: MutableList<Breakfast>?,
+        position: Int?,
+        count: String,
+        jsonObject: JsonObject
+    ) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            cookedTabViewModel?.recipeServingCountRequest({
+                BaseApplication.dismissMe()
+                handleCountApiResponse(it,item,adapter,type,mealList,position,count)
+            }, jsonObject)
+        }
+    }
+
+    private fun handleLikeAndUnlikeApiResponse(
+        result: NetworkResult<String>,
+        item: Breakfast?,
+        adapter: AdapterFoodListItem?,
+        type: String,
+        mealList: MutableList<Breakfast>?,
+        position: Int?,
+        dialogAddRecipe: Dialog?
+    ) {
+        when (result) {
+            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(result.data.toString(),item,adapter,type,mealList,position,dialogAddRecipe)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    private fun handleCountApiResponse(
+        result: NetworkResult<String>,
+        item: Breakfast?,
+        adapter: AdapterFoodListItem?,
+        type: String,
+        mealList: MutableList<Breakfast>?,
+        position: Int?,
+        count: String,
+        ) {
+        when (result) {
+            is NetworkResult.Success -> handleCountSuccessResponse(result.data.toString(),item,adapter,type,mealList,position,count)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    private fun showAlert(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleLikeAndUnlikeSuccessResponse(
+        data: String,
+        item: Breakfast?,
+        adapter: AdapterFoodListItem?,
+        type: String,
+        mealList: MutableList<Breakfast>?,
+        position: Int?,
+        dialogAddRecipe: Dialog?
+    ) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ Plan List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                dialogAddRecipe?.dismiss()
+                // Toggle the is_like value
+                item?.is_like = if (item?.is_like == 0) 1 else 0
+                if (item != null) {
+                    mealList?.set(position!!, item)
+                }
+                // Update the adapter
+                if (mealList != null) {
+                    adapter?.updateList(mealList, type)
+                }
+
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleCountSuccessResponse(
+        data: String,
+        item: Breakfast?,
+        adapter: AdapterFoodListItem?,
+        type: String,
+        mealList: MutableList<Breakfast>?,
+        position: Int?,
+        count: String,
+    ) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ count ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                // Toggle the is_like value
+                item?.servings = count.toInt()
+                if (item != null) {
+                    mealList?.set(position!!, item)
+                }
+                // Update the adapter
+                if (mealList != null) {
+                    adapter?.updateList(mealList, type)
+                }
+
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun addFavTypeDialog(
+        item: Breakfast?,
+        adapter: AdapterFoodListItem?,
+        type: String,
+        mealList: MutableList<Breakfast>?,
+        position: Int?,
+        likeType: String) {
+        val dialogAddRecipe: Dialog = context?.let { Dialog(it) }!!
+        dialogAddRecipe.setContentView(R.layout.alert_dialog_add_recipe)
+        dialogAddRecipe.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialogAddRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val rlDoneBtn = dialogAddRecipe.findViewById<RelativeLayout>(R.id.rlDoneBtn)
+        spinnerActivityLevel = dialogAddRecipe.findViewById(R.id.spinnerActivityLevel)
+        val relCreateNewCookBook = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
+        val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
+
+        spinnerActivityLevel.setItems(cookbookList.map { it.name })
+
+        dialogAddRecipe.show()
+        dialogAddRecipe.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        getCookBookList()
+
+
+        relCreateNewCookBook.setOnClickListener{
+            relCreateNewCookBook.setBackgroundResource(R.drawable.light_green_rectangular_bg)
+            imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
+            dialogAddRecipe.dismiss()
+            val bundle=Bundle()
+            bundle.putString("value","New")
+            bundle.putString("uri",item?.recipe?.uri)
+            findNavController().navigate(R.id.createCookBookFragment,bundle)
+        }
+
+
+        rlDoneBtn.setOnClickListener{
+            if (spinnerActivityLevel.text.toString().equals(ErrorMessage.cookBookSelectError,true)){
+                BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
+            }else {
+                val cookbooktype = cookbookList[spinnerActivityLevel.selectedIndex].id
+                recipeLikeAndUnlikeData(
+                    item,
+                    adapter,
+                    type,
+                    mealList,
+                    position,
+                    likeType,
+                    cookbooktype.toString(),
+                    dialogAddRecipe
+                )
+            }
+
+
+
+        }
+
 
     }
 
-    private fun removeMealDialog(cookedId: String?, position: Int?, status: String?) {
+    private fun getCookBookList(){
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            cookedTabViewModel?.getCookBookRequest {
+                BaseApplication.dismissMe()
+                handleApiCookBookResponse(it)
+            }
+        }
+    }
+
+    private fun handleApiCookBookResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessCookBookResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessCookBookResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, CookBookListResponse::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data!=null && apiModel.data.size>0){
+                    cookbookList.retainAll { it == cookbookList[0] }
+                    cookbookList.addAll(apiModel.data)
+                    // OR directly modify the original list
+                    spinnerActivityLevel.setItems(cookbookList.map { it.name })
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+
+
+    private fun removeMealDialog(
+        item: Breakfast,
+        adapter: AdapterFoodListItem?,
+        type: String,
+        mealList: MutableList<Breakfast>,
+        position: Int?
+    ) {
         val dialogRemoveDay: Dialog = context?.let { Dialog(it) }!!
         dialogRemoveDay.setContentView(R.layout.alert_dialog_remove_cooked_meals)
         dialogRemoveDay.window!!.setLayout(
@@ -481,9 +854,8 @@ class CookedFragment : Fragment(), OnItemClickListener {
         }
 
         tvDialogYesBtn.setOnClickListener {
-
             if (BaseApplication.isOnline(requireActivity())) {
-                removeCookBookApi(cookedId.toString(), dialogRemoveDay, position, status)
+                removeCookBookApi(item.id.toString(), dialogRemoveDay, adapter, type,mealList,position)
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
@@ -493,8 +865,10 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private fun removeCookBookApi(
         cookedId: String,
         dialogRemoveDay: Dialog,
-        position: Int?,
-        status: String?
+        adapter: AdapterFoodListItem?,
+        type: String,
+        mealList: MutableList<Breakfast>,
+        position: Int?
     ) {
         BaseApplication.showMe(requireActivity())
         lifecycleScope.launch {
@@ -505,14 +879,32 @@ class CookedFragment : Fragment(), OnItemClickListener {
                         val gson = Gson()
                         val cookedModel = gson.fromJson(it.data, CookedTabModel::class.java)
                         if (cookedModel.code == 200 && cookedModel.success) {
-                            when (status) {
-                                "Breakfast" -> foodListBreakFastAdapter?.removeItem(position!!)
-                                "Lunch" -> foodListLunchAdapter?.removeItem(position!!)
-                                "Dinner" -> foodListDinnerAdapter?.removeItem(position!!)
-                                "Snacks" -> foodListSnacksAdapter?.removeItem(position!!)
-                                "Teatime" -> foodListTeaTimeAdapter?.removeItem(position!!)
+
+                            // Remove item from the list
+                            mealList.removeAt(position!!)
+
+                           // Define meal types and corresponding UI elements
+                            val mealVisibilityMap = mapOf(
+                                "BreakFast" to binding!!.rlBreakfast,
+                                "Lunch" to binding!!.rlLunch,
+                                "Dinner" to binding!!.relDinner,
+                                "Snack" to binding!!.relSnacks,
+                                "Teatime" to binding!!.relTeaTime
+                            )
+
+                           // Update adapter and visibility
+                            mealVisibilityMap[type]?.let { view ->
+                                if (mealList.isNotEmpty()) {
+                                    adapter?.updateList(mealList, type)
+                                    view.visibility = View.VISIBLE
+                                } else {
+                                    view.visibility = View.GONE
+                                }
                             }
+
+                            // Dismiss the dialog
                             dialogRemoveDay.dismiss()
+
                         } else {
                             if (cookedModel.code == ErrorMessage.code) {
                                 showAlertFunction(cookedModel.message, true)

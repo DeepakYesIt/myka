@@ -83,8 +83,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="@dimen/_7sdp"
-                android:layout_marginHorizontal="@dimen/_16sdp"
-                android:paddingHorizontal="@dimen/_6sdp"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
                 android:visibility="gone"
                 android:paddingVertical="@dimen/_10sdp"
                 android:background="@drawable/calendar_events_bg">
@@ -93,6 +93,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:visibility="gone"
                     android:weightSum="3">
 
                     <LinearLayout
@@ -203,7 +204,7 @@
                 app:cardElevation="@dimen/_10sdp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_15sdp"
+                android:layout_marginHorizontal="@dimen/_8sdp"
                 android:layout_marginTop="@dimen/_10sdp">
 
                 <LinearLayout
@@ -288,6 +289,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:layout_marginBottom="@dimen/_15sdp"
                 android:visibility="visible">
 
@@ -480,11 +482,7 @@
                         tools:listitem="@layout/adapter_layout_food_items_list" />
 
                 </RelativeLayout>
-
             </LinearLayout>
-
         </LinearLayout>
-
     </ScrollView>
-
 </RelativeLayout>

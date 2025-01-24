@@ -43,6 +43,8 @@ class CreateRecipeFragment : Fragment(), OnItemClickListener {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+
         // Inflate the layout for this fragment
         binding = FragmentCreateRecipeBinding.inflate(layoutInflater, container, false)
 
@@ -59,6 +61,7 @@ class CreateRecipeFragment : Fragment(), OnItemClickListener {
 
         return binding!!.root
     }
+
 
     private val pickImageLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()

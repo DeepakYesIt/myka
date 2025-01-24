@@ -126,6 +126,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             })
 
         (activity as MainActivity?)?.changeBottom("plan")
+        cookbookList.clear()
 
         val data= com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favourites",0,"",0)
         cookbookList.add(0,data)
@@ -1208,7 +1209,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
          getCookBookList()
 
         relCreateNewCookBook.setOnClickListener{
-//            statuses="newCook"
             relCreateNewCookBook.setBackgroundResource(R.drawable.light_green_rectangular_bg)
             imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
             dialogAddRecipe.dismiss()
@@ -1249,7 +1249,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 bundle.putString("value","New")
                 findNavController().navigate(R.id.createCookBookFragment,bundle)
             }*/
-            if (spinnerActivityLevel.text.toString().equals("",true)){
+            if (spinnerActivityLevel.text.toString().equals(ErrorMessage.cookBookSelectError,true)){
                 BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
             }else {
                 val cookbooktype = cookbookList[spinnerActivityLevel.selectedIndex].id
@@ -1264,8 +1264,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                     dialogAddRecipe
                 )
             }
-
         }
+
     }
 
     private fun getCookBookList(){
