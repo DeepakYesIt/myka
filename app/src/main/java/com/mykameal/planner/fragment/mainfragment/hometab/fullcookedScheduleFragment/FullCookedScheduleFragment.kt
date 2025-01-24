@@ -175,7 +175,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         tvWeekRange?.text = "${formatDate(startDate)} - ${formatDate(endDate)}"
 
         // Initialize the adapter with the updated date list
-        calendarAdapter = CalendarDayDateAdapter(updatedDaysBetween) { selectedPosition ->
+        calendarAdapter = CalendarDayDateAdapter(updatedDaysBetween.toMutableList()) { selectedPosition ->
             // Update the list to reflect the selected date
             updatedDaysBetween.forEachIndexed { index, dateModel ->
                 dateModel.status = (index == selectedPosition)
@@ -183,7 +183,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             Log.d("Date ", "*****$updatedDaysBetween")
 
             // Notify the adapter to refresh the data
-            calendarAdapter?.updateList(updatedDaysBetween)
+            calendarAdapter?.updateList(updatedDaysBetween.toMutableList())
 
             // Update the current date selection
             currentDateSelected = updatedDaysBetween[selectedPosition].date
@@ -930,7 +930,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             fUllCookingScheduleViewModel.likeUnlikeRequest({
                 BaseApplication.dismissMe()
                 handleLikeAndUnlikeApiResponse(it, item, type, mealList, position, dialogAddRecipe)
-            }, item.recipe.uri, likeType, cookBookType)
+            }, item.recipe.uri.toString(), likeType, cookBookType)
         }
     }
 

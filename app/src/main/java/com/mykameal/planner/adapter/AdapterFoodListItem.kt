@@ -15,18 +15,11 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.mykameal.planner.OnItemClickListener
-import com.mykameal.planner.OnItemSelectUnSelectListener
 import com.mykameal.planner.R
 import com.mykameal.planner.databinding.AdapterLayoutFoodItemsListBinding
 import com.mykameal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.Breakfast
 
-
-class AdapterFoodListItem(private var itemList: MutableList<Breakfast>,private var type:String?,private var requireActivity: FragmentActivity,
-                          private var onItemSelectListener: OnItemSelectUnSelectListener) : RecyclerView.Adapter<AdapterFoodListItem.ViewHolder>() {
-
-class AdapterFoodListItem(var itemList: MutableList<Breakfast>,var type:String?,private var requireActivity: FragmentActivity,
-                          private var onItemSelectListener: OnItemClickListener) : RecyclerView.Adapter<AdapterFoodListItem.ViewHolder>() {
-
+class AdapterFoodListItem(var itemList: MutableList<Breakfast>,var type:String?,private var requireActivity: FragmentActivity, private var onItemSelectListener: OnItemClickListener) : RecyclerView.Adapter<AdapterFoodListItem.ViewHolder>() {
 
     private var quantity:Int=1
 
@@ -42,7 +35,7 @@ class AdapterFoodListItem(var itemList: MutableList<Breakfast>,var type:String?,
         holder.binding.tvBreakfast.text = itemList[position].recipe.label
 
         if (itemList[position].is_like!=null){
-            if (itemList[position].is_like ==0){
+            if (itemList[position].is_like ==0 ){
                 holder.binding.imgHeartRed.setImageResource(R.drawable.heart_white_icon)
             }else{
                 holder.binding.imgHeartRed.setImageResource(R.drawable.heart_red_icon)
@@ -56,6 +49,7 @@ class AdapterFoodListItem(var itemList: MutableList<Breakfast>,var type:String?,
                 holder.binding.textTimeAgo.text=itemList[position].created_date.toString()
             }
         }
+
 
         if (itemList[position].servings!=null){
             holder.binding.tvServes.text="Serves "+itemList[position].servings.toString()
@@ -95,34 +89,6 @@ class AdapterFoodListItem(var itemList: MutableList<Breakfast>,var type:String?,
 
 
         holder.binding.imageMinusItem.setOnClickListener{
-            onItemSelectListener.itemSelectUnSelect(itemList[position].servings,"3",type,position)
-
-            /*  if (quantity > 1) {
-                  quantity--
-                  updateValue(holder.binding.tvServes)
-              }else{
-                  Toast.makeText(requireActivity,"Minimum serving atleast value is one", Toast.LENGTH_LONG).show()
-              }*/
-        }
-
-        holder.binding.imagePlusItem.setOnClickListener{
-            onItemSelectListener.itemSelectUnSelect(itemList[position].servings,"3",type,position)
-
-            /* if (quantity < 99) {
-                 quantity++
-                 updateValue(holder.binding.tvServes)
-             }*/
-        }
-
-        holder.binding.imgAppleRemove.setOnClickListener {
-            onItemSelectListener.itemSelectUnSelect(itemList[position].id,"1",type,position)
-         /*   onItemSelectListener.itemClick(position, type, itemList[position].id.toString())*/
-        }
-
-        holder.binding.imgHeartRed.setOnClickListener{
-            if (itemList[position]!= null) {
-                onItemSelectListener.itemSelectUnSelect(itemList[position].is_like,"2",type,position)
-            }
             if (itemList[position].servings.toString().toInt() > 1) {
                 onItemSelectListener.itemClick(position, "4", type)
             }else{
@@ -154,10 +120,10 @@ class AdapterFoodListItem(var itemList: MutableList<Breakfast>,var type:String?,
         notifyDataSetChanged()
     }
 
-  /*  private fun updateValue(tvServes: TextView) {
+    private fun updateValue(tvServes: TextView) {
         tvServes.text ="Serves"+ String.format("%02d", quantity)
 
-    }*/
+    }
 
     override fun getItemCount(): Int {
         return itemList.size
@@ -168,13 +134,6 @@ class AdapterFoodListItem(var itemList: MutableList<Breakfast>,var type:String?,
         itemList.removeAt(position)
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, itemList.size) // Optional, updates the positions of remaining items
-    }
-
-    fun updateList(mealList: MutableList<Breakfast>, type: String) {
-        itemList=mealList
-        this.type=type
-        notifyDataSetChanged()
-
     }
 
     class ViewHolder(var binding: AdapterLayoutFoodItemsListBinding) :
