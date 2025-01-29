@@ -183,12 +183,9 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
                             Log.d("MealRoutine@@@","message:---"+e.message)
                         }
                     }
-
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
-                    }
-
-                    else -> {
+                    }else -> {
                         showAlertFunction(it.message, false)
                     }
                 }

@@ -1326,7 +1326,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_40sdp"
                 android:layout_below="@+id/linearTeatime"
-                android:layout_marginHorizontal="@dimen/_12sdp"
+                android:layout_marginHorizontal="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_25sdp"
                 android:visibility="visible"
                 android:layout_marginBottom="@dimen/_30sdp"
@@ -1340,10 +1340,10 @@
                     android:layout_weight="1"
                     android:background="@drawable/outline_green_border_bg"
                     android:gravity="center"
-                    android:padding="@dimen/_10sdp"
-                    android:text="Add Another Meal"
+                    android:padding="@dimen/_5sdp"
+                    android:text="Add Another Meal Type"
                     android:textColor="@color/light_green"
-                    android:textSize="@dimen/_13sdp" />
+                    android:textSize="@dimen/_12sdp" />
 
                 <TextView
                     android:id="@+id/tvConfirmBtn"
@@ -1354,10 +1354,10 @@
                     android:layout_weight="1"
                     android:background="@drawable/green_fill_corner_bg"
                     android:gravity="center"
-                    android:padding="@dimen/_10sdp"
+                    android:padding="@dimen/_5sdp"
                     android:text="Confirm"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/_13sdp" />
+                    android:textSize="@dimen/_12sdp" />
 
             </LinearLayout>
 

@@ -42,7 +42,8 @@
             android:fontFamily="@font/poppins"
             android:layout_marginTop="@dimen/_10sdp"
             android:layout_centerHorizontal="true"
-            android:text="ffg"
+            android:text=""
+            android:singleLine="true"
             android:textColor="@color/black"
             android:textSize="@dimen/_12sdp" />
 

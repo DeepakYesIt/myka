@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -71,6 +72,10 @@ class AdapterPlanBreakByDateFast(var datalist: MutableList<BreakfastModelPlanByD
             holder.binding.tvCalories.text = "" + data.recipe.calories.toInt()
         }
 
+        if (data?.servings != null) {
+            holder.binding.tvServing.text = "" + data.servings +" servings"
+        }
+
         if (data?.recipe?.totalNutrients?.FAT?.quantity != null) {
             holder.binding.tvFat.text = "" + data.recipe.totalNutrients.FAT.quantity.toInt()
         }
@@ -87,6 +92,23 @@ class AdapterPlanBreakByDateFast(var datalist: MutableList<BreakfastModelPlanByD
         holder.binding.tvSwap.setOnClickListener {
             onItemClickListener.itemSelectPlayByDate(position,"1",type)
         }
+
+
+        holder.binding.minus.setOnClickListener{
+            if (data?.servings!! > 1) {
+                onItemClickListener.itemSelectPlayByDate(position,"3",type)
+            }else{
+                Toast.makeText(requireActivity,"Minimum serving at least value is one", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        holder.binding.plus.setOnClickListener{
+            if (data?.servings!!  < 99) {
+                onItemClickListener.itemSelectPlayByDate(position,"2",type)
+            }
+        }
+
+
 
 
     }

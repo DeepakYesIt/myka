@@ -847,6 +847,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun removeCookBookApi(
         cookedId: String,
         dialogRemoveDay: Dialog,
@@ -864,31 +865,51 @@ class CookedFragment : Fragment(), OnItemClickListener {
                         val gson = Gson()
                         val cookedModel = gson.fromJson(it.data, CookedTabModel::class.java)
                         if (cookedModel.code == 200 && cookedModel.success) {
-
-                            // Remove item from the list
-                            mealList.removeAt(position!!)
-
-                           // Define meal types and corresponding UI elements
-                            val mealVisibilityMap = mapOf(
-                                "BreakFast" to binding!!.rlBreakfast,
-                                "Lunch" to binding!!.rlLunch,
-                                "Dinner" to binding!!.relDinner,
-                                "Snack" to binding!!.relSnacks,
-                                "Teatime" to binding!!.relTeaTime
-                            )
-
-                           // Update adapter and visibility
-                            mealVisibilityMap[type]?.let { view ->
-                                if (mealList.isNotEmpty()) {
-                                    adapter?.updateList(mealList, type)
-                                    view.visibility = View.VISIBLE
-                                } else {
-                                    view.visibility = View.GONE
+                            try {
+                                // Remove item from the list
+                                mealList.removeAt(position!!)
+                                val count = listOf(
+                                    recipesModel?.Breakfast?.size ?: 0,
+                                    recipesModel?.Lunch?.size ?: 0,
+                                    recipesModel?.Dinner?.size ?: 0,
+                                    recipesModel?.Snacks?.size ?: 0,
+                                    recipesModel?.Teatime?.size ?: 0
+                                ).sum().let { total ->
+                                    if (total == 0) 0 else total
                                 }
-                            }
 
-                            // Dismiss the dialog
-                            dialogRemoveDay.dismiss()
+
+                                // Define meal types and corresponding UI elements
+                                val mealVisibilityMap = mapOf(
+                                    "BreakFast" to binding!!.rlBreakfast,
+                                    "Lunch" to binding!!.rlLunch,
+                                    "Dinner" to binding!!.relDinner,
+                                    "Snack" to binding!!.relSnacks,
+                                    "Teatime" to binding!!.relTeaTime
+                                )
+
+                                // Update adapter and visibility
+                                mealVisibilityMap[type]?.let { view ->
+                                    if (mealList.isNotEmpty()) {
+                                        adapter?.updateList(mealList, type)
+                                        view.visibility = View.VISIBLE
+                                    } else {
+                                        view.visibility = View.GONE
+                                    }
+                                }
+
+                                // Dismiss the dialog
+                                dialogRemoveDay.dismiss()
+
+                                if (planType.equals("1",true)){
+                                    binding!!.textFridge.text = "Freezer ($count)"
+                                }else{
+                                    binding!!.textFreezer.text = "Freezer ($count)"
+                                }
+
+                            }catch (e:Exception){
+                                Log.d("@@@@@@","Error response "+e.message)
+                            }
 
                         } else {
                             if (cookedModel.code == ErrorMessage.code) {

@@ -66,6 +66,8 @@ object ApiEndPoint {
     const val createCookBook="add-cook-book"
 
     const val removeMeal="remove-meal"
+    const val forSearchUrl="for-search"
+    const val forPreferenceUrl="for-preference-update"
     const val getSchedule="get-schedule"
 
 

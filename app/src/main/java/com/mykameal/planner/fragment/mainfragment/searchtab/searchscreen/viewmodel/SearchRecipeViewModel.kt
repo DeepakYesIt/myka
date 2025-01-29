@@ -14,4 +14,12 @@ class SearchRecipeViewModel @Inject constructor(private val repository: MainRepo
     }
 
 
+    suspend fun recipeforSearchApi(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.recipeforSearchApi { successCallback(it) }
+    }
+
+    suspend fun recipePreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.recipePreferencesApi { successCallback(it) }
+    }
+
 }

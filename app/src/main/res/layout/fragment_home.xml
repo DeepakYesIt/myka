@@ -113,7 +113,7 @@
                     android:id="@+id/relPlanMeal"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_180sdp"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:layout_marginHorizontal="@dimen/_15sdp"
                     android:background="@drawable/plan_meal_bg">
 

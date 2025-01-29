@@ -9,7 +9,7 @@ data class MealRoutineModel(
 
 data class MealRoutineModelData(
     val id: Int,
-    val name: String,
+    val name: String?,
     var selected:Boolean
 
 )

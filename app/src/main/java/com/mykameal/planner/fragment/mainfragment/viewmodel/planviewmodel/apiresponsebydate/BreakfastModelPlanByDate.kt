@@ -4,5 +4,8 @@ import com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apires
 
 data class BreakfastModelPlanByDate(
     var id: Int?,
+    var servings: Int?,
+    var date: String?,
+    var day: String?,
     val recipe: RecipePlanModel?,
 )

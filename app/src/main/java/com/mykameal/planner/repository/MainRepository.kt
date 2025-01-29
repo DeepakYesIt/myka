@@ -168,9 +168,13 @@ interface MainRepository {
     suspend fun updateAllergiesApi(successCallback: (response: NetworkResult<String>) -> Unit, allergies:List<String>?)
 
     suspend fun updateBodyGoalApi(successCallback: (response: NetworkResult<String>) -> Unit,bodyGoal: String?)
+
     suspend fun updateCookingFrequencyApi(successCallback: (response: NetworkResult<String>) -> Unit,cookingFrequency: String?)
+
     suspend fun updateReasonTakeAwayApi(successCallback: (response: NetworkResult<String>) -> Unit,takeAway: String?)
+
     suspend fun updateEatingOutApi(successCallback: (response: NetworkResult<String>) -> Unit,eatingOut: String?)
+
     suspend fun updatePartnerInfoApi(successCallback: (response: NetworkResult<String>) -> Unit,partnerName: String?,
                                      partnerAge: String?,partnerGender: String?)
     suspend fun updateFamilyInfoApi(successCallback: (response: NetworkResult<String>) -> Unit,familyName: String?,
@@ -180,12 +184,23 @@ interface MainRepository {
                                            duration: String?)
 
     suspend fun updateMealRoutineApi(successCallback: (response: NetworkResult<String>) -> Unit, mealRoutineId:List<String>?)
+
     suspend fun updateDietaryApi(successCallback: (response: NetworkResult<String>) -> Unit, dietaryId:List<String>?)
+
     suspend fun updateFavouriteApi(successCallback: (response: NetworkResult<String>) -> Unit, favouriteId:List<String>?)
+
     suspend fun updateDislikedIngredientsApi(successCallback: (response: NetworkResult<String>) -> Unit, dislikedId:List<String>?)
 
     suspend fun recipeSearchApi(successCallback: (response: NetworkResult<String>) -> Unit, itemSearch:String?)
+
     suspend fun createRecipeUrlApi(successCallback: (response: NetworkResult<String>) -> Unit, itemSearch:String?)
+
+
+    suspend fun recipeforSearchApi(successCallback: (response: NetworkResult<String>) -> Unit)
+
+    suspend fun recipePreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit)
+
+
     suspend fun removeMealApi(successCallback: (response: NetworkResult<String>) -> Unit, cookedId:String?)
 
 

@@ -446,6 +446,13 @@ interface ApiInterface {
         @Field("q") q: String?
     ): Response<JsonObject>
 
+
+    @POST(ApiEndPoint.forSearchUrl)
+    suspend fun recipeForSearchApi(): Response<JsonObject>
+
+    @POST(ApiEndPoint.forPreferenceUrl)
+    suspend fun recipePreferencesApi(): Response<JsonObject>
+
     @FormUrlEncoded
     @POST(ApiEndPoint.createRecipeUrl)
     suspend fun createRecipeUrlApi(

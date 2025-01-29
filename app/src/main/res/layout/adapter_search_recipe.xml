@@ -17,11 +17,23 @@
         android:gravity="center"
         android:layout_centerInParent="true">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/imgRecipe"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/apple_image"/>
+        <RelativeLayout
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp">
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/imgRecipe"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/no_image"
+                android:layout_marginTop="@dimen/_2sdp"
+                android:layout_centerHorizontal="true" />
+            <include
+                android:id="@+id/lay_progess"
+                layout="@layout/progess_loader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
 
 <!--        <ImageView-->
 <!--            android:id="@+id/imgRecipe"-->
