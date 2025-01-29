@@ -43,5 +43,14 @@ class PlanViewModel @Inject constructor(private val repository: MainRepository) 
     }
 
 
+    suspend fun updateMealRoutineApi(successCallback: (response: NetworkResult<String>) -> Unit,mealRoutineId: List<String>?){
+        repository.updateMealRoutineApi ({ successCallback(it) },mealRoutineId)
+    }
+
+    suspend fun recipeServingCountRequest(successCallback: (response: NetworkResult<String>) -> Unit, jsonObject: JsonObject
+    ){
+        repository.recipeAddToPlanRequestApi({ successCallback(it) },jsonObject)
+    }
+
 
 }

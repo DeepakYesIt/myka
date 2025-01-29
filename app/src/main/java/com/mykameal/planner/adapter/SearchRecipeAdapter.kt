@@ -1,16 +1,21 @@
 package com.mykameal.planner.adapter
 
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.mykameal.planner.R
 import com.mykameal.planner.databinding.AdapterSearchRecipeBinding
-import com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen.model.Ingredient
 
 class SearchRecipeAdapter(
-    private var ingredientsList: MutableList<Ingredient>,
+    private var ingredientsList: MutableList<com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen.apiresponse.Ingredient>,
     private var requireActivity: FragmentActivity
 ) : RecyclerView.Adapter<SearchRecipeAdapter.ViewHolder>() {
 
@@ -23,16 +28,40 @@ class SearchRecipeAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        if (ingredientsList[position].food!=null){
-            holder.binding.tvRecipeName.text = ingredientsList[position].food
+        if (ingredientsList[position].name!=null){
+            holder.binding.tvRecipeName.text = ingredientsList[position].name
         }
 
-        if (ingredientsList[position].image!=null){
+        if (ingredientsList[position].image !=null){
             Glide.with(requireActivity)
                 .load(ingredientsList[position].image)
-                .placeholder(R.drawable.mask_group_icon)
-                .error(R.drawable.mask_group_icon)
+                .error(R.drawable.no_image)
+                .placeholder(R.drawable.no_image)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        holder.binding.layProgess.root.visibility= View.GONE
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        holder.binding.layProgess.root.visibility= View.GONE
+                        return false
+                    }
+                })
                 .into(holder.binding.imgRecipe)
+        }else{
+            holder.binding.layProgess.root.visibility= View.GONE
         }
 
     }

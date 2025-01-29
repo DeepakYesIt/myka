@@ -1,5 +1,6 @@
 package com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -22,6 +23,7 @@ import com.google.gson.Gson
 import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
 import com.mykameal.planner.adapter.SearchMealAdapter
+import com.mykameal.planner.adapter.SearchMealCatAdapter
 import com.mykameal.planner.adapter.SearchRecipeAdapter
 import com.mykameal.planner.apiInterface.BaseUrl
 import com.mykameal.planner.basedata.BaseApplication
@@ -29,6 +31,8 @@ import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.basedata.SessionManagement
 import com.mykameal.planner.commonworkutils.CommonWorkUtils
 import com.mykameal.planner.databinding.FragmentSearchBinding
+import com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen.apiresponse.Data
+import com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen.apiresponse.SearchApiResponse
 import com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen.model.Ingredient
 import com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen.model.SearchModel
 import com.mykameal.planner.fragment.mainfragment.searchtab.searchscreen.model.SearchModelData
@@ -45,6 +49,7 @@ class SearchFragment : Fragment(),View.OnClickListener {
     private var binding: FragmentSearchBinding? = null
     private var searchRecipeAdapter: SearchRecipeAdapter? = null
     private var searchMealAdapter: SearchMealAdapter? = null
+    private var searchMealCatAdapter: SearchMealCatAdapter? = null
     private var status:String?="RecipeSearch"
     private lateinit var commonWorkUtils: CommonWorkUtils
     private lateinit var sessionManagement: SessionManagement
@@ -81,8 +86,105 @@ class SearchFragment : Fragment(),View.OnClickListener {
 
         initialize()
 
+        // This Api call when the screen in loaded
+        lunchApi()
+
+
+
+
         return binding!!.root
     }
+
+    private fun lunchApi() {
+        if (BaseApplication.isOnline(requireActivity())) {
+            BaseApplication.showMe(requireContext())
+            lifecycleScope.launch {
+                searchRecipeViewModel.recipeforSearchApi {
+                    BaseApplication.dismissMe()
+                    when (it) {
+                        is NetworkResult.Success -> handleSuccessResponse(it.data.toString())
+                        is NetworkResult.Error -> showAlert(it.message, false)
+                        else -> showAlert(it.message, false)
+                    }
+                }
+            }
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
+    private fun showAlert(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SearchApiResponse::class.java)
+            Log.d("@@@ Recipe Details ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                showData(apiModel.data)
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun showData(data: Data?) {
+
+        try {
+            if (data?.ingredient!=null && data.ingredient.size>0){
+                searchRecipeAdapter = SearchRecipeAdapter(data?.ingredient, requireActivity())
+                binding!!.rcySearchRecipe.adapter = searchRecipeAdapter
+                binding!!.llSearchRecipientIng.visibility=View.VISIBLE
+            }else{
+                binding!!.llSearchRecipientIng.visibility=View.GONE
+            }
+
+            if (data?.mealType!=null && data.mealType.size>0){
+                searchMealAdapter = SearchMealAdapter(data.mealType, requireActivity())
+                binding!!.rcySearchMeal.adapter = searchMealAdapter
+                binding!!.llSearchByMeal.visibility=View.VISIBLE
+            }else{
+                binding!!.llSearchByMeal.visibility=View.GONE
+            }
+
+            if (data?.category!=null && data.category.size>0){
+                searchMealCatAdapter = SearchMealCatAdapter(data.category, requireActivity())
+                binding!!.rcyPopularCat.adapter = searchMealCatAdapter
+                binding!!.llPopularCat.visibility=View.VISIBLE
+            }else{
+                binding!!.llPopularCat.visibility=View.GONE
+            }
+
+            if (data?.preference_status!=null){
+                if (data.preference_status == 0){
+                    Glide.with(requireActivity())
+                        .load(R.drawable.toggle_off_icon)
+                        .into(binding!!.imgPreferences)
+                }else{
+                    Glide.with(requireActivity())
+                        .load(R.drawable.toggle_on_icon)
+                        .into(binding!!.imgPreferences)
+                }
+            }else{
+                Glide.with(requireActivity())
+                    .load(R.drawable.toggle_off_icon)
+                    .into(binding!!.imgPreferences)
+            }
+
+
+        }catch (e:Exception){
+            showAlert(e.message, false)
+        }
+    }
+
 
     private fun initialize() {
 
@@ -99,6 +201,11 @@ class SearchFragment : Fragment(),View.OnClickListener {
         binding!!.imageProfile.setOnClickListener(this)
         binding!!.imgBasketIcon.setOnClickListener(this)
         binding!!.imgFilterIcon.setOnClickListener(this)
+        binding!!.imgPreferences.setOnClickListener(this)
+
+
+
+
     }
 
     private fun searchRecipeApi() {
@@ -141,8 +248,8 @@ class SearchFragment : Fragment(),View.OnClickListener {
                         allIngredients!!.addAll(recipeWrapper.recipe.ingredients)
                         Log.d("xsdsdsss","dfdgfg"+allIngredients)
                         Log.d("xsdsd","dfdgfg"+allIngredients)
-                        searchRecipeAdapter = SearchRecipeAdapter(allIngredients!!, requireActivity())
-                        binding!!.rcySearchRecipe.adapter = searchRecipeAdapter
+//                        searchRecipeAdapter = SearchRecipeAdapter(allIngredients!!, requireActivity())
+//                        binding!!.rcySearchRecipe.adapter = searchRecipeAdapter
                     }
                 }
             }
@@ -371,8 +478,8 @@ class SearchFragment : Fragment(),View.OnClickListener {
         dataList.add(data9)
         dataList.add(data10)
 
-        searchMealAdapter = SearchMealAdapter(dataList, requireActivity())
-        binding!!.rcySearchMeal.adapter = searchMealAdapter
+        /*searchMealAdapter = SearchMealAdapter(dataList, requireActivity())
+        binding!!.rcySearchMeal.adapter = searchMealAdapter*/
     }
 
     private fun searchPopCatModel() {
@@ -449,8 +556,8 @@ class SearchFragment : Fragment(),View.OnClickListener {
         dataList.add(data9)
         dataList.add(data10)
 
-        searchMealAdapter = SearchMealAdapter(dataList, requireActivity())
-        binding!!.rcyPopularCat.adapter = searchMealAdapter
+        /*searchMealAdapter = SearchMealAdapter(dataList, requireActivity())
+        binding!!.rcyPopularCat.adapter = searchMealAdapter*/
     }
 
     override fun onClick(item: View?) {
@@ -474,8 +581,29 @@ class SearchFragment : Fragment(),View.OnClickListener {
             R.id.imgFilterIcon->{
                 findNavController().navigate(R.id.filterSearchFragment)
             }
+            R.id.imgPreferences->{
+                upDatePreferences()
+            }
         }
 
+    }
+
+    private fun upDatePreferences() {
+        if (BaseApplication.isOnline(requireActivity())) {
+            BaseApplication.showMe(requireContext())
+            lifecycleScope.launch {
+                searchRecipeViewModel.recipePreferencesApi {
+                    BaseApplication.dismissMe()
+                    when (it) {
+                        is NetworkResult.Success -> handleSuccessResponse(it.data.toString())
+                        is NetworkResult.Error -> showAlert(it.message, false)
+                        else -> showAlert(it.message, false)
+                    }
+                }
+            }
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
     }
 
 }

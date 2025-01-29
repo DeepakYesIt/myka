@@ -13,7 +13,7 @@ class FullCookingScheduleViewModel @Inject constructor(private val repository: M
                                 date: String,planType:String){
         repository.getScheduleApi({ successCallback(it) },date,planType)
     }
-    
+
     suspend fun likeUnlikeRequest(successCallback: (response: NetworkResult<String>) -> Unit,
                                   uri: String,likeType: String,type:String) {
         repository.likeUnlikeRequestApi({ successCallback(it) }, uri, likeType, type)

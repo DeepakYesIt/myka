@@ -15,7 +15,6 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -45,23 +44,29 @@ import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
-class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnItemLongClickListener {
+class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
+    OnItemLongClickListener {
 
     private var binding: FragmentHomeBinding? = null
     private var dataList3: MutableList<DataModel> = mutableListOf()
     private var recipeCookedAdapter: RecipeCookedAdapter? = null
     private var adapterSuperMarket: AdapterSuperMarket? = null
-    private var statuses:String?=""
-    private var checkStatus:Boolean?=false
-    private var recySuperMarket:RecyclerView?=null
+    private var statuses: String? = ""
+    private var checkStatus: Boolean? = false
+    private var recySuperMarket: RecyclerView? = null
     private lateinit var sessionManagement: SessionManagement
     private lateinit var viewModel: HomeViewModel
     private lateinit var userDataLocal: com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.DataModel
     private lateinit var spinnerActivityLevel: PowerSpinnerView
-    private var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
+    private var cookbookList: MutableList<com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
+        mutableListOf()
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
 
         // Inflate the layout for this fragment
         binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -70,15 +75,25 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         viewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
 
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
+        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
+        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
 
         (activity as MainActivity?)?.changeBottom("home")
 
 
         cookbookList.clear()
-        val data= com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favourites",0,"",0)
-        cookbookList.add(0,data)
+        val data =
+            com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
+                "",
+                "",
+                0,
+                "",
+                "Favourites",
+                0,
+                "",
+                0
+            )
+        cookbookList.add(0, data)
 
         homeSchDinnerModel()
 //        addSuperMarketDialog()
@@ -141,100 +156,210 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     @SuppressLint("SetTextI18n")
     private fun showData(data: com.mykameal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.DataModel?) {
         try {
-            userDataLocal= data!!
+            userDataLocal = data!!
 
-            if (userDataLocal.userData!=null && userDataLocal.userData!!.size>0){
-                binding!!.relPlanMeal.visibility=View.GONE
-                binding!!.llRecipesCooked.visibility=View.VISIBLE
-                recipeCookedAdapter = RecipeCookedAdapter(userDataLocal.userData,requireActivity(),this)
+            if (userDataLocal.userData != null && userDataLocal.userData!!.size > 0) {
+                binding!!.relPlanMeal.visibility = View.GONE
+                binding!!.llRecipesCooked.visibility = View.VISIBLE
+                recipeCookedAdapter =
+                    RecipeCookedAdapter(userDataLocal.userData, requireActivity(), this)
                 binding!!.rcyRecipesCooked.adapter = recipeCookedAdapter
-            }else{
-                binding!!.relPlanMeal.visibility=View.VISIBLE
-                binding!!.llRecipesCooked.visibility=View.GONE
+            } else {
+                binding!!.relPlanMeal.visibility = View.VISIBLE
+                binding!!.llRecipesCooked.visibility = View.GONE
             }
 
-            if (userDataLocal.graph_value==0){
-                binding!!.imagePlanMeal.visibility=View.VISIBLE
-                binding!!.imageCheckSav.visibility=View.GONE
-            }else{
-                binding!!.imagePlanMeal.visibility=View.GONE
-                binding!!.imageCheckSav.visibility=View.VISIBLE
+            if (userDataLocal.graph_value == 0) {
+                binding!!.imagePlanMeal.visibility = View.VISIBLE
+                binding!!.imageCheckSav.visibility = View.GONE
+            } else {
+                binding!!.imagePlanMeal.visibility = View.GONE
+                binding!!.imageCheckSav.visibility = View.VISIBLE
             }
 
-            if (userDataLocal.date!=null){
-                val name=BaseApplication.getColoredSpanned("Next meal to be cooked on ","#3C4541") + BaseApplication.getColoredSpanned(data.date+".","#06C169")
-                binding!!.tvHomeDesc.text=Html.fromHtml(name)
-            }else{
-                binding!!.tvHomeDesc.text="Your cooking schedule is empty! Tap the button below to add a meal and get started."
-            }
-
-
-            if (userDataLocal.frezzer!=null){
-
-                if (userDataLocal.frezzer.Breakfast!=null){
-                    binding!!.tvfreezerbreakfast.text = ""+userDataLocal.frezzer.Breakfast
-                }
-                if (userDataLocal.frezzer.Lunch!=null){
-                    binding!!.tvfreezerlunch.text = ""+userDataLocal.frezzer.Lunch
-                }
-                if (userDataLocal.frezzer.Dinner!=null){
-                    binding!!.tvfreezerdinner.text = ""+userDataLocal.frezzer.Dinner
-                }
-
-                if (userDataLocal.frezzer.Snacks!=null){
-                    binding!!.laySnack.visibility=View.VISIBLE
-                    binding!!.tvfreezersnack.text = ""+userDataLocal.frezzer.Snacks
-                }else{
-                    binding!!.tvfreezersnack.visibility=View.GONE
-                }
-
-                if (userDataLocal.frezzer.Teatime!=null){
-                    binding!!.layTeatime.visibility=View.VISIBLE
-                    binding!!.tvfreezerteatime.text = ""+userDataLocal.frezzer.Teatime
-                }else{
-                    binding!!.layTeatime.visibility=View.GONE
-                }
-            }
-
-            if (userDataLocal.fridge!=null){
-
-                if (userDataLocal.fridge.Breakfast!=null){
-                    binding!!.tvfridgebreakfast.text = ""+userDataLocal.fridge.Breakfast
-                }
-                if (userDataLocal.fridge.Lunch!=null){
-                    binding!!.tvfridgelunch.text = ""+userDataLocal.fridge.Lunch
-                }
-                if (userDataLocal.fridge.Dinner!=null){
-                    binding!!.tvfridgedinner.text = ""+userDataLocal.fridge.Dinner
-                }
-                if (userDataLocal.fridge.Snacks!=null){
-                    binding!!.laySnack.visibility=View.VISIBLE
-                    binding!!.tvfridgesnack.text = ""+userDataLocal.fridge.Snacks
-                }else{
-                    binding!!.laySnack.visibility=View.GONE
-                }
-
-                if (userDataLocal.fridge.Teatime!=null){
-                    binding!!.layTeatime.visibility=View.VISIBLE
-                    binding!!.tvfridgeteatime.text = ""+userDataLocal.fridge.Teatime
-                }else{
-                    binding!!.layTeatime.visibility=View.GONE
-                }
-
+            if (userDataLocal.date != null && !userDataLocal.date.equals("", true)) {
+                val name = BaseApplication.getColoredSpanned(
+                    "Next meal to be cooked on ",
+                    "#3C4541"
+                ) + BaseApplication.getColoredSpanned(data.date + ".", "#06C169")
+                binding!!.tvHomeDesc.text = Html.fromHtml(name)
+            } else {
+                binding!!.tvHomeDesc.text =
+                    "Your cooking schedule is empty! Tap the button below to add a meal and get started."
             }
 
 
-            /*if (allZero) {
-                binding!!.rlSeeAllBtn.visibility=View.VISIBLE
-                binding!!.imageCookedMeals.visibility=View.GONE
-            }else{
-                binding!!.imageCookedMeals.visibility=View.VISIBLE
-                binding!!.rlSeeAllBtn.visibility=View.GONE
-            }*/
+            fun updateCount(breakfast: Int?) {
+                var cookstatus = false
+                if (breakfast!! != 0){
+                    cookstatus=true
+                }
+                /*if (cookstatus) {
+                    binding!!.rlSeeAllBtn.visibility = View.VISIBLE
+                    binding!!.imageCookedMeals.visibility = View.GONE
+                } else {
+                    binding!!.imageCookedMeals.visibility = View.VISIBLE
+                    binding!!.rlSeeAllBtn.visibility = View.GONE
+                }*/
+            }
 
-        }catch (e:Exception){
+
+
+            if (userDataLocal.frezzer != null) {
+
+                if (userDataLocal.frezzer.Breakfast != null) {
+                    binding!!.tvfreezerbreakfast.text = "" + userDataLocal.frezzer.Breakfast
+                    updateCount(userDataLocal.frezzer.Breakfast)
+
+                }
+                if (userDataLocal.frezzer.Lunch != null) {
+                    binding!!.tvfreezerlunch.text = "" + userDataLocal.frezzer.Lunch
+                    updateCount(userDataLocal.frezzer.Lunch)
+                }
+                if (userDataLocal.frezzer.Dinner != null) {
+                    binding!!.tvfreezerdinner.text = "" + userDataLocal.frezzer.Dinner
+                    updateCount(userDataLocal.frezzer.Dinner)
+                }
+
+                if (userDataLocal.frezzer.Snacks != null) {
+                    binding!!.laySnack.visibility = View.VISIBLE
+                    binding!!.tvfreezersnack.text = "" + userDataLocal.frezzer.Snacks
+                    updateCount(userDataLocal.frezzer.Snacks)
+                } else {
+                    binding!!.tvfreezersnack.visibility = View.GONE
+                }
+
+                if (userDataLocal.frezzer.Teatime != null) {
+                    binding!!.layTeatime.visibility = View.VISIBLE
+                    binding!!.tvfreezerteatime.text = "" + userDataLocal.frezzer.Teatime
+                    updateCount(userDataLocal.frezzer.Breakfast)
+                } else {
+                    binding!!.layTeatime.visibility = View.GONE
+                }
+            }
+
+            if (userDataLocal.fridge != null) {
+
+                if (userDataLocal.fridge.Breakfast != null) {
+                    binding!!.tvfridgebreakfast.text = "" + userDataLocal.fridge.Breakfast
+                    updateCount(userDataLocal.fridge.Breakfast)
+                }
+                if (userDataLocal.fridge.Lunch != null) {
+                    binding!!.tvfridgelunch.text = "" + userDataLocal.fridge.Lunch
+                    updateCount(userDataLocal.fridge.Lunch)
+                }
+                if (userDataLocal.fridge.Dinner != null) {
+                    binding!!.tvfridgedinner.text = "" + userDataLocal.fridge.Dinner
+                    updateCount(userDataLocal.fridge.Dinner)
+                }
+                if (userDataLocal.fridge.Snacks != null) {
+                    binding!!.laySnack.visibility = View.VISIBLE
+                    binding!!.tvfridgesnack.text = "" + userDataLocal.fridge.Snacks
+                    updateCount(userDataLocal.fridge.Snacks)
+                } else {
+                    binding!!.laySnack.visibility = View.GONE
+                }
+
+                if (userDataLocal.fridge.Teatime != null) {
+                    binding!!.layTeatime.visibility = View.VISIBLE
+                    binding!!.tvfridgeteatime.text = "" + userDataLocal.fridge.Teatime
+                    updateCount(userDataLocal.fridge.Teatime)
+                } else {
+                    binding!!.layTeatime.visibility = View.GONE
+                }
+
+            }
+
+
+
+
+
+        } catch (e: Exception) {
             showAlert(e.message, false)
         }
+    }
+
+
+    private fun checkForZeroValues(): Boolean {
+        var allZero = true // Initialize to true
+
+        if (userDataLocal.frezzer != null) {
+            if (userDataLocal.frezzer.Breakfast != null) {
+                binding!!.tvfreezerbreakfast.text = "" + userDataLocal.frezzer.Breakfast
+                if (userDataLocal.frezzer.Breakfast == 0) return false
+                allZero = false
+            }
+            if (userDataLocal.frezzer.Lunch != null) {
+                binding!!.tvfreezerlunch.text = "" + userDataLocal.frezzer.Lunch
+                if (userDataLocal.frezzer.Lunch == 0) return false
+                allZero = false
+            }
+            if (userDataLocal.frezzer.Dinner != null) {
+                binding!!.tvfreezerdinner.text = "" + userDataLocal.frezzer.Dinner
+                if (userDataLocal.frezzer.Dinner == 0) return false
+                allZero = false
+            }
+            if (userDataLocal.frezzer.Snacks != null) {
+                binding!!.laySnack.visibility = View.VISIBLE
+                binding!!.tvfreezersnack.text = "" + userDataLocal.frezzer.Snacks
+                if (userDataLocal.frezzer.Snacks == 0) return false
+                allZero = false
+            } else {
+                binding!!.tvfreezersnack.visibility = View.GONE
+            }
+            if (userDataLocal.frezzer.Teatime != null) {
+                binding!!.layTeatime.visibility = View.VISIBLE
+                binding!!.tvfreezerteatime.text = "" + userDataLocal.frezzer.Teatime
+                if (userDataLocal.frezzer.Teatime == 0) return false
+                allZero = false
+            } else {
+                binding!!.layTeatime.visibility = View.GONE
+            }
+        }
+
+        if (userDataLocal.fridge != null) {
+            if (userDataLocal.fridge.Breakfast != null) {
+                binding!!.tvfridgebreakfast.text = "" + userDataLocal.fridge.Breakfast
+                if (userDataLocal.fridge.Breakfast == 0) return false
+                allZero = false
+            }
+            if (userDataLocal.fridge.Lunch != null) {
+                binding!!.tvfridgelunch.text = "" + userDataLocal.fridge.Lunch
+                if (userDataLocal.fridge.Lunch == 0) return false
+                allZero = false
+            }
+            if (userDataLocal.fridge.Dinner != null) {
+                binding!!.tvfridgedinner.text = "" + userDataLocal.fridge.Dinner
+                if (userDataLocal.fridge.Dinner == 0) return false
+                allZero = false
+            }
+            if (userDataLocal.fridge.Snacks != null) {
+                binding!!.laySnack.visibility = View.VISIBLE
+                binding!!.tvfridgesnack.text = "" + userDataLocal.fridge.Snacks
+                if (userDataLocal.fridge.Snacks == 0) return false
+                allZero = false
+            } else {
+                binding!!.laySnack.visibility = View.GONE
+            }
+            if (userDataLocal.fridge.Teatime != null) {
+                binding!!.layTeatime.visibility = View.VISIBLE
+                binding!!.tvfridgeteatime.text = "" + userDataLocal.fridge.Teatime
+                if (userDataLocal.fridge.Teatime == 0) return false
+                allZero = false
+            } else {
+                binding!!.layTeatime.visibility = View.GONE
+            }
+        }
+
+        if (allZero) {
+            binding!!.rlSeeAllBtn.visibility = View.VISIBLE
+            binding!!.imageCookedMeals.visibility = View.GONE
+        } else {
+            binding!!.imageCookedMeals.visibility = View.VISIBLE
+            binding!!.rlSeeAllBtn.visibility = View.GONE
+        }
+
+        return true // Return true only if no value is zero
     }
 
 
@@ -247,7 +372,10 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         val dialogAddItem: Dialog = context?.let { Dialog(it) }!!
         dialogAddItem.setContentView(R.layout.alert_dialog_super_market)
         dialogAddItem.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialogAddItem.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialogAddItem.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
         recySuperMarket = dialogAddItem.findViewById<RecyclerView>(R.id.recySuperMarket)
         val rlDoneBtn = dialogAddItem.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         dialogAddItem.show()
@@ -348,25 +476,28 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         dataList3.add(data4)
         dataList3.add(data5)
 
-       /* ingredientDinnerAdapter = IngredientsDinnerAdapter(dataList3, requireActivity(), this, null,this)
-        binding!!.rcyRecipesCooked.adapter = ingredientDinnerAdapter*/
+        /* ingredientDinnerAdapter = IngredientsDinnerAdapter(dataList3, requireActivity(), this, null,this)
+         binding!!.rcyRecipesCooked.adapter = ingredientDinnerAdapter*/
     }
 
     private fun initialize() {
 
 
-        if (sessionManagement.getImage()!=null){
+        if (sessionManagement.getImage() != null) {
             Glide.with(requireContext())
-                .load(BaseUrl.imageBaseUrl+sessionManagement.getImage())
+                .load(BaseUrl.imageBaseUrl + sessionManagement.getImage())
                 .placeholder(R.drawable.mask_group_icon)
                 .error(R.drawable.mask_group_icon)
                 .into(binding!!.imageProfile)
         }
 
 
-        if (sessionManagement.getUserName()!=null){
-            val name=BaseApplication.getColoredSpanned("Hello","#06C169") + BaseApplication.getColoredSpanned(", "+sessionManagement.getUserName(),"#000000")
-            binding?.tvName?.text =  Html.fromHtml(name)
+        if (sessionManagement.getUserName() != null) {
+            val name = BaseApplication.getColoredSpanned(
+                "Hello",
+                "#06C169"
+            ) + BaseApplication.getColoredSpanned(", " + sessionManagement.getUserName(), "#000000")
+            binding?.tvName?.text = Html.fromHtml(name)
         }
 
 
@@ -392,40 +523,47 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
     override fun onClick(item: View?) {
         when (item!!.id) {
-            R.id.textSeeAll->{
+            R.id.textSeeAll -> {
                 findNavController().navigate(R.id.fullCookedScheduleFragment)
             }
+
             R.id.rlSeeAllBtn -> {
                 findNavController().navigate(R.id.cookedFragment)
             }
-            R.id.imageCheckSav->{
+
+            R.id.imageCheckSav -> {
                 findNavController().navigate(R.id.statisticsGraphFragment)
             }
-            R.id.imagePlanMeal->{
+
+            R.id.imagePlanMeal -> {
                 findNavController().navigate(R.id.planFragment)
             }
 
-            R.id.imageCookedMeals->{
+            R.id.imageCookedMeals -> {
                 findNavController().navigate(R.id.cookedFragment)
             }
-            R.id.imgBasketIcon->{
+
+            R.id.imgBasketIcon -> {
                 findNavController().navigate(R.id.basketScreenFragment)
             }
 
-            R.id.imgHearRedIcons->{
+            R.id.imgHearRedIcons -> {
                 findNavController().navigate(R.id.cookBookFragment)
             }
-            R.id.imageProfile->{
+
+            R.id.imageProfile -> {
                 findNavController().navigate(R.id.settingProfileFragment)
             }
-            R.id.rlPlanAMealBtn->{
+
+            R.id.rlPlanAMealBtn -> {
                 findNavController().navigate(R.id.planFragment)
             }
-            R.id.imgFreeTrial->{
+
+            R.id.imgFreeTrial -> {
                 findNavController().navigate(R.id.homeSubscriptionFragment)
             }
             ///for checking purpose only
-            R.id.tv_name->{
+            R.id.tv_name -> {
                 findNavController().navigate(R.id.statisticsGraphFragment)
             }
 
@@ -449,22 +587,26 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             "1" -> {
 
             }
+
             "2" -> {
 
             }
+
             "4" -> {
                 if (BaseApplication.isOnline(requireActivity())) {
                     // Safely get the item and position
-                    val newLikeStatus = if (userDataLocal.userData?.get(position!!)?.is_like == 0) "1" else "0"
-                    if (newLikeStatus.equals("0",true)){
+                    val newLikeStatus =
+                        if (userDataLocal.userData?.get(position!!)?.is_like == 0) "1" else "0"
+                    if (newLikeStatus.equals("0", true)) {
                         recipeLikeAndUnlikeData(position, newLikeStatus, "", null)
-                    }else{
+                    } else {
                         addFavTypeDialog(position, newLikeStatus)
                     }
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }
+
             "5" -> {
                 val bundle = Bundle().apply {
                     putString("uri", type)
@@ -480,11 +622,15 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private fun addFavTypeDialog(position: Int?, likeType: String) {
         val dialogAddRecipe: Dialog = context?.let { Dialog(it) }!!
         dialogAddRecipe.setContentView(R.layout.alert_dialog_add_recipe)
-        dialogAddRecipe.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialogAddRecipe.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
         dialogAddRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val rlDoneBtn = dialogAddRecipe.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         spinnerActivityLevel = dialogAddRecipe.findViewById(R.id.spinnerActivityLevel)
-        val relCreateNewCookBook = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
+        val relCreateNewCookBook =
+            dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
         val relFavourites = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relFavourites)
         val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
 
@@ -495,29 +641,40 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
         getCookBookList()
 
-        relCreateNewCookBook.setOnClickListener{
+        relCreateNewCookBook.setOnClickListener {
             relCreateNewCookBook.setBackgroundResource(R.drawable.light_green_rectangular_bg)
             imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
             dialogAddRecipe.dismiss()
-            val bundle=Bundle()
-            bundle.putString("value","New")
+            val bundle = Bundle()
+            bundle.putString("value", "New")
             bundle.putString("uri", userDataLocal.userData?.get(position!!)?.recipe?.url)
-            findNavController().navigate(R.id.createCookBookFragment,bundle)
+            findNavController().navigate(R.id.createCookBookFragment, bundle)
         }
 
 
-        rlDoneBtn.setOnClickListener{
-            if (spinnerActivityLevel.text.toString().equals(ErrorMessage.cookBookSelectError,true)){
-                BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
-            }else {
+        rlDoneBtn.setOnClickListener {
+            if (spinnerActivityLevel.text.toString()
+                    .equals(ErrorMessage.cookBookSelectError, true)
+            ) {
+                BaseApplication.alertError(
+                    requireContext(),
+                    ErrorMessage.selectCookBookError,
+                    false
+                )
+            } else {
                 val cookbooktype = cookbookList[spinnerActivityLevel.selectedIndex].id
-                recipeLikeAndUnlikeData(position,likeType,cookbooktype.toString(),dialogAddRecipe)
+                recipeLikeAndUnlikeData(
+                    position,
+                    likeType,
+                    cookbooktype.toString(),
+                    dialogAddRecipe
+                )
             }
 
         }
     }
 
-    private fun getCookBookList(){
+    private fun getCookBookList() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             viewModel.getCookBookRequest {
@@ -533,7 +690,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             val apiModel = Gson().fromJson(data, CookBookListResponse::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                if (apiModel.data!=null && apiModel.data.size>0){
+                if (apiModel.data != null && apiModel.data.size > 0) {
                     cookbookList.retainAll { it == cookbookList[0] }
                     cookbookList.addAll(apiModel.data)
                     // OR directly modify the original list
@@ -560,8 +717,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     }
 
 
-
-
     private fun recipeLikeAndUnlikeData(
         position: Int?,
         likeType: String,
@@ -586,7 +741,12 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         dialogAddRecipe: Dialog?
     ) {
         when (result) {
-            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(result.data.toString(),position,dialogAddRecipe)
+            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(
+                result.data.toString(),
+                position,
+                dialogAddRecipe
+            )
+
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }

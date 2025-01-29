@@ -74,7 +74,7 @@ class EditProfileFragment : Fragment() {
 //                val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, uri)
                 file = getPath(requireContext(), uri)?.let { File(it) }
                 /*processImage(bitmap)*/
-// Now you can send the image URI to Vision API for processing
+               // Now you can send the image URI to Vision API for processing
                 // Convert image to Base64
                /* val base64Image = convertImageToBase64(uri)
 

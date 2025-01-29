@@ -19,15 +19,21 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.appsflyer.AppsFlyerLib
 import com.appsflyer.deeplink.DeepLinkResult
+import com.google.gson.Gson
 import com.mykameal.planner.R
 import com.mykameal.planner.basedata.BaseApplication
+import com.mykameal.planner.basedata.NetworkResult
 import com.mykameal.planner.commonworkutils.CommonWorkUtils
 import com.mykameal.planner.databinding.ActivityMainBinding
+import com.mykameal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
+import com.mykameal.planner.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModelData
+import com.mykameal.planner.fragment.commonfragmentscreen.mealRoutine.viewmodel.MealRoutineViewModel
 import com.mykameal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -39,11 +45,16 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     var binding: ActivityMainBinding? = null
     private lateinit var commonWorkUtils: CommonWorkUtils
 
+    private lateinit var mealRoutineViewModel: MealRoutineViewModel
+
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this))
         setContentView(binding!!.root)
+        mealRoutineViewModel = ViewModelProvider(this@MainActivity)[MealRoutineViewModel::class.java]
+
 
         commonWorkUtils = CommonWorkUtils(this)
 
@@ -284,6 +295,61 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 binding!!.cardViewAddRecipe.visibility = View.GONE
             }
         }
+    }
+
+
+    fun mealRoutineSelectApi(onResult: (MutableList<MealRoutineModelData>) -> Unit) {
+        // Show the loading indicator
+        BaseApplication.showMe(this)
+
+        // Launch the coroutine to perform the API call
+        lifecycleScope.launch {
+            mealRoutineViewModel.userPreferencesApi { networkResult ->
+                // Dismiss the loading indicator
+                BaseApplication.dismissMe()
+
+                val mealRoutineList = mutableListOf<MealRoutineModelData>()
+
+                when (networkResult) {
+                    is NetworkResult.Success -> {
+                        try {
+                            val gson = Gson()
+                            val bodyModel = gson.fromJson(networkResult.data, GetUserPreference::class.java)
+                            if (bodyModel.code == 200 && bodyModel.success) {
+                                mealRoutineList.addAll(bodyModel.data.mealroutine)
+                            } else {
+                                // Handle specific error cases
+                                if (bodyModel.code == ErrorMessage.code) {
+                                    showAlertFunction(bodyModel.message, true)
+                                } else {
+                                    showAlertFunction(bodyModel.message, false)
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.d("MealRoutine@@", "message:---" + e.message)
+                        }
+                    }
+
+                    is NetworkResult.Error -> {
+                        showAlertFunction(networkResult.message, false)
+                    }
+
+                    else -> {
+                        showAlertFunction(networkResult.message, false)
+                    }
+                }
+
+                // Return the result through the callback
+                onResult(mealRoutineList)
+            }
+        }
+    }
+
+
+
+
+    private fun showAlertFunction(message: String?, status: Boolean) {
+        BaseApplication.alertError(this, message, status)
     }
 
     private fun getFcmToken() {
