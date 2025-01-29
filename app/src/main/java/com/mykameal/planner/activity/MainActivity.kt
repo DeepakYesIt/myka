@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.appsflyer.AppsFlyerLib
 import com.appsflyer.deeplink.DeepLinkResult
 import com.mykameal.planner.R
@@ -276,7 +277,10 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
             R.id.relCreateNewRecipe -> {
                 binding!!.cardViewAddRecipe.visibility = View.GONE
-                findNavController(R.id.frameContainerMain).navigate(R.id.createRecipeFragment)
+                val bundle = Bundle().apply {
+                    putString("name","")
+                }
+                findNavController(R.id.frameContainerMain).navigate(R.id.createRecipeFragment,bundle)
             }
 
             R.id.relRecipeImage->{

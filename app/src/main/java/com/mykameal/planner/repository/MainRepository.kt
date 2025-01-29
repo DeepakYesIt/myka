@@ -97,6 +97,7 @@ interface MainRepository {
  suspend fun recipeAddBasketRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)
 
  suspend fun recipeAddToPlanRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)
+ suspend fun createRecipeRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)
 
  suspend fun getCookBookRequestApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
@@ -184,6 +185,7 @@ interface MainRepository {
     suspend fun updateDislikedIngredientsApi(successCallback: (response: NetworkResult<String>) -> Unit, dislikedId:List<String>?)
 
     suspend fun recipeSearchApi(successCallback: (response: NetworkResult<String>) -> Unit, itemSearch:String?)
+    suspend fun createRecipeUrlApi(successCallback: (response: NetworkResult<String>) -> Unit, itemSearch:String?)
     suspend fun removeMealApi(successCallback: (response: NetworkResult<String>) -> Unit, cookedId:String?)
 
 

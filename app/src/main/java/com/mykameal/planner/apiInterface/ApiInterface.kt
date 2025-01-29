@@ -249,6 +249,9 @@ interface ApiInterface {
     @POST(ApiEndPoint.addMealUrl)
     suspend fun recipeAddToPlanRequestApi(@Body jsonObject: JsonObject): Response<JsonObject>
 
+    @POST(ApiEndPoint.createMealUrl)
+    suspend fun createRecipeRequestApi(@Body jsonObject: JsonObject): Response<JsonObject>
+
     @POST(ApiEndPoint.getCookBookUrl)
     suspend fun getCookBookRequestApi(): Response<JsonObject>
 
@@ -440,6 +443,12 @@ interface ApiInterface {
     @FormUrlEncoded
     @POST(ApiEndPoint.recipeSearch)
     suspend fun recipeSearchApi(
+        @Field("q") q: String?
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.createRecipeUrl)
+    suspend fun createRecipeUrlApi(
         @Field("q") q: String?
     ): Response<JsonObject>
 

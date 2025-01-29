@@ -69,10 +69,6 @@ import java.util.Locale
 class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListener {
 
     private var binding: FragmentPlanBinding? = null
-    private val calendar = Calendar.getInstance()
-    private var dataList1: MutableList<DataModel> = mutableListOf()
-    private var dataList2: MutableList<DataModel> = mutableListOf()
-    private var dataList3: MutableList<DataModel> = mutableListOf()
     private var tvWeekRange: TextView? = null
     private var status: Boolean = true
     private var clickable: String? = ""
@@ -630,7 +626,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         binding!!.rlAddDayToBasket.setOnClickListener {
             if (clickable == "") {
-
             } else {
                 findNavController().navigate(R.id.basketScreenFragment)
             }

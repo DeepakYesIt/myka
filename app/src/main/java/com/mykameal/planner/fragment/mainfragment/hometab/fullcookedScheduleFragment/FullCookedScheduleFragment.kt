@@ -100,8 +100,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
         currentDateSelected = BaseApplication.currentDateFormat().toString()
 
-        fUllCookingScheduleViewModel =
-            ViewModelProvider(requireActivity())[FullCookingScheduleViewModel::class.java]
+        fUllCookingScheduleViewModel = ViewModelProvider(requireActivity())[FullCookingScheduleViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(),
             object : OnBackPressedCallback(true) {
@@ -109,6 +108,10 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                     findNavController().navigateUp()
                 }
             })
+
+        if (cookbookList!=null){
+            cookbookList.clear()
+        }
 
         val data = com.mykameal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
                 "", "", 0, "", "Favourites", 0, "", 0)
@@ -571,7 +574,6 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         binding!!.imgBackCookingSchedule.setOnClickListener {
             findNavController().navigateUp()
         }
-
     }
 
     private fun setupRecyclerView() {
@@ -695,7 +697,6 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             // Convert selected date into a Calendar instance
             val selectedCalendar = Calendar.getInstance()
             selectedCalendar.set(year, month, dayOfMonth)
-
 
             // Calculate start and end of the week
             val startOfWeek = calendar.clone() as Calendar
@@ -1031,11 +1032,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
         rlDoneBtn.setOnClickListener {
             if (spinnerActivityLevel.text.toString().equals("", true)) {
-                BaseApplication.alertError(
-                    requireContext(),
-                    ErrorMessage.selectCookBookError,
-                    false
-                )
+                BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
             } else {
                 val cookBookType = cookbookList[spinnerActivityLevel.selectedIndex].id
                 recipeLikeAndUnlikeData(

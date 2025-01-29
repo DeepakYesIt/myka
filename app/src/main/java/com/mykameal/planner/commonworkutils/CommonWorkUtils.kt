@@ -3,10 +3,13 @@ package com.mykameal.planner.commonworkutils
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
+import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
 import android.content.SharedPreferences
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.location.Address
@@ -25,6 +28,8 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.mykameal.planner.R
 import com.mykameal.planner.basedata.AppConstant
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.util.*
 
 class CommonWorkUtils(var context: Context) {

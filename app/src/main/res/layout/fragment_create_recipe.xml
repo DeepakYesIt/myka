@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".fragment.mainfragment.addrecipetab.CreateRecipeFragment">
+    tools:context=".fragment.mainfragment.addrecipetab.createrecipefragment.CreateRecipeFragment">
 
     <LinearLayout
         android:id="@+id/lay_title"
@@ -67,6 +67,14 @@
                     android:src="@drawable/bg_cover"
                     app:shapeAppearanceOverlay="@style/CornerCut" />
 
+                <include
+                    android:id="@+id/lay_progess"
+                    layout="@layout/progess_loader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_centerInParent="true" />
+
                 <ImageView
                     android:id="@+id/addImageIcon"
                     android:layout_width="wrap_content"
@@ -98,19 +106,22 @@
                 app:drawableStartCompat="@drawable/recipe_title_icon" />
 
             <LinearLayout
+                android:id="@+id/llCreateTitle"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_40sdp"
-                android:background="@drawable/create_select_bg">
+                android:background="@drawable/create_unselect_bg">
 
                 <EditText
+                    android:id="@+id/etRecipeName"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center|start"
                     android:paddingHorizontal="@dimen/_10sdp"
                     android:fontFamily="@font/poppins"
                     android:background="@null"
-                    android:text="Pizza"
+                    android:hint="Pizza"
                     android:textSize="@dimen/_13sdp" />
+
             </LinearLayout>
 
             <RelativeLayout
@@ -250,18 +261,11 @@
                     android:drawableStart="@drawable/author_notes_icon"
                     android:drawablePadding="@dimen/_10sdp"
                     android:padding="@dimen/_5sdp"
-                    android:text="Author Notes (Optional)"
+                    android:text="Total Time"
                     android:textColor="#3C4541"
                     android:textSize="@dimen/_13sdp"
                     android:textStyle="bold" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_marginEnd="@dimen/_10sdp"
-                    android:src="@drawable/add_image" />
             </RelativeLayout>
 
             <LinearLayout
@@ -270,20 +274,68 @@
                 android:background="@drawable/create_unselect_bg">
 
                 <EditText
+                    android:id="@+id/edtTotalTime"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center|start"
                     android:fontFamily="@font/poppins"
                     android:background="@null"
+                    android:inputType="number"
+                    android:singleLine="true"
                     android:paddingHorizontal="@dimen/_10sdp"
-                    android:text="Pizza"
+                    android:hint="Add total time in minutes"
                     android:textSize="@dimen/_13sdp" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:drawableStart="@drawable/author_notes_icon"
+                    android:drawablePadding="@dimen/_10sdp"
+                    android:padding="@dimen/_5sdp"
+                    android:text="Author Notes (Optional)"
+                    android:textColor="#3C4541"
+                    android:textSize="@dimen/_13sdp"
+                    android:textStyle="bold" />
+
+         <!--       <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:src="@drawable/add_image" />-->
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_100sdp"
+                android:background="@drawable/create_unselect_bg">
+
+                <EditText
+                    android:id="@+id/edtSummary"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="top|start"
+                    android:fontFamily="@font/poppins"
+                    android:background="@null"
+                    android:padding="@dimen/_10sdp"
+                    android:hint="This recipe took only 5-6 minutes"
+                    android:textSize="@dimen/_13sdp" />
+
             </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:drawableStart="@drawable/privacy_icon"
                 android:drawablePadding="@dimen/_10sdp"
@@ -307,7 +359,6 @@
                         android:id="@+id/textPrivate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
                         android:layout_marginTop="@dimen/_10sdp"
                         android:drawableStart="@drawable/radio_check_icon"
                         android:drawablePadding="@dimen/_10sdp"
@@ -374,30 +425,13 @@
                 android:background="@drawable/edittext_bg"
                 android:fontFamily="@font/poppins"
                 android:foreground="?attr/selectableItemBackground"
-                android:hint="Favorites"
+                android:hint="Select cookbook"
                 android:padding="@dimen/_10sdp"
                 android:paddingStart="@dimen/_20sdp"
                 android:textColor="#3C4541"
                 android:textColorHint="#3C4541"
                 android:textSize="14.5sp"
                 tools:ignore="RtlSymmetry" />
-
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="@dimen/_40sdp"-->
-<!--                android:background="@drawable/create_unselect_bg">-->
-
-<!--                <TextView-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:drawableEnd="@drawable/down_icon"-->
-<!--                    android:drawablePadding="@dimen/_10sdp"-->
-<!--                    android:gravity="center|start"-->
-<!--                    android:paddingHorizontal="@dimen/_10sdp"-->
-<!--                    android:text="Favorites"-->
-<!--                    android:textSize="@dimen/_13sdp" />-->
-<!--            </LinearLayout>-->
-
 
         </LinearLayout>
     </ScrollView>

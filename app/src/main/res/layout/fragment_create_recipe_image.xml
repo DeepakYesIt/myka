@@ -16,6 +16,7 @@
         android:layout_marginTop="@dimen/_15sdp"
         android:background="@color/transparent"
         android:contentDescription="TODO"
+        android:padding="@dimen/_6sdp"
         android:src="@drawable/white_back_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -16,6 +16,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
@@ -212,8 +213,12 @@ class SearchFragment : Fragment(),View.OnClickListener {
             }else if (status=="Web"){
                 addRecipeFromWeb()
             }else if (status=="AddRecipe"){
-                findNavController().navigate(R.id.createRecipeFragment)
+                val bundle = Bundle().apply {
+                    putString("name","")
+                }
+                findNavController().navigate(R.id.createRecipeFragment,bundle)
             }else{
+                findNavController().navigate(R.id.createRecipeImageFragment)
 
             }
             dialogSearchDialog.dismiss()

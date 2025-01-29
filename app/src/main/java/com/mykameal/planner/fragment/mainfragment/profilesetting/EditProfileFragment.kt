@@ -71,16 +71,8 @@ class EditProfileFragment : Fragment() {
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.let { uri ->
 
-//                val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, uri)
+                val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, uri)
                 file = getPath(requireContext(), uri)?.let { File(it) }
-                /*processImage(bitmap)*/
-// Now you can send the image URI to Vision API for processing
-                // Convert image to Base64
-               /* val base64Image = convertImageToBase64(uri)
-
-                // Call Vision API to recognize the image
-                recognizeImage(base64Image)*/
-
                 Glide.with(this)
                     .load(uri)
                     .placeholder(R.drawable.mask_group_icon)
@@ -127,8 +119,6 @@ class EditProfileFragment : Fragment() {
                 Toast.makeText(requireContext(),"Name :-"+t.message,Toast.LENGTH_LONG).show()
             }
         })
-
-
     }
 
     // Retrofit setup

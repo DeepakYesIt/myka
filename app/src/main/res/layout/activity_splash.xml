@@ -18,12 +18,12 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true">
 
-        <ImageView
-            android:id="@+id/images_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:src="@drawable/kitchen_assistant_images"/>
+            <ImageView
+                android:id="@+id/images_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/kitchen_assistant_images" />
 
             <ImageView
                 android:layout_width="wrap_content"

@@ -13,4 +13,5 @@ class SearchRecipeViewModel @Inject constructor(private val repository: MainRepo
         repository.recipeSearchApi ({ successCallback(it) },itemSearch)
     }
 
+
 }
