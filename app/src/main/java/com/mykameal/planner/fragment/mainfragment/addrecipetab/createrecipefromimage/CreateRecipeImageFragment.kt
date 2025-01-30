@@ -2,26 +2,43 @@ package com.mykameal.planner.fragment.mainfragment.addrecipetab.createrecipefrom
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.findNavController
+import com.mykameal.planner.R
 import com.mykameal.planner.activity.MainActivity
+import com.mykameal.planner.apiInterface.ApiInterface
+import com.mykameal.planner.basedata.BaseApplication
 import com.mykameal.planner.databinding.FragmentCreateRecipeImageBinding
+import com.mykameal.planner.repository.Feature
+import com.mykameal.planner.repository.Image
+import com.mykameal.planner.repository.Request
+import com.mykameal.planner.repository.VisionRequest
+import com.mykameal.planner.repository.VisionResponse
+import retrofit2.Call
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -42,14 +59,22 @@ class CreateRecipeImageFragment : Fragment() {
         // Inflate the layout for this fragment
         binding= FragmentCreateRecipeImageBinding.inflate(layoutInflater,container,false)
 
+        requireActivity().onBackPressedDispatcher.addCallback(
+            requireActivity(),
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
+
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
 
-        initliaze()
+        initialize()
         return binding!!.root
     }
 
-    private fun initliaze() {
+    private fun initialize() {
         // Request camera permissions
         if (allPermissionsGranted()) {
             startCamera()
@@ -60,6 +85,12 @@ class CreateRecipeImageFragment : Fragment() {
         clickListener()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
+    }
+
+    private fun convertImageToBase64(uri: Uri): String {
+        val inputStream: InputStream? = requireContext().contentResolver.openInputStream(uri)
+        val bytes = inputStream?.readBytes()
+        return Base64.encodeToString(bytes, Base64.DEFAULT)
     }
 
     private fun startCamera() {
@@ -108,12 +139,13 @@ class CreateRecipeImageFragment : Fragment() {
         }
 
         binding?.backBtn!!.setOnClickListener {
-            requireActivity().onBackPressed()
+            findNavController().navigateUp()
+            /*requireActivity().onBackPressed()*/
         }
 
         // Tick button
         binding?.okBtn!!.setOnClickListener {
-            Toast.makeText(requireActivity(), "Image saved to $capturedImageUri", Toast.LENGTH_SHORT).show()
+            recognizeImage(convertImageToBase64(capturedImageUri!!))
             restoreCameraView()
         }
 
@@ -122,6 +154,57 @@ class CreateRecipeImageFragment : Fragment() {
             Toast.makeText(requireActivity(), "Preview canceled", Toast.LENGTH_SHORT).show()
             restoreCameraView()
         }
+    }
+
+    private fun recognizeImage(base64Image: String) {
+
+        BaseApplication.showMe(requireContext())
+        val visionApiService = createRetrofit().create(ApiInterface::class.java)
+
+       // Request setup for WEB_DETECTION instead of LABEL_DETECTION
+        val features = listOf(Feature("WEB_DETECTION", 1))  // Adjusting to use WEB_DETECTION
+        val image = Image(base64Image)
+        val request = Request(image, features)
+        val visionRequest = VisionRequest(listOf(request))
+
+       // Pass your API key (this is just for demonstration, don't hardcode your API key)
+        val apiKey = "AIzaSyB1WtrB2oHQmyIX1ZpaXzbI9kOA2FlkCXk"
+
+        val call = visionApiService.annotateImage(apiKey, visionRequest)
+        call.enqueue(object : retrofit2.Callback<VisionResponse> {
+            override fun onResponse(call: Call<VisionResponse>, response: retrofit2.Response<VisionResponse>) {
+                BaseApplication.dismissMe()
+                if (response.isSuccessful) {
+                    val webDetection = response.body()?.responses?.get(0)?.webDetection
+                    if (webDetection!=null){
+                        if (webDetection.webEntities.size>0){
+
+                            val bundle = Bundle().apply {
+                                putString("name", webDetection.webEntities[0].description.toString())
+                            }
+                            findNavController().navigate(R.id.createRecipeFragment, bundle)
+
+//                            Toast.makeText(requireContext(),"Name :-"+ webDetection.webEntities!![0].description.toString(),Toast.LENGTH_LONG).show()
+                            Log.d("Google Vision", "Similar Image: "+ webDetection.webEntities!![0].description.toString())
+                        }
+                    }
+                }else{
+                    Toast.makeText(requireContext(),"Name :-"+response.message(),Toast.LENGTH_LONG).show()
+                }
+            }
+
+            override fun onFailure(call: Call<VisionResponse>, t: Throwable) {
+                Log.e("Google Vision", "API call failed", t)
+                Toast.makeText(requireContext(),"Name :-"+t.message,Toast.LENGTH_LONG).show()
+            }
+        })
+    }
+
+    private fun createRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://vision.googleapis.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
     }
 
     private fun showCapturedPreview() {
@@ -184,6 +267,7 @@ class CreateRecipeImageFragment : Fragment() {
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     capturedImageUri = output.savedUri
+
 //                    Toast.makeText(baseContext, "Image captured successfully", Toast.LENGTH_SHORT).show()
                     showCapturedPreview()
                 }
@@ -196,8 +280,29 @@ class CreateRecipeImageFragment : Fragment() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
             type = "image/*"
         }
-        startActivity(intent)
+        startActivityForResult(intent, 201)
+
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 201 && resultCode == Activity.RESULT_OK) {
+            val selectedImageUri = data?.data
+            if (selectedImageUri != null) {
+                capturedImageUri=selectedImageUri
+                Log.d(TAG, "Selected image URI: $selectedImageUri")
+                // Handle the image URI (e.g., display it in an ImageView)
+/*
+                showImagePreview(selectedImageUri)
+*/
+                showCapturedPreview()
+            } else {
+                Log.e(TAG, "No image selected")
+            }
+        }
+    }
+
 
 
     companion object {

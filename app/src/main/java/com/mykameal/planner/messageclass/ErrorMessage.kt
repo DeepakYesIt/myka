@@ -19,6 +19,7 @@ object ErrorMessage {
 
      const val apiKey:String="AIzaSyC9NuN_f-wESHh3kihTvpbvdrmKlTQurxw"
      const val emailPhone:String="Please Enter Email/Phone"
+     const val recipeName:String="Please Enter Recipe Name"
      const val postCode:String="Please Enter Post Code"
      const val selectGender:String="Please select gender"
      const val pasteUrl:String="Please Paste Url"
@@ -56,6 +57,7 @@ object ErrorMessage {
      const val emailError="Email can't be empty."
      const val phoneError="phone can't be empty."
      const val validEmailPhone:String="Please Enter Valid Email or Phone Number"
+     const val validTotalTime:String="Please add total time in minutes"
      const val selectReasonEmpty:String="Please select reason"
      const val dobError:String="Please select DOB"
      const val selectIdTypeError:String="Select id type"

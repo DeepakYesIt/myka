@@ -71,8 +71,9 @@ class EditProfileFragment : Fragment() {
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.let { uri ->
 
-//                val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, uri)
+                val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, uri)
                 file = getPath(requireContext(), uri)?.let { File(it) }
+
                 /*processImage(bitmap)*/
                // Now you can send the image URI to Vision API for processing
                 // Convert image to Base64
@@ -127,8 +128,6 @@ class EditProfileFragment : Fragment() {
                 Toast.makeText(requireContext(),"Name :-"+t.message,Toast.LENGTH_LONG).show()
             }
         })
-
-
     }
 
     // Retrofit setup

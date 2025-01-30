@@ -666,7 +666,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         binding!!.rlAddDayToBasket.setOnClickListener {
             if (clickable == "") {
-
             } else {
                 findNavController().navigate(R.id.basketScreenFragment)
             }
