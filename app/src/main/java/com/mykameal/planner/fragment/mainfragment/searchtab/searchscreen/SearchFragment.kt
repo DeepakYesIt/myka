@@ -147,6 +147,8 @@ class SearchFragment : Fragment(),View.OnClickListener {
                 binding!!.llSearchRecipientIng.visibility=View.GONE
             }
 
+            
+
             if (data?.mealType!=null && data.mealType.size>0){
                 searchMealAdapter = SearchMealAdapter(data.mealType, requireActivity())
                 binding!!.rcySearchMeal.adapter = searchMealAdapter
