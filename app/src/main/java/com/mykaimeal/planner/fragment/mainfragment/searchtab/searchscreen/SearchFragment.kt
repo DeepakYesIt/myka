@@ -403,6 +403,8 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
                 binding!!.llSearchRecipientIng.visibility=View.GONE
             }
 
+            
+
             if (data?.mealType!=null && data.mealType.size>0){
                 mealType=data.mealType
                 searchMealAdapter = SearchMealAdapter(data.mealType, requireActivity(),this)
