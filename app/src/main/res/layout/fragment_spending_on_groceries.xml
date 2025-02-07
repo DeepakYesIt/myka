@@ -205,6 +205,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:layout_weight="1"
+                    android:visibility="gone"
                     android:background="@drawable/outline_green_border_bg"
                     android:gravity="center"
                     android:padding="@dimen/_10sdp"
@@ -214,7 +215,7 @@
 
                 <TextView
                     android:id="@+id/tvNextBtn"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:layout_marginStart="@dimen/_10sdp"
@@ -233,6 +234,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10sdp"
+                android:visibility="gone"
                 android:background="@drawable/green_btn_background">
 
                 <TextView

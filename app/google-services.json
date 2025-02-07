@@ -7,6 +7,53 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:1008724107712:android:0bdb9edf3c7c28a33de825",
+        "android_client_info": {
+          "package_name": "com.mykaimeal.planner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1008724107712-o4vi9dhb0mrniul2ve2ogr0n3hods413.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mykaimeal.planner",
+            "certificate_hash": "c93edcf5913bf13588a6d6fb5217f219b2cf2516"
+          }
+        },
+        {
+          "client_id": "1008724107712-aqr04398vrkjjg2r7acob0k905j8r4m3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAF7p4YnEOwkoGO5bEWOwLsxcoDSntcY58"
+        },
+        {
+          "current_key": "AIzaSyB1WtrB2oHQmyIX1ZpaXzbI9kOA2FlkCXk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1008724107712-aqr04398vrkjjg2r7acob0k905j8r4m3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1008724107712-iblre7o8lj53gp0al18fu2hqtdohinv1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.MykaApp.com"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:1008724107712:android:79c12c3b719b07493de825",
         "android_client_info": {
           "package_name": "com.mykameal.planner"
@@ -22,11 +69,30 @@
           }
         },
         {
+          "client_id": "1008724107712-0sr4i5tmbra00d6geo3ou8dr5hb8a8aj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mykameal.planner",
+            "certificate_hash": "d6fd912b372c32fd616c317da35dcd7fd493776f"
+          }
+        },
+        {
+          "client_id": "1008724107712-875b24e5v6rulgavjcjqp0f13f7in6cp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mykameal.planner",
+            "certificate_hash": "c93edcf5913bf13588a6d6fb5217f219b2cf2516"
+          }
+        },
+        {
           "client_id": "1008724107712-aqr04398vrkjjg2r7acob0k905j8r4m3.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
+        {
+          "current_key": "AIzaSyAF7p4YnEOwkoGO5bEWOwLsxcoDSntcY58"
+        },
         {
           "current_key": "AIzaSyB1WtrB2oHQmyIX1ZpaXzbI9kOA2FlkCXk"
         }
@@ -39,10 +105,10 @@
               "client_type": 3
             },
             {
-              "client_id": "1008724107712-u4qakv0qbd9u3h4p0td8jqeln458uj76.apps.googleusercontent.com",
+              "client_id": "1008724107712-iblre7o8lj53gp0al18fu2hqtdohinv1.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.yesitlabs.MykaApp.com"
+                "bundle_id": "com.MykaApp.com"
               }
             }
           ]

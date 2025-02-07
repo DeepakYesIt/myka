@@ -266,6 +266,7 @@
                                     android:src="@drawable/calories_icon" />
 
                                 <TextView
+                                    android:id="@+id/tvCalories"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
@@ -306,6 +307,7 @@
                                     android:src="@drawable/fat_icon" />
 
                                 <TextView
+                                    android:id="@+id/tvFats"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
@@ -346,6 +348,7 @@
                                     android:src="@drawable/carbs_icon" />
 
                                 <TextView
+                                    android:id="@+id/tvCarbohydrates"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
@@ -386,6 +389,7 @@
                                     android:src="@drawable/protin_icon" />
 
                                 <TextView
+                                    android:id="@+id/tvProteins"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
@@ -397,13 +401,14 @@
                         </LinearLayout>
 
                     </LinearLayout>
+
                     <ImageView
                         android:id="@+id/img_bmr"
                         android:layout_width="match_parent"
-                        android:src="@drawable/bmr_no_add"
+                        android:layout_height="match_parent"
                         android:layout_centerInParent="true"
                         android:scaleType="centerCrop"
-                        android:layout_height="match_parent"/>
+                        android:src="@drawable/bmr_no_add" />
                 </RelativeLayout>
 
                 <LinearLayout

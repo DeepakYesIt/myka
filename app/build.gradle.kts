@@ -9,15 +9,21 @@ plugins {
 }
 
 android {
-    namespace = "com.mykameal.planner"
+    namespace = "com.mykaimeal.planner"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.mykameal.planner"
+        applicationId = "com.mykaimeal.planner"
         minSdk = 24
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.2"
+
+        ////for yesitlabs account
+    /*    versionCode = 3
+        versionName = "1.2"*/
+
+        ///for my-kai app development
+        versionCode = 1
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -98,6 +104,10 @@ dependencies {
     implementation("com.intuit.ssp:ssp-android:1.0.5")
     implementation("com.intuit.sdp:sdp-android:1.0.6")
 
+    ///for in app subscriptions
+    val billing_version = "6.0.1"
+    implementation("com.android.billingclient:billing-ktx:$billing_version")
+
     //otpView
     implementation("com.github.aabhasr1:OtpView:v1.1.2-ktx")
 
@@ -122,8 +132,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.android.gms:play-services-auth:21.1.1")
 
-    ///appsFlyer sdk for deep linking
-    implementation("com.appsflyer:af-android-sdk:6.11.0")
+/*    ///appsFlyer sdk for deep linking
+    implementation("com.appsflyer:af-android-sdk:6.11.0")*/
 
     ///app lottie for android
     implementation ("com.airbnb.android:lottie:3.4.0")

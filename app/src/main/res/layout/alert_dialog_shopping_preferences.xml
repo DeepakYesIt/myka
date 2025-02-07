@@ -90,7 +90,7 @@
             android:textColorHint="@color/light_black"
             android:textSize="@dimen/_13sdp" />
 
-        <com.mykameal.planner.CombinedProgressView
+        <com.mykaimeal.planner.CombinedProgressView
             android:id="@+id/customSeekBar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_100sdp"

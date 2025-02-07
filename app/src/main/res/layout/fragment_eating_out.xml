@@ -139,6 +139,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10sdp"
+                android:visibility="gone"
                 android:background="@drawable/green_btn_background">
 
                 <TextView

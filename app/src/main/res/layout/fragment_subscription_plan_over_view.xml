@@ -49,6 +49,7 @@
                 android:layout_centerInParent="true"
                 android:fontFamily="@font/montserrat_medium"
                 android:text="Plan Overview"
+                android:textSize="@dimen/_13sdp"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
 
@@ -70,18 +71,19 @@
                 app:civ_circle_background_color="#FFFFFF"
                 android:layout_width="@dimen/_25sdp"
                 android:layout_height="@dimen/_25sdp"
-                android:layout_marginHorizontal="@dimen/_15sdp"
+                android:layout_marginStart="@dimen/_15sdp"
                 android:src="@drawable/ic_mask_group" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="@dimen/_30sdp"
+                android:layout_marginStart="@dimen/_10sdp"
                 android:layout_toEndOf="@+id/imageProfile"
                 android:fontFamily="@font/montserrat_medium"
                 android:text="My Kitchen Assistant"
                 android:textAlignment="center"
+                android:textSize="@dimen/_12sdp"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
 
@@ -94,6 +96,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_20sdp"
             android:fontFamily="@font/poppins"
+            android:textSize="@dimen/_11sdp"
             android:text="Your plan automatically renew on 09/12/2024"
             android:textAlignment="center"
             android:textColor="@color/white" />
@@ -107,6 +110,7 @@
             android:layout_marginStart="@dimen/_35sdp"
             android:layout_marginTop="@dimen/_5sdp"
             android:fontFamily="@font/poppins"
+            android:textSize="@dimen/_11sdp"
             android:text="You will be charged  £11.99/month."
             android:textAlignment="center"
             android:textColor="@color/white" />
@@ -119,6 +123,7 @@
             android:layout_marginTop="@dimen/_20sdp"
             android:fontFamily="@font/poppins"
             android:text="Plan includes"
+            android:textSize="@dimen/_12sdp"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textStyle="bold" />
@@ -163,7 +168,6 @@ reinvented version of your favorite meal."
             android:text="See All Plans"
             android:textAlignment="center"
             android:textColor="@color/white" />
-
 
         <RelativeLayout
             android:id="@+id/rlBottom"

@@ -130,7 +130,7 @@
                 android:layout_below="@id/tvSavings"
                 android:textSize="@dimen/_13sdp"/>
 
-            <com.mykameal.planner.customview.SpendingChartView
+            <com.mykaimeal.planner.customview.SpendingChartView
                 android:id="@+id/spendingChart"
                 android:layout_width="match_parent"
                 android:layout_marginTop="@dimen/_10sdp"

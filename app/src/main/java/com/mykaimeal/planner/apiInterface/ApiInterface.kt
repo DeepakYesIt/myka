@@ -1,0 +1,551 @@
+package com.mykaimeal.planner.apiInterface
+
+import com.google.gson.JsonObject
+import com.mykaimeal.planner.messageclass.ApiEndPoint
+import com.mykaimeal.planner.repository.VisionRequest
+import com.mykaimeal.planner.repository.VisionResponse
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.Call
+import retrofit2.Response
+import retrofit2.http.*
+
+interface ApiInterface {
+
+    @GET(ApiEndPoint.bodyGoals)
+    suspend fun getBogyGoal(): Response<JsonObject>
+
+    @GET(ApiEndPoint.dietaryRestrictions)
+    suspend fun getDietaryRestrictions(): Response<JsonObject>
+
+    @GET(ApiEndPoint.favouriteCuisines)
+    suspend fun getFavouriteCuisines(): Response<JsonObject>
+
+    @GET(ApiEndPoint.dislikeIngredients)
+    suspend fun getDislikeIngredients(): Response<JsonObject>
+
+    @GET(ApiEndPoint.allergensIngredients)
+    suspend fun getAllergensIngredients(): Response<JsonObject>
+
+    @GET(ApiEndPoint.mealRoutine)
+    suspend fun getMealRoutine(): Response<JsonObject>
+
+    @GET(ApiEndPoint.cookingFrequency)
+    suspend fun getCookingFrequency(): Response<JsonObject>
+
+    @GET(ApiEndPoint.eatingOut)
+    suspend fun getEatingOut(): Response<JsonObject>
+
+    @GET(ApiEndPoint.takeAwayReason)
+    suspend fun getTakeAwayReason(): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.userSignup)
+    suspend fun userSignUp(
+        @Field("email_or_phone") emailOrPhone: String,
+        @Field("password") password: String
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.socialLogin)
+    suspend fun socialLogin(
+        @Field("email_or_phone") emailOrPhone: String?,
+        @Field("social_id") socialId: String?,
+        @Field("username") username: String?,
+        @Field("usergender") userGender: String?,
+        @Field("bodygoal") bodyGoal: String?,
+        @Field("cooking_frequency") cookingFrequency: String?,
+        @Field("eating_out") eatingOut: String?,
+        @Field("take_way") takeWay: String?,
+        @Field("cooking_for_type") cookingForType: String?,
+        @Field("partner_name") partnerName: String?,
+        @Field("partner_age") partnerAge: String?,
+        @Field("partner_gender") partnerGender: String?,
+        @Field("family_member_name") familyMemberName: String?,
+        @Field("family_member_age") familyMemberAge: String?,
+        @Field("child_friendly_meals") childFriendlyMeals: String?,
+        @Field("meal_routine_id[]") mealRoutineId: List<String>?,
+        @Field("spending_amount") spendingAmount: String?,
+        @Field("duration") duration: String?,
+        @Field("dietary_id[]") dietaryId: List<String>?,
+        @Field("favourite[]") favourite: List<String>?,
+        @Field("allergies[]") allergies: List<String>?,
+        @Field("dislike_ingredients_id[]") dislikeIngredientsId: List<String>?,
+        @Field("device_type") deviceType: String?,
+        @Field("fcm_token") fcmToken: String?,
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.otpVerify)
+    suspend fun otpVerify(
+        @Field("user_id") userId: String?,
+        @Field("otp") otp: String?,
+        @Field("username") username: String?,
+        @Field("usergender") userGender: String?,
+        @Field("bodygoal") bodyGoal: String?,
+        @Field("cooking_frequency") cookingFrequency: String?,
+        @Field("eating_out") eatingOut: String?,
+        @Field("take_way") takeWay: String?,
+        @Field("cooking_for_type") cookingForType: String?,
+        @Field("partner_name") partnerName: String?,
+        @Field("partner_age") partnerAge: String?,
+        @Field("partner_gender") partnerGender: String?,
+        @Field("family_member_name") familyMemberName: String?,
+        @Field("family_member_age") familyMemberAge: String?,
+        @Field("child_friendly_meals") childFriendlyMeals: String?,
+        @Field("meal_routine_id[]") mealRoutineId: List<String>?,
+        @Field("spending_amount") spendingAmount: String?,
+        @Field("duration") duration: String?,
+        @Field("dietary_id[]") dietaryId: List<String>?,
+        @Field("favourite[]") favourite: List<String>?,
+        @Field("allergies[]") allergies: List<String>?,
+        @Field("dislike_ingredients_id[]") dislikeIngredientsId: List<String>?,
+        @Field("device_type") deviceType: String?,
+        @Field("fcm_token") fcmToken: String?,
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.forgotPassword)
+    suspend fun forgotPassword(
+        @Field("email_or_phone") emailOrPhone: String
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.forgotOtpVerify)
+    suspend fun forgotOtpVerify(
+        @Field("email_or_phone") emailOrPhone: String,
+        @Field("otp") otp: String,
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.resendOtp)
+    suspend fun resendOtp(
+        @Field("email_or_phone") emailOrPhone: String
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updatePassword)
+    suspend fun resetPassword(
+        @Field("email_or_phone") emailOrPhone: String,
+        @Field("password") password: String,
+        @Field("conformpassword") conformPassword: String,
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.userLogin)
+    suspend fun userLogin(
+        @Field("email_or_phone") emailOrPhone: String,
+        @Field("password") password: String,
+        @Field("device_type") deviceType: String,
+        @Field("fcm_token") fcmToken: String
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateLocation)
+    suspend fun updateLocation(
+        @Field("location_on_off") locationOnOff: String
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateNotification)
+    suspend fun updateNotification(
+        @Field("notification_status") notificationStatus: String
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.saveFeedback)
+    suspend fun saveFeedback(
+        @Field("email") email: String,
+        @Field("message") message: String,
+    ): Response<JsonObject>
+
+
+    @GET(ApiEndPoint.termsCondition)
+    suspend fun getTermsCondition(): Response<JsonObject>
+
+    @GET(ApiEndPoint.privacyPolicy)
+    suspend fun getPrivacyPolicy(): Response<JsonObject>
+
+
+    @POST(ApiEndPoint.userProfileUrl)
+    suspend fun userProfileDataApi(): Response<JsonObject>
+
+    @POST(ApiEndPoint.logOutUrl)
+    suspend fun userLogOutDataApi(): Response<JsonObject>
+
+
+    @POST(ApiEndPoint.deleteUrl)
+    suspend fun userDeleteDataApi(): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.userProfileUpdateUrl)
+    suspend fun userProfileUpdateApi(
+        @Field("name") name: String,
+        @Field("bio") bio: String,
+        @Field("gender") gender: String,
+        @Field("dob") dob: String,
+        @Field("height") height: String,
+        @Field("height_type") heightType: String,
+        @Field("activity_level") activityLevel: String,
+        @Field("height_protein") heightProtein: String,
+        @Field("calories") calories: String,
+        @Field("fat") fat: String,
+        @Field("carbs") carbs: String,
+        @Field("protien") protien: String,
+        @Field("weight") weight: String,
+        @Field("weight_type") weightType: String
+    ): Response<JsonObject>
+
+    @Multipart
+    @POST(ApiEndPoint.userImageUpdateUrl)
+    suspend fun upDateImageNameRequestApi(
+        @Part image: MultipartBody.Part?,
+        @Part("name") name: RequestBody?
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.addCardUrl)
+    suspend fun addCardRequestApi(@Field("stripe_token") stripeToken: String): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateNotificationUrl)
+    suspend fun notificationRequestApi(
+        @Field("push_notification") pushNotification: String,
+        @Field("recipe_recommendations") recipeRecommendations: String,
+        @Field("product_updates") productUpdates: String,
+        @Field("promotional_updates") promotionalUpdates: String
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.recipeDetailsUrl)
+    suspend fun recipeDetailsRequestApi(@Field("uri") url: String): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.mealReviewUrl)
+    suspend fun recipeReviewRequestApi(
+        @Field("uri") url: String,
+        @Field("comment") msg: String,
+        @Field("rating") ratingBarcount: String
+    ): Response<JsonObject>
+
+
+    @POST(ApiEndPoint.homeUrl)
+    suspend fun homeDetailsRequestApi(): Response<JsonObject>
+
+
+    @POST(ApiEndPoint.addBasketeDetailsUrl)
+    suspend fun recipeAddBasketRequestApi(@Body jsonObject: JsonObject): Response<JsonObject>
+
+
+    @POST(ApiEndPoint.addMealUrl)
+    suspend fun recipeAddToPlanRequestApi(@Body jsonObject: JsonObject): Response<JsonObject>
+
+    @POST(ApiEndPoint.createMealUrl)
+    suspend fun createRecipeRequestApi(@Body jsonObject: JsonObject): Response<JsonObject>
+
+    @POST(ApiEndPoint.getCookBookUrl)
+    suspend fun getCookBookRequestApi(): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.cookBookTypeListUrl)
+    suspend fun getCookBookTypeRequestApi(@Field("type") type: String?): Response<JsonObject>
+
+
+    @Multipart
+    @POST(ApiEndPoint.createCookBook)
+    suspend fun createCookBook(
+        @Part("name") name: RequestBody?,
+        @Part image: MultipartBody.Part?,
+        @Part("status") status: RequestBody?,
+        @Part("id") id: RequestBody?
+    ): Response<JsonObject>
+
+
+    @POST(ApiEndPoint.getCardBankUrl)
+    suspend fun getCardAndBankRequestApi(): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.allRecipeUrl)
+    suspend fun planRequestApi(@Field("q") q: String): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.getMealsUrl)
+    suspend fun planDateRequestApi(
+        @Field("date") date: String,
+        @Field("plan_type") planType: String
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.getSchedule)
+    suspend fun getScheduleApi(
+        @Field("date") date: String,
+        @Field("plan_type") planType: String
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.likeUnlikeUrl)
+    suspend fun likeUnlikeRequestApi(
+        @Field("uri") uri: String, @Field("type") type: String, @Field("cook_book") cookbook: String
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.moveRecipeUrl)
+    suspend fun moveRecipeRequestApi(
+        @Field("id") id: String,
+        @Field("cook_book") cookbook: String
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.removeCookBookUrl)
+    suspend fun deleteCookBookRequestApi(@Field("id") id: String): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.addBasketeUrl)
+    suspend fun addBasketRequestApi(
+        @Field("uri") uri: String, @Field("quantity") quantity: String
+    ): Response<JsonObject>
+
+    @POST(ApiEndPoint.walletAmountUrl)
+    suspend fun getWalletRequestApi(): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.deleteCardUrl)
+    suspend fun deleteCardRequestApi(
+        @Field("card_id") cardId: String,
+        @Field("customer_id") customerId: String
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.deleteBankUrl)
+    suspend fun deleteBankRequestApi(@Field("stripe_account_id") stripeAccountId: String): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.countriesUrl)
+    suspend fun countryRequestApi(@Field("url") url: String): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.transferToAccountUrl)
+    suspend fun transferAmountRequest(
+        @Field("amount") amount: String, @Field("account_id") destination: String
+    ): Response<JsonObject>
+
+    @Multipart
+    @POST(ApiEndPoint.bankAddUrl)
+    suspend fun addBankRequestApi(
+        @Part image: MultipartBody.Part?,
+        @Part filePartBack: MultipartBody.Part?,
+        @Part filePart: MultipartBody.Part?,
+        @Part("firstname") firstNameBody: RequestBody,
+        @Part("lastname") lastNameBody: RequestBody,
+        @Part("email") emailBody: RequestBody,
+        @Part("phone") phoneBody: RequestBody,
+        @Part("dob") dobBody: RequestBody,
+        @Part("id_number") personalIdentificationNobody: RequestBody,
+        @Part("id_type") idTypeBody: RequestBody,
+        @Part("ssn") ssnBody: RequestBody,
+        @Part("address") addressBody: RequestBody,
+        @Part("country") countryBody: RequestBody,
+        @Part("state_code") shortStateNameBody: RequestBody,
+        @Part("city") cityBody: RequestBody,
+        @Part("postal_code") postalCodeBody: RequestBody,
+        @Part("bank_proof_type") bankDocumentTypeBody: RequestBody,
+        @Part("device_type") deviceTypeBody: RequestBody,
+        @Part("token_type") tokenTypeBody: RequestBody,
+        @Part("stripe_token") stripeTokenBody: RequestBody,
+        @Part("save_card") saveCardBody: RequestBody,
+        @Part("amount") amountBody: RequestBody,
+        @Part("payment_type") paymentTypeBody: RequestBody,
+        @Part("bank_id") bankIdBody: RequestBody
+    ): Response<JsonObject>
+
+
+    @POST(ApiEndPoint.getUserPreferences)
+    suspend fun userPreferencesApi(): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateBodyGoalApi(@Field("bodygoal") bodyGoal: String?): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateCookingFrequencyApi(@Field("cooking_frequency") cookingFrequency: String?): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateReasonTakeAwayApi(@Field("take_way") takeWay: String?): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateEatingOutApi(@Field("eating_out") eatingOut: String?): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updatePartnerInfoApi(
+        @Field("partner_name") partnerName: String?,
+        @Field("partner_age") partnerAge: String?,
+        @Field("partner_gender") partnerGender: String?,
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateFamilyInfoApi(
+        @Field("family_member_name") familyMemberName: String?,
+        @Field("family_member_age") familyMemberAge: String?,
+        @Field("child_friendly_meals") childFriendlyMeals: String?,
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateMealRoutineApi(
+        @Field("meal_routine_id[]") mealRoutineId: List<String>?
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateSpendingGroceriesApi(
+        @Field("spending_amount") spendingAmount: String?,
+        @Field("duration") duration: String?
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateDietaryApi(
+        @Field("dietary_id[]") dietaryId: List<String>?
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateFavouriteApi(
+        @Field("favourite[]") favouriteId: List<String>?
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateAllergiesApi(
+        @Field("allergies[]") allergensId: List<String>?
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updateDislikedIngredientsApi(
+        @Field("dislike_ingredients_id[]") dislikeIngId: List<String>?
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updatePreferencesApi(
+        @Field("username") username: String?,
+        @Field("cooking_for_type") cookingForType: String?,
+        @Field("usergender") userGender: String?,
+        @Field("bodygoal") bodyGoal: String?,
+        @Field("partner_name") partnerName: String?,
+        @Field("partner_age") partnerAge: String?,
+        @Field("partner_gender") partnerGender: String?,
+        @Field("family_member_name") familyMemberName: String?,
+        @Field("family_member_age") familyMemberAge: String?,
+        @Field("child_friendly_meals") childFriendlyMeals: String?,
+        @Field("dietary_id[]") dietaryId: MutableList<String>?,
+        @Field("favourite[]") favouriteId: MutableList<String>?,
+        @Field("dislike_ingredients_id[]") dislikeIngId: MutableList<String>?,
+        @Field("allergies[]") allergensId: MutableList<String>?,
+        @Field("meal_routine_id[]") mealRoutineId: MutableList<String>?,
+        @Field("cooking_frequency") cookingFrequency: String?,
+        @Field("spending_amount") spendingAmount: String?,
+        @Field("duration") duration: String?,
+        @Field("eating_out") eatingOut: String?,
+        @Field("take_way") takeWay: String?
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateUserPreferences)
+    suspend fun updatePostCode(
+        @Field("postcode") postcode: String?,
+        @Field("longitude") longitude: String?,
+        @Field("latitude") latitude: String?
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.recipeSearch)
+    suspend fun recipeSearchApi(
+        @Field("q") q: String?
+    ): Response<JsonObject>
+
+
+    @POST(ApiEndPoint.forSearchUrl)
+    suspend fun recipeForSearchApi(): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.addToCartUrl)
+    suspend fun addToCartUrlApi(
+        @Field("food_ids[]") foodIds: MutableList<String>?,
+        @Field("sch_id") schId: String?,
+        @Field("names[]") foodName: MutableList<String>?
+    ): Response<JsonObject>
+
+    @POST(ApiEndPoint.forPreferenceUrl)
+    suspend fun recipePreferencesApi(): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.createRecipeUrl)
+    suspend fun createRecipeUrlApi(
+        @Field("q") q: String?
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.removeMeal)
+    suspend fun removeMealApi(
+        @Field("id") id: String?
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.getMissingIngUrl)
+    suspend fun getMissingIngredientsApi(
+        @Field("uri") uri: String?,
+        @Field("sch_id") schId: String?
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.getMealByUrl)
+    suspend fun getMealByUrl(
+        @Field("q") uri: String?
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.updateMealUrl)
+    suspend fun updateMealUrl(@Body jsonObject: JsonObject): Response<JsonObject>
+
+    /*   @POST("v1/images:annotate")
+       fun annotateImage(@Body request: VisionRequest): Call<VisionResponse>*/
+
+    @Headers("Content-Type: application/json")
+    @POST("v1/images:annotate")
+    fun annotateImage(
+        @Query("key") apiKey: String,
+        @Body visionRequest: VisionRequest
+    ): Call<VisionResponse>
+
+
+}

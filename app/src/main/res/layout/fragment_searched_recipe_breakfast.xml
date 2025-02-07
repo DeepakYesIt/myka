@@ -1,81 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragment.mainfragment.searchtab.SearchedRecipeBreakfastFragment">
+    android:layout_height="match_parent">
 
-    <ScrollView
+    <RelativeLayout
+        android:id="@+id/layTittle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:gravity="start|center">
 
         <RelativeLayout
-            android:layout_width="match_parent"
+            android:id="@+id/relBackSearched"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <RelativeLayout
-                android:id="@+id/layTittle"
-                android:layout_width="match_parent"
+            <ImageView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                android:layout_marginTop="@dimen/_10sdp"
-                android:gravity="start|center">
-
-                <RelativeLayout
-                    android:id="@+id/relBackSearched"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/_10sdp"
-                        android:src="@drawable/back_icon" />
-
-                </RelativeLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_5sdp"
-                    android:layout_centerInParent="true"
-                    android:text="Dinner"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:textColor="#000000"
-                    android:textSize="@dimen/_15sdp" />
-
-                <ImageView
-                    android:id="@+id/imgHeartRed"
-                    android:layout_width="@dimen/_30sdp"
-                    android:layout_height="@dimen/_30sdp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="@dimen/_10sdp"
-                    android:layout_toStartOf="@+id/imgBasketIcon"
-                    android:src="@drawable/heart_red_icon" />
-
-                <ImageView
-                    android:id="@+id/imgBasketIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/yellow_basket_icon" />
-            </RelativeLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rcySearchedItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/layTittle"
-                android:layout_marginTop="@dimen/_20sdp"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                app:spanCount="2"/>
+                android:layout_margin="@dimen/_10sdp"
+                android:src="@drawable/back_icon" />
 
         </RelativeLayout>
 
-    </ScrollView>
+        <TextView
+            android:id="@+id/tvSearchedTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:fontFamily="@font/montserrat_semibold"
+            android:text="Dinner"
+            android:textColor="#000000"
+            android:textSize="@dimen/_15sdp" />
+
+        <ImageView
+            android:id="@+id/imgHeartRed"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_toStartOf="@+id/imgBasketIcon"
+            android:src="@drawable/heart_red_icon" />
+
+        <ImageView
+            android:id="@+id/imgBasketIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/yellow_basket_icon" />
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcySearchedItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layTittle"
+        android:layout_marginHorizontal="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="2" />
 
 </RelativeLayout>
