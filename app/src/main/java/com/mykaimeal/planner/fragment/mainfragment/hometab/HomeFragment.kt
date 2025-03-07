@@ -2,9 +2,13 @@ package com.mykaimeal.planner.fragment.mainfragment.hometab
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.location.LocationManager
 import android.os.Bundle
+import android.os.Looper
 import android.text.Html
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -15,11 +19,17 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.OnItemLongClickListener
@@ -34,6 +44,8 @@ import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentHomeBinding
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.HomeViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.HomeApiResponse
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModelData
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
@@ -50,13 +62,16 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
     private var dataList3: MutableList<DataModel> = mutableListOf()
     private var recipeCookedAdapter: RecipeCookedAdapter? = null
     private var adapterSuperMarket: AdapterSuperMarket? = null
-    private var statuses: String? = ""
-    private var checkStatus: Boolean? = false
     private var recySuperMarket: RecyclerView? = null
     private lateinit var sessionManagement: SessionManagement
     private lateinit var viewModel: HomeViewModel
     private lateinit var userDataLocal: com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.DataModel
     private lateinit var spinnerActivityLevel: PowerSpinnerView
+    private var fusedLocationClient: FusedLocationProviderClient? = null
+
+    private var latitude = "0.0"
+    private var longitude = "0.0"
+
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
         mutableListOf()
 
@@ -72,6 +87,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
         sessionManagement = SessionManagement(requireContext())
 
         viewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
@@ -81,14 +97,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
         cookbookList.clear()
         val data =
             com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
-                "",
-                "",
-                0,
-                "",
-                "Favourites",
-                0,
-                "",
-                0
+                "", "", 0, "", "Favourites", 0, "", 0
             )
         cookbookList.add(0, data)
 
@@ -111,6 +120,14 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
         }
     }
 
+    private fun supermarketOnLoad() {
+        if (BaseApplication.isOnline(requireActivity())) {
+            superMarketDetailsData()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
     private fun fetchHomeDetailsData() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
@@ -121,11 +138,60 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
         }
     }
 
+    private fun superMarketDetailsData() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.getSuperMarket({
+                BaseApplication.dismissMe()
+                handleMarketApiResponse(it)
+            }, latitude, longitude)
+        }
+    }
+
     private fun handleApiResponse(result: NetworkResult<String>) {
         when (result) {
             is NetworkResult.Success -> handleSuccessResponse(result.data.toString())
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
+        }
+    }
+
+    private fun handleMarketApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleMarketSuccessResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleMarketSuccessResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SuperMarketModel::class.java)
+            Log.d("@@@ Recipe Details ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success==true) {
+                showUIData(apiModel.data)
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun showUIData(data: List<SuperMarketModelData>?) {
+        try {
+            if (data!=null){
+                adapterSuperMarket = AdapterSuperMarket(data, requireActivity(), this)
+                recySuperMarket!!.adapter = adapterSuperMarket
+            }
+
+        }catch (e:Exception){
+            showAlert(e.message, false)
         }
     }
 
@@ -165,13 +231,21 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
                 binding!!.llRecipesCooked.visibility = View.GONE
             }
 
-            if (userDataLocal.graph_value == 0) {
-                binding!!.imagePlanMeal.visibility = View.VISIBLE
-                binding!!.imageCheckSav.visibility = View.GONE
-            } else {
+              if (userDataLocal.graph_value == 0) {
+                  binding!!.imagePlanMeal.visibility = View.VISIBLE
+                  binding!!.imageCheckSav.visibility = View.GONE
+              } else {
+                  binding!!.imagePlanMeal.visibility = View.GONE
+                  binding!!.imageCheckSav.visibility = View.VISIBLE
+              }
+
+          /*  if (userDataLocal.graph_value == 0) {
                 binding!!.imagePlanMeal.visibility = View.GONE
                 binding!!.imageCheckSav.visibility = View.VISIBLE
-            }
+            } else {
+                binding!!.imagePlanMeal.visibility = View.VISIBLE
+                binding!!.imageCheckSav.visibility = View.GONE
+            }*/
 
             if (userDataLocal.date != null && !userDataLocal.date.equals("", true)) {
                 val name = BaseApplication.getColoredSpanned(
@@ -184,11 +258,10 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
                     "Your cooking schedule is empty! Tap the button below to add a meal and get started."
             }
 
-
             fun updateCount(breakfast: Int?) {
                 var cookstatus = false
-                if (breakfast!! != 0){
-                    cookstatus=true
+                if (breakfast!! != 0) {
+                    cookstatus = true
                 }
                 /*if (cookstatus) {
                     binding!!.rlSeeAllBtn.visibility = View.VISIBLE
@@ -198,8 +271,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
                     binding!!.rlSeeAllBtn.visibility = View.GONE
                 }*/
             }
-
-
 
             if (userDataLocal.frezzer != null) {
 
@@ -235,7 +306,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
             }
 
             if (userDataLocal.fridge != null) {
-
                 if (userDataLocal.fridge.Breakfast != null) {
                     binding!!.tvfridgebreakfast.text = "" + userDataLocal.fridge.Breakfast
                     updateCount(userDataLocal.fridge.Breakfast)
@@ -263,12 +333,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
                 } else {
                     binding!!.layTeatime.visibility = View.GONE
                 }
-
             }
-
-
-
-
 
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -372,66 +437,17 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT
         )
-        recySuperMarket = dialogAddItem.findViewById<RecyclerView>(R.id.recySuperMarket)
+        recySuperMarket = dialogAddItem.findViewById(R.id.recySuperMarket)
         val rlDoneBtn = dialogAddItem.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         dialogAddItem.show()
         dialogAddItem.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        superMarketModel()
+        // When dialog open then api call
+        supermarketOnLoad()
+        /*superMarketModel()*/
 
         rlDoneBtn.setOnClickListener {
             dialogAddItem.dismiss()
         }
-    }
-
-    private fun superMarketModel() {
-        val dataList1: MutableList<DataModel> = mutableListOf()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-        val data6 = DataModel()
-
-        data1.title = "Tesco"
-        data1.isOpen = false
-        data1.type = "SuperMarket"
-        data1.price = "25"
-        data1.image = R.drawable.super_market_tesco_image
-
-        data2.title = "Coop"
-        data2.isOpen = false
-        data2.price = "28"
-        data2.image = R.drawable.super_market_coop_image
-
-        data3.title = "Iceland"
-        data3.isOpen = false
-        data3.price = "30"
-        data3.image = R.drawable.super_market_iceland_image
-
-        data4.title = "Albertsons"
-        data4.isOpen = false
-        data4.price = "32"
-        data4.image = R.drawable.super_market_albertsons
-
-        data5.title = "Aldi"
-        data5.isOpen = false
-        data5.price = "35"
-        data5.image = R.drawable.super_market_aldi_image
-
-        data6.title = "Costco"
-        data6.isOpen = false
-        data6.price = "35"
-        data6.image = R.drawable.super_market_costco_image
-
-        dataList1.add(data1)
-        dataList1.add(data2)
-        dataList1.add(data3)
-        dataList1.add(data4)
-        dataList1.add(data5)
-        dataList1.add(data6)
-
-        adapterSuperMarket = AdapterSuperMarket(dataList1, requireActivity(), this)
-        recySuperMarket!!.adapter = adapterSuperMarket
     }
 
     private fun homeSchDinnerModel() {
@@ -486,7 +502,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
                 .into(binding!!.imageProfile)
         }
 
-
         if (sessionManagement.getUserName() != null) {
             val name = BaseApplication.getColoredSpanned(
                 "Hello",
@@ -514,6 +529,83 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
         binding!!.imageCheckSav.setOnClickListener(this)
 
 
+        if (BaseApplication.isOnline(requireActivity())){
+            // This condition for check location run time permission
+            if (ContextCompat.checkSelfPermission(
+                    requireActivity(),
+                    android.Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                    requireActivity(),
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                getCurrentLocation()
+            } else {
+                requestPermissions(
+                    arrayOf(
+                        android.Manifest.permission.ACCESS_FINE_LOCATION,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION
+                    ), 100
+                )
+            }
+        }else{
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
+
+    @SuppressLint("MissingPermission")
+    private fun getCurrentLocation() {
+        // Initialize Location manager
+        val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        // Check condition
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+                LocationManager.NETWORK_PROVIDER
+            )
+        ) {
+            // When location service is enabled
+            // Get last location
+            fusedLocationClient!!.lastLocation.addOnCompleteListener { task ->
+                // Initialize location
+                // Check condition
+                if (task.isSuccessful && task.result != null) {
+                    val location = task.result
+                    // When location result is not
+                    // null set latitude
+                    latitude = location.latitude.toString()
+                    longitude = location.longitude.toString()
+                } else {
+                    // When location result is null
+                    // initialize location request
+                    val locationRequest = LocationRequest()
+                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                        .setInterval(10000)
+                        .setFastestInterval(1000)
+                    // Initialize location call back
+                    val locationCallback: LocationCallback = object : LocationCallback() {
+                        override fun onLocationResult(locationResult: LocationResult) {
+                            // location
+                            val location1 = locationResult.lastLocation
+                            latitude = location1!!.latitude.toString()
+                            longitude = location1.longitude.toString()
+
+                        }
+                    }
+                    fusedLocationClient!!.requestLocationUpdates(
+                        locationRequest,
+                        locationCallback,
+                        Looper.myLooper()
+                    )
+                }
+            }
+        } else {
+            requestPermissions(
+                arrayOf(
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ), 100
+            )
+        }
     }
 
     override fun onClick(item: View?) {
@@ -561,7 +653,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
             R.id.tv_name -> {
                 findNavController().navigate(R.id.statisticsGraphFragment)
             }
-
         }
     }
 
@@ -580,7 +671,11 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
 
         when (status) {
             "1" -> {
-
+                val bundle = Bundle().apply {
+                    putString("uri", type)
+                    putString("schId", position.toString())
+                }
+                findNavController().navigate(R.id.missingIngredientsFragment, bundle)
             }
 
             "2" -> {
@@ -609,9 +704,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
                 }
                 findNavController().navigate(R.id.recipeDetailsFragment, bundle)
             }
-
         }
-
     }
 
     private fun addFavTypeDialog(position: Int?, likeType: String) {

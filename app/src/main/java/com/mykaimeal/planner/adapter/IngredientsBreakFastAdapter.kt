@@ -23,7 +23,8 @@ import com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.mode
 import java.util.Collections
 
 class IngredientsBreakFastAdapter(var datalist:MutableList<Breakfast>?, private var requireActivity: FragmentActivity,
-                                  private var onItemClickListener: OnItemSelectUnSelectListener, private var onItemLongClickListener: OnItemLongClickListener, var type:String): RecyclerView.Adapter<IngredientsBreakFastAdapter.ViewHolder>() {
+                                  private var onItemClickListener: OnItemSelectUnSelectListener,
+                                  private var onItemLongClickListener: OnItemLongClickListener, var type:String): RecyclerView.Adapter<IngredientsBreakFastAdapter.ViewHolder>() {
 
     private var checkStatus:String?=null
     private var checkTypeStatus: String? = null
@@ -144,7 +145,6 @@ class IngredientsBreakFastAdapter(var datalist:MutableList<Breakfast>?, private 
                 checkStatus = "0"
             }*/
             onItemClickListener.itemSelectUnSelect(datalist?.get(position)!!.id,checkTypeStatus,"BreakFast",position)
-
         }
 
         holder.itemView.setOnLongClickListener{
@@ -203,9 +203,14 @@ class IngredientsBreakFastAdapter(var datalist:MutableList<Breakfast>?, private 
 
     private fun stopZiggle(view: View) {
         ziggleAnimation?.cancel()
+        view.animate().cancel()  // Cancel any ongoing animations on the view
+        view.rotation = 0f
+        ziggleAnimation = null
+        isZiggleEnabled = false
+        /*ziggleAnimation?.cancel()
         ziggleAnimation = null
         view.rotation = 0f
-        isZiggleEnabled = false
+        isZiggleEnabled = false*/
     }
 
     fun updateList(mealList: MutableList<Breakfast>) {

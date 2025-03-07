@@ -15,17 +15,14 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.CalendarView
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -63,7 +60,6 @@ import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Arrays
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -94,7 +90,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
     lateinit var adapter: ImageViewPagerAdapter
     val dataList = arrayListOf<DataModel>()
-    private lateinit var layonboarding_indicator: LinearLayout
     private var currentDate = Date() // Current date
 
     // Define global variables
@@ -148,13 +143,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         // When screen load then api call
         fetchDataOnLoad()
 
-        val imageList = Arrays.asList<Int>(
-            R.drawable.ic_food_image,
-            R.drawable.ic_food_image,
-            R.drawable.ic_food_image
-        )
-        adapter = ImageViewPagerAdapter(requireContext(), imageList)
-
         // Display current week dates
         showWeekDates()
 
@@ -175,7 +163,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         val daysBetween = getDaysBetween(startDate, endDate)
 
         // Print the dates
-        println("Days between ${startDate} and ${endDate}:")
+        println("Days between $startDate and ${endDate}:")
         daysBetween.forEach { println(it) }
         binding!!.tvDate.text = BaseApplication.formatonlyMonthYear(startDate)
         binding!!.textWeekRange.text = ""+formatDate(startDate)+"-"+formatDate(endDate)
@@ -452,6 +440,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 }
             }
 
+            binding!!.llCalculateBmr.visibility=View.GONE
+
             // Breakfast
             if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
                 breakfastAdapter = setupMealAdapter(recipesModel?.Breakfast, binding!!.rcyBreakFast, "BreakFast")
@@ -507,18 +497,25 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 if (recipesDateModel!!.fat?.toInt() !=0 || recipesDateModel!!.protein?.toInt() !=0 ||
                     recipesDateModel!!.kcal?.toInt() !=0 || recipesDateModel!!.carbs?.toInt()!=0){
                     binding!!.imgBmr.visibility=View.GONE
+                    binding!!.llCalculateBmr.visibility=View.VISIBLE
 
                     binding!!.tvCalories.text=String.format("%.2f", recipesDateModel!!.kcal)
+                    binding!!.tvCalories.text= binding!!.tvCalories.text.toString().take(5) // Allows only the first 5 characters
                     binding!!.tvFats.text= String.format("%.2f", recipesDateModel!!.fat)
+                    binding!!.tvFats.text= binding!!.tvFats.text.toString().take(5) // Allows only the first 5 characters
                     binding!!.tvCarbohydrates.text= String.format("%.2f", recipesDateModel!!.carbs)
+                    binding!!.tvCarbohydrates.text= binding!!.tvCarbohydrates.text.toString().take(5) // Allows only the first 5 characters
                     binding!!.tvProteins.text= String.format("%.2f", recipesDateModel!!.protein)
+                    binding!!.tvProteins.text= binding!!.tvProteins.text.toString().take(5) // Allows only the first 5 characters
 
                 }
             }else{
                 binding!!.imgBmr.visibility=View.VISIBLE
+                binding!!.llCalculateBmr.visibility=View.GONE
             }
 
             var status=false
+
 
             fun setupMealAdapter(mealRecipes: MutableList<BreakfastModelPlanByDate>?, recyclerView: RecyclerView, type: String): AdapterPlanBreakByDateFast? {
                 return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
@@ -733,7 +730,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
     }
 
-
     private fun getWeekDates(currentDate: Date): Pair<Date, Date> {
         val calendar = Calendar.getInstance()
         calendar.time = currentDate
@@ -775,133 +771,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             dialog.dismiss()
         }
         dialog.show()
-    }
-
-    private fun dialogDailyInspiration() {
-        val dialog = Dialog(requireContext(), R.style.BottomSheetDialog)
-        dialog.apply {
-            setCancelable(true)
-            setContentView(R.layout.alert_dialog_daily_inspiration)
-            window?.attributes = WindowManager.LayoutParams().apply {
-                copyFrom(window?.attributes)
-                width = WindowManager.LayoutParams.MATCH_PARENT
-                height = WindowManager.LayoutParams.MATCH_PARENT
-            }
-
-            layonboarding_indicator = findViewById<LinearLayout>(R.id.layonboarding_indicator)
-            val viewPager = findViewById<ViewPager2>(R.id.viewPager)
-            val llBreakfast = findViewById<LinearLayout>(R.id.llBreakfast)
-            val llLunch = findViewById<LinearLayout>(R.id.llLunch)
-            val llDinner = findViewById<LinearLayout>(R.id.llDinner)
-            val rlAddPlanButton = findViewById<RelativeLayout>(R.id.rlAddPlanButton)
-            val rlAddCartButton = findViewById<RelativeLayout>(R.id.rlAddCartButton)
-            val textBreakfast = findViewById<TextView>(R.id.textBreakfast)
-            val textDinner = findViewById<TextView>(R.id.textDinner)
-            val textLunch = findViewById<TextView>(R.id.textLunch)
-            val viewBreakfast = findViewById<View>(R.id.viewBreakfast)
-            val viewLunch = findViewById<View>(R.id.viewLunch)
-            val viewDinner = findViewById<View>(R.id.viewDinner)
-
-            llBreakfast.setOnClickListener {
-                viewBreakfast.visibility = View.VISIBLE
-                viewLunch.visibility = View.GONE
-                viewDinner.visibility = View.GONE
-
-                textBreakfast.setTextColor(ContextCompat.getColor(requireContext(), R.color.orange))
-                textDinner.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-                textLunch.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-            }
-
-            llLunch.setOnClickListener {
-                viewBreakfast.visibility = View.GONE
-                viewLunch.visibility = View.VISIBLE
-                viewDinner.visibility = View.GONE
-                textBreakfast.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-                textLunch.setTextColor(ContextCompat.getColor(requireContext(), R.color.orange))
-                textDinner.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-            }
-
-            llDinner.setOnClickListener {
-                viewBreakfast.visibility = View.GONE
-                viewLunch.visibility = View.GONE
-                viewDinner.visibility = View.VISIBLE
-                textBreakfast.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-                textLunch.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-                textDinner.setTextColor(ContextCompat.getColor(requireContext(), R.color.orange))
-            }
-
-            rlAddPlanButton.setOnClickListener {
-                chooseDayDialog(0, "")
-                dismiss()
-            }
-
-            rlAddCartButton.setOnClickListener {
-                findNavController().navigate(R.id.basketScreenFragment)
-                dismiss()
-            }
-
-            // Set up ViewPager with images
-            viewPager.adapter = adapter
-            // Set up ViewPager with images
-            setUpOnBoardingIndicator()
-            currentOnBoardingIndicator(0)
-            viewPager.setAdapter(adapter)
-
-            viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    super.onPageSelected(position)
-                    currentOnBoardingIndicator(position)
-                }
-            })
-
-
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-            show()
-        }
-    }
-
-    private fun setUpOnBoardingIndicator() {
-        val indicator = arrayOfNulls<ImageView>(adapter.itemCount)
-        val layoutParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-
-        layoutParams.setMargins(10, 0, 10, 0)
-        for (i in indicator.indices) {
-            indicator[i] = ImageView(requireActivity())
-            indicator[i]!!.setImageDrawable(
-                ContextCompat.getDrawable(
-                    requireActivity(),
-                    R.drawable.default_dot
-                )
-            )
-            indicator[i]!!.layoutParams = layoutParams
-            layonboarding_indicator.addView(indicator[i])
-        }
-    }
-
-    private fun currentOnBoardingIndicator(index: Int) {
-        val childCount: Int = layonboarding_indicator.getChildCount()
-        for (i in 0 until childCount) {
-            val imageView = layonboarding_indicator.getChildAt(i) as ImageView
-            if (i == index) {
-                imageView.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        requireActivity(),
-                        R.drawable.selected_dot
-                    )
-                )
-            } else {
-                imageView.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        requireActivity(),
-                        R.drawable.default_dot
-                    )
-                )
-            }
-        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -1043,8 +912,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "BreakFast" -> recipesModel?.Breakfast to breakfastAdapter
             "Lunch" -> recipesModel?.Lunch to lunchAdapter
             "Dinner" -> recipesModel?.Dinner to dinnerAdapter
-            "Snack" -> recipesModel?.Dinner to snackesAdapter
-            "TeaTime" -> recipesModel?.Dinner to teaTimeAdapter
+            "Snack" -> recipesModel?.Snack to snackesAdapter
+            "TeaTime" -> recipesModel?.Teatime to teaTimeAdapter
             else -> null to null
         }
 

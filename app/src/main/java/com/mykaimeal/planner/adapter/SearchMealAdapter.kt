@@ -79,6 +79,11 @@ class SearchMealAdapter(var datalist: MutableList<MealType>?, private var requir
 
     }
 
+    fun submitList(mealType: MutableList<MealType>?) {
+        this.datalist=mealType
+        notifyDataSetChanged()
+    }
+
 
     class ViewHolder(var binding: AdapterMealItemBinding) : RecyclerView.ViewHolder(binding.root){
 

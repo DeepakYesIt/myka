@@ -79,7 +79,6 @@ class AdapterPrepareCookItem(private var datalist: MutableList<IngredientsModel>
                 holder.binding.tvTitleDesc.text =""+data.quantity
             }
         }
-
     }
 
     override fun getItemCount(): Int {

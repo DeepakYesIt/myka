@@ -140,7 +140,7 @@ object BaseApplication {
     }
 
     fun formatonlyMonthYear(date: Date): String {
-        val dateFormat = SimpleDateFormat("MMM, yyyy", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("MMMM, yyyy", Locale.getDefault())
         return dateFormat.format(date)
     }
 
@@ -162,7 +162,6 @@ object BaseApplication {
             "" // Return null if parsing fails
         }
     }
-
 
     fun currentDateFormat(): String? {
         val formatter = SimpleDateFormat("yyyy-MM-dd")

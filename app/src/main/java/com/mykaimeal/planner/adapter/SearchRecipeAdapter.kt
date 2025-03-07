@@ -76,6 +76,11 @@ class SearchRecipeAdapter(
 
     }
 
+    fun submitList(ingredient: MutableList<com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.apiresponse.Ingredient>) {
+        this.ingredientsList=ingredient
+        notifyDataSetChanged()
+    }
+
 
     class ViewHolder(var binding: AdapterSearchRecipeBinding) :
         RecyclerView.ViewHolder(binding.root) {

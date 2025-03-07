@@ -19,6 +19,7 @@ class DietaryRestrictionsAdapter(
 
     private val selectedPositions = mutableSetOf<Int>()
     private val dietaryId = mutableListOf<String>()
+    private var isExpanded = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -70,11 +71,9 @@ class DietaryRestrictionsAdapter(
                     }
                 } else {
                     // Deselect "select all" if another item is clicked
-                   /* if (selectedPositions.contains(0)) {
-                        selectedPositions.remove(0)*/
+
                         datalist[0].selected = false
                         dietaryId.clear()
-                   /* }*/
 
                     // Toggle the current item's selection state
                     if (datalist[position].selected) {
@@ -97,7 +96,13 @@ class DietaryRestrictionsAdapter(
     }
 
     override fun getItemCount(): Int {
-        return datalist.size
+        return if (isExpanded) datalist.size else Math.min(3, datalist.size)
+//        return datalist.size
+    }
+
+    fun setExpanded(expanded: Boolean) {
+        isExpanded = expanded
+        notifyDataSetChanged()
     }
 
     fun filterList(filteredList: MutableList<DietaryRestrictionsModelData>) {

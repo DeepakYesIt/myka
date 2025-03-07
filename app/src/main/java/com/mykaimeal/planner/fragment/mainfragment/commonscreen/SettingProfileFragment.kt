@@ -67,7 +67,6 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     private var longitude = "0.0"
     private var postalCode:String = ""
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         binding = FragmentSettingProfileBinding.inflate(inflater, container, false)
@@ -382,7 +381,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     private fun setupClickListeners() {
         binding?.apply {
             arrayOf(
-                imageEditProfile, relMyWallet, relHealthData, relPreferences, imageNameEditable,
+                imageEditProfile, relMyWallet,relOrderHistory, relHealthData, relPreferences, imageNameEditable,
                 imageEditTargets, imageProfile, imgBackProfileSetting, imgThreeDotIcon,relNotifications, relPrivacyTerms, relAboutApp,
                 relPostalCode, rlSubmitBtn, relFeedbackSupport, relPrivacyPolicy, relSubscriptionPlan
             ).forEach { it.setOnClickListener(this@SettingProfileFragment) }
@@ -400,6 +399,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
             R.id.imageNameEditable -> disableProfileEditing()
             R.id.imageEditTargets -> moveToNextScreen()
             R.id.relMyWallet -> navigateToFragment(R.id.walletFragment)
+            R.id.relOrderHistory -> navigateToFragment(R.id.orderHistoryFragment)
             R.id.relHealthData -> navigateToFragment(R.id.healthDataFragment)
             R.id.relFeedbackSupport -> navigateToFragment(R.id.feedbackFragment)
             R.id.imageProfile -> navigateToFragment(R.id.editProfileFragment)
@@ -549,25 +549,11 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     private fun upDateProfile() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            viewModel.upDateProfileRequest(
+            viewModel.userProfileUpdateBioApi(
                 {
                     BaseApplication.dismissMe()
                     handleApiUpdateResponse(it)
-                }, viewModel.getProfileData()?.name.toString()
-                , binding?.tvBio?.text.toString()
-                , viewModel.getProfileData()?.gender.toString()
-                , viewModel.getProfileData()?.dob.toString()
-                , viewModel.getProfileData()?.height.toString(),
-                viewModel.getProfileData()?.height_type.toString(),
-                viewModel.getProfileData()?.activity_level.toString(),
-                viewModel.getProfileData()?.height_protein.toString()
-                , viewModel.getProfileData()?.calories.toString(),
-                viewModel.getProfileData()?.fat.toString()
-                , viewModel.getProfileData()?.carbs.toString(),
-                viewModel.getProfileData()?.protien.toString(),
-                viewModel.getProfileData()?.weight.toString(),
-                viewModel.getProfileData()?.weight_type.toString()
-            )
+                }, binding?.tvBio?.text.toString())
         }
     }
 

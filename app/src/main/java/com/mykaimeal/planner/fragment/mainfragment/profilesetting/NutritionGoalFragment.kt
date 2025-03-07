@@ -2,6 +2,7 @@ package com.mykaimeal.planner.fragment.mainfragment.profilesetting
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.Html
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -35,7 +36,6 @@ class NutritionGoalFragment : Fragment() {
         binding = FragmentNutritionGoalBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[SettingViewModel::class.java]
         sessionManagement = SessionManagement(requireContext())
-
 
         setupBackPressHandler()
         initializeUI()
@@ -145,22 +145,20 @@ class NutritionGoalFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun initializeUI() {
 
+        if (sessionManagement.getUserName() != null) {
+            binding.tvName.text = sessionManagement.getUserName()+"'s Nutrition Goals"
+        }
+
         binding.imageBackNutrition.setOnClickListener {
             findNavController().navigateUp()
         }
-
-
 
         if (sessionManagement.getUserName()!=null && sessionManagement.getUserName().equals("null")){
             binding.tvName.text=sessionManagement.getUserName()+"’s Nutrition Goals"
         }
 
-
-
         setSeekBarValue()
-
         setupSpinner()
-
         setupUpdateButton()
     }
 

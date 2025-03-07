@@ -2,9 +2,15 @@ package com.mykaimeal.planner.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.appsflyer.AppsFlyerLib
+import com.appsflyer.deeplink.DeepLinkResult
+import com.mykaimeal.planner.R
 import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.ActivitySplashBinding
 import kotlinx.coroutines.delay
@@ -27,12 +33,12 @@ class SplashActivity : AppCompatActivity() {
         sessionManagement = SessionManagement(this)
         // Initialize screen actions
 
-
         initialize()
     }
 
     private fun initialize() {
         navigateNext()
+
         /*lifecycleScope.launch {
             delay(SPLASH_DELAY)
             // Check login session and navigate accordingly
@@ -45,6 +51,13 @@ class SplashActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }*/
+    }
+
+    private fun redirectToPlayStore() {
+        val playStoreIntent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse("https://play.google.com/store/apps/details?id=com.mykaimeal.planner")
+        }
+        startActivity(playStoreIntent)
     }
 
     private fun navigateNext() {

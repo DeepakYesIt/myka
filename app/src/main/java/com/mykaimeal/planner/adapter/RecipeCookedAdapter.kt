@@ -40,10 +40,16 @@ class RecipeCookedAdapter(var datalist: MutableList<UserDataModel>?, var require
 
         holder.binding.imageMinus.visibility=View.GONE
 
+        if (datalist!![position].is_missing==0){
+            holder.binding.missingIngredientsImg.visibility=View.VISIBLE
+            holder.binding.checkBoxImg.visibility=View.GONE
+        }else{
+            holder.binding.missingIngredientsImg.visibility=View.GONE
+            holder.binding.checkBoxImg.visibility=View.VISIBLE
+        }
+
         if (data != null) {
-
             holder.binding.tvBreakfast.text=data.recipe?.label
-
             if (data.recipe?.images?.SMALL?.url!=null){
                 Glide.with(requireActivity)
                     .load(data.recipe.images.SMALL.url)
@@ -76,7 +82,6 @@ class RecipeCookedAdapter(var datalist: MutableList<UserDataModel>?, var require
                 holder.binding.layProgess.root.visibility= View.GONE
             }
 
-
             if (data.is_like !=null){
                 if (data.is_like ==0 ){
                     holder.binding.imgHeartRed.setImageResource(R.drawable.heart_white_icon)
@@ -85,9 +90,8 @@ class RecipeCookedAdapter(var datalist: MutableList<UserDataModel>?, var require
                 }
             }
 
-
             if (data.recipe?.totalTime!=null){
-                holder.binding.tvTime.text=""+data.recipe?.totalTime
+                holder.binding.tvTime.text=""+ data.recipe.totalTime +" min "
             }
         }
 
@@ -98,17 +102,16 @@ class RecipeCookedAdapter(var datalist: MutableList<UserDataModel>?, var require
             }
         }
 
+        holder.binding.missingIngredientsImg.setOnClickListener{
+            onItemClickListener.itemClick(datalist?.get(position)?.id, "1", datalist?.get(position)?.uri)
+        }
 
         holder.binding.imgHeartRed.setOnClickListener {
             if (data != null) {
                 onItemClickListener.itemClick(position,"4", data.is_like.toString())
             }
         }
-
-
     }
-
-
 
     override fun getItemCount(): Int {
         return datalist?.size!!

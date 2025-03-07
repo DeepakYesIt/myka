@@ -5,23 +5,23 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
-import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.OnItemClickedListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.DietaryRestrictionsAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentDietaryRestrictionsBinding
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
@@ -43,6 +43,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
     private var dietarySelectedId = mutableListOf<String>()
     private lateinit var dietaryRestrictionsViewModel: DietaryRestrictionsViewModel
     private var dietaryModelsData: MutableList<DietaryRestrictionsModelData>?=null
+    private var isExpanded = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -94,9 +95,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }
-
         }
-
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -154,7 +153,6 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                             val gson = Gson()
                             val dietaryModel = gson.fromJson(it.data, DietaryRestrictionsModel::class.java)
                             if (dietaryModel.code == 200 && dietaryModel.success) {
-//                            showDataInUi(dietaryModel.data)
                                 showDataFirstUi(dietaryModel.data)
                             } else {
                                 if (dietaryModel.code == ErrorMessage.code) {
@@ -190,9 +188,14 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                 dietaryModelData.forEach {
                     if(it.selected) selected = true
                 }
-                if(!selected){
+                 if(!selected){
                     dietaryModelData.set(0, DietaryRestrictionsModelData(id = -1, selected = true, "None")
                     )
+                }
+
+                // Show "Show More" button only if there are more than 3 items
+                if (dietaryModelData.size > 3) {
+                    binding!!.relMoreButton.visibility = View.VISIBLE
                 }
                 dietaryModelsData=dietaryModelData
                 dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
@@ -212,6 +215,10 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                     dietaryModelData.add(0, DietaryRestrictionsModelData( id = -1, selected = false,"None")) // ID set to -1 as an indicator
                 }
                 dietaryModelsData=dietaryModelData
+                // Show "Show More" button only if there are more than 3 items
+                if (dietaryModelData.size > 3) {
+                    binding!!.relMoreButton.visibility = View.VISIBLE
+                }
                 dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
                 binding!!.rcyDietaryRestrictions.adapter = dietaryRestrictionsAdapter
             }
@@ -260,6 +267,13 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
+
+        binding!!.relMoreButton.setOnClickListener { v ->
+            isExpanded = true
+            dietaryRestrictionsAdapter!!.setExpanded(true)
+            binding!!.relMoreButton.visibility = View.GONE // Hide button after expanding
+        }
+
     }
 
     private fun updateDietaryRestApi() {

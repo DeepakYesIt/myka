@@ -30,7 +30,7 @@ class CalendarDayDateAdapter(var days: MutableList<DateModel>, private val onDay
         holder.binding.tvDayDate.text = BaseApplication.formatOnlyDate(day.date)
 
         if (day.status){
-            holder.binding.llMainLayouts.setBackgroundResource(R.drawable.calendar_select_bg)
+            holder.binding.llMainLayouts.setBackgroundResource(R.drawable.calendar_select_green_bg)
             holder.binding.tvDayName.setTextColor(Color.parseColor("#ffffff"))
             holder.binding.tvDayDate.setTextColor(Color.parseColor("#ffffff"))
         }else{
@@ -39,18 +39,7 @@ class CalendarDayDateAdapter(var days: MutableList<DateModel>, private val onDay
             holder.binding.tvDayDate.setTextColor(Color.parseColor("#3C4541"))
         }
 
-        /*if (position == selectedPosition) {
-            holder.binding.llMainLayouts.setBackgroundResource(R.drawable.calendar_select_bg)
-            holder.binding.tvDayName.setTextColor(Color.parseColor("#ffffff"))
-            holder.binding.tvDayDate.setTextColor(Color.parseColor("#ffffff"))
-        } else {
-            holder.binding.llMainLayouts.setBackgroundResource(R.drawable.calendar_unselect_bg)
-            holder.binding.tvDayName.setTextColor(Color.parseColor("#999999"))
-            holder.binding.tvDayDate.setTextColor(Color.parseColor("#3C4541"))
-        }*/
-
         holder.itemView.setOnClickListener {
-//            selectedPosition = position
             notifyDataSetChanged()
             onDaySelected(position)
         }

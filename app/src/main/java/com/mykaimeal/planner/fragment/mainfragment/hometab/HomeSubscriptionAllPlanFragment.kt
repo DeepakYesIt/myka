@@ -15,7 +15,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.SubscriptionAdaptor
 import com.mykaimeal.planner.databinding.FragmentHomeSubscriptionAllPlanBinding
-import com.mykaimeal.planner.model.SubscriptionsModel
+import com.mykaimeal.planner.model.SubscriptionModel
 import java.util.ArrayList
 import kotlin.math.abs
 
@@ -23,7 +23,7 @@ class HomeSubscriptionAllPlanFragment : Fragment() {
 
     private var binding: FragmentHomeSubscriptionAllPlanBinding?=null
     var adapter: SubscriptionAdaptor? = null
-    var datalist: ArrayList<SubscriptionsModel> = arrayListOf()
+    var datalist: ArrayList<SubscriptionModel> = arrayListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,7 +46,7 @@ class HomeSubscriptionAllPlanFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        datalist = getSubscription()
+        /*datalist = getSubscription()*/
 
         adapter = SubscriptionAdaptor(datalist,requireActivity())
         binding!!.viewpager.adapter = adapter
@@ -102,12 +102,12 @@ class HomeSubscriptionAllPlanFragment : Fragment() {
         return binding!!.root
     }
 
-    private fun getSubscription(): ArrayList<SubscriptionsModel> {
+  /*  private fun getSubscription(): ArrayList<SubscriptionsModel> {
         val data: ArrayList<SubscriptionsModel> = ArrayList()
         data.add(SubscriptionsModel("Myka Basic", "\$1.99 / Weekly", "\$3.99 / Weekly"))
         data.add(SubscriptionsModel("Myka Monthly", "\$5.99 / monthly", "\$11.99 / monthly"))
         data.add(SubscriptionsModel("Annual", "\$55.00 / Yearly", "\$66.00 / Yearly"))
         return data
-    }
+    }*/
 
 }

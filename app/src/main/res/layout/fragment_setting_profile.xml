@@ -284,7 +284,7 @@
                                 android:layout_centerHorizontal="true"
                                 android:layout_marginTop="@dimen/_5sdp"
                                 android:fontFamily="@font/poppins"
-                                android:text="0"
+                                android:text="00"
                                 android:textSize="@dimen/_11sdp" />
 
                         </RelativeLayout>
@@ -336,7 +336,7 @@
                                 android:layout_centerHorizontal="true"
                                 android:layout_marginTop="@dimen/_5sdp"
                                 android:fontFamily="@font/poppins"
-                                android:text="0"
+                                android:text="00"
                                 android:textSize="@dimen/_11sdp" />
 
                         </RelativeLayout>
@@ -388,7 +388,7 @@
                                 android:layout_centerHorizontal="true"
                                 android:layout_marginTop="@dimen/_5sdp"
                                 android:fontFamily="@font/poppins"
-                                android:text="0"
+                                android:text="00"
                                 android:textSize="@dimen/_11sdp" />
 
                         </RelativeLayout>
@@ -440,7 +440,7 @@
                                 android:layout_centerHorizontal="true"
                                 android:layout_marginTop="@dimen/_5sdp"
                                 android:fontFamily="@font/poppins"
-                                android:text="0"
+                                android:text="00"
                                 android:textSize="@dimen/_11sdp" />
 
                         </RelativeLayout>
@@ -505,10 +505,45 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/relPostCode"
+                    android:id="@+id/relOrderHistory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/relMyWallet"
+                    android:background="@drawable/setting_rectangular_bg">
+
+                    <ImageView
+                        android:id="@+id/imgOrderHistory"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/order_history_icon" />
+
+                    <TextView
+                        android:id="@+id/tvOrderHistory"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="@dimen/_15sdp"
+                        android:layout_toEndOf="@+id/imgOrderHistory"
+                        android:fontFamily="@font/poppins"
+                        android:text="Order History"
+                        android:textSize="@dimen/_13sdp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="@dimen/_10sdp"
+                        android:src="@drawable/forward_icon" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/relPostCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/relOrderHistory"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:background="@drawable/setting_rectangular_bg">
 

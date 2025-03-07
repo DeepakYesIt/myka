@@ -69,10 +69,13 @@ class CreateCookBookFragment : Fragment() {
             uri = requireArguments().getString("uri", "")
         }
 
-        id=sessionManagement.getCookBookId()
-        name=sessionManagement.getCookBookName()
-        image=sessionManagement.getCookBookImage()
-        status=sessionManagement.getCookBookType()
+        if (checkType!="New"){
+            id=sessionManagement.getCookBookId()
+            name=sessionManagement.getCookBookName()
+            image=sessionManagement.getCookBookImage()
+            status=sessionManagement.getCookBookType()
+        }
+
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
@@ -115,18 +118,21 @@ class CreateCookBookFragment : Fragment() {
 
         if (checkType == "New") {
             binding!!.tvToolbar.text = "Create Cookbook"
+            binding!!.textDone.text = "Done"
         } else {
             binding!!.tvToolbar.text = "Edit Cookbook"
+            binding!!.textDone.text = "Update"
         }
-
 
         if (!name.equals("",true)){
             binding!!.etEnterYourNewCookbook.setText(name)
         }
 
         if (!image.equals("")){
+            binding!!.imageCookBook.visibility=View.VISIBLE
+            binding!!.llAddImages.visibility=View.GONE
 
-            Glide.with(this)
+            Glide.with(requireActivity())
                 .load(BaseUrl.imageBaseUrl+image)
                 .placeholder(R.drawable.mask_group_icon)
                 .error(R.drawable.mask_group_icon)

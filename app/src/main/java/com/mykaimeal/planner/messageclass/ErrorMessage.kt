@@ -15,6 +15,7 @@ object ErrorMessage {
      const val ratingError:String="Message can't be empty."
      const val cookBookSelectError:String="Select Cook Book"
      const val amountEmptyError:String="Amount can't be empty."
+     const val shareCookBookError:String="Private cookbook couldn't be shared"
      const val code: Int=206
 
      const val apiKey:String="AIzaSyC9NuN_f-wESHh3kihTvpbvdrmKlTQurxw"
@@ -58,6 +59,7 @@ object ErrorMessage {
      const val emailError="Email can't be empty."
      const val phoneError="phone can't be empty."
      const val validEmailPhone:String="Please Enter Valid Email or Phone Number"
+     const val validPhone:String="Please Enter Valid Phone Number"
      const val validTotalTime:String="Please add total time in minutes"
      const val selectReasonEmpty:String="Please select reason"
      const val dobError:String="Please select DOB"
@@ -106,6 +108,7 @@ object ErrorMessage {
      const val settingImageError="Please go to setting Enable Permission"
      const val addressUpload:String="Please upload Address Proof."
      const val idProofUpload:String="Please upload Id Proof."
+     const val changeScheduleDate:String="Please select change date"
      const val selfieProofUpload:String="Please upload Selfie Proof."
      const val cookbookUpload:String="Please upload cookbook image."
 
@@ -117,10 +120,5 @@ object ErrorMessage {
      const val emailValidationError="Please enter valid email."
      const val checkListError="Please Select At Least One."
      const val checkError="Please Select At Least One."
-
-
-
-
-
 
 }

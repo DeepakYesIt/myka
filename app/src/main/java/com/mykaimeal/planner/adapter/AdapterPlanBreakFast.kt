@@ -110,9 +110,6 @@ class AdapterPlanBreakFast(var datalist: MutableList<BreakfastModel>?, private v
         }catch (e:Exception){
             Log.d("@@@@ ","Error ****"+e.message.toString())
         }
-
-
-
     }
 
 

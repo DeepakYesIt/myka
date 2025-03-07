@@ -46,7 +46,7 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
     private var status: String? = ""
     private var dislikeSelectedId = mutableListOf<String>()
     private lateinit var dislikeIngredientsViewModel: DislikeIngredientsViewModel
-
+    private var isExpanded = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -193,6 +193,12 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
+
+        binding!!.relMoreButton.setOnClickListener { v ->
+            isExpanded = true
+            dislikeIngredientsAdapter!!.setExpanded(true)
+            binding!!.relMoreButton.visibility = View.GONE // Hide button after expanding
+        }
     }
 
     private fun updateIngDislikeApi() {
@@ -285,6 +291,11 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
                         0, DislikedIngredientsModelData(id = -1, selected = true, "None")
                     )
                 }
+
+                // Show "Show More" button only if there are more than 3 items
+                if (dislikeIngModelData.size > 3) {
+                    binding!!.relMoreButton.visibility = View.VISIBLE
+                }
                 dislikeIngredientModelData = dislikeIngModelData.toMutableList()
 
                 dislikeIngredientsAdapter =
@@ -304,6 +315,11 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
                         0,
                         DislikedIngredientsModelData(id = -1, selected = false, "None")
                     ) // ID set to -1 as an indicator
+                }
+
+                // Show "Show More" button only if there are more than 3 items
+                if (dislikeIngModelData.size > 3) {
+                    binding!!.relMoreButton.visibility = View.VISIBLE
                 }
                 dislikeIngredientModelData = dislikeIngModelData.toMutableList()
                 dislikeIngredientsAdapter =

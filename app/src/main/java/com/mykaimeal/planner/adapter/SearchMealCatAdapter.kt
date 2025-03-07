@@ -75,6 +75,11 @@ class SearchMealCatAdapter(var datalist: MutableList<Category>?, private var req
         notifyDataSetChanged()
     }
 
+    fun submitList(category: MutableList<Category>?) {
+        this.datalist=category
+        notifyDataSetChanged()
+    }
+
 
     class ViewHolder(var binding: AdapterMealItemBinding) : RecyclerView.ViewHolder(binding.root){
 

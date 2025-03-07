@@ -18,6 +18,7 @@ class AdapterFavouriteCuisinesItem(private var favouriteCuisineModelData: List<F
 
     private val selectedPositions = mutableSetOf<Int>() // Track selected positions
     private val dietaryId = mutableListOf<String>() // Track selected dietary IDs
+    private var isExpanded = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -67,12 +68,8 @@ class AdapterFavouriteCuisinesItem(private var favouriteCuisineModelData: List<F
                         onItemClickedListener.itemClicked(position, dietaryId, "2", "true")
                     }
                 } else {
-                    // Deselect "select all" if another item is clicked
-//                    if (selectedPositions.contains(0)) {
-//                        selectedPositions.remove(0)
                         favouriteCuisineModelData[0].selected = false
                         dietaryId.clear()
-//                    }
 
                     // Toggle the current item's selection state
                     if (favouriteCuisineModelData[position].selected) {
@@ -94,9 +91,14 @@ class AdapterFavouriteCuisinesItem(private var favouriteCuisineModelData: List<F
         }
     }
 
+    fun setExpanded(expanded: Boolean) {
+        isExpanded = expanded
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int {
         isNoneSelected = true
-        return favouriteCuisineModelData.size
+        return if (isExpanded) favouriteCuisineModelData.size else Math.min(3, favouriteCuisineModelData.size)
     }
 
     class ViewHolder(var binding: AdapterBodyGoalsBinding) : RecyclerView.ViewHolder(binding.root){

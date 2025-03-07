@@ -104,7 +104,7 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
             planType="1"
 
             binding!!.textFridge.text="Fridge (1)"
-            binding!!.textFreezer.text="Fridge (0)"
+            binding!!.textFreezer.text="Freezer (0)"
 
         }
 
@@ -116,7 +116,7 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
             planType="2"
 
             binding!!.textFridge.text="Fridge (0)"
-            binding!!.textFreezer.text="Fridge (1)"
+            binding!!.textFreezer.text="Freezer (1)"
 
         }
 

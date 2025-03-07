@@ -2,6 +2,8 @@ package com.mykaimeal.planner.fragment.authfragment.signup
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -76,7 +78,6 @@ class SignUpFragment : Fragment() {
         binding = FragmentSignUpBinding.inflate(inflater, container, false)
 
         signUpViewModel = ViewModelProvider(this)[SignUpViewModel::class.java]
-
 
         //// handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -203,6 +204,18 @@ class SignUpFragment : Fragment() {
             }
         }
 
+        binding!!.imgEye.setOnClickListener {
+            if (binding!!.etSignUpPassword.transformationMethod === PasswordTransformationMethod.getInstance()) {
+                binding!!.etSignUpPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
+                binding!!.imgEye.setImageDrawable(resources.getDrawable(R.drawable.ic_password_eye))
+                binding!!.etSignUpPassword.setSelection(binding!!.etSignUpPassword.text.length)
+            } else {
+                binding!!.etSignUpPassword.transformationMethod = PasswordTransformationMethod.getInstance()
+                binding!!.imgEye.setImageDrawable(resources.getDrawable(R.drawable.hide_pass))
+                binding!!.etSignUpPassword.setSelection(binding!!.etSignUpPassword.text.length)
+            }
+        }
+
         //// add validation based  on email or phone & password
         ///checking the device of mobile data in online and offline(show network error message)
         //// implement signup api and redirection
@@ -221,9 +234,6 @@ class SignUpFragment : Fragment() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .build()
-
-        // Build a GoogleSignInClient with the options specified by gso.
-
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
         mGoogleSignInClient!!.signOut()
@@ -239,7 +249,6 @@ class SignUpFragment : Fragment() {
 
         // Password Validation Conditions
         val hasUpperCase = password.any { it.isUpperCase() }
-        val hasLowerCase = password.any { it.isLowerCase() }
         val hasDigit = password.any { it.isDigit() }
         val hasSpecialChar = password.any { "!@#\$%^&*()-_=+[{]};:'\",<.>/?".contains(it) }
         val isValidLength = password.length >= 6
@@ -291,27 +300,6 @@ class SignUpFragment : Fragment() {
         }
 
         return true
-      /*  val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]"
-        val emaPattern = Pattern.compile(emailPattern)
-        val emailMatcher = emaPattern.matcher(binding!!.etSignUpEmailPhone.text.toString().trim())
-        val passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%^&+=])(?=\\S+\$).{6,}\$"
-        chooseType = "email"
-        val pattern = Pattern.compile(passwordPattern)
-        val passMatchers = pattern.matcher(binding!!.etSignUpPassword.text.toString().trim())
-        if (binding!!.etSignUpEmailPhone.text.toString().trim().isEmpty()) {
-            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.emailPhone, false)
-            return false
-        } else if (!emailMatcher.find() && !validNumber()) {
-            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validEmailPhone, false)
-            return false
-        } else if (binding!!.etSignUpPassword.text.toString().trim().isEmpty()) {
-            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.password, false)
-            return false
-        } else if (!passMatchers.find()) {
-            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.passwordMatch, false)
-            return false
-        }
-        return true*/
     }
 
     //// signup api implement & redirection
@@ -391,7 +379,6 @@ class SignUpFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-//        callbackManager?.onActivityResult(requestCode, resultCode, data)
         if (requestCode == googleLogin) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             handleSignInResult(task)

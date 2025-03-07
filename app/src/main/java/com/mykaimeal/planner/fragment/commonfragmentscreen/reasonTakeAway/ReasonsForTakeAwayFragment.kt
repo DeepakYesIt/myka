@@ -263,9 +263,6 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 }else{
                     reasonTakeAwayViewModel.setReasonTakeData(reasonTakeModelData!!.toMutableList())
                     sessionManagement.setReasonTakeAway(reasonSelect.toString())
-                    /*val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
-                    startActivity(intent)
-                    requireActivity().finish()*/
                     navigateToAuthActivity("login")
                 }
             }
@@ -292,6 +289,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                             val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
                             if (updateModel.code == 200 && updateModel.success) {
                                 sessionManagement.setLoginSession(true)
+
                                 val intent = Intent(requireActivity(), MainActivity::class.java)
                                 startActivity(intent)
                                 requireActivity().finish()
@@ -429,9 +427,6 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         tvDialogSkipBtn.setOnClickListener {
             sessionManagement.setReasonTakeAway("")
             dialogStillSkip.dismiss()
-            /*val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
-            startActivity(intent)
-            requireActivity().finish()*/
             navigateToAuthActivity("login")
         }
     }

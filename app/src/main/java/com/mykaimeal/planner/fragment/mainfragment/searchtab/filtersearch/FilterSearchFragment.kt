@@ -1,28 +1,45 @@
 package com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
+import com.google.gson.Gson
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
-import com.mykaimeal.planner.adapter.AdapterFilterSearchItem
+import com.mykaimeal.planner.adapter.AdapterFilterCookTimeItem
+import com.mykaimeal.planner.adapter.AdapterFilterDietItem
+import com.mykaimeal.planner.adapter.AdapterFilterMealItem
+import com.mykaimeal.planner.basedata.BaseApplication
+import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentFilterSearchBinding
-import com.mykaimeal.planner.model.DataModel
+import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.FilterSearchModel
+import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.FilterSearchModelData
+import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.viewmodel.FilterSearchViewModel
+import com.mykaimeal.planner.messageclass.ErrorMessage
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class FilterSearchFragment : Fragment(),OnItemClickListener {
 
     private var binding: FragmentFilterSearchBinding?=null
-    private var adapterFilterSearchItem: AdapterFilterSearchItem? = null
+    private var adapterFilterMealItem: AdapterFilterMealItem? = null
+    private var adapterFilterDietItem: AdapterFilterDietItem? = null
+    private var adapterFilterCookBookItem: AdapterFilterCookTimeItem? = null
+    private lateinit var filterSearchViewModel: FilterSearchViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,6 +50,7 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.GONE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
+        filterSearchViewModel = ViewModelProvider(this)[FilterSearchViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -41,8 +59,105 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
         })
 
         initialize()
+        // This Api call when the screen in loaded
+        launchApi()
 
         return binding!!.root
+    }
+
+    private fun launchApi() {
+        if (BaseApplication.isOnline(requireActivity())) {
+            BaseApplication.showMe(requireContext())
+            lifecycleScope.launch {
+                filterSearchViewModel.getFilterList {
+                    BaseApplication.dismissMe()
+                    when (it) {
+                        is NetworkResult.Success -> handleSuccessResponse(it.data.toString())
+                        is NetworkResult.Error -> showAlert(it.message, false)
+                        else -> showAlert(it.message, false)
+                    }
+                }
+            }
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, FilterSearchModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success == true) {
+                if (apiModel.data!=null ){
+                    showDataInUi(apiModel.data)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun showDataInUi(data: FilterSearchModelData) {
+        try {
+            if (data.mealType!=null && data.mealType.size>0){
+                if (data.mealType.size>5){
+
+                }else{
+                    val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+                        flexDirection = FlexDirection.ROW
+                        flexWrap = FlexWrap.WRAP
+                        justifyContent = JustifyContent.FLEX_START
+                    }
+                    adapterFilterMealItem = AdapterFilterMealItem(data.mealType, requireActivity(),this)
+                    binding!!.rcyMealType.layoutManager = flexboxLayoutManager
+                    binding!!.rcyMealType.adapter = adapterFilterMealItem
+                }
+            }
+
+            if (data.Diet!=null && data.Diet.size>0){
+                if (data.Diet.size>5){
+
+                }else{
+                    val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+                        flexDirection = FlexDirection.ROW
+                        flexWrap = FlexWrap.WRAP
+                        justifyContent = JustifyContent.FLEX_START
+                    }
+                    adapterFilterDietItem = AdapterFilterDietItem(data.Diet, requireActivity(),this)
+                    binding!!.rcyDiet.layoutManager = flexboxLayoutManager
+                    binding!!.rcyDiet.adapter = adapterFilterDietItem
+                }
+            }
+            if (data.cook_time!=null && data.cook_time.size>0){
+                if (data.cook_time.size>5){
+
+                }else{
+                    val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+                        flexDirection = FlexDirection.ROW
+                        flexWrap = FlexWrap.WRAP
+                        justifyContent = JustifyContent.FLEX_START
+                    }
+                    //        adjustSpanCount(gridLayoutManager)// Default: 2 items per row
+                    adapterFilterCookBookItem = AdapterFilterCookTimeItem(data.cook_time, requireActivity(),this)
+                    binding!!.rcyCookTime.layoutManager = flexboxLayoutManager
+                    binding!!.rcyCookTime.adapter = adapterFilterCookBookItem
+                }
+            }
+
+        }catch (e:Exception){
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun showAlert(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
     }
 
     private fun initialize() {
@@ -54,192 +169,8 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
         binding!!.relApplyBtn.setOnClickListener{
             findNavController().navigate(R.id.searchedRecipeBreakfastFragment)
         }
-
-        mealTypeModel()
-        dietModel()
-        cookTimeModel()
     }
 
-    private fun mealTypeModel() {
-        val dataList = ArrayList<DataModel>()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-        val data6 = DataModel()
-        val data7 = DataModel()
-        val data8 = DataModel()
-        val data9 = DataModel()
-
-        data1.title = "Breakfast"
-        data1.isOpen = false
-
-        data2.title = "Lunch"
-        data2.isOpen = false
-
-        data3.title = "Dinner"
-        data3.isOpen = false
-
-        data4.title = "Appitizer"
-        data4.isOpen = false
-
-        data5.title = "Breakfast"
-        data5.isOpen = false
-
-        data6.title = "Lunch"
-        data6.isOpen = false
-
-        data7.title = "Dinner"
-        data7.isOpen = false
-
-        data8.title = "Appitizer"
-        data8.isOpen = false
-
-        data9.title = "Cocktails"
-        data9.isOpen = false
-
-        dataList.add(data1)
-        dataList.add(data2)
-        dataList.add(data3)
-        dataList.add(data4)
-        dataList.add(data5)
-        dataList.add(data6)
-        dataList.add(data7)
-        dataList.add(data8)
-        dataList.add(data9)
-
-        val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
-            flexDirection = FlexDirection.ROW
-            flexWrap = FlexWrap.WRAP
-            justifyContent = JustifyContent.FLEX_START
-        }
-
-//        adjustSpanCount(gridLayoutManager)// Default: 2 items per row
-        adapterFilterSearchItem = AdapterFilterSearchItem(dataList, requireActivity(),this)
-        binding!!.rcyMealType.layoutManager = flexboxLayoutManager
-        binding!!.rcyMealType.adapter = adapterFilterSearchItem
-    }
-
-
-    private fun dietModel() {
-        val dataList = ArrayList<DataModel>()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-        val data6 = DataModel()
-        val data7 = DataModel()
-        val data8 = DataModel()
-        val data9 = DataModel()
-
-        data1.title = "Breakfast"
-        data1.isOpen = false
-
-        data2.title = "Lunch"
-        data2.isOpen = false
-
-        data3.title = "Dinner"
-        data3.isOpen = false
-
-        data4.title = "Appitizer"
-        data4.isOpen = false
-
-        data5.title = "Breakfast"
-        data5.isOpen = false
-
-        data6.title = "Lunch"
-        data6.isOpen = false
-
-        data7.title = "Dinner"
-        data7.isOpen = false
-
-        data8.title = "Appitizer"
-        data8.isOpen = false
-
-        data9.title = "Cocktails"
-        data9.isOpen = false
-
-
-        dataList.add(data1)
-        dataList.add(data2)
-        dataList.add(data3)
-        dataList.add(data4)
-        dataList.add(data5)
-        dataList.add(data6)
-        dataList.add(data7)
-        dataList.add(data8)
-        dataList.add(data9)
-
-        val gridLayoutManager = GridLayoutManager(requireActivity(), 3) // Default: 2 items per row
-        adapterFilterSearchItem = AdapterFilterSearchItem(dataList, requireActivity(),this)
-        binding!!.rcyDiet.layoutManager = gridLayoutManager
-        binding!!.rcyDiet.adapter = adapterFilterSearchItem
-//        adjustSpanCount(gridLayoutManager)
-
-    }
-    private fun cookTimeModel() {
-        val dataList = ArrayList<DataModel>()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-        val data6 = DataModel()
-        val data7 = DataModel()
-        val data8 = DataModel()
-        val data9 = DataModel()
-        val data10 = DataModel()
-
-        data1.title = "Breakfast"
-        data1.isOpen = false
-
-        data2.title = "Lunch"
-        data2.isOpen = false
-
-        data3.title = "Dinner"
-        data3.isOpen = false
-
-        data4.title = "Appitizer"
-        data4.isOpen = false
-
-        data5.title = "Breakfast"
-        data5.isOpen = false
-
-        data6.title = "Lunch"
-        data6.isOpen = false
-
-        data7.title = "Dinner"
-        data7.isOpen = false
-
-        data8.title = "Appitizer"
-        data8.isOpen = false
-
-        data9.title = "Cocktails"
-        data9.isOpen = false
-
-        data10.title = "More"
-        data10.isOpen = true
-
-        dataList.add(data1)
-        dataList.add(data2)
-        dataList.add(data3)
-        dataList.add(data4)
-        dataList.add(data5)
-        dataList.add(data6)
-        dataList.add(data7)
-        dataList.add(data8)
-        dataList.add(data9)
-        dataList.add(data10)
-
-        val gridLayoutManager = GridLayoutManager(requireActivity(), 3) // Default: 2 items per row
-        adapterFilterSearchItem = AdapterFilterSearchItem(dataList, requireActivity(),this)
-        binding!!.rcyCookTime.layoutManager = gridLayoutManager
-        binding!!.rcyCookTime.adapter = adapterFilterSearchItem
-//        adjustSpanCount(gridLayoutManager)
-
-    }
 
 //    private fun adjustSpanCount(gridLayoutManager: GridLayoutManager) {
 //        // Get screen width in pixels

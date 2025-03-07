@@ -1,7 +1,12 @@
 package com.mykaimeal.planner.model
 
-data class SubscriptionsModel(
-    var textTitle1 : String,
-    var textAmount : String,
-    var textAmount2 : String
+
+
+data class SubscriptionModel(
+    var title: String? = null,
+    var description: String? = null,
+    var price: String? = null,
+    var offerPrice: String? = null,
+    var status: String? = null
 )
+

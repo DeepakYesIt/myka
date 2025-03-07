@@ -1,4 +1,4 @@
-package com.mykaimeal.planner.fragment.mainfragment.profilesetting
+package com.mykaimeal.planner.fragment.mainfragment.profilesetting.subscriptionplan
 
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
@@ -23,8 +24,10 @@ import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
+import com.mykaimeal.planner.basedata.AppConstant
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.databinding.FragmentSubscriptionPlanOverViewBinding
+import com.mykaimeal.planner.model.SubscriptionModel
 import java.util.Arrays
 import java.util.concurrent.Executors
 import java.util.stream.Collectors
@@ -33,6 +36,10 @@ class SubscriptionPlanOverViewFragment : Fragment() {
     private var binding: FragmentSubscriptionPlanOverViewBinding?=null
     private lateinit var slideUp: Animation
     private var billingClient: BillingClient? = null
+    private var premiumMonthly = ""
+    private var premiumAnnual = ""
+    private var premiumWeekly = ""
+    private val rootPlanList: MutableList<SubscriptionModel> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,8 +67,6 @@ class SubscriptionPlanOverViewFragment : Fragment() {
         binding!!.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()
         }
-
-
         startBillingApi()
 
         binding!!.textSeeAllButton.setOnClickListener {
@@ -72,7 +77,6 @@ class SubscriptionPlanOverViewFragment : Fragment() {
             slideUp = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up_anim)
             slideUp.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {
-
                 }
 
                 override fun onAnimationEnd(animation: Animation?) {
@@ -93,7 +97,7 @@ class SubscriptionPlanOverViewFragment : Fragment() {
             .enablePendingPurchases()
             .build()
 
-//        getPrices()
+        getPrices()
     }
 
 
@@ -115,58 +119,31 @@ class SubscriptionPlanOverViewFragment : Fragment() {
             } else {
                 when (billingResult.responseCode) {
                     BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> Toast.makeText(
-                        requireActivity(),
-                        "Already Subscribed",
-                        Toast.LENGTH_LONG
-                    ).show()
+                        requireActivity(), "Already Subscribed", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED -> Toast.makeText(
-                        requireActivity(),
-                        "FEATURE_NOT_SUPPORTED",
-                        Toast.LENGTH_LONG
-                    ).show()
+                        requireActivity(), "FEATURE_NOT_SUPPORTED", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.BILLING_UNAVAILABLE -> Toast.makeText(
-                        requireActivity(),
-                        "BILLING_UNAVAILABLE",
-                        Toast.LENGTH_LONG
-                    ).show()
+                        requireActivity(), "BILLING_UNAVAILABLE", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.USER_CANCELED -> Toast.makeText(
-                        requireActivity(),
-                        "USER_CANCELLED",
-                        Toast.LENGTH_LONG
-                    ).show()
+                        requireActivity(), "USER_CANCELLED", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.DEVELOPER_ERROR -> Toast.makeText(
-                        requireActivity(),
-                        "DEVELOPER_ERROR",
-                        Toast.LENGTH_LONG
-                    ).show()
+                        requireActivity(), "DEVELOPER_ERROR", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.ITEM_UNAVAILABLE -> Toast.makeText(
-                        requireActivity(),
-                        "ITEM_UNAVAILABLE",
-                        Toast.LENGTH_LONG
-                    ).show()
+                        requireActivity(), "ITEM_UNAVAILABLE", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.NETWORK_ERROR -> Toast.makeText(
-                        requireActivity(),
-                        "NETWORK_ERROR",
-                        Toast.LENGTH_LONG
-                    ).show()
+                        requireActivity(), "NETWORK_ERROR", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.SERVICE_DISCONNECTED -> Toast.makeText(
-                        requireActivity(),
-                        "SERVICE_DISCONNECTED",
-                        Toast.LENGTH_LONG
-                    ).show()
+                        requireActivity(), "SERVICE_DISCONNECTED", Toast.LENGTH_LONG).show()
 
                     else -> Toast.makeText(
-                        requireActivity(),
-                        "Error " + billingResult.debugMessage,
-                        Toast.LENGTH_LONG
-                    ).show()
+                        requireActivity(), "Error " + billingResult.debugMessage, Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -176,7 +153,7 @@ class SubscriptionPlanOverViewFragment : Fragment() {
             .setPurchaseToken(purchase.purchaseToken)
             .build()
         val listener =
-            ConsumeResponseListener { billingResult, purchaseToken ->
+            ConsumeResponseListener {  billingResult, purchaseToken ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     // Handle the success of the consume operation.
                 }
@@ -190,8 +167,8 @@ class SubscriptionPlanOverViewFragment : Fragment() {
                 billingClient!!.acknowledgePurchase(
                     acknowledgePurchaseParams
                 ) { billingResult ->
-                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                 /*       editor.putString("subscription_id", purchase.orderId.toString())
+                   /* if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                        editor.putString("subscription_id", purchase.orderId.toString())
                         editor.putString(
                             "subscription_PurchaseToken",
                             purchase.purchaseToken
@@ -208,8 +185,8 @@ class SubscriptionPlanOverViewFragment : Fragment() {
                         Log.d("****", "startDate" + BaseApplication.startDate())
                         requireActivity().runOnUiThread(Runnable {
                             callingPurchaseSubscriptionApi(purchase.orderId, purchase.purchaseToken)
-                        })*/
-                    }
+                        })
+                    }*/
                 }
             } else {
                 Toast.makeText(requireActivity(), "Already Subscribed", Toast.LENGTH_LONG).show()
@@ -231,12 +208,10 @@ class SubscriptionPlanOverViewFragment : Fragment() {
                     val executorService = Executors.newSingleThreadExecutor()
                     executorService.execute {
                         val ids =
-                            Arrays.asList<String>(
-                                /*AppConstants.Premium_Monthly,
-                                AppConstants.Premium_Annual,
-                                AppConstants.Gym_Annual,
-                                AppConstants.Family_two_user,
-                                AppConstants.Family_four_user*/
+                            mutableListOf<String>(
+                                AppConstant.Premium_Monthly,
+                                AppConstant.Premium_Annual,
+                                AppConstant.Premium_Weekly
                             ) // your product IDs
                         val productList =
                             ids.stream().map { productId: String? ->
@@ -244,13 +219,8 @@ class SubscriptionPlanOverViewFragment : Fragment() {
                                     .setProductId(productId!!)
                                     .setProductType(BillingClient.ProductType.SUBS)
                                     .build()
-                            }
-                                .collect(
-                                    Collectors.toList()
-                                )
-                        val queryProductDetailsParams =
-                            QueryProductDetailsParams.newBuilder()
-                                .setProductList(productList).build()
+                            }.collect(Collectors.toList())
+                        val queryProductDetailsParams = QueryProductDetailsParams.newBuilder().setProductList(productList).build()
                         billingClient!!.queryProductDetailsAsync(
                             queryProductDetailsParams
                         ) { billingResult1: BillingResult?, productDetailsList: List<ProductDetails> ->
@@ -259,42 +229,26 @@ class SubscriptionPlanOverViewFragment : Fragment() {
                                 assert(productDetails.subscriptionOfferDetails != null)
                                 for (subscriptionOfferDetails in productDetails.subscriptionOfferDetails!!) {
                                     when (productDetails.productId) {
-                                    /*    AppConstants.Premium_Monthly -> premiumMonthly =
-                                            subscriptionOfferDetails.pricingPhases
-                                                .pricingPhaseList[0]
-                                                .formattedPrice + "/ month"
+                                        AppConstant.Premium_Monthly ->
+                                            premiumMonthly = subscriptionOfferDetails.pricingPhases.pricingPhaseList[0].formattedPrice + "/ month"
 
-                                        AppConstants.Premium_Annual -> premiumAnnual =
+                                        AppConstant.Premium_Annual -> premiumAnnual =
                                             subscriptionOfferDetails.pricingPhases
                                                 .pricingPhaseList[0]
                                                 .formattedPrice + "/ year"
 
-                                        AppConstants.Gym_Annual -> gymAnnual =
+                                        AppConstant.Premium_Weekly -> premiumWeekly =
                                             subscriptionOfferDetails.pricingPhases
                                                 .pricingPhaseList[0]
-                                                .formattedPrice + "/ month"
+                                                .formattedPrice + "/ weekly"
 
-                                        AppConstants.Family_two_user -> familytwouser =
-                                            subscriptionOfferDetails.pricingPhases
-                                                .pricingPhaseList[0]
-                                                .formattedPrice + "/ user"
-
-                                        AppConstants.Family_four_user -> familyfouruser =
-                                            subscriptionOfferDetails.pricingPhases
-                                                .pricingPhaseList[0]
-                                                .formattedPrice + "/ user"*/
                                     }
                                 }
                             }
                         }
                     }
                     requireActivity().runOnUiThread(Runnable {
-                        try {
-                            Thread.sleep(1000)
-                        } catch (e: InterruptedException) {
-                            e.printStackTrace()
-                        }
-//                        setPlanList()
+                        setPlanList()
                         BaseApplication.dismissMe()
                     })
                 }
@@ -304,6 +258,32 @@ class SubscriptionPlanOverViewFragment : Fragment() {
                 billingClient!!.startConnection(this)
             }
         })
+    }
+
+    private fun setPlanList() {
+        if (rootPlanList != null) {
+            rootPlanList.clear()
+        }
+
+        rootPlanList.add(SubscriptionModel("My-kai Basic Plan","Plan",premiumMonthly,"",""))
+        rootPlanList.add(SubscriptionModel("Popular","My-kai Standard\n" + "Plan ",premiumAnnual,"",""))
+        rootPlanList.add(SubscriptionModel("Best Value","Annual\n" + "Plan",premiumWeekly,"",""))
+        rootPlanList.add(SubscriptionModel("Best Value","Annual\n" + "Plan",premiumWeekly,"",""))
+
+
+        /*adapter = NewSubscriptionAdapter(this, rootPlanList, this)
+        binding.subscriptionview.setAdapter(adapter)
+        setUpOnBoardingIndicator()
+        currentOnBoardingIndicator(0)
+        binding.subscriptionview.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                currentOnBoardingIndicator(position)
+                productId = ""
+                planType = ""
+            }
+        })*/
+
     }
 
 }

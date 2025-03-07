@@ -108,17 +108,11 @@ class AdapterPlanBreakByDateFast(var datalist: MutableList<BreakfastModelPlanByD
                 onItemClickListener.itemSelectPlayByDate(position,"2",type)
             }
         }
-
-
-
-
     }
-
 
     override fun getItemCount(): Int {
         return datalist!!.size
     }
-
 
     class ViewHolder(var binding: AdapterMealTypeHorizentalBinding) : RecyclerView.ViewHolder(binding.root){
 

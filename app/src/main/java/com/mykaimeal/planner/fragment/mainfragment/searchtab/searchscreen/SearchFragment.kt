@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
+import android.text.Html
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
@@ -39,6 +40,7 @@ import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentSearchBinding
+import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.mykaimeal.planner.fragment.commonfragmentscreen.ingredientDislikes.model.DislikedIngredientsModelData
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.apiresponse.Category
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.apiresponse.Data
@@ -69,11 +71,9 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
     private var searchMealAdapter: SearchMealAdapter? = null
     private var searchMealCatAdapter: SearchMealCatAdapter? = null
     private var status:String?="RecipeSearch"
-    private var recipes: MutableList<Recipe>?= mutableListOf()
     private lateinit var commonWorkUtils: CommonWorkUtils
     private lateinit var sessionManagement: SessionManagement
     private lateinit var searchRecipeViewModel:SearchRecipeViewModel
-    private var searchAdapterItem:SearchAdapterItem?=null
     private var clickedUrl: String = ""
     private var uri: String = ""
     private var bottomSheetDialog: BottomSheetDialog? = null
@@ -164,9 +164,7 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
         val relFavourites = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relFavourites)
         val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
 
-
         val newLikeStatus = 0
-
         spinnerActivityLevel.setItems(cookbookList.map { it.name })
 
         dialogAddRecipe.show()
@@ -343,12 +341,9 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
             }else{
                 rcyIngredients!!.visibility=View.GONE
             }
-
-
         }catch (e:Exception){
             showAlert(e.message, false)
         }
-
     }
 
     private fun lunchApi() {
@@ -392,6 +387,27 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
         }
     }
 
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessPreferences(data: String) {
+        try {
+            val gson = Gson()
+            val updateModel =
+                gson.fromJson(data, UpdatePreferenceSuccessfully::class.java)
+            if (updateModel.code == 200 && updateModel.success) {
+                lunchApi()
+            } else {
+                if (updateModel.code == ErrorMessage.code) {
+                    showAlert(updateModel.message, true)
+                } else {
+                    showAlert(updateModel.message, false)
+                }
+            }
+        }catch (e:Exception){
+            Log.d("bodyGoal@@@","message"+e.message)
+        }
+    }
+
     private fun showData(data: Data?) {
         try {
             if (data?.ingredient!=null && data.ingredient.size>0){
@@ -402,8 +418,6 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
             }else{
                 binding!!.llSearchRecipientIng.visibility=View.GONE
             }
-
-            
 
             if (data?.mealType!=null && data.mealType.size>0){
                 mealType=data.mealType
@@ -439,7 +453,6 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
                     .into(binding!!.imgPreferences)
             }
 
-
         }catch (e:Exception){
             showAlert(e.message, false)
         }
@@ -447,6 +460,14 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
 
 
     private fun initialize() {
+
+        if (sessionManagement.getUserName() != null) {
+            val name = BaseApplication.getColoredSpanned(
+                "Hello",
+                "#06C169"
+            ) + BaseApplication.getColoredSpanned(", " + sessionManagement.getUserName(), "#000000")
+            binding?.tvUserName?.text = Html.fromHtml(name)
+        }
 
         if (sessionManagement.getImage()!=null){
             Glide.with(requireContext())
@@ -463,27 +484,41 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
         binding!!.imgFilterIcon.setOnClickListener(this)
         binding!!.imgPreferences.setOnClickListener(this)
 
-        binding!!.etIngRecipeSearchBar.addTextChangedListener(object :
-            TextWatcher {
+        binding!!.etIngRecipeSearchBar.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(editable: Editable) {
-
-                if (editable.toString()!=""){
-                    if (binding!!.rcySearchRecipe.getVisibility() === View.VISIBLE) {
-                        filterIngredients(editable.toString())
+                val query = editable.toString().trim()
+                if (query.isNotEmpty()) {
+                    if (binding!!.rcySearchRecipe.visibility == View.VISIBLE) {
+                        filterIngredients(query)
                     }
-
-                    if (binding!!.rcySearchMeal.getVisibility() === View.VISIBLE) {
-                        filterMealType(editable.toString())
+                    if (binding!!.rcySearchMeal.visibility == View.VISIBLE) {
+                        filterMealType(query)
                     }
-
-                    if (binding!!.rcyPopularCat.getVisibility() === View.VISIBLE) {
-                        filterPopular(editable.toString())
+                    if (binding!!.rcyPopularCat.visibility == View.VISIBLE) {
+                        filterPopular(query)
                     }
+                } else {
+                    // If the query is empty, reset the lists to show all original data
+                    resetLists()
                 }
             }
         })
+    }
+
+    private fun resetLists() {
+        if (binding!!.rcySearchRecipe.visibility == View.VISIBLE) {
+            ingredient?.let { searchRecipeAdapter!!.submitList(it) } // Reset recipe list
+        }
+
+        if (binding!!.rcySearchMeal.visibility == View.VISIBLE) {
+            searchMealAdapter?.submitList(mealType) // Reset meal type list
+        }
+
+        if (binding!!.rcyPopularCat.visibility == View.VISIBLE) {
+            searchMealCatAdapter?.submitList(category) // Reset popular category list
+        }
     }
 
     private fun filterPopular(editText: String) {
@@ -940,12 +975,12 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
 
     private fun upDatePreferences() {
         if (BaseApplication.isOnline(requireActivity())) {
-            BaseApplication.showMe(requireContext())
+//            BaseApplication.showMe(requireContext())
             lifecycleScope.launch {
                 searchRecipeViewModel.recipePreferencesApi {
                     BaseApplication.dismissMe()
                     when (it) {
-                        is NetworkResult.Success -> handleSuccessResponse(it.data.toString())
+                        is NetworkResult.Success -> handleSuccessPreferences(it.data.toString())
                         is NetworkResult.Error -> showAlert(it.message, false)
                         else -> showAlert(it.message, false)
                     }

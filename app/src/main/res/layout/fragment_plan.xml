@@ -64,8 +64,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-
-
             <RelativeLayout
                 android:id="@+id/relWeekDate"
                 android:layout_width="match_parent"
@@ -233,6 +231,7 @@
                         android:layout_marginHorizontal="@dimen/_25sdp"
                         android:layout_marginBottom="@dimen/_15sdp"
                         android:gravity="center"
+                        android:baselineAligned="false"
                         android:orientation="horizontal"
                         android:weightSum="4">
 
@@ -399,7 +398,6 @@
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
                         </LinearLayout>
-
                     </LinearLayout>
 
                     <ImageView
@@ -490,8 +488,7 @@
                                 android:layout_gravity="center"
                                 android:gravity="center"
                                 android:textSize="@dimen/_13sdp"
-                                android:textColor="@color/white"
-                                android:layout_weight="1"/>
+                                android:textColor="@color/white" />
 
                         </RelativeLayout>
 
@@ -635,6 +632,7 @@
                                 android:layout_gravity="center"
                                 android:layout_marginBottom="@dimen/_15sdp"
                                 android:gravity="center"
+                                android:baselineAligned="false"
                                 android:orientation="horizontal"
                                 android:weightSum="4">
 
@@ -886,8 +884,7 @@
                             android:layout_gravity="center"
                             android:gravity="center"
                             android:textSize="@dimen/_13sdp"
-                            android:textColor="@color/white"
-                            android:layout_weight="1"/>
+                            android:textColor="@color/white" />
 
                     </RelativeLayout>
 
@@ -1031,6 +1028,7 @@
                             android:layout_gravity="center"
                             android:layout_marginBottom="@dimen/_15sdp"
                             android:gravity="center"
+                            android:baselineAligned="false"
                             android:orientation="horizontal"
                             android:weightSum="4">
 

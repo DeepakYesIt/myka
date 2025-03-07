@@ -30,10 +30,7 @@ class MyWalletAdapter(var context: Context, var itemList: MutableList<CardData>,
                 if (item.last4!=null){
                     binding.textDes.text = "**** **** **** "+item.last4
                 }
-
                 binding.imageIcon.setImageResource(R.drawable.ic_card_number_icon)
-
-
 
             binding.select.setOnClickListener {
                 onCardBankListener.itemSelect(position,type,type)

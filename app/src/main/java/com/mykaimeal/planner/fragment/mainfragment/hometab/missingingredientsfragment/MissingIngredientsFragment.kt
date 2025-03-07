@@ -42,6 +42,7 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
     private var recipeUri:String?=""
     private var foodIds = mutableListOf<String>()
     private var foodName = mutableListOf<String>()
+    private var statusType = mutableListOf<String>()
 
     private lateinit var missingIngredientViewModel: MissingIngredientViewModel
 
@@ -94,19 +95,12 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
                 // Notify adapter with updated data
                 adapterMissingIngredientsItem?.updateList(missingIngredientViewModel.getRecipeData()!!)
             }
-
-          /*  if (selectAll==true){
-                adapterMissingIngredientsItem?.setCheckEnabled(false)
-                binding!!.checkBoxImg.setImageResource(R.drawable.orange_uncheck_box_images)
-                selectAll=false
-            }else{
-                binding!!.checkBoxImg.setImageResource(R.drawable.orange_checkbox_images)
-                selectAll=true
-                adapterMissingIngredientsItem?.setCheckEnabled(true)
-            }*/
         }
 
         binding!!.tvAddToBasket.setOnClickListener{
+            if (statusType.size!=null){
+                statusType.clear()
+            }
             if (BaseApplication.isOnline(requireActivity())) {
                 if (missingIngredientViewModel.getRecipeData()?.size!!  > 0) {
                     try {
@@ -115,6 +109,36 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
                             if (ingredientsModel.status) {
                                 foodIds.add(ingredientsModel.foodId.toString())
                                 foodName.add(ingredientsModel.food.toString())
+                                statusType.add("0")
+                            }
+                        }
+                        // Log the final JSON data
+                        Log.d("final data", "******$foodIds")
+                        Log.d("final data", "******$foodName")
+                        addToCartApi()
+                    } catch (e: Exception) {
+                        BaseApplication.alertError(requireContext(), e.message, false)
+                    }
+                }
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+
+
+        binding!!.tvPurchasedBtn.setOnClickListener{
+            if (statusType.size!=null){
+                statusType.clear()
+            }
+            if (BaseApplication.isOnline(requireActivity())) {
+                if (missingIngredientViewModel.getRecipeData()?.size!!  > 0) {
+                    try {
+                        // Iterate through the ingredients and add them to the array if status is true
+                        missingIngredientViewModel.getRecipeData()?.forEach { ingredientsModel ->
+                            if (ingredientsModel.status) {
+                                foodIds.add(ingredientsModel.foodId.toString())
+                                foodName.add(ingredientsModel.food.toString())
+                                statusType.add("1")
                             }
                         }
                         // Log the final JSON data
@@ -196,10 +220,11 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
                     adapterMissingIngredientsItem = AdapterMissingIngredientsItem(data, requireActivity(),this)
                     binding!!.rcyIngredientsRecipe.adapter = adapterMissingIngredientsItem
                 }else{
+                    findNavController().navigateUp()
                     binding!!.rcyIngredientsRecipe.visibility=View.GONE
                 }
 
-                if (availableIngredientList!=null && availableIngredientList. size>0){
+                if (availableIngredientList!=null && availableIngredientList.size>0){
                     binding!!.rcyAddedIngredientsRecipes.visibility=View.VISIBLE
                     adapterMissingIngAvailItem = AdapterMissingIngredientAvailableItem(availableIngredientList, requireActivity())
                     binding!!.rcyAddedIngredientsRecipes.adapter = adapterMissingIngAvailItem
@@ -211,12 +236,9 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
             }else{
 //                binding!!.llSearchRecipientIng.visibility=View.GONE
             }
-
         }catch (e:Exception){
             Log.d("MissingIngredient@@@@","Data List:------"+e.message)
         }
-
-
     }
 
     private fun showAlert(message: String?, status: Boolean) {
@@ -229,7 +251,7 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
             missingIngredientViewModel.addToCartUrlApi({
                 BaseApplication.dismissMe()
                 handleCartApiResponse(it)
-            }, foodIds, shcId,foodName)
+            }, foodIds, shcId,foodName,statusType)
         }
     }
 
@@ -248,7 +270,15 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
             Log.d("@@@ Recipe Details ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
-                findNavController().navigateUp()
+                if (statusType[0]=="0"){
+                    findNavController().navigateUp()
+                }else{
+                    if (BaseApplication.isOnline(requireActivity())) {
+                        missingIngredientApi()
+                    } else {
+                        BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                    }
+                }
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)

@@ -68,7 +68,6 @@ class TermsConditionFragment : Fragment() {
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
-
     }
 
 

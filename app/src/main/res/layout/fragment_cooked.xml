@@ -69,8 +69,7 @@
                     android:layout_height="@dimen/_6sdp"
                     android:layout_centerVertical="true"
                     android:layout_marginHorizontal="@dimen/_4sdp"
-                    android:layout_toEndOf="@+id/textMonthAndYear"
-                    android:src="@drawable/drop_down_small_icon" />
+                    android:layout_toEndOf="@+id/textMonthAndYear" />
             </RelativeLayout>
             <LinearLayout
                 android:id="@+id/llCalendarViewEvents"

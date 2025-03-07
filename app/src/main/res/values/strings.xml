@@ -6,6 +6,10 @@
     <string name="simplify_cooking_meal_planning_and_shopping_all_in_one_place">Simplify cooking, meal planning,\n and shopping all in one place</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+<!--
+    <string name="api_key">AIzaSyC9NuN_f-wESHh3kihTvpbvdrmKlTQurxw</string>
+-->
+    <string name="api_key">AIzaSyA-e6IRZ8axxpwrm1GEjlFOTzwb5KVQHgc</string>
     <string name="tvDescriptions1">Get meal plans tailored to your\n preferences and goals</string>
     <string name="tvDescriptions2">Track spending and meal choices to\n reach your goals</string>
     <string name="tvDescription3">Automatically generate organized grocery\n lists from your meal plans, tailored to your\n preferences and dietary needs, making\n shopping faster and stress-free</string>

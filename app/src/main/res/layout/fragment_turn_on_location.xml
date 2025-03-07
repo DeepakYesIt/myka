@@ -14,6 +14,81 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+<!--            <RelativeLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginHorizontal="@dimen/_15sdp"-->
+<!--                android:layout_marginTop="@dimen/_25sdp"-->
+<!--                android:layout_marginBottom="@dimen/_30sdp">-->
+
+<!--                <ImageView-->
+<!--                    android:id="@+id/imgBackTurnLocation"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:src="@drawable/black_images_back" />-->
+
+<!--                <ImageView-->
+<!--                    android:id="@+id/imagesLocations"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_centerHorizontal="true"-->
+<!--                    android:layout_marginTop="@dimen/_40sdp"-->
+<!--                    android:src="@drawable/img_location_icons" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/tvTurnOnLocations"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_below="@+id/imagesLocations"-->
+<!--                    android:layout_marginTop="@dimen/_30sdp"-->
+<!--                    android:fontFamily="@font/montserrat_bold"-->
+<!--                    android:text="@string/turn_on_location"-->
+<!--                    android:textSize="@dimen/_14sdp" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/tvTurnOnLocationDesc"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_below="@+id/tvTurnOnLocations"-->
+<!--                    android:layout_marginTop="@dimen/_10sdp"-->
+<!--                    android:fontFamily="@font/poppins"-->
+<!--                    android:text="@string/turn_on_locationDesc"-->
+<!--                    android:textSize="@dimen/_11sdp" />-->
+
+<!--                <RelativeLayout-->
+<!--                    android:id="@+id/rlTurnOnLocation"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_below="@+id/tvTurnOnLocationDesc"-->
+<!--                    android:layout_marginTop="@dimen/_20sdp"-->
+<!--                    android:background="@drawable/green_btn_background">-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_centerInParent="true"-->
+<!--                        android:fontFamily="@font/poppins"-->
+<!--                        android:paddingVertical="@dimen/_12sdp"-->
+<!--                        android:text="Turn on Location"-->
+<!--                        android:textColor="@color/white"-->
+<!--                        android:textSize="@dimen/_12sdp" />-->
+
+<!--                </RelativeLayout>-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/tvNotNow"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_below="@+id/rlTurnOnLocation"-->
+<!--                    android:layout_centerHorizontal="true"-->
+<!--                    android:layout_marginTop="@dimen/_13sdp"-->
+<!--                    android:fontFamily="@font/poppins"-->
+<!--                    android:text="Not now"-->
+<!--                    android:visibility="gone"-->
+<!--                    android:textColor="@color/black" />-->
+
+<!--            </RelativeLayout>-->
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -42,7 +117,7 @@
                     android:layout_below="@+id/imagesLocations"
                     android:layout_marginTop="@dimen/_30sdp"
                     android:fontFamily="@font/montserrat_bold"
-                    android:text="@string/turn_on_location"
+                    android:text="Find stores near you"
                     android:textSize="@dimen/_14sdp" />
 
                 <TextView
@@ -52,15 +127,28 @@
                     android:layout_below="@+id/tvTurnOnLocations"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:fontFamily="@font/poppins"
-                    android:text="@string/turn_on_locationDesc"
+                    android:text="We need your location to find grocery stores nearby for you."
+                    android:textSize="@dimen/_11sdp" />
+
+                <TextView
+                    android:id="@+id/tvTurnNotice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvTurnOnLocationDesc"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:fontFamily="@font/poppins"
+                    android:textAlignment="center"
+                    android:textColor="@color/light_green"
+                    android:layout_centerHorizontal="true"
+                    android:text="“This will help me give you more accurate\n pricing information”"
                     android:textSize="@dimen/_11sdp" />
 
                 <RelativeLayout
-                    android:id="@+id/rlTurnOnLocation"
+                    android:id="@+id/rlShareLocation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvTurnOnLocationDesc"
-                    android:layout_marginTop="@dimen/_20sdp"
+                    android:layout_below="@+id/tvTurnNotice"
+                    android:layout_marginTop="@dimen/_30sdp"
                     android:background="@drawable/green_btn_background">
 
                     <TextView
@@ -69,23 +157,11 @@
                         android:layout_centerInParent="true"
                         android:fontFamily="@font/poppins"
                         android:paddingVertical="@dimen/_12sdp"
-                        android:text="Turn on Location"
+                        android:text="Share Location"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_12sdp" />
 
                 </RelativeLayout>
-
-                <TextView
-                    android:id="@+id/tvNotNow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/rlTurnOnLocation"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/_13sdp"
-                    android:fontFamily="@font/poppins"
-                    android:text="Not now"
-                    android:visibility="gone"
-                    android:textColor="@color/black" />
 
             </RelativeLayout>
 

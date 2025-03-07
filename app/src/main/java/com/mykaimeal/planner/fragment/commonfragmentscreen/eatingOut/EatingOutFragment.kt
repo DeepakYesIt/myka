@@ -144,12 +144,6 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
         binding!!.tvSkipBtn.setOnClickListener(this)
         binding!!.tvNextBtn.setOnClickListener(this)
         binding!!.rlUpdateEatingOut.setOnClickListener(this)
-//        binding!!.rlEatingDropDown.setOnClickListener(this)
-//        binding!!.relDaily.setOnClickListener(this)
-//        binding!!.relAFewTimes.setOnClickListener(this)
-//        binding!!.relOnceAWeek.setOnClickListener(this)
-//        binding!!.relRarely.setOnClickListener(this)
-
     }
 
     private fun stillSkipDialog() {
@@ -238,8 +232,6 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
                     eatingOutViewModel.setEatingOutData(eatingOutModelsData!!.toMutableList())
                     sessionManagement.setEatingOut(eatingOutSelect.toString())
                     findNavController().navigate(R.id.reasonsForTakeAwayFragment)
-//                    val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
-//                    startActivity(intent)
                 }
             }
 
@@ -316,12 +308,5 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
             status = ""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
-       /* if (status1 == "1") {
-            status()
-        } else {
-            status="2"
-            eatingOutSelect=selectItem.toString()
-            status()
-        }*/
     }
 }

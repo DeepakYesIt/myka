@@ -134,7 +134,7 @@
                     app:drawableStartCompat="@drawable/basket_icon" />
 
                 <TextView
-                    android:id="@+id/tvNextBtn"
+                    android:id="@+id/tvPurchasedBtn"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:text="Purchased"

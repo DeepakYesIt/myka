@@ -18,8 +18,7 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterIngredientsRecipeBinding
 import com.mykaimeal.planner.fragment.mainfragment.hometab.missingingredientsfragment.model.MissingIngredientModelData
 
-
-class AdapterMissingIngredientsItem(var datalist: MutableList<MissingIngredientModelData>?, var requireActivity: FragmentActivity, var OnItemSelectListener: OnItemSelectListener): RecyclerView.Adapter<AdapterMissingIngredientsItem.ViewHolder>() {
+class AdapterMissingIngredientsItem(var datalist: MutableList<MissingIngredientModelData>?, var requireActivity: FragmentActivity, var onItemSelectListener: OnItemSelectListener): RecyclerView.Adapter<AdapterMissingIngredientsItem.ViewHolder>() {
 
     private  var isCheckEnabled = false
 
@@ -85,17 +84,9 @@ class AdapterMissingIngredientsItem(var datalist: MutableList<MissingIngredientM
             }
 
             holder.binding.imgCheckbox.setOnClickListener{
-                OnItemSelectListener.itemSelect(position,"","")
+                onItemSelectListener.itemSelect(position,"","")
 
-               /* if (data.status){
-                    OnItemSelectListener.itemSelect(position,"","")
-                }*/
             }
-
-            /*holder.itemView.setOnClickListener {
-                OnItemSelectListener.itemSelect(position,"","")
-            }*/
-
 
         }catch (e:Exception){
             Log.d("@@@@ ","Error ******"+e.message.toString())

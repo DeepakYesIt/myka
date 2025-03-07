@@ -19,7 +19,7 @@
             android:src="@drawable/super_market_albertsons"/>
 
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/_5sdp"
             android:layout_marginHorizontal="@dimen/_5sdp"
@@ -27,10 +27,11 @@
 
             <TextView
                 android:id="@+id/textName"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@+id/textAmounts"
                 android:fontFamily="@font/poppins_semibold"
+                android:layout_centerHorizontal="true"
                 android:text="Tesco"
                 android:textSize="@dimen/_12sdp" />
 
@@ -39,6 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
+                android:visibility="gone"
                 android:fontFamily="@font/poppins_semibold"
                 android:text="$25"
                 android:textSize="@dimen/_12sdp" />

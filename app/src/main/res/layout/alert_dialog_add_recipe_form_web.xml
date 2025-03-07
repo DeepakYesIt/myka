@@ -34,7 +34,7 @@
             android:layout_below="@+id/imgWebURl"
             android:layout_marginTop="@dimen/_10sdp"
             android:fontFamily="@font/poppins_semibold"
-            android:text="Add recipe from web"
+            android:text="Add Recipe From Web"
             android:textColor="@color/black"
             android:textSize="@dimen/_17sdp" />
 

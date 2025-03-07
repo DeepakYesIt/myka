@@ -155,24 +155,54 @@ class ResetPasswordFragment : Fragment() {
 
     //// validation part
     private fun validate(): Boolean {
-        val passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%^&+=])(?=\\S+\$).{6,}\$"
-        val pattern = Pattern.compile(passwordPattern)
-        val passMatcher = pattern.matcher(binding!!.etCreatePassword.text.toString().trim())
-        if (binding!!.etCreatePassword.text.toString().isEmpty()) {
+        val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]"
+        val password = binding!!.etCreatePassword.text.toString().trim()
+
+        // Password Validation Conditions
+        val hasUpperCase = password.any { it.isUpperCase() }
+        val hasDigit = password.any { it.isDigit() }
+        val hasSpecialChar = password.any { "!@#\$%^&*()-_=+[{]};:'\",<.>/?".contains(it) }
+        val isValidLength = password.length >= 6
+
+        // Check if password is empty
+        if (password.isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.password, false)
             return false
-        } else if (binding!!.etConfirmPassword.text.toString().isEmpty()) {
-            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.confirmPassword, false)
+        }
+        // Check password conditions individually and show specific errors
+        else if (!isValidLength) {
+            commonWorkUtils.alertDialog(
+                requireActivity(),
+                "Password must be at least 6 characters long.",
+                false
+            )
             return false
-        } else if (!passMatcher.find()) {
-            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.passwordMatch, false)
+        } else if (!hasDigit) {
+            commonWorkUtils.alertDialog(
+                requireActivity(),
+                "Password must contain at least one digit.",
+                false
+            )
             return false
-        } else if (binding!!.etCreatePassword.text.toString()
-                .trim() != binding!!.etConfirmPassword.text.toString().trim()
-        ) {
+        } else if (!hasUpperCase) {
+            commonWorkUtils.alertDialog(
+                requireActivity(),
+                "Password must contain at least one uppercase letter.",
+                false
+            )
+            return false
+        } else if (!hasSpecialChar) {
+            commonWorkUtils.alertDialog(
+                requireActivity(),
+                "Password must contain at least one special character.",
+                false
+            )
+            return false
+        }else if (binding!!.etCreatePassword.text.toString().trim() != binding!!.etConfirmPassword.text.toString().trim()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.passwordSame, false)
             return false
         }
+
         return true
     }
 

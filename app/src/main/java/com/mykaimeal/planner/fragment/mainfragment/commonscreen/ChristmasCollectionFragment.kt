@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -17,10 +18,13 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.PackageManagerCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.appsflyer.share.LinkGenerator
+import com.appsflyer.share.ShareInviteHelper
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -32,6 +36,7 @@ import com.mykaimeal.planner.adapter.ChooseDayAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
+import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentChristmasCollectionBinding
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.cookbookviewmodel.CookBookViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.cookbookviewmodel.apiresponse.CookBookDataModel
@@ -66,6 +71,7 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
     // Define global variables
     private lateinit var startDate: Date
     private lateinit var endDate: Date
+    private lateinit var commonWorkUtils: CommonWorkUtils
     private lateinit var spinnerActivityLevel: PowerSpinnerView
     var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
     private lateinit var sessionManagement: SessionManagement
@@ -75,10 +81,7 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         // Inflate the layout for this fragment
         binding=FragmentChristmasCollectionBinding.inflate(layoutInflater, container, false)
         sessionManagement = SessionManagement(requireContext())
-
-
-
-
+        commonWorkUtils = CommonWorkUtils(requireActivity())
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.GONE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
@@ -92,7 +95,6 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
          name=sessionManagement.getCookBookName()
          image=sessionManagement.getCookBookImage()
          type=sessionManagement.getCookBookType()
-
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -111,7 +113,6 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
-
         return binding!!.root
     }
 
@@ -144,7 +145,6 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
             else -> showAlert(result.message, false)
         }
     }
-
 
     @SuppressLint("SetTextI18n")
     private fun handleSuccessCookBookListResponse(data: String) {
@@ -203,9 +203,7 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         }
     }
 
-
     private fun initialize() {
-
 
         if (name!=null){
             binding!!.tvName.text = name
@@ -235,15 +233,21 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         }
 
         binding!!.relShareCookBook.setOnClickListener{
-            binding!!.cardViewMenuPopUp.visibility = View.GONE
-            val appPackageName: String = requireActivity().packageName
+            if (type=="1"){
+                binding!!.cardViewMenuPopUp.visibility = View.GONE
+                copyShareInviteLink()
+            }else{
+                commonWorkUtils.alertDialog(requireContext(),ErrorMessage.shareCookBookError,false)
+            }
+
+  /*          val appPackageName: String = requireActivity().packageName
             val myIntent = Intent(Intent.ACTION_SEND)
             myIntent.type = "text/plain"
             val body = "https://play.google.com/store/apps/details?id=$appPackageName"
             val sub = "Your Subject"
             myIntent.putExtra(Intent.EXTRA_SUBJECT, sub)
             myIntent.putExtra(Intent.EXTRA_TEXT, body)
-            startActivity(Intent.createChooser(myIntent, "Share Using"))
+            startActivity(Intent.createChooser(myIntent, "Share Using"))*/
         }
 
         binding!!.relDeleteCookBook.setOnClickListener{
@@ -254,8 +258,97 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         binding!!.rlAddRecipes.setOnClickListener {
             findNavController().navigate(R.id.createRecipeFragment)
         }
-
     }
+
+    @SuppressLint("RestrictedApi")
+    private fun copyShareInviteLink() {
+
+        val currentCampaign = "user_invite"
+        val currentChannel = "mobile_share"
+        val currentReferrerId = sessionManagement.getId().toString()
+
+// Base OneLink URL (Replace this with your actual OneLink domain)
+        val baseOneLink = "https://mykaimealplanner.onelink.me/LQhk/"
+
+// Manually append query parameters to ensure they appear in the final link
+        val deepLinkUrl = Uri.parse(baseOneLink).buildUpon()
+            .appendQueryParameter("af_user_id", currentReferrerId)
+            .appendQueryParameter("CookbooksID", id)
+            .appendQueryParameter("ItemName", name)
+            .appendQueryParameter("ScreenName", "CookBooksType")
+            .build()
+            .toString()
+
+        Log.d("AppsFlyer", "Generated Deep Link: $deepLinkUrl")
+
+        // Prepare share message
+        val message = "Hi, I am inviting you to download My-Kai app!\n\nClick on the link below:\n$deepLinkUrl"
+
+        // Open share dialog
+        requireActivity().runOnUiThread {
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, message)
+            }
+            requireActivity().startActivity(Intent.createChooser(shareIntent, "Share invite link via"))
+
+            // Log invite event to AppsFlyer
+            val logInviteMap = hashMapOf(
+                "referrerId" to currentReferrerId,
+                "campaign" to currentCampaign
+            )
+            ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
+        }
+
+        /*       val currentCampaign = "user_invite"
+               val currentChannel = "mobile_share"
+               val currentReferrerId = sessionManagement.getId().toString()
+
+               // Generate the invite URL using ShareInviteHelper
+               val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity()).apply {
+                   addParameter("af_user_id", currentReferrerId) // Set the referrer ID
+                   addParameter("CookbooksID", id) // Example value from your link
+                   addParameter("ItemName", name) // Example value from your link
+                   addParameter("ScreenName", "CookBooksType") // Example value from your link
+                   campaign = currentCampaign
+                   channel = currentChannel
+               }
+
+               Log.d("********", "Link params: ${linkGenerator.userParams.toString()}")
+
+               val listener: LinkGenerator.ResponseListener = object : LinkGenerator.ResponseListener {
+                   override fun onResponse(inviteLink: String) {
+                       Log.d(PackageManagerCompat.LOG_TAG, "Generated invite link: $inviteLink")
+                       Log.d("***********", "Generated invite link: $inviteLink")
+
+                       val message = "Hi, I am inviting you to download My-Kai app!\n\nClick on the link below:\n$inviteLink"
+
+                       requireActivity().runOnUiThread {
+                           val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                               type = "text/plain"
+                               putExtra(Intent.EXTRA_TEXT, message)
+                           }
+                           requireActivity().startActivity(Intent.createChooser(shareIntent, "Share invite link via"))
+
+                           // Log invite data
+                           val logInviteMap = hashMapOf(
+                               "referrerId" to currentReferrerId,
+                               "campaign" to currentCampaign
+                           )
+                           ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
+                       }
+                   }
+
+                   override fun onResponseError(error: String) {
+                       Log.d(PackageManagerCompat.LOG_TAG, "onResponseError: $error")
+                   }
+               }
+
+       // Generate the deep link URL
+               linkGenerator.generateLink(requireActivity(), listener)
+       */
+    }
+
 
     private fun removeCookBookDialog() {
         val dialogRemoveCookBook: Dialog = context?.let { Dialog(it) }!!

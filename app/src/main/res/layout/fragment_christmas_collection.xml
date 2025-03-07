@@ -20,13 +20,13 @@
             android:layout_centerInParent="true"
             android:src="@drawable/black_images_back" />
         <TextView
-            android:id="@+id/tv_name"
+            android:id="@+id/tvName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_centerInParent="true"
-            android:layout_alignLeft="@id/imgBackChristmas"
+            android:layout_alignStart="@id/imgBackChristmas"
             android:layout_alignEnd="@id/imgThreeDotIcon"
             android:fontFamily="@font/montserrat_semibold"
             android:text=""

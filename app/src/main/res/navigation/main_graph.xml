@@ -248,12 +248,12 @@
         tools:layout="@layout/fragment_home_subscription_all_plan" />
     <fragment
         android:id="@+id/subscriptionPlanOverViewFragment"
-        android:name="com.mykaimeal.planner.fragment.mainfragment.profilesetting.SubscriptionPlanOverViewFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.profilesetting.subscriptionplan.SubscriptionPlanOverViewFragment"
         android:label="fragment_subscription_plan_over_view"
         tools:layout="@layout/fragment_subscription_plan_over_view" />
     <fragment
         android:id="@+id/basketScreenFragment"
-        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.BasketScreenFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.BasketScreenFragment"
         android:label="fragment_basket_screen"
         tools:layout="@layout/fragment_basket_screen" />
     <fragment
@@ -307,7 +307,7 @@
         tools:layout="@layout/fragment_nutrition_goal" />
     <fragment
         android:id="@+id/basketYourRecipeFragment"
-        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.BasketYourRecipeFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketyourrecipe.BasketYourRecipeFragment"
         android:label="fragment_basket_your_recipe"
         tools:layout="@layout/fragment_basket_your_recipe" />
     <fragment
@@ -355,5 +355,45 @@
         android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.WebViewByUrlFragment"
         android:label="fragment_web_view_by_url"
         tools:layout="@layout/fragment_web_view_by_url" />
+    <fragment
+        android:id="@+id/orderHistoryFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.profilesetting.OrderHistoryFragment"
+        android:label="fragment_order_history"
+        tools:layout="@layout/fragment_order_history" />
+    <fragment
+        android:id="@+id/orderDetailsScreenFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.profilesetting.OrderDetailsScreenFragment"
+        android:label="fragment_order_details_screen"
+        tools:layout="@layout/fragment_order_details_screen" />
+    <fragment
+        android:id="@+id/enterYourAddressFragment"
+        android:name="com.mykaimeal.planner.fragment.authfragment.enteryouraddress.EnterYourAddressFragment"
+        android:label="fragment_enter_your_address"
+        tools:layout="@layout/fragment_enter_your_address" />
+    <fragment
+        android:id="@+id/checkoutScreenFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.CheckoutScreenFragment"
+        android:label="fragment_checkout_screen"
+        tools:layout="@layout/fragment_checkout_screen" />
+    <fragment
+        android:id="@+id/addNumberVerifyFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.addnumberfragment.AddNumberVerifyFragment"
+        android:label="fragment_add_number_verify"
+        tools:layout="@layout/fragment_add_number_verify" />
+    <fragment
+        android:id="@+id/addTipScreenFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.AddTipScreenFragment"
+        android:label="fragment_add_tip_screen"
+        tools:layout="@layout/fragment_add_tip_screen" />
+    <fragment
+        android:id="@+id/basketIngredientsDetailsFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.BasketIngredientsDetailsFragment"
+        android:label="fragment_baseket_ingredients_details"
+        tools:layout="@layout/fragment_baseket_ingredients_details" />
+    <fragment
+        android:id="@+id/dropOffOptionsScreenFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.DropOffOptionsScreenFragment"
+        android:label="fragment_drop_off_options_screen"
+        tools:layout="@layout/fragment_drop_off_options_screen" />
 
 </navigation>

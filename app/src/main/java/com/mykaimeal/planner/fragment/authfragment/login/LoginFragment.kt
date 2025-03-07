@@ -5,14 +5,16 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.RelativeLayout
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -25,7 +27,6 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.gson.Gson
 import com.mykaimeal.planner.R
-import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.activity.AuthActivity
 import com.mykaimeal.planner.activity.EnterYourNameActivity
 import com.mykaimeal.planner.activity.MainActivity
@@ -33,6 +34,7 @@ import com.mykaimeal.planner.adapter.RememberMeAdapter
 import com.mykaimeal.planner.adapter.RememberSelect
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentLoginBinding
 import com.mykaimeal.planner.fragment.authfragment.login.model.LoginModel
@@ -98,9 +100,6 @@ class LoginFragment : Fragment() {
             requireActivity(),
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    /*val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
-                    startActivity(intent)
-                    requireActivity().finish()*/
                     requireActivity().finish()
                 }
             })
@@ -239,6 +238,18 @@ class LoginFragment : Fragment() {
             findNavController().navigate(R.id.signUpFragment)
         }
 
+        binding!!.imgEye.setOnClickListener {
+            if (binding!!.etSignPassword.transformationMethod === PasswordTransformationMethod.getInstance()) {
+                binding!!.etSignPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
+                binding!!.imgEye.setImageDrawable(resources.getDrawable(R.drawable.ic_password_eye))
+                binding!!.etSignPassword.setSelection(binding!!.etSignPassword.text.length)
+            } else {
+                binding!!.etSignPassword.transformationMethod = PasswordTransformationMethod.getInstance()
+                binding!!.imgEye.setImageDrawable(resources.getDrawable(R.drawable.hide_pass))
+                binding!!.etSignPassword.setSelection(binding!!.etSignPassword.text.length)
+            }
+        }
+
         /// handle on back pressed
         binding!!.imagesBackLogin.setOnClickListener {
             /*val intent = Intent(requireActivity(), LetsStartOptionActivity::class.java)
@@ -310,6 +321,28 @@ class LoginFragment : Fragment() {
                 checkStatus = true
             }
         }
+
+     /*   val data: String? = sessionManagement.getRememberMe()
+        var mutableList: MutableList<RememberMe> = ArrayList()
+        if (!data.isNullOrEmpty()) {
+            val objectList: List<RememberMe> = Gson().fromJson(data, Array<RememberMe>::class.java).asList()
+            mutableList = objectList.toMutableList()
+        }
+        val email = binding!!.etSignEmailPhone.text.toString()
+        val password = binding!!.etSignPassword.text.toString()
+        var found = false
+        for (item in mutableList) {
+            if (item.email.equals(email,true)) {
+                item.pass = password  // Update password if email exists
+                found = true
+                break
+            }
+        }
+        if (!found) {
+            mutableList.add(RememberMe(email, password, false)) // Add new entry if not found
+        }
+        sessionManagement.setRememberMe(mutableList)*/
+
     }
 
 
@@ -336,10 +369,7 @@ class LoginFragment : Fragment() {
                                 val loginModel = gson.fromJson(it.data, LoginModel::class.java)
                                 if (loginModel.code == 200 && loginModel.success) {
                                     if (checkStatus == true) {
-                                        saveRemember(
-                                            binding!!.etSignEmailPhone.text.toString().trim(),
-                                            binding!!.etSignPassword.text.toString().trim()
-                                        )
+                                        saveRemember()
                                     }
                                     showDataInUi(loginModel.data)
                                 } else {
@@ -370,8 +400,8 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun saveRemember(emailOrPhone: String, password: String) {
-        val data: String = sessionManagement.getRememberMe()
+    private fun saveRemember() {
+     /*   val data: String = sessionManagement.getRememberMe()
         var checkDuplicate = false
         var mutableList: MutableList<RememberMe>? = ArrayList()
         if (data != null && data != "") {
@@ -393,13 +423,35 @@ class LoginFragment : Fragment() {
                 mutableList.add(RememberMe(emailOrPhone, password))
             }
             sessionManagement.setRememberMe(mutableList)
+        } */
+
+        val data: String? = sessionManagement.getRememberMe()
+        var mutableList: MutableList<RememberMe> = ArrayList()
+        if (!data.isNullOrEmpty()) {
+            val objectList: List<RememberMe> = Gson().fromJson(data, Array<RememberMe>::class.java).asList()
+            mutableList = objectList.toMutableList()
         }
+        val emailOrPhone = binding!!.etSignEmailPhone.text.toString().trim()
+        val password = binding!!.etSignPassword.text.toString().trim()
+        var found = false
+        for (item in mutableList) {
+            if (item.email.equals(emailOrPhone,true)) {
+                item.pass = password  // Update password if email exists
+                found = true
+                break
+            }
+        }
+        if (!found) {
+            mutableList.add(RememberMe(emailOrPhone, password)) // Add new entry if not found
+        }
+        sessionManagement.setRememberMe(mutableList)
     }
 
     /// handle set session and redirection implement
     private fun showDataInUi(loginModelData: LoginModelData) {
         try {
 
+//            findNavController().navigate(R.id.enterYourAddressFragment)
             if (loginModelData.email != null) {
                 sessionManagement.setEmail(loginModelData.email)
             }
@@ -518,27 +570,6 @@ class LoginFragment : Fragment() {
         }
 
         return true
-
-        /*        val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]"
-                val emaPattern = Pattern.compile(emailPattern)
-                val emailMatcher = emaPattern.matcher(binding!!.etSignEmailPhone.text.toString().trim())
-                val passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%^&+=])(?=\\S+\$).{6,}\$"
-                val pattern = Pattern.compile(passwordPattern)
-                val passMatchers = pattern.matcher(binding!!.etSignPassword.text.toString().trim())
-                if (binding!!.etSignEmailPhone.text.toString().trim().isEmpty()) {
-                    commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.emailPhone, false)
-                    return false
-                } else if (!emailMatcher.find() && !validNumber()) {
-                    commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validEmailPhone, false)
-                    return false
-                } else if (binding!!.etSignPassword.text.toString().trim().isEmpty()) {
-                    commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.password, false)
-                    return false
-                } else if (!passMatchers.find()) {
-                    commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.passwordMatch, false)
-                    return false
-                }
-                return true*/
     }
 
     /// add validation based on valid phone number

@@ -76,6 +76,9 @@ interface MainRepository {
         weightType: String
     )
 
+    suspend fun userProfileUpdateBioApi(
+        successCallback: (response: NetworkResult<String>) -> Unit, bio: String)
+
  suspend fun upDateImageNameRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, Image: MultipartBody.Part?, name: RequestBody)
 
  suspend fun addCardRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, token: String)
@@ -167,7 +170,8 @@ interface MainRepository {
     suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
     suspend fun updateAllergiesApi(successCallback: (response: NetworkResult<String>) -> Unit, allergies:List<String>?)
-    suspend fun addToCartUrlApi(successCallback: (response: NetworkResult<String>) -> Unit,foodIds: MutableList<String>?, schId:String?, foodName:MutableList<String>?)
+    suspend fun addToCartUrlApi(successCallback: (response: NetworkResult<String>) -> Unit,foodIds: MutableList<String>?,
+                                schId:String?, foodName:MutableList<String>?,status: MutableList<String>?)
 
     suspend fun updateBodyGoalApi(successCallback: (response: NetworkResult<String>) -> Unit,bodyGoal: String?)
 
@@ -199,20 +203,32 @@ interface MainRepository {
 
     suspend fun createRecipeUrlApi(successCallback: (response: NetworkResult<String>) -> Unit, itemSearch:String?)
 
-
     suspend fun recipeforSearchApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
     suspend fun recipePreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
-
     suspend fun removeMealApi(successCallback: (response: NetworkResult<String>) -> Unit, cookedId:String?)
     suspend fun getMealByUrl(successCallback: (response: NetworkResult<String>) -> Unit, q:String?)
-    suspend fun updatePreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit, userName: String?,cookingForType: String?,userGender:String?,bodygoal:String?,partner_name:String?,partner_age:String?,partner_gender:String?,family_member_name:String?,
-                             family_member_age:String?,child_friendly_meals:String?,dietaryId: MutableList<String>?,favouriteId: MutableList<String>?,
+    suspend fun updatePreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit, userName: String?,cookingForType: String?,
+                                     userGender:String?,bodyGoal:String?,partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?,
+                             familyMemberAge:String?,childFriendlyMeals:String?,dietaryId: MutableList<String>?,favouriteId: MutableList<String>?,
                              dislikeIngId: MutableList<String>?,allergensId: MutableList<String>?,mealRoutineId: MutableList<String>?,cookingFrequency: String?,
                              spendingAmount: String?,duration: String?,eatingOut: String?,takeWay: String?)
 
+    suspend fun getFilterList(successCallback: (response: NetworkResult<String>) -> Unit)
 
+    suspend fun getSuperMarket(successCallback: (response: NetworkResult<String>) -> Unit, latitude: String?, longitude:String?)
+    suspend fun subscriptionGoogle(successCallback: (response: NetworkResult<String>) -> Unit, purchaseToken: String?, subscriptionId:String?)
+
+    suspend fun getBasketUrl(successCallback: (response: NetworkResult<String>) -> Unit,storeId:String?)
+    suspend fun getAddressUrl(successCallback: (response: NetworkResult<String>) -> Unit)
+    suspend fun getYourRecipeUrl(successCallback: (response: NetworkResult<String>) -> Unit)
+
+    suspend fun addAddressUrl(successCallback: (response: NetworkResult<String>) -> Unit,latitude: String?, longitude: String?,streetName:String?,streetNum:String?,apartNum:String?,city:String?,country:String?,
+                              zipcode:String?,primary:String?,id:String?,type:String?)
+
+    suspend fun sendOtpUrl(successCallback: (response: NetworkResult<String>) -> Unit,phone: String?)
+    suspend fun addPhoneUrl(successCallback: (response: NetworkResult<String>) -> Unit,phone: String?,otp:String?)
 
 
 }

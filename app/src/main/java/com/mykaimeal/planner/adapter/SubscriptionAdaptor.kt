@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.mykaimeal.planner.databinding.AdapterSubscriptionItemBinding
-import com.mykaimeal.planner.model.SubscriptionsModel
+import com.mykaimeal.planner.model.SubscriptionModel
 
-class SubscriptionAdaptor(private var datalist: List<SubscriptionsModel>, private var requireActivity: FragmentActivity): RecyclerView.Adapter<SubscriptionAdaptor.ViewHolder>() {
+class SubscriptionAdaptor(private var datalist: List<SubscriptionModel>, private var requireActivity: FragmentActivity): RecyclerView.Adapter<SubscriptionAdaptor.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -16,9 +16,9 @@ class SubscriptionAdaptor(private var datalist: List<SubscriptionsModel>, privat
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.textTitle1.text=datalist[position].textTitle1
+  /*      holder.binding.textTitle1.text=datalist[position].textTitle1
         holder.binding.textAmount.text=datalist[position].textAmount
-        holder.binding.textAmount2.text=datalist[position].textAmount2
+        holder.binding.textAmount2.text=datalist[position].textAmount2*/
 
     }
 

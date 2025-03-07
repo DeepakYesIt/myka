@@ -152,8 +152,8 @@ class AdapterCreateIngredientsItem(private var datalist: MutableList<RecyclerVie
         for (i in datalist.indices) {
             val holder = recyclerView.findViewHolderForAdapterPosition(i) as? ViewHolder
             holder?.binding!!.etAddIngredients.let { editText ->
-                if (datalist[i].ingredientName.trim().isEmpty()) {
-                }
+               /* if (datalist[i].ingredientName.trim().isEmpty()) {
+                }*/
             }
         }
     }

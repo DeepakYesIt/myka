@@ -125,13 +125,7 @@ class AdapterCookBookDetailsItem(var datalist: MutableList<CookBookDataModel>?, 
             // Notify the adapter to refresh the views
             notifyDataSetChanged()
         }
-
-
-
     }
-
-
-
 
     override fun getItemCount(): Int {
         return datalist!!.size

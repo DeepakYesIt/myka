@@ -1,6 +1,5 @@
 package com.mykaimeal.planner.adapter
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
@@ -8,14 +7,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterSearchFilterItemBinding
-import com.mykaimeal.planner.model.DataModel
+import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.CookTime
 
-
-class AdapterFilterSearchItem(
-    private var datalist: List<DataModel>,
+class AdapterFilterCookTimeItem(
+    private var datalist: MutableList<CookTime>?,
     private var requireActivity: FragmentActivity,
     private var onItemClickListener: OnItemClickListener
-) : RecyclerView.Adapter<AdapterFilterSearchItem.ViewHolder>() {
+) : RecyclerView.Adapter<AdapterFilterCookTimeItem.ViewHolder>() {
 
     private var selected: Boolean = false
     private var isExpanded = false
@@ -28,14 +26,7 @@ class AdapterFilterSearchItem(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.tvItem.text = datalist[position].title
-
-        // Highlight the "More" button differently
-        if (datalist[position].isOpen) {
-            holder.binding.tvItem.setTextColor(Color.parseColor("#00A86B")) // Green
-        } else {
-            holder.binding.tvItem.setTextColor(Color.BLACK)
-        }
+        holder.binding.tvItem.text = datalist!![position].name
 
         holder.binding.relMainLayouts.setOnClickListener {
             if (selected) {
@@ -49,7 +40,8 @@ class AdapterFilterSearchItem(
     }
 
     override fun getItemCount(): Int {
-        return if (isExpanded) datalist.size else datalist.take(5).size + 1
+        return datalist!!.size
+//        return if (isExpanded) datalist!!.size else datalist!!.take(3).size + 1
     }
 
     class ViewHolder(var binding: AdapterSearchFilterItemBinding) :

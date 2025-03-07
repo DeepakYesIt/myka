@@ -107,6 +107,7 @@
                         android:background="@null"
                         android:drawableStart="@drawable/password_images"
                         android:drawablePadding="@dimen/_12sdp"
+                        android:layout_toLeftOf="@+id/imgEye"
                         android:fontFamily="@font/poppins"
                         android:gravity="center_vertical"
                         android:hint="Password"
@@ -117,6 +118,16 @@
                         android:textColor="@color/black"
                         android:textColorHint="@color/light_black"
                         android:textSize="@dimen/_13sdp" />
+
+                    <ImageView
+                        android:id="@+id/imgEye"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/hide_pass"
+                        android:layout_alignParentEnd="true"
+                        android:padding="@dimen/_5sdp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="@dimen/_8sdp"/>
 
                 </RelativeLayout>
 

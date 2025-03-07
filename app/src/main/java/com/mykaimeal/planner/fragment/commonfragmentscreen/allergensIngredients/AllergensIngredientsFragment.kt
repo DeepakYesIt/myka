@@ -47,6 +47,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
     private var status: String? = null
     private var allergensSelectedId = mutableListOf<String>()
     private lateinit var allergenIngredientViewModel: AllergenIngredientViewModel
+    private var isExpanded = false
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreateView(
@@ -215,6 +216,13 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
+
+
+        binding!!.relMoreButton.setOnClickListener { v ->
+            isExpanded = true
+            allergenIngAdapter!!.setExpanded(true)
+            binding!!.relMoreButton.visibility = View.GONE // Hide button after expanding
+        }
     }
 
     private fun updateAllergensApi() {
@@ -315,6 +323,10 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                         AllergensIngredientModelData(id = -1, selected = false, "None")
                     ) // ID set to -1 as an indicator
                 }
+                // Show "Show More" button only if there are more than 3 items
+                if (allergensModelData.size > 3) {
+                    binding!!.relMoreButton.visibility = View.VISIBLE
+                }
                 allergenIngModelData = allergensModelData.toMutableList()
                 allergenIngAdapter = AdapterAllergensIngItem(allergensModelData, requireActivity(), this)
                 binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
@@ -340,6 +352,11 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 if(!selected){
                     allergensModelData.set(0, AllergensIngredientModelData(id = -1, selected = true, "None")
                     )
+                }
+
+                // Show "Show More" button only if there are more than 3 items
+                if (allergensModelData.size > 3) {
+                    binding!!.relMoreButton.visibility = View.VISIBLE
                 }
                 allergenIngModelData = allergensModelData.toMutableList()
                 allergenIngAdapter = AdapterAllergensIngItem(allergensModelData, requireActivity(), this)

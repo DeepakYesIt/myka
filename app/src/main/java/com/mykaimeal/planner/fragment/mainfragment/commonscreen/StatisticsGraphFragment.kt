@@ -3,6 +3,7 @@ package com.mykaimeal.planner.fragment.mainfragment.commonscreen
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -35,7 +36,7 @@ class StatisticsGraphFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding=FragmentStatisticsGraphBinding.inflate(layoutInflater, container, false)
 
@@ -135,7 +136,7 @@ class StatisticsGraphFragment : Fragment() {
         binding!!.barChart.data = barData
         binding!!.barChart.invalidate()
 
-// Customize labels
+        // Customize labels
         val xAxis = binding!!.barChart.xAxis
         xAxis.valueFormatter = IndexAxisValueFormatter(listOf("01 June", "07 June", "14 June", "28 June"))
         xAxis.position = XAxis.XAxisPosition.BOTTOM
@@ -161,6 +162,13 @@ class StatisticsGraphFragment : Fragment() {
         }
     }
 
+    private fun redirectToPlayStore() {
+        val playStoreIntent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse("https://play.google.com/store/apps/details?id=com.mykaimeal.planner")
+        }
+        startActivity(playStoreIntent)
+    }
+
     @SuppressLint("RestrictedApi")
     private fun copyShareInviteLink() {
         val currentCampaign = "user_invite"
@@ -173,13 +181,13 @@ class StatisticsGraphFragment : Fragment() {
         linkGenerator.campaign = currentCampaign
         linkGenerator.channel = currentChannel
 
-        Log.d(LOG_TAG, "Link params: ${linkGenerator.userParams.toString()}")
+        Log.d(LOG_TAG, "Link params: ${linkGenerator.userParams}")
 
         val listener: LinkGenerator.ResponseListener = object : LinkGenerator.ResponseListener {
             override fun onResponse(s: String) {
-                Log.d(LOG_TAG, "Hi, I am inviting you to download My-kai app! $s")
+                Log.d(LOG_TAG, "Hi, I am inviting you to download My-kai app!\nclick on the link below:$s")
 
-                val message = "Hi, I am inviting you to download My-kai app!\n\n$s"
+                val message = "Hi, I am inviting you to download My-kai app!\nclick on the link below:\n$s"
 
                 // Ensure the URL has the correct deep link format
                 requireActivity().runOnUiThread {
@@ -209,56 +217,5 @@ class StatisticsGraphFragment : Fragment() {
         // Generate the deep link URL
         linkGenerator.generateLink(requireActivity(), listener)
     }
-
-
-
-    /* @SuppressLint("RestrictedApi")
-     private fun copyShareInviteLink() {
-         val currentCampaign = "user_invite"
-         val currentChannel = "mobile_share"
-         val currentReferrerId = sessionManagement.getId().toString()
-         val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity())
-         *//*linkGenerator.addParameter("deep_link_value", this.fruitName)
-        linkGenerator.addParameter("deep_link_sub1", this.fruitAmountStr)*//*
-        *//*linkGenerator.addParameter("deep_link_sub2", currentReferrerId)
-        linkGenerator.campaign = currentCampaign
-        linkGenerator.channel = currentChannel
-        Log.d(LOG_TAG, "Link params:" + linkGenerator.userParams.toString())*//*
-
-        linkGenerator.addParameter("deep_link_sub2", currentReferrerId)
-        linkGenerator.campaign = currentCampaign
-        linkGenerator.channel = currentChannel
-
-        val listener: LinkGenerator.ResponseListener = object : LinkGenerator.ResponseListener {
-            override fun onResponse(s: String) {
-                Log.d(LOG_TAG, "Share invite link: $s")
-               // Run on the main thread
-                requireActivity().runOnUiThread {
-                    // Create an intent for sharing
-                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                        type = "text/plain" // Indicate you're sharing plain text
-                        putExtra(Intent.EXTRA_TEXT, s) // Add the invite link
-                    }
-
-                    // Show the chooser dialog
-                    val chooser = Intent.createChooser(shareIntent, "Share invite link via")
-                    requireActivity().startActivity(chooser)
-
-                    // Log the invite data
-                    val logInviteMap = HashMap<String, String>()
-                    logInviteMap["referrerId"] = currentReferrerId
-                    logInviteMap["campaign"] = currentCampaign
-                    ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
-                }
-
-            }
-
-            override fun onResponseError(s: String) {
-                Log.d(LOG_TAG, "onResponseError called")
-            }
-        }
-        linkGenerator.generateLink(requireActivity(), listener)
-    }*/
-
 
 }

@@ -20,12 +20,9 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MealRatingActivity : AppCompatActivity() {
 
-    private var mealType: String = ""
     private var uri: String = ""
-
     lateinit var binding: ActivityMealRatingBinding
     private lateinit var viewModel: RecipeDetailsViewModel
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,10 +30,7 @@ class MealRatingActivity : AppCompatActivity() {
         setContentView(binding.root)
         viewModel = ViewModelProvider(this)[RecipeDetailsViewModel::class.java]
 
-
         uri = intent?.getStringExtra("uri").toString()
-
-
 
         binding.imgBackRateMeal.setOnClickListener {
             finish()
@@ -51,7 +45,6 @@ class MealRatingActivity : AppCompatActivity() {
                 }
             }
         }
-
     }
 
     private fun isValidation(): Boolean {
@@ -97,11 +90,9 @@ class MealRatingActivity : AppCompatActivity() {
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
-
     }
 
     private fun showAlert(message: String?, status: Boolean) {
         BaseApplication.alertError(this, message, status)
     }
-
 }

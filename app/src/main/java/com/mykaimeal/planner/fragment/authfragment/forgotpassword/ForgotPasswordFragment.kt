@@ -31,7 +31,6 @@ class ForgotPasswordFragment : Fragment() {
     private var chooseType: String? = ""
     private lateinit var forgotPasswordViewModel: ForgotPasswordViewModel
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

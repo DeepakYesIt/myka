@@ -99,7 +99,6 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
 //        ingredientsModel()
         initialize()
 
-
         // When screen load then api call
         fetchDataOnLoad()
 
@@ -220,6 +219,10 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                 .into(binding!!.imageData)
         } else {
             binding!!.layProgess.root.visibility = View.GONE
+        }
+
+        if (viewModel.getRecipeData()?.get(0)!!.recipe?.source!=null){
+            binding!!.tvSourcesName.text="By "+ viewModel.getRecipeData()?.get(0)!!.recipe?.source
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.review!=null){

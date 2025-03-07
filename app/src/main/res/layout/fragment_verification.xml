@@ -96,14 +96,13 @@
                         android:id="@+id/otpView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/light_black"
-                        app:length="6"
                         android:layout_centerInParent="true"
                         android:foregroundGravity="center"
+                        android:textColor="@color/light_black"
+                        app:length="6"
                         app:otp_box_background="@drawable/otp_edit"
                         app:otp_text_size="@dimen/_13sdp"
-                        app:width="@dimen/_35sdp"
-                        android:layout_centerHorizontal="true"/>
+                        app:width="@dimen/_35sdp" />
 
                 </RelativeLayout>
 

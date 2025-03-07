@@ -112,14 +112,6 @@ class IngredientsSnacksAdapter(var datalist:MutableList<Breakfast>?, private var
             stopZiggle(holder.itemView)
         }
 
-        /*    if (datalist[position].isOpen){
-                holder.binding.missingIngredientsImg.visibility=View.VISIBLE
-                holder.binding.checkBoxImg.visibility=View.GONE
-            }else{
-                holder.binding.missingIngredientsImg.visibility=View.GONE
-                holder.binding.checkBoxImg.visibility=View.VISIBLE
-            }*/
-
         holder.binding.missingIngredientsImg.setOnClickListener{
             checkTypeStatus="missingIng"
             onItemClickListener.itemSelectUnSelect(position,checkTypeStatus,"Snacks",position)
@@ -137,11 +129,6 @@ class IngredientsSnacksAdapter(var datalist:MutableList<Breakfast>?, private var
 
          holder.binding.imageMinus.setOnClickListener {
              checkTypeStatus="minus"
-           /*  if (datalist[position].isOpen) {
-                 checkStatus = "1"
-             } else {
-                 checkStatus = "0"
-             }*/
              onItemClickListener.itemSelectUnSelect(datalist?.get(position)!!.id,checkTypeStatus,"Snacks",position)
 
          }

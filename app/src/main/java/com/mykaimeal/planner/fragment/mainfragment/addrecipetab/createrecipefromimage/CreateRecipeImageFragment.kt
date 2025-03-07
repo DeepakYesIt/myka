@@ -84,7 +84,6 @@ class CreateRecipeImageFragment : Fragment() {
 
         clickListener()
         cameraExecutor = Executors.newSingleThreadExecutor()
-
     }
 
     private fun convertImageToBase64(uri: Uri): String {
@@ -140,7 +139,6 @@ class CreateRecipeImageFragment : Fragment() {
 
         binding?.backBtn!!.setOnClickListener {
             findNavController().navigateUp()
-            /*requireActivity().onBackPressed()*/
         }
 
         // Tick button
@@ -177,14 +175,13 @@ class CreateRecipeImageFragment : Fragment() {
                 if (response.isSuccessful) {
                     val webDetection = response.body()?.responses?.get(0)?.webDetection
                     if (webDetection!=null){
-                        if (webDetection.webEntities.size>0){
+                        if (webDetection.webEntities.isNotEmpty()){
 
                             val bundle = Bundle().apply {
                                 putString("name", webDetection.webEntities[0].description.toString())
                             }
                             findNavController().navigate(R.id.createRecipeFragment, bundle)
 
-//                            Toast.makeText(requireContext(),"Name :-"+ webDetection.webEntities!![0].description.toString(),Toast.LENGTH_LONG).show()
                             Log.d("Google Vision", "Similar Image: "+ webDetection.webEntities[0].description.toString())
                         }
                     }

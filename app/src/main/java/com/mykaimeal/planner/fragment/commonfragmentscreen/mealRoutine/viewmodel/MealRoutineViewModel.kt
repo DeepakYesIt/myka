@@ -1,6 +1,7 @@
 package com.mykaimeal.planner.fragment.commonfragmentscreen.mealRoutine.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.google.gson.JsonObject
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModelData
 import com.mykaimeal.planner.repository.MainRepository
@@ -14,6 +15,13 @@ class MealRoutineViewModel @Inject constructor(private val repository: MainRepos
     suspend fun getMealRoutine(successCallback: (response: NetworkResult<String>) -> Unit){
         repository.getMealRoutine { successCallback(it) }
     }
+
+
+    suspend fun recipeAddToPlanRequest(successCallback: (response: NetworkResult<String>) -> Unit, jsonObject: JsonObject
+    ){
+        repository.recipeAddToPlanRequestApi({ successCallback(it) },jsonObject)
+    }
+
 
     fun setMealRoutineData(data: MutableList<MealRoutineModelData>) {
         mealRoutineLocalData=data
@@ -35,6 +43,11 @@ class MealRoutineViewModel @Inject constructor(private val repository: MainRepos
 
     suspend fun updateMealRoutineApi(successCallback: (response: NetworkResult<String>) -> Unit,mealRoutineId: List<String>?){
         repository.updateMealRoutineApi ({ successCallback(it) },mealRoutineId)
+    }
+
+    suspend fun planRequest(successCallback: (response: NetworkResult<String>) -> Unit,
+                            q: String){
+        repository.planRequestApi({ successCallback(it) },q)
     }
 
 }

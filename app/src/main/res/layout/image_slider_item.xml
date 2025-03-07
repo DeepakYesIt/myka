@@ -1,7 +1,30 @@
-<com.google.android.material.imageview.ShapeableImageView xmlns:android="http://schemas.android.com/apk/res/android"
+<!--<com.google.android.material.imageview.ShapeableImageView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/imageView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:shapeAppearanceOverlay="@style/RoundedSquare"
-    android:scaleType="centerCrop" />
+    android:scaleType="centerCrop"
+    app:shapeAppearanceOverlay="@style/RoundedSquare" />-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/imageBread"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/imageData"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/no_image"
+        app:shapeAppearanceOverlay="@style/CornerCut" />
+
+    <include
+        android:id="@+id/lay_progess"
+        layout="@layout/progess_loader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+</RelativeLayout>
+

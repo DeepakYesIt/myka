@@ -129,8 +129,8 @@ class SuperMarketsNearByFragment : Fragment(),OnItemClickListener {
         dataList1.add(data8)
         dataList1.add(data9)
 
-        adapterSuperMarket = AdapterSuperMarket(dataList1, requireActivity(), this)
-        binding.recySuperMarket.adapter = adapterSuperMarket
+        /*adapterSuperMarket = AdapterSuperMarket(dataList1, requireActivity(), this)
+        binding.recySuperMarket.adapter = adapterSuperMarket*/
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {

@@ -6,7 +6,6 @@ import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.HttpException
 import javax.inject.Inject
 
 class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : MainRepository {
@@ -22,8 +21,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -38,8 +37,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -54,8 +53,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -70,8 +69,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -86,8 +85,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -102,8 +101,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -118,8 +117,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -135,8 +134,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -152,8 +151,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -173,8 +172,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -240,8 +239,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -260,8 +259,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -279,8 +278,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -300,8 +299,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -320,8 +319,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -341,8 +340,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -364,8 +363,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -432,8 +431,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -451,8 +450,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -470,8 +469,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -486,8 +485,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -503,8 +502,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -524,8 +523,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -540,8 +539,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -556,8 +555,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -573,8 +572,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -608,8 +607,27 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun userProfileUpdateBioApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        bio: String) {
+        try {
+            api.userProfileUpdateBioApi(bio).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -628,8 +646,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -647,8 +665,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -674,8 +692,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -693,8 +711,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -714,8 +732,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -730,8 +748,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -749,8 +767,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -768,8 +786,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -787,8 +805,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -807,8 +825,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -823,10 +841,11 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
+
 
     override suspend fun getCookBookTypeRequestApi(
         successCallback: (response: NetworkResult<String>) -> Unit,
@@ -842,8 +861,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -865,8 +884,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -884,8 +903,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -903,8 +922,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -923,8 +942,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -944,8 +963,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -964,8 +983,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -983,8 +1002,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1003,8 +1022,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1019,8 +1038,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1035,8 +1054,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1055,8 +1074,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1074,8 +1093,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1093,8 +1112,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1113,8 +1132,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1180,8 +1199,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1199,8 +1218,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1219,8 +1238,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1238,8 +1257,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1258,18 +1277,21 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
 
     override suspend fun addToCartUrlApi(
         successCallback: (response: NetworkResult<String>) -> Unit,
-        foodIds: MutableList<String>?, schId:String?, foodName:MutableList<String>?
+        foodIds: MutableList<String>?,
+        schId: String?,
+        foodName: MutableList<String>?,
+        status: MutableList<String>?
     ) {
         try {
-            api.addToCartUrlApi(foodIds,schId,foodName).apply {
+            api.addToCartUrlApi(foodIds, schId, foodName, status).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -1278,8 +1300,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1297,8 +1319,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1317,8 +1339,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1336,8 +1358,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1356,8 +1378,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1376,8 +1398,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1396,8 +1418,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1415,8 +1437,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1435,8 +1457,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1455,17 +1477,17 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
     override suspend fun updatePostCodeApi(
         successCallback: (response: NetworkResult<String>) -> Unit,
-        postCode: String?,longitude:String?,latitude:String?
+        postCode: String?, longitude: String?, latitude: String?
     ) {
         try {
-            api.updatePostCode(postCode,longitude,latitude).apply {
+            api.updatePostCode(postCode, longitude, latitude).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -1474,8 +1496,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1492,8 +1514,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1508,8 +1530,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1524,8 +1546,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1544,8 +1566,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1563,8 +1585,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1583,8 +1605,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
@@ -1603,23 +1625,58 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 
 
     override suspend fun updatePreferencesApi(
         successCallback: (response: NetworkResult<String>) -> Unit,
-        userName: String?,cookingForType: String?,userGender:String?,bodygoal:String?,partner_name:String?,partner_age:String?,partner_gender:String?,family_member_name:String?,
-        family_member_age:String?,child_friendly_meals:String?,dietaryId: MutableList<String>?,favouriteId: MutableList<String>?,
-        dislikeIngId: MutableList<String>?,allergensId: MutableList<String>?,mealRoutineId: MutableList<String>?,cookingFrequency: String?,
-        spendingAmount: String?,duration: String?,eatingOut: String?,takeWay: String?
+        userName: String?,
+        cookingForType: String?,
+        userGender: String?,
+        bodygoal: String?,
+        partner_name: String?,
+        partner_age: String?,
+        partner_gender: String?,
+        family_member_name: String?,
+        family_member_age: String?,
+        child_friendly_meals: String?,
+        dietaryId: MutableList<String>?,
+        favouriteId: MutableList<String>?,
+        dislikeIngId: MutableList<String>?,
+        allergensId: MutableList<String>?,
+        mealRoutineId: MutableList<String>?,
+        cookingFrequency: String?,
+        spendingAmount: String?,
+        duration: String?,
+        eatingOut: String?,
+        takeWay: String?
     ) {
         try {
-            api.updatePreferencesApi(userName,cookingForType,userGender,bodygoal,partner_name,partner_age,partner_gender,family_member_name,
-                family_member_age,child_friendly_meals,dietaryId,favouriteId,dislikeIngId, allergensId, mealRoutineId,
-                cookingFrequency, spendingAmount, duration, eatingOut, takeWay).apply {
+            api.updatePreferencesApi(
+                userName,
+                cookingForType,
+                userGender,
+                bodygoal,
+                partner_name,
+                partner_age,
+                partner_gender,
+                family_member_name,
+                family_member_age,
+                child_friendly_meals,
+                dietaryId,
+                favouriteId,
+                dislikeIngId,
+                allergensId,
+                mealRoutineId,
+                cookingFrequency,
+                spendingAmount,
+                duration,
+                eatingOut,
+                takeWay
+            ).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -1628,8 +1685,172 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: HttpException) {
-            successCallback(NetworkResult.Error(e.message()))
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun getFilterList(successCallback: (response: NetworkResult<String>) -> Unit) {
+        try {
+            api.getFilterList().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun getSuperMarket(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        latitude: String?, longitude: String?
+    ) {
+        try {
+            api.getSuperMarket(latitude, longitude).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun subscriptionGoogle(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        purchaseToken: String?, subscriptionId: String?
+    ) {
+        try {
+            api.subscriptionGoogle(purchaseToken, subscriptionId).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun getBasketUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,storeId:String?) {
+        try {
+            api.getBasketListUrl(storeId).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+    override suspend fun getYourRecipeUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit) {
+        try {
+            api.getYourRecipeUrl().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun sendOtpUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,phone:String?) {
+        try {
+            api.sendOtpUrl(phone).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+    override suspend fun addPhoneUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,phone:String?,otp:String?) {
+        try {
+            api.addPhoneUrl(phone,otp).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+    override suspend fun getAddressUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit) {
+        try {
+            api.getAddressUrl().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+    override suspend fun addAddressUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        latitude: String?, longitude: String?,streetName:String?,streetNum:String?,apartNum:String?,city:String?,country:String?,
+        zipcode:String?,primary:String?,id:String?,type:String?
+    ) {
+        try {
+            api.addAddressUrl(latitude, longitude,streetName,streetNum,apartNum,city,country,zipcode, primary, id, type).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
 

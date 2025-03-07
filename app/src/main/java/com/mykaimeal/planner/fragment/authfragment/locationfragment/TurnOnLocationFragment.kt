@@ -10,7 +10,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -38,6 +40,7 @@ class TurnOnLocationFragment : Fragment() {
     private lateinit var locationViewModel: LocationViewModel
     private var status: String = ""
     private var fusedLocationClient: FusedLocationProviderClient? = null
+    private val LOCATION_PERMISSION_REQUEST_CODE = 1001
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,7 +50,6 @@ class TurnOnLocationFragment : Fragment() {
         binding = FragmentTurnOnLocationBinding.inflate(inflater, container, false)
 
         locationViewModel = ViewModelProvider(this)[LocationViewModel::class.java]
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         /// handle on back pressed
@@ -74,10 +76,13 @@ class TurnOnLocationFragment : Fragment() {
 
         ///checking the device of mobile data in online and offline(show network error message)
         /// turn on location permission and implement api
-        binding!!.rlTurnOnLocation.setOnClickListener {
+        binding!!.rlShareLocation.setOnClickListener {
             status = "1"
 
-            if (BaseApplication.isOnline(requireActivity())){
+            findNavController().navigate(R.id.enterYourAddressFragment)
+//            requestLocationPermission()
+
+        /*    if (BaseApplication.isOnline(requireActivity())){
                 // This condition for check location run time permission
                 if (ContextCompat.checkSelfPermission(
                         requireActivity(),
@@ -95,32 +100,42 @@ class TurnOnLocationFragment : Fragment() {
                             android.Manifest.permission.ACCESS_COARSE_LOCATION
                         ), 100
                     )
-                }
+                }    
             }else{
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-
-            }
-
-           /* if (BaseApplication.isOnline(requireActivity())) {
-                locationApi()
-            } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }*/
         }
+    }
 
-        /// handle click event location permission denied in this time
-        ///checking the device of mobile data in online and offline(show network error message)
-        ///// implement location api
-        binding!!.tvNotNow.setOnClickListener {
-            status = "0"
-            if (BaseApplication.isOnline(requireActivity())) {
-                locationApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-
+    private fun requestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            // Permission is already granted, proceed with location access
+            getCurrentLocation()
+        } else {
+            // Show permission request dialog
+            ActivityCompat.requestPermissions(
+                requireActivity(), arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
         }
     }
+
+    // Handle Permission Result
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation()
+            } else {
+                Toast.makeText(requireActivity(), "Location permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 
 
     @SuppressLint("MissingPermission")
@@ -128,10 +143,7 @@ class TurnOnLocationFragment : Fragment() {
         // Initialize Location manager
         val locationManager = requireActivity().getSystemService(LOCATION_SERVICE) as LocationManager
         // Check condition
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-                LocationManager.NETWORK_PROVIDER
-            )
-        ) {
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             // When location service is enabled
             // Get last location
             fusedLocationClient!!.lastLocation.addOnCompleteListener { task ->
@@ -142,7 +154,7 @@ class TurnOnLocationFragment : Fragment() {
                     // When location result is not
                     // null set latitude
                     status = "1"
-                    locationApi()
+//                    locationApi()
 
                 } else {
                     // When location result is null
@@ -160,7 +172,7 @@ class TurnOnLocationFragment : Fragment() {
                             longitude = location1.longitude.toString()*/
 
                             status = "1"
-                            locationApi()
+//                            locationApi()
 
                         }
                     }
@@ -180,7 +192,6 @@ class TurnOnLocationFragment : Fragment() {
             )
         }
     }
-
 
     /// implement location api & redirection
     private fun locationApi() {

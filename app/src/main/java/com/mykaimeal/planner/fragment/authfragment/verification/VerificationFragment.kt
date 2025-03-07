@@ -297,6 +297,7 @@ class VerificationFragment : Fragment() {
                             val gson = Gson()
                             val forgotModel = gson.fromJson(it.data, ForgotPasswordModel::class.java)
                             if (forgotModel.code == 200 && forgotModel.success) {
+                                binding!!.otpView.setOTP("")
                                 binding!!.relResendVerificationTimer.visibility = View.VISIBLE
                                 binding!!.textResend.isEnabled = false
                                 startTime()
@@ -424,16 +425,7 @@ class VerificationFragment : Fragment() {
                 sessionManagement.setId(signUpVerificationModelData.id.toString())
             }
 
-            if (signUpVerificationModelData.is_cooking_complete==0){
-                val intent = Intent(requireActivity(), EnterYourNameActivity::class.java)
-                startActivity(intent)
-                requireActivity().finish()
-                sessionManagement.setPreferences(true)
-            }else{
-                sessionManagement.setLoginSession(true)
-
-                successDialog()
-            }
+            successDialog(signUpVerificationModelData.is_cooking_complete)
 
         }catch (e:Exception){
             Log.d("verification","message"+e.message)
@@ -531,7 +523,7 @@ class VerificationFragment : Fragment() {
     }
 
     //// this function is used for success password match & redirect location permission screen
-    private fun successDialog() {
+    private fun successDialog(isCookingComplete: Int?) {
         val dialogSuccess: Dialog = context?.let { Dialog(it) }!!
         dialogSuccess.setContentView(R.layout.alert_dialog_singup_success)
         dialogSuccess.window!!.setLayout(
@@ -544,10 +536,17 @@ class VerificationFragment : Fragment() {
         dialogSuccess.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
         rlOkayBtn.setOnClickListener {
+            if (isCookingComplete==0){
+                val intent = Intent(requireActivity(), EnterYourNameActivity::class.java)
+                startActivity(intent)
+                requireActivity().finish()
+                sessionManagement.setPreferences(true)
+            }else{
+                sessionManagement.setLoginSession(true)
+                findNavController().navigate(R.id.turnOnLocationFragment)
+            }
             dialogSuccess.dismiss()
-            findNavController().navigate(R.id.turnOnLocationFragment)
         }
-
     }
 
     override fun onStart() {

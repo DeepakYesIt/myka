@@ -222,8 +222,8 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
         dataList1.add(data8)
         dataList1.add(data9)
 
-        adapterSuperMarket = AdapterSuperMarket(dataList1, requireActivity(), this)
-        rcvBottomDialog!!.adapter = adapterSuperMarket
+       /* adapterSuperMarket = AdapterSuperMarket(dataList1, requireActivity(), this)
+        rcvBottomDialog!!.adapter = adapterSuperMarket*/
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {

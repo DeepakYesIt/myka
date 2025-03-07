@@ -1,0 +1,191 @@
+package com.mykaimeal.planner.fragment.mainfragment.commonscreen.addnumberfragment
+
+import android.annotation.SuppressLint
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import com.google.gson.Gson
+import com.mykaimeal.planner.R
+import com.mykaimeal.planner.basedata.BaseApplication
+import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
+import com.mykaimeal.planner.databinding.FragmentAddNumberVerifyBinding
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addnumberfragment.model.OtpSendModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addnumberfragment.viewmodel.AddNumberVerifyViewModel
+import com.mykaimeal.planner.messageclass.ErrorMessage
+import `in`.aabhasjindal.otptextview.OTPListener
+import kotlinx.coroutines.launch
+import java.util.regex.Pattern
+
+
+class AddNumberVerifyFragment : Fragment() {
+    private var binding: FragmentAddNumberVerifyBinding? = null
+    private lateinit var addNumberVerifyViewModel: AddNumberVerifyViewModel
+    var lastNumber: String? = null
+    private lateinit var commonWorkUtils: CommonWorkUtils
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        binding = FragmentAddNumberVerifyBinding.inflate(layoutInflater, container, false)
+
+        commonWorkUtils = CommonWorkUtils(requireActivity())
+
+        addNumberVerifyViewModel =
+            ViewModelProvider(requireActivity())[AddNumberVerifyViewModel::class.java]
+
+        initialize()
+
+        return binding!!.root
+    }
+
+    private fun initialize() {
+
+        binding!!.etRegPhone.addTextChangedListener(object : TextWatcher {
+            @SuppressLint("ResourceAsColor")
+            override fun afterTextChanged(s: Editable?) {
+                val input = s.toString()
+
+                // Enable the button only if the input is different from the last entered number
+                binding!!.tvVerify.isClickable = input.isNotEmpty() && input != lastNumber
+                // Update lastNumber when textView becomes clickable
+                if (binding!!.tvVerify.isClickable) {
+                    lastNumber = input
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+
+        binding!!.tvVerify.setOnClickListener {
+            if (validate()) {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    getOtpUrl()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
+        }
+
+        binding!!.rlVerificationVerify.setOnClickListener{
+            if (BaseApplication.isOnline(requireActivity())) {
+                addNumberUrl()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+
+        binding?.otpView?.otpListener = object : OTPListener {
+            override fun onInteractionListener() {
+                // Called when user starts typing
+            }
+
+            override fun onOTPComplete(otp: String) {
+                // Called when OTP is fully entered
+                binding!!.rlVerificationVerify.setBackgroundResource(R.drawable.green_btn_background)
+                binding!!.rlVerificationVerify.isClickable=true
+            }
+        }
+    }
+
+    /// add validation based on valid email or phone
+    private fun validate(): Boolean {
+
+        // Check if email/phone is empty
+        if (binding!!.etRegPhone.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.phoneNumber, false)
+            return false
+        }
+        // Check if email or phone is valid
+        else if (!validNumber()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validPhone, false)
+            return false
+        }
+
+        return true
+    }
+
+    /// add validation based on valid phone number
+    private fun validNumber(): Boolean {
+        val email: String = binding!!.etRegPhone.text.toString().trim()
+        if (email.length != 10) {
+            return false
+        }
+        var onlyDigits = true
+        for (i in 0 until email.length) {
+            if (!Character.isDigit(email[i])) {
+                onlyDigits = false
+                break
+            }
+        }
+        return onlyDigits
+    }
+
+    private fun getOtpUrl() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            addNumberVerifyViewModel.sendOtpUrl({
+                BaseApplication.dismissMe()
+                handleApiOtpSendResponse(it)
+            }, binding!!.etRegPhone.text.toString().trim())
+        }
+    }
+
+    private fun addNumberUrl() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            addNumberVerifyViewModel.sendOtpUrl({
+                BaseApplication.dismissMe()
+                handleApiOtpSendResponse(it)
+            }, binding!!.etRegPhone.text.toString().trim())
+        }
+    }
+
+    private fun handleApiOtpSendResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessOtpResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    private fun showAlert(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
+    }
+
+    @SuppressLint("SetTextI18n", "ResourceAsColor")
+    private fun handleSuccessOtpResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, OtpSendModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                binding!!.tvVerify.setTextColor(R.color.grey5)
+                binding!!.relPhoneValidation.visibility = View.VISIBLE
+                binding!!.tvVerify.isClickable=false
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+
+}

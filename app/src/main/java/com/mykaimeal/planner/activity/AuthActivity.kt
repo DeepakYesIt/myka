@@ -48,7 +48,4 @@ class AuthActivity : AppCompatActivity() {
         navController.graph = navGraph
 
     }
-
-
-
 }

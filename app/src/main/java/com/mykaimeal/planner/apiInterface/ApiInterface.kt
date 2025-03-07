@@ -183,6 +183,14 @@ interface ApiInterface {
     @POST(ApiEndPoint.deleteUrl)
     suspend fun userDeleteDataApi(): Response<JsonObject>
 
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.userProfileUpdateUrl)
+    suspend fun userProfileUpdateBioApi(
+        @Field("bio") bio: String
+    ): Response<JsonObject>
+
+
     @FormUrlEncoded
     @POST(ApiEndPoint.userProfileUpdateUrl)
     suspend fun userProfileUpdateApi(
@@ -500,7 +508,8 @@ interface ApiInterface {
     suspend fun addToCartUrlApi(
         @Field("food_ids[]") foodIds: MutableList<String>?,
         @Field("sch_id") schId: String?,
-        @Field("names[]") foodName: MutableList<String>?
+        @Field("names[]") foodName: MutableList<String>?,
+        @Field("status[]") status: MutableList<String>?
     ): Response<JsonObject>
 
     @POST(ApiEndPoint.forPreferenceUrl)
@@ -536,6 +545,57 @@ interface ApiInterface {
     @FormUrlEncoded
     @POST(ApiEndPoint.updateMealUrl)
     suspend fun updateMealUrl(@Body jsonObject: JsonObject): Response<JsonObject>
+
+
+    @POST(ApiEndPoint.filterSearchUrl)
+    suspend fun getFilterList(): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.superMarketsUrl)
+    suspend fun getSuperMarket(@Field("latitude") latitude:String?,
+                               @Field("longitude") longitude:String?): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.subscriptionGoogleUrl)
+    suspend fun subscriptionGoogle(@Field("purchase_token") purchaseToken:String?,
+                               @Field("subscription_id") subscriptionId:String?): Response<JsonObject>
+
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.getBasketListUrl)
+    suspend fun getBasketListUrl(@Field("store_id") storeId:String?): Response<JsonObject>
+
+    @POST(ApiEndPoint.getYourRecipeUrl)
+    suspend fun getYourRecipeUrl(): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.getSendSmsUrl)
+    suspend fun sendOtpUrl(@Field("phone") phone:String?): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.addPhoneUrl)
+    suspend fun addPhoneUrl(@Field("phone") phone:String?,@Field("otp") otp:String?): Response<JsonObject>
+
+
+    @POST(ApiEndPoint.getAddressUrl)
+    suspend fun getAddressUrl(): Response<JsonObject>
+
+    @GET(ApiEndPoint.addAddressUrl)
+    suspend fun addAddressUrl(@Query("latitude") latitude:String?,
+                               @Query("longitude") longitude:String?,
+                               @Query("street_name") streetName:String?,
+                               @Query("street_num") streetNum:String?,
+                               @Query("apart_num") apartNum:String?,
+                               @Query("city") city:String?,
+                               @Query("country") country:String?,
+                               @Query("zipcode") zipcode:String?,
+                               @Query("primary") primary:String?,
+                               @Query("id") id:String?,
+                               @Query("type") type:String?,
+                                   ): Response<JsonObject>
 
     /*   @POST("v1/images:annotate")
        fun annotateImage(@Body request: VisionRequest): Call<VisionResponse>*/

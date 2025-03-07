@@ -105,14 +105,6 @@ class IngredientsDinnerAdapter(
             stopZiggle(holder.itemView)
         }
 
-     /*   if (datalist[position].isOpen){
-            holder.binding.missingIngredientsImg.visibility=View.VISIBLE
-            holder.binding.checkBoxImg.visibility=View.GONE
-        }else{
-            holder.binding.missingIngredientsImg.visibility=View.GONE
-            holder.binding.checkBoxImg.visibility=View.VISIBLE
-        }*/
-
         holder.binding.missingIngredientsImg.setOnClickListener{
             checkTypeStatus="missingIng"
             onItemClickListener.itemSelectUnSelect(position,checkTypeStatus,"Dinner",position)
@@ -130,52 +122,9 @@ class IngredientsDinnerAdapter(
 
         holder.binding.imageMinus.setOnClickListener {
             checkTypeStatus="minus"
-          /*  if (datalist[position].isOpen) {
-                checkStatus = "1"
-            } else {
-                checkStatus = "0"
-            }*/
             onItemClickListener.itemSelectUnSelect(datalist?.get(position)!!.id,checkTypeStatus,"Dinner",position)
 
         }
-
-        /*holder.itemView.setOnLongClickListener {
-            val clipData = ClipData(
-                datalist[position].title, // Use the title as the drag data
-                arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
-                ClipData.Item(datalist[position].title)
-            )
-
-            val shadowBuilder = View.DragShadowBuilder(holder.itemView)
-            holder.itemView.startDragAndDrop(clipData, shadowBuilder, null, 0)
-
-            // Setup onDragListener to handle scrolling
-            holder.itemView.setOnDragListener { v, event ->
-                when (event.action) {
-                    DragEvent.ACTION_DRAG_LOCATION -> {
-                        val yPosition = event.y.toInt()
-
-                        // Adjust this threshold based on your needs
-                        val threshold = 200
-                        if (yPosition < threshold) {
-                            // Scroll Up
-                            recyclerView!!.smoothScrollBy(0, -10) // Scroll up by 10 pixels
-                        } else if (yPosition > recyclerView!!.height - threshold) {
-                            // Scroll Down
-                            recyclerView!!.smoothScrollBy(0, 10) // Scroll down by 10 pixels
-                        }
-                    }
-                    DragEvent.ACTION_DRAG_ENDED -> {
-                        // Reset scroll behavior once drag is over
-                    }
-                }
-                true
-            }
-
-            onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
-            true
-        }*/
-
 
         if (item?.recipe?.label!=null){
             holder.binding.tvBreakfast.text = item.recipe.label
@@ -195,22 +144,6 @@ class IngredientsDinnerAdapter(
             onItemLongClickListener.itemLongClick(position, checkStatus, type)
             true
         }
-
-
-
-        /*holder.itemView.setOnLongClickListener{
-            val clipData = ClipData(
-                datalist[position].title, // Use the title as the drag data
-                arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
-                ClipData.Item(datalist[position].title)
-            )
-
-            val shadowBuilder = View.DragShadowBuilder(holder.itemView)
-            holder.itemView.startDragAndDrop(clipData, shadowBuilder, null, 0)
-            onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
-            true
-//            onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
-        }*/
     }
 
     fun setZiggleEnabled(enabled: Boolean) {

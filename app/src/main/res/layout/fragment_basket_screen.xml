@@ -5,16 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".fragment.mainfragment.commonscreen.BasketScreenFragment">
+    tools:context=".fragment.mainfragment.commonscreen.basketscreen.BasketScreenFragment">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/_15sdp"
+            android:layout_marginStart="@dimen/_10sdp"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -68,81 +68,94 @@
                 android:id="@+id/rlSuperMarket"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/rlHeader"
                 android:layout_marginTop="@dimen/_15sdp">
 
-                <TextView
-                    android:id="@+id/textSuperMarket"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_15sdp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:text="Supermarket"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_12ssp"
-                    android:textStyle="bold" />
+                <RelativeLayout
+                    android:id="@+id/relSuperMarkets"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/textSeeAll1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="@dimen/_15sdp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:text="See All"
-                    android:textColor="#06C169"
-                    android:textSize="@dimen/_12ssp"
-                    android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/textSuperMarket"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_15sdp"
+                        android:fontFamily="@font/montserrat_medium"
+                        android:text="Supermarket"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_12ssp"
+                        android:textStyle="bold" />
 
+                    <TextView
+                        android:id="@+id/textSeeAll1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="@dimen/_15sdp"
+                        android:fontFamily="@font/montserrat_medium"
+                        android:text="See All"
+                        android:textColor="#06C169"
+                        android:textSize="@dimen/_12ssp"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rcvSuperMarket"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/textSuperMarket"
+                    android:layout_below="@+id/relSuperMarkets"
+                    android:layout_marginStart="@dimen/_5sdp"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
 
             </RelativeLayout>
-
 
             <RelativeLayout
                 android:id="@+id/rlYourRecipes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/rlSuperMarket"
                 android:layout_marginTop="@dimen/_15sdp">
 
-                <TextView
-                    android:id="@+id/textYourRecipes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_15sdp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:text="Your Recipes"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_12ssp"
-                    android:textStyle="bold" />
+                <RelativeLayout
+                    android:id="@+id/relYourRecipes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
+                    <TextView
+                        android:id="@+id/textYourRecipes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_15sdp"
+                        android:fontFamily="@font/montserrat_medium"
+                        android:text="Your Recipes"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_12ssp"
+                        android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/textSeeAll2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="@dimen/_15sdp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:text="See All"
-                    android:textColor="#06C169"
-                    android:textSize="@dimen/_12ssp"
-                    android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/textSeeAll2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="@dimen/_15sdp"
+                        android:fontFamily="@font/montserrat_medium"
+                        android:text="See All"
+                        android:textColor="#06C169"
+                        android:textSize="@dimen/_12ssp"
+                        android:textStyle="bold" />
 
+                </RelativeLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rcvYourRecipes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/textYourRecipes"
+                    android:layout_below="@+id/relYourRecipes"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
@@ -150,43 +163,49 @@
 
             </RelativeLayout>
 
-
             <RelativeLayout
                 android:id="@+id/rlIngredients"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/rlYourRecipes"
                 android:layout_marginTop="@dimen/_15sdp">
 
-                <TextView
-                    android:id="@+id/textIngredients"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_15sdp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:text="Ingredients"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_12ssp"
-                    android:textStyle="bold" />
+                <RelativeLayout
+                    android:id="@+id/relIngredients"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/textSeeAll3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="@dimen/_15sdp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:text="See All"
-                    android:textColor="#06C169"
-                    android:textSize="@dimen/_12ssp"
-                    android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/textIngredients"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_15sdp"
+                        android:fontFamily="@font/montserrat_medium"
+                        android:text="Ingredients"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_12ssp"
+                        android:textStyle="bold" />
 
+                    <TextView
+                        android:id="@+id/textSeeAll3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="@dimen/_15sdp"
+                        android:fontFamily="@font/montserrat_medium"
+                        android:text="See All"
+                        android:textColor="#06C169"
+                        android:textSize="@dimen/_12ssp"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rcvIngredients"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
-                    android:layout_below="@+id/textIngredients"
+                    android:layout_below="@+id/relIngredients"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:orientation="vertical"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
@@ -194,83 +213,173 @@
 
             </RelativeLayout>
 
-
             <RelativeLayout
+                android:id="@+id/relBillingDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#FFF7F0"
+                android:layout_below="@+id/rlIngredients">
 
+                <TextView
+                    android:id="@+id/textBililing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:fontFamily="@font/montserrat_medium"
+                    android:text="Billing details"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold" />
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/relBillingDetailAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#E7FFF4"
+                android:layout_below="@+id/relBillingDetails"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginHorizontal="@dimen/_20sdp">
 
-                <TextView
-                    android:id="@+id/textRecipe"
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:id="@+id/relRecipes"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins"
-                    android:layout_marginTop="@dimen/_13sdp"
-                    android:paddingHorizontal="@dimen/_20sdp"
-                    android:text="Recipe"
-                    android:textColor="#4A4A4A" />
+                    android:layout_marginTop="@dimen/_13sdp">
 
-                <TextView
-                    android:id="@+id/textRecipeCount"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/textRecipe"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_medium"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:text="Recipe"
+                        android:textColor="#4A4A4A" />
+
+                    <TextView
+                        android:id="@+id/textRecipeCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:fontFamily="@font/poppins"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:text="7"
+                        android:textColor="#4A4A4A" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/relNetTotalProduct"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:fontFamily="@font/poppins"
-                    android:layout_marginTop="@dimen/_13sdp"
-                    android:paddingHorizontal="@dimen/_20sdp"
-                    android:text="7"
-                    android:textColor="#4A4A4A" />
+                    android:layout_below="@+id/relRecipes"
+                    android:layout_marginTop="@dimen/_5sdp">
 
+                    <TextView
+                        android:id="@+id/textTotalProduct"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_medium"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:text="Net Total"
+                        android:textColor="#4A4A4A" />
 
-                <TextView
-                    android:id="@+id/textServings"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/textNetTotalProduct"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:fontFamily="@font/poppins"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:text="200"
+                        android:textColor="#4A4A4A" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/relTax"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/textRecipe"
-                    android:layout_marginTop="@dimen/_13sdp"
-                    android:fontFamily="@font/poppins"
-                    android:paddingHorizontal="@dimen/_20sdp"
-                    android:text="Servings"
-                    android:textColor="#4A4A4A" />
+                    android:layout_below="@+id/relNetTotalProduct"
+                    android:layout_marginTop="@dimen/_5sdp">
 
-                <TextView
-                    android:id="@+id/textServingsCount"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/textTax"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_medium"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:text="Tax"
+                        android:textColor="#4A4A4A" />
+
+                    <TextView
+                        android:id="@+id/textTaxPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:fontFamily="@font/poppins"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:text="$20"
+                        android:textColor="#4A4A4A" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/relDelivery"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/textRecipe"
-                    android:layout_marginTop="@dimen/_13sdp"
-                    android:layout_alignParentEnd="true"
-                    android:paddingHorizontal="@dimen/_20sdp"
-                    android:fontFamily="@font/poppins"
-                    android:text="3"
-                    android:textColor="#4A4A4A" />
+                    android:layout_below="@+id/relTax"
+                    android:layout_marginTop="@dimen/_5sdp">
 
-                <TextView
-                    android:id="@+id/textCostPerServing"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/textDelivery"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_medium"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:text="Delivery"
+                        android:textColor="#4A4A4A" />
+
+                    <TextView
+                        android:id="@+id/textDeliveyPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:fontFamily="@font/poppins"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:text="$10"
+                        android:textColor="#4A4A4A" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/relProcessingFees"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/textServings"
-                    android:layout_marginTop="@dimen/_13sdp"
-                    android:paddingHorizontal="@dimen/_20sdp"
-                    android:fontFamily="@font/poppins"
-                    android:text="Cost Per Serving"
-                    android:textColor="#4A4A4A" />
+                    android:layout_below="@+id/relDelivery"
+                    android:layout_marginTop="@dimen/_5sdp">
 
-                <TextView
-                    android:id="@+id/textCostPerServingCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/textServings"
-                    android:layout_marginTop="@dimen/_13sdp"
-                    android:layout_alignParentEnd="true"
-                    android:paddingHorizontal="@dimen/_20sdp"
-                    android:fontFamily="@font/poppins"
-                    android:text="$200"
-                    android:textColor="#4A4A4A" />
+                    <TextView
+                        android:id="@+id/textProcessingFees"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_medium"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:text="Processing Fee"
+                        android:textColor="#4A4A4A" />
 
+                    <TextView
+                        android:id="@+id/textProcessingAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:fontFamily="@font/poppins"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:text="2.9%"
+                        android:textColor="#4A4A4A" />
+
+                </RelativeLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -279,16 +388,14 @@
                     android:layout_marginTop="@dimen/_13sdp"
                     android:weightSum="2"
                     android:paddingVertical="@dimen/_4sdp"
-                    android:background="#FE9F45"
-                    android:paddingHorizontal="@dimen/_20sdp"
-                    android:layout_below="@+id/textCostPerServing"
-                    >
+                    android:background="@drawable/add_to_plan_bg"
+                    android:paddingHorizontal="@dimen/_15sdp"
+                    android:layout_below="@+id/relProcessingFees">
 
                     <TextView
                         android:id="@+id/textTotal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/textServings"
                         android:layout_weight="1"
                         android:fontFamily="@font/poppins"
                         android:text="Total"
@@ -302,33 +409,30 @@
                         android:textAlignment="textEnd"
                         android:layout_gravity="end"
                         android:fontFamily="@font/poppins"
-                        android:text="$200"
+                        android:text="$200*"
                         android:textColor="#FFFFFF" />
-
 
                 </LinearLayout>
 
-
             </RelativeLayout>
 
-
-
             <TextView
-                android:id="@+id/textCheckoutTesco"
+                android:id="@+id/textConfirmOrder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Checkout with Tesco"
+                android:text="Confirm Order"
+                android:layout_below="@+id/relBillingDetailAmount"
                 android:textAlignment="center"
-                android:fontFamily="@font/poppins"
-                android:textColor="@color/white"
+                android:fontFamily="@font/poppins_bold"
+                android:textColor="@color/light_green"
                 android:layout_marginTop="@dimen/_20sdp"
-                android:background="@drawable/button_bg"
+                android:background="@drawable/green_outline_border_bg"
                 android:paddingVertical="@dimen/_7sdp"
                 android:layout_marginBottom="@dimen/_20sdp"
-                android:layout_marginHorizontal="@dimen/_20sdp"/>
+                android:layout_marginHorizontal="@dimen/_20sdp" />
 
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </ScrollView>
 

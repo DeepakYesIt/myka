@@ -96,7 +96,6 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
-
         createRecipeViewModel = ViewModelProvider(requireActivity())[CreateRecipeViewModel::class.java]
 
         recipeName = arguments?.getString("name", "").toString()
@@ -292,9 +291,7 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
             return false
         }*/
         return true
-
     }
-
 
     private fun updateBackground(llCreateTitle: LinearLayout, text: String) {
         if (text.isNotEmpty()) {
@@ -356,58 +353,6 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
                 handleApiCreateRecipeResponse(it)
             }, jsonObject)
         }
-
-        /*  // Create a JsonObject for the main JSON structure
-          val jsonObject = JsonObject()
-
-          Log.d("fdfdf","ffd:--0"+ingredientList!!.size)
-  //        Log.d("fdfdfddd","ffd: "+cookbookList[binding!!.spinnerCookBook.selectedIndex].id.toString())
-
-          // Create a JsonArray for ingredients
-          val ingArray = JsonArray()
-          val prepArray = JsonArray()
-
-          // Extract required fields dynamically
-          ingredientList?.forEach { item ->
-              val ingredientString = "${item.ingredientName},${item.quantity},${item.measurement}"
-              ingArray.add(ingredientString)  // Directly adding as JsonPrimitive
-          }
-
-          // Prepare prep steps
-          cookList?.forEach { items ->
-              prepArray.add(items.description)  // Adding description directly
-          }
-
-          if (checkBase64Url == false){
-              recipeMainImageUri = imageUrlToBase64(recipeMainImageUri!!)
-          }
-          var cookBookID=""
-          if (binding!!.spinnerCookBook.text.toString() != ""){
-              cookBookID=cookbookList[binding!!.spinnerCookBook.selectedIndex].id.toString()
-          }
-
-          jsonObject.addProperty("recipe_key", recipeStatus.toString())
-          jsonObject.addProperty("cook_book", cookBookID)
-          jsonObject.addProperty("title", binding!!.etRecipeName.text.toString().trim())
-          jsonObject.add("ingr", ingArray)
-          jsonObject.addProperty("summary", binding!!.edtSummary.text.toString().trim())
-          jsonObject.addProperty("yield", binding!!.textValue.text.toString().trim())
-          jsonObject.addProperty("totalTime", binding!!.edtTotalTime.text.toString().trim())
-          jsonObject.add("prep",prepArray)
-          jsonObject.addProperty("img", recipeMainImageUri)
-
-
-          jsonObject.addProperty("tags",binding!!.etRecipeName.text.toString().trim())
-
-          Log.d("json object ", "******$jsonObject")
-
-          BaseApplication.showMe(requireContext())
-          lifecycleScope.launch {
-              createRecipeViewModel.createRecipeRequestApi({
-                  BaseApplication.dismissMe()
-                  handleApiCreateRecipeResponse(it)
-              }, jsonObject)
-          }*/
     }
 
     private fun handleApiCreateRecipeResponse(result: NetworkResult<String>) {
@@ -675,14 +620,18 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri ->
-                file = MediaUtility.getPath(requireContext(), uri)?.let { File(it) }
+            try {
+                result.data?.data?.let { uri ->
+                    file = MediaUtility.getPath(requireContext(), uri)?.let { File(it) }
 
-                ingredientList!![position!!].uri = UriToBase64(requireActivity(), uri)
-                ingredientList!![position!!].status=true
-                showCrossIngImage?.visibility = View.VISIBLE
-                showIngredientImage?.setImageURI(uri)
-                ingredientLists?.add(file!!.absolutePath)
+                    ingredientList!![position!!].uri = UriToBase64(requireActivity(), uri)
+                    ingredientList!![position!!].status=true
+                    showCrossIngImage?.visibility = View.VISIBLE
+                    showIngredientImage?.setImageURI(uri)
+                    ingredientLists?.add(file!!.absolutePath)
+                }
+            }catch (e:Exception){
+                BaseApplication.alertError(requireContext(), e.message, false)
             }
         }
     }

@@ -8,10 +8,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
-
-
     suspend fun homeDetailsRequest(successCallback: (response: NetworkResult<String>) -> Unit){
-        repository.homeDetailsRequestApi { successCallback(it) }
+        repository.homeDetailsRequestApi{ successCallback(it) }
     }
 
     suspend fun likeUnlikeRequest(successCallback: (response: NetworkResult<String>) -> Unit,
@@ -23,5 +21,9 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
         repository.getCookBookRequestApi { successCallback(it) }
     }
 
+    suspend fun getSuperMarket(successCallback: (response: NetworkResult<String>) -> Unit,
+                               latitude: String?,longitude: String?){
+        repository.getSuperMarket({ successCallback(it) },latitude,longitude)
+    }
 
 }

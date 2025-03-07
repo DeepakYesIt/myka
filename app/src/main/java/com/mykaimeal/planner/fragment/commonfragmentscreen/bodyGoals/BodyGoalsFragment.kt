@@ -234,8 +234,6 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
         binding!!.imageBackBodyGoals.setOnClickListener {
             if (sessionManagement.getCookingScreen() != "Profile") {
                 if (sessionManagement.getCookingFor().equals("Myself")) {
-                   /* val intent = Intent(requireActivity(), CookingForScreenActivity::class.java)
-                    startActivity(intent)*/
                     requireActivity().finish()
                 } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
                     findNavController().navigateUp()

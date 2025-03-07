@@ -73,6 +73,15 @@ object ApiEndPoint {
     const val getSchedule="get-schedule"
     const val getMealByUrl="get-meal-by-url"
     const val updateMealUrl="update-meal"
+    const val filterSearchUrl="for-filter-search"
+    const val superMarketsUrl="super-markets"
+    const val subscriptionGoogleUrl="subscription/google"
+    const val getAddressUrl="get-address"
+    const val addAddressUrl="add-address"
+    const val getBasketListUrl="get-basketlist"
+    const val getYourRecipeUrl="your-recipe"
+    const val getSendSmsUrl="send-sms"
+    const val addPhoneUrl="add-phone"
 
 
 }

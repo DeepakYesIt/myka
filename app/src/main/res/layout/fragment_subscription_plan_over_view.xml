@@ -7,7 +7,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:clipChildren="false"
     android:clipToPadding="false"
-    tools:context=".fragment.mainfragment.profilesetting.SubscriptionPlanOverViewFragment">
+    tools:context=".fragment.mainfragment.profilesetting.subscriptionplan.SubscriptionPlanOverViewFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -177,7 +177,7 @@ reinvented version of your favorite meal."
             android:clipChildren="false"
             android:clipToPadding="false"
             android:paddingBottom="@dimen/_30sdp"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <LinearLayout
                 android:id="@+id/llSubPlans"
@@ -221,7 +221,7 @@ reinvented version of your favorite meal."
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/_8sdp"
                         android:fontFamily="@font/montserrat_medium"
-                        android:text="Basic Plan"
+                        android:text="My-kai Basic"
                         android:textAlignment="center"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_10ssp"
@@ -289,7 +289,7 @@ reinvented version of your favorite meal."
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/_8sdp"
                         android:fontFamily="@font/montserrat_medium"
-                        android:text="Myka\n standard"
+                        android:text="My-kai\n standard"
                         android:textAlignment="center"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_10ssp"

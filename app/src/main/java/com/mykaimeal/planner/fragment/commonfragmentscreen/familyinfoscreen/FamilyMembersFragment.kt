@@ -71,8 +71,6 @@ class FamilyMembersFragment : Fragment() {
                     if (sessionManagement.getCookingScreen()=="Profile"){
                         findNavController().navigateUp()
                     }else{
-                       /* val intent = Intent(requireActivity(), CookingForScreenActivity::class.java)
-                        startActivity(intent)*/
                         requireActivity().finish()
                     }
 

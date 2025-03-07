@@ -22,9 +22,9 @@ class MissingIngredientViewModel @Inject constructor(private val repository: Mai
     }
 
 
-    suspend fun addToCartUrlApi(successCallback: (response: NetworkResult<String>) -> Unit,foodIds: MutableList<String>?, schId:String?, foodName:MutableList<String>?){
-        repository.addToCartUrlApi ({ successCallback(it) },foodIds,schId,foodName)
+    suspend fun addToCartUrlApi(successCallback: (response: NetworkResult<String>) -> Unit,foodIds: MutableList<String>?, schId:String?,
+                                foodName:MutableList<String>?,status:MutableList<String>?){
+        repository.addToCartUrlApi ({ successCallback(it) },foodIds,schId,foodName,status)
     }
-
 
 }

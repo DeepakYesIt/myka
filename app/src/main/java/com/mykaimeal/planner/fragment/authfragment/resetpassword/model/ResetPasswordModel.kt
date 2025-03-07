@@ -9,12 +9,12 @@ data class ResetPasswordModel(
 
 data class ResetPasswordModelData(
     val bio: String,
-    val bodygoal: Int,
+    val bodygoal: Any,
     val calories: Int,
     val carbs: Int,
     val conversions: Any,
-    val cooking_for_type: Int,
-    val cooking_frequency: Int,
+    val cooking_for_type: Any,
+    val cooking_frequency: Any,
     val country: Any,
     val created_at: String,
     val deleted_at: Any,
@@ -40,7 +40,7 @@ data class ResetPasswordModelData(
     val social_id: Any,
     val social_type: Any,
     val status: Int,
-    val take_way: Int,
+    val take_way: Any,
     val updated_at: String,
     val user_type: Int
 )

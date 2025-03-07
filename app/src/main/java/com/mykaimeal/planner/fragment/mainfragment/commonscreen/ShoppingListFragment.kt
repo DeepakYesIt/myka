@@ -10,14 +10,14 @@ import androidx.navigation.fragment.findNavController
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.IngredientsAdapter
-import com.mykaimeal.planner.adapter.YourRecipeAdapter
+import com.mykaimeal.planner.adapter.BasketYourRecipeAdapter
 import com.mykaimeal.planner.databinding.FragmentShoppingListBinding
 import com.mykaimeal.planner.model.IngredientsItems
 import com.mykaimeal.planner.model.YourRecipeItem
 
 class ShoppingListFragment : Fragment(),OnItemClickListener {
     private lateinit var binding: FragmentShoppingListBinding
-    private lateinit var adapterRecipe: YourRecipeAdapter
+    private lateinit var adapterRecipe: BasketYourRecipeAdapter
     private lateinit var adapterIngredients: IngredientsAdapter
 
     private val listRecipe = mutableListOf<YourRecipeItem>()
@@ -61,8 +61,8 @@ class ShoppingListFragment : Fragment(),OnItemClickListener {
 
     private fun adapterInitialize(){
 
-        adapterRecipe = YourRecipeAdapter(requireContext(), itemList = listRecipe,this)
-        adapterIngredients = IngredientsAdapter(requireContext(), itemList = listIngredients)
+//        adapterRecipe = YourRecipeAdapter(requireContext(), itemList = listRecipe,this)
+//        adapterIngredients = IngredientsAdapter(requireContext(), itemList = listIngredients)
 
         binding.rcvYourRecipes.adapter = adapterRecipe
         binding.rcvIngredients.adapter = adapterIngredients
@@ -83,8 +83,8 @@ class ShoppingListFragment : Fragment(),OnItemClickListener {
             }
         }
 
-        adapterRecipe.addItems(initialList1)
-        adapterIngredients.addItems(initialList2)
+//        adapterRecipe.addItems(initialList1)
+//        adapterIngredients.addItems(initialList2)
 
     }
 

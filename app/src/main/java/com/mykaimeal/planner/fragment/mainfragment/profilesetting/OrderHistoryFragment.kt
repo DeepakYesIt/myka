@@ -1,0 +1,102 @@
+package com.mykaimeal.planner.fragment.mainfragment.profilesetting
+
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
+import com.mykaimeal.planner.OnItemClickedListener
+import com.mykaimeal.planner.R
+import com.mykaimeal.planner.activity.MainActivity
+import com.mykaimeal.planner.adapter.AdapterOrderHistoryItem
+import com.mykaimeal.planner.adapter.RecipeCookedAdapter
+import com.mykaimeal.planner.databinding.FragmentOrderHistoryBinding
+import com.mykaimeal.planner.databinding.FragmentSettingProfileBinding
+import com.mykaimeal.planner.model.DataModel
+
+class OrderHistoryFragment : Fragment(),OnItemClickedListener {
+
+    private var binding: FragmentOrderHistoryBinding? = null
+    private var dataList3: MutableList<DataModel> = mutableListOf()
+    private var adapterOrderHistoryItem: AdapterOrderHistoryItem? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        binding = FragmentOrderHistoryBinding.inflate(inflater, container, false)
+
+        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
+        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
+
+        binding!!.rlStartOrder.setOnClickListener{
+            binding!!.relNoOrders.visibility=View.GONE
+            binding!!.rcyOrderHistory.visibility=View.VISIBLE
+        }
+
+        orderHistoryModel()
+
+        return binding!!.root
+    }
+
+
+    private fun orderHistoryModel() {
+        val data1 = DataModel()
+        val data2 = DataModel()
+        val data3 = DataModel()
+        val data4 = DataModel()
+        val data5 = DataModel()
+
+        data1.title = "11 jan"
+        data1.price="$48.47"
+        data1.distance="Delivered - 926 Gainsway Street, NY 12603"
+        data1.isOpen = false
+        data1.quantity="6 items"
+        data1.image = R.drawable.ic_welmart_super_market
+
+        data2.title = "11 jan"
+        data2.price="$48.47"
+        data2.distance="Delivered to Home\n" +
+                "17 Sugar Lane South Ozone Park, NY 11420"
+        data2.isOpen = false
+        data2.quantity="6 items"
+        data2.image = R.drawable.ic_kroger_super_market
+
+        data3.title = "11 jan"
+        data3.price="$48.47"
+        data3.distance="Delivered - 926 Gainsway Street, NY 12603"
+        data3.isOpen = false
+        data3.quantity="6 items"
+        data3.image = R.drawable.ic_target_super_market
+
+        data4.title = "11 jan"
+        data4.price="$48.47"
+        data4.distance="Delivered - 926 Gainsway Street, NY 12603"
+        data4.isOpen = false
+        data4.quantity="6 items"
+        data4.image = R.drawable.ic_welmart_super_market
+
+        data5.title = "11 jan"
+        data5.price="$48.47"
+        data5.distance="Delivered - 926 Gainsway Street, NY 12603"
+        data5.isOpen = false
+        data5.quantity="6 items"
+        data5.image = R.drawable.ic_kroger_super_market
+
+        dataList3.add(data1)
+        dataList3.add(data2)
+        dataList3.add(data3)
+        dataList3.add(data4)
+        dataList3.add(data5)
+
+        adapterOrderHistoryItem = AdapterOrderHistoryItem(dataList3, requireActivity(), this)
+         binding!!.rcyOrderHistory.adapter = adapterOrderHistoryItem
+    }
+
+    override fun itemClicked(position: Int?, list: MutableList<String>?, status: String?, type: String?) {
+        findNavController().navigate(R.id.orderDetailsScreenFragment)
+    }
+
+}

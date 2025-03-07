@@ -43,6 +43,7 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
     private var favouriteSelectId = mutableListOf<String>()
     private lateinit var favouriteCuisineViewModel: FavouriteCuisineViewModel
     private var favouriteCuiModelData: MutableList<FavouriteCuisinesModelData>? = null
+    private var isExpanded = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -129,7 +130,6 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
                     findNavController().navigate(R.id.ingredientDislikesFragment)
                 } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
                     findNavController().navigate(R.id.mealRoutineFragment)
-//                    findNavController().navigate(R.id.cookingScheduleFragment)
                 } else {
                     findNavController().navigate(R.id.mealRoutineFragment)
                 }
@@ -142,6 +142,12 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
+        }
+
+        binding!!.relMoreButton.setOnClickListener { v ->
+            isExpanded = true
+            adapterFavouriteCuisinesItem!!.setExpanded(true)
+            binding!!.relMoreButton.visibility = View.GONE // Hide button after expanding
         }
     }
 
@@ -202,7 +208,6 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
                 findNavController().navigate(R.id.ingredientDislikesFragment)
             } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
                 findNavController().navigate(R.id.mealRoutineFragment)
-//                    findNavController().navigate(R.id.cookingScheduleFragment)
             } else {
                 findNavController().navigate(R.id.mealRoutineFragment)
             }
@@ -301,6 +306,11 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
                         0, FavouriteCuisinesModelData(id = -1, selected = true, "None")
                     )
                 }
+
+                // Show "Show More" button only if there are more than 3 items
+                if (favouriteModelData.size > 3) {
+                    binding!!.relMoreButton.visibility = View.VISIBLE
+                }
                 favouriteCuiModelData = favouriteModelData
                 adapterFavouriteCuisinesItem =
                     AdapterFavouriteCuisinesItem(favouriteModelData, requireActivity(), this)
@@ -322,6 +332,10 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
                 }
 
                 favouriteCuiModelData = favouriteModelData
+                // Show "Show More" button only if there are more than 3 items
+                if (favouriteModelData.size > 3) {
+                    binding!!.relMoreButton.visibility = View.VISIBLE
+                }
                 adapterFavouriteCuisinesItem =
                     AdapterFavouriteCuisinesItem(favouriteModelData, requireActivity(), this)
                 binding!!.rcyFavCuisines.adapter = adapterFavouriteCuisinesItem

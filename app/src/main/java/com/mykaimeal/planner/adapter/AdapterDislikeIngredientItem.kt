@@ -18,6 +18,7 @@ class AdapterDislikeIngredientItem(private var dislikeIngredientsData: List<Disl
 
     private val selectedPositions = mutableSetOf<Int>() // Track selected positions
     private val dietaryId = mutableListOf<String>() // Track selected dietary IDs
+    private var isExpanded = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -96,7 +97,12 @@ class AdapterDislikeIngredientItem(private var dislikeIngredientsData: List<Disl
     }
 
     override fun getItemCount(): Int {
-        return dislikeIngredientsData.size
+        return if (isExpanded) dislikeIngredientsData.size else Math.min(3, dislikeIngredientsData.size)
+    }
+
+    fun setExpanded(expanded: Boolean) {
+        isExpanded = expanded
+        notifyDataSetChanged()
     }
 
     fun filterList(filteredList: MutableList<DislikedIngredientsModelData>) {

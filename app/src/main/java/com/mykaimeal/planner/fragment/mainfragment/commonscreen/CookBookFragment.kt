@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
@@ -170,6 +171,11 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
                     adapterCookBookItem = AdapterCookBookItem(cookbookList, requireActivity(), this)
                     binding!!.rcyCookBookAdding.adapter = adapterCookBookItem
                     getCookBookTypeList()
+                }else{
+                    // OR directly modify the original list
+                    adapterCookBookItem = AdapterCookBookItem(cookbookList, requireActivity(), this)
+                    binding!!.rcyCookBookAdding.adapter = adapterCookBookItem
+                    getCookBookTypeList()
                 }
             } else {
                 if (apiModel.code == ErrorMessage.code) {
@@ -193,11 +199,12 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
             findNavController().navigateUp()
         }
 
-
         binding!!.rlAddRecipes.setOnClickListener {
-            findNavController().navigate(R.id.createRecipeFragment)
+            val bundle = Bundle().apply {
+                putString("name","")
+            }
+            findNavController().navigate(R.id.createRecipeFragment,bundle)
         }
-
     }
 
     private fun getCookBookTypeList(){
