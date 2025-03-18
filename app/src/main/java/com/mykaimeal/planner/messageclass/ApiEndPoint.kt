@@ -66,6 +66,7 @@ object ApiEndPoint {
     const val createCookBook="add-cook-book"
 
     const val removeMeal="remove-meal"
+    const val removeBasketUrl="remove-basket"
     const val getMissingIngUrl="get-missing-ingredient"
     const val forSearchUrl="for-search"
     const val addToCartUrl="add-to-cart"
@@ -82,6 +83,11 @@ object ApiEndPoint {
     const val getYourRecipeUrl="your-recipe"
     const val getSendSmsUrl="send-sms"
     const val addPhoneUrl="add-phone"
+    const val getShoppingListUrl="shopping-list"
+    const val addNotesUrl="add-notes"
+    const val getNotesUrl="get-notes"
+    const val getCheckoutUrl="checkout"
+    const val getOrderProductUrl="order-product"
 
 
 }

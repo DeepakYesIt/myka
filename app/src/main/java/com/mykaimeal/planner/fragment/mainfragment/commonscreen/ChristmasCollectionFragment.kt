@@ -267,10 +267,10 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         val currentChannel = "mobile_share"
         val currentReferrerId = sessionManagement.getId().toString()
 
-// Base OneLink URL (Replace this with your actual OneLink domain)
+        // Base OneLink URL (Replace this with your actual OneLink domain)
         val baseOneLink = "https://mykaimealplanner.onelink.me/LQhk/"
 
-// Manually append query parameters to ensure they appear in the final link
+        // Manually append query parameters to ensure they appear in the final link
         val deepLinkUrl = Uri.parse(baseOneLink).buildUpon()
             .appendQueryParameter("af_user_id", currentReferrerId)
             .appendQueryParameter("CookbooksID", id)

@@ -17,6 +17,8 @@ import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterIngredientsRecipeBinding
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.recipedetails.apiresponse.IngredientsModel
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 
 class IngredientsRecipeAdapter(var datalist: MutableList<IngredientsModel>?, var requireActivity: FragmentActivity, var OnItemSelectListener: OnItemSelectListener): RecyclerView.Adapter<IngredientsRecipeAdapter.ViewHolder>() {
@@ -88,10 +90,13 @@ class IngredientsRecipeAdapter(var datalist: MutableList<IngredientsModel>?, var
             }
 
             if (data.quantity!=null){
+                val roundedQuantity = data.quantity.let {
+                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+                }
                 if (!data.measure.equals("<unit>")){
-                    holder.binding.tvTitleDesc.text =""+data.quantity+" "+data.measure
+                    holder.binding.tvTitleDesc.text =""+roundedQuantity+" "+data.measure
                 }else{
-                    holder.binding.tvTitleDesc.text =""+data.quantity
+                    holder.binding.tvTitleDesc.text =""+roundedQuantity
                 }
             }
 

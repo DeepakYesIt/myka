@@ -7,7 +7,6 @@ class DataModel() {
     lateinit var price:String
     lateinit var distance:String
     lateinit var type:String
-    lateinit var typeAttribute:String
     lateinit var quantity:String
     lateinit var time:String
     lateinit var date:String
@@ -15,6 +14,7 @@ class DataModel() {
     var image: Int = 0
     var value: Int = 0
 
+    var valuePrice:Double= 0.0
     var isOpen = false
 
 }

@@ -166,12 +166,14 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 if (apiModel.data!=null && apiModel.data.size>0){
+                    binding!!.llCookBookItems.visibility=View.VISIBLE
                     cookbookList.addAll(apiModel.data)
                     // OR directly modify the original list
                     adapterCookBookItem = AdapterCookBookItem(cookbookList, requireActivity(), this)
                     binding!!.rcyCookBookAdding.adapter = adapterCookBookItem
                     getCookBookTypeList()
                 }else{
+                    binding!!.llCookBookItems.visibility=View.VISIBLE
                     // OR directly modify the original list
                     adapterCookBookItem = AdapterCookBookItem(cookbookList, requireActivity(), this)
                     binding!!.rcyCookBookAdding.adapter = adapterCookBookItem

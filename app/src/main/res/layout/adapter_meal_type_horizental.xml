@@ -78,7 +78,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_30sdp"
-                android:layout_marginTop="@dimen/_3sdp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:background="@drawable/time_bg"
                 android:gravity="center|start"
                 android:orientation="horizontal"
@@ -113,7 +113,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_30sdp"
-                android:layout_marginTop="@dimen/_7sdp"
+                android:layout_marginTop="@dimen/_17sdp"
                 android:background="@drawable/time_bg"
                 android:gravity="center|start"
                 android:orientation="horizontal">
@@ -151,6 +151,7 @@
                 android:layout_marginTop="@dimen/_7sdp"
                 android:background="@drawable/time_bg"
                 android:gravity="center|start"
+                android:visibility="gone"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -176,6 +177,7 @@
                 android:layout_marginTop="@dimen/_5sdp"
                 android:fontFamily="@font/poppins_medium"
                 android:text="0 min"
+                android:visibility="gone"
                 android:textColor="#FE9F45"
                 android:textSize="@dimen/_10sdp" />
 

@@ -17,6 +17,8 @@ import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterIngredientsRecipeBinding
 import com.mykaimeal.planner.fragment.mainfragment.hometab.missingingredientsfragment.model.MissingIngredientModelData
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 class AdapterMissingIngredientsItem(var datalist: MutableList<MissingIngredientModelData>?, var requireActivity: FragmentActivity, var onItemSelectListener: OnItemSelectListener): RecyclerView.Adapter<AdapterMissingIngredientsItem.ViewHolder>() {
 
@@ -76,20 +78,34 @@ class AdapterMissingIngredientsItem(var datalist: MutableList<MissingIngredientM
             }
 
             if (data.quantity!=null){
+                Log.d("@@@@@@@@$$$$$$$$","Quantity******"+datalist!![0].quantity)
+
+                val roundedQuantity = data.quantity.let {
+                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+                }
                 if (!data.measure.equals("<unit>")){
-                    holder.binding.tvTitleDesc.text =""+data.quantity+" "+data.measure
+                    holder.binding.tvTitleDesc.text =""+roundedQuantity+" "+data.measure
                 }else{
-                    holder.binding.tvTitleDesc.text =""+data.quantity
+                    holder.binding.tvTitleDesc.text =""+roundedQuantity
                 }
             }
 
             holder.binding.imgCheckbox.setOnClickListener{
                 onItemSelectListener.itemSelect(position,"","")
-
             }
 
         }catch (e:Exception){
             Log.d("@@@@ ","Error ******"+e.message.toString())
+        }
+    }
+
+    private fun truncateToTwoDecimalPlaces(value: String): String {
+        return try {
+            BigDecimal(value)
+                .setScale(2, RoundingMode.DOWN) // Truncate without rounding
+                .toPlainString() // Ensures no scientific notation
+        } catch (e: NumberFormatException) {
+            "0.00" // Default value if input is invalid
         }
     }
 

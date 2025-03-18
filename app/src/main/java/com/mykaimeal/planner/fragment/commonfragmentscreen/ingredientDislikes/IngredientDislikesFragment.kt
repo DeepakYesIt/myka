@@ -44,9 +44,9 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue: Int = 0
     private var status: String? = ""
+    private var itemCount:String = "10"  // Default count
     private var dislikeSelectedId = mutableListOf<String>()
     private lateinit var dislikeIngredientsViewModel: DislikeIngredientsViewModel
-    private var isExpanded = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -195,9 +195,20 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
         }
 
         binding!!.relMoreButton.setOnClickListener { v ->
-            isExpanded = true
             dislikeIngredientsAdapter!!.setExpanded(true)
+            binding!!.relMoreButton.visibility=View.VISIBLE
+
+/*
             binding!!.relMoreButton.visibility = View.GONE // Hide button after expanding
+*/
+
+            itemCount = (itemCount.toInt() + 10).toString()  // Convert to Int, add 10, convert back to String
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireContext())) {
+                ingredientDislikeApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
     }
 
@@ -240,7 +251,7 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
     private fun ingredientDislikeApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            dislikeIngredientsViewModel.getDislikeIngredients {
+            dislikeIngredientsViewModel.getDislikeIngredients({
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
@@ -269,7 +280,7 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
                         showAlertFunction(it.message, false)
                     }
                 }
-            }
+            },itemCount)
         }
     }
 
@@ -292,10 +303,12 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
                     )
                 }
 
-                // Show "Show More" button only if there are more than 3 items
+                /*// Show "Show More" button only if there are more than 3 items
                 if (dislikeIngModelData.size > 3) {
                     binding!!.relMoreButton.visibility = View.VISIBLE
-                }
+                }*/
+
+
                 dislikeIngredientModelData = dislikeIngModelData.toMutableList()
 
                 dislikeIngredientsAdapter =
@@ -317,10 +330,13 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
                     ) // ID set to -1 as an indicator
                 }
 
-                // Show "Show More" button only if there are more than 3 items
-                if (dislikeIngModelData.size > 3) {
-                    binding!!.relMoreButton.visibility = View.VISIBLE
+                if (itemCount=="10"){
+                    // Show "Show More" button only if there are more than 3 items
+                    if (dislikeIngModelData.size > 3) {
+                        binding!!.relMoreButton.visibility = View.VISIBLE
+                    }
                 }
+
                 dislikeIngredientModelData = dislikeIngModelData.toMutableList()
                 dislikeIngredientsAdapter =
                     AdapterDislikeIngredientItem(dislikeIngModelData, requireActivity(), this)
@@ -336,18 +352,23 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
     }
 
     private fun searchable(editText: String) {
-        val filteredList: MutableList<DislikedIngredientsModelData> =
-            java.util.ArrayList<DislikedIngredientsModelData>()
-        for (item in dislikeIngredientModelData) {
-            if (item.name.toLowerCase().contains(editText.lowercase(Locale.getDefault()))) {
-                filteredList.add(item)
+        if (editText!=""){
+            binding!!.relMoreButton.visibility=View.GONE
+            val filteredList: MutableList<DislikedIngredientsModelData> =
+                java.util.ArrayList<DislikedIngredientsModelData>()
+            for (item in dislikeIngredientModelData) {
+                if (item.name.toLowerCase().contains(editText.lowercase(Locale.getDefault()))) {
+                    filteredList.add(item)
+                }
             }
-        }
-        if (filteredList.size > 0) {
-            dislikeIngredientsAdapter!!.filterList(filteredList)
-            binding!!.rcyIngDislikes.visibility = View.VISIBLE
-        } else {
-            binding!!.rcyIngDislikes.visibility = View.GONE
+            if (filteredList.size > 0) {
+                dislikeIngredientsAdapter!!.filterList(filteredList)
+                binding!!.rcyIngDislikes.visibility = View.VISIBLE
+            } else {
+                binding!!.rcyIngDislikes.visibility = View.GONE
+            }
+        }else{
+            binding!!.relMoreButton.visibility=View.VISIBLE
         }
     }
 

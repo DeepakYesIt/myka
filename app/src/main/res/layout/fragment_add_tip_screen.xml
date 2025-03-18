@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.mainfragment.commonscreen.AddTipScreenFragment">
+    tools:context=".fragment.mainfragment.commonscreen.addtipscreen.AddTipScreenFragment">
 
     <RelativeLayout
         android:id="@+id/layTitle"
@@ -21,7 +21,10 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
                 android:src="@drawable/back_icon" />
         </RelativeLayout>
 
@@ -52,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:src="@drawable/add_tip_amico_icon"/>
+                android:src="@drawable/add_tip_main_icon"/>
 
             <TextView
                 android:id="@+id/tvDescriptions"
@@ -75,6 +78,7 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
+                    android:id="@+id/linearNotNow"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/edittext_bg"
@@ -95,6 +99,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/llSevenDollar"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/edittext_bg"
@@ -118,7 +123,8 @@
                         android:id="@+id/tvDollarSeven"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="@dimen/_5sdp"
+                        android:paddingVertical="@dimen/_5sdp"
+                        android:paddingHorizontal="@dimen/_3sdp"
                         android:textColor="@color/light_green"
                         android:layout_marginHorizontal="@dimen/_15sdp"
                         android:text="$7"
@@ -127,6 +133,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/llNineDollar"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/edittext_bg"
@@ -150,7 +157,8 @@
                         android:id="@+id/tvDollarNine"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="@dimen/_5sdp"
+                        android:paddingVertical="@dimen/_5sdp"
+                        android:paddingHorizontal="@dimen/_3sdp"
                         android:textColor="@color/light_green"
                         android:layout_marginHorizontal="@dimen/_15sdp"
                         android:text="$9"
@@ -159,6 +167,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/llTwelveDollar"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/edittext_bg"
@@ -182,7 +191,8 @@
                         android:id="@+id/tvDollarTwelve"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="@dimen/_5sdp"
+                        android:paddingVertical="@dimen/_5sdp"
+                        android:paddingHorizontal="@dimen/_3sdp"
                         android:textColor="@color/light_green"
                         android:layout_marginHorizontal="@dimen/_15sdp"
                         android:text="$12"
@@ -191,6 +201,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/llFifteenDollar"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/edittext_bg"
@@ -214,7 +225,8 @@
                         android:id="@+id/tvDollarFifteen"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="@dimen/_5sdp"
+                        android:paddingVertical="@dimen/_5sdp"
+                        android:paddingHorizontal="@dimen/_3sdp"
                         android:textColor="@color/light_green"
                         android:layout_marginHorizontal="@dimen/_15sdp"
                         android:text="$15"

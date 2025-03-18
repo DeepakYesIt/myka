@@ -270,6 +270,7 @@
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
+                                    android:maxLength="5"
                                     android:text="0"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
@@ -312,6 +313,7 @@
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
                                     android:text="0"
+                                    android:maxLength="5"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
@@ -353,6 +355,7 @@
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
                                     android:text="0"
+                                    android:maxLength="5"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
@@ -394,6 +397,7 @@
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
                                     android:text="0"
+                                    android:maxLength="5"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
@@ -1265,6 +1269,7 @@
                         android:textSize="@dimen/_14sdp" />
 
                     <ImageView
+                        android:id="@+id/imgAddSnacks"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -1306,6 +1311,7 @@
                         android:textSize="@dimen/_14sdp" />
 
                     <ImageView
+                        android:id="@+id/imgAddTeaTime1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"

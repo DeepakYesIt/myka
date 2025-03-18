@@ -1,4 +1,4 @@
-package com.mykaimeal.planner.fragment.mainfragment.commonscreen
+package com.mykaimeal.planner.fragment.mainfragment.commonscreen.supermarktesnearbyscreen
 
 import android.graphics.Color
 import android.os.Bundle

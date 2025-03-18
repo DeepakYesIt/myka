@@ -27,8 +27,10 @@ class CategoryProductAdapter(private val products: List<DataModel>, private var 
         fun bind(product: DataModel) {
             binding.textProductName.text = product.title
             binding.productImage.setImageResource(product.image)
+/*
             binding.textProductQuantity.text = product.quantity
-            binding.textPrice.text = "$${product.value}"
+*/
+            binding.textPrice.text = "$${product.valuePrice.toString()}"
 
             // Implement quantity controls
             binding.imageDecreaseQuantity.setOnClickListener {

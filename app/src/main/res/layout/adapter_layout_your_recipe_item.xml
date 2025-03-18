@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/_10sdp"
     app:cardCornerRadius="@dimen/_10sdp"
-    app:cardElevation="@dimen/_10sdp">
+    app:cardElevation="@dimen/_3sdp">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -36,8 +36,8 @@
 
             <ImageView
                 android:id="@+id/imageCross"
-                android:layout_width="@dimen/_13sdp"
-                android:layout_height="@dimen/_13sdp"
+                android:layout_width="@dimen/_14sdp"
+                android:layout_height="@dimen/_14sdp"
                 android:elevation="@dimen/_180sdp"
                 android:layout_marginTop="@dimen/_8sdp"
                 android:layout_marginEnd="@dimen/_8sdp"

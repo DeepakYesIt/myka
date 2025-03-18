@@ -91,7 +91,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
-
         (activity as MainActivity?)?.changeBottom("home")
 
         cookbookList.clear()

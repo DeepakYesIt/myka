@@ -20,7 +20,6 @@
                 android:id="@+id/layTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:gravity="start|center">
 
@@ -88,7 +87,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="@dimen/_8sdp"
-                        android:src="@drawable/order_history_icon" />
+                        android:src="@drawable/us_flag_icon" />
 
                     <ImageView
                         android:layout_width="wrap_content"

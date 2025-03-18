@@ -6,7 +6,7 @@
     <string name="simplify_cooking_meal_planning_and_shopping_all_in_one_place">Simplify cooking, meal planning,\n and shopping all in one place</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-<!--
+    <!--
     <string name="api_key">AIzaSyC9NuN_f-wESHh3kihTvpbvdrmKlTQurxw</string>
 -->
     <string name="api_key">AIzaSyA-e6IRZ8axxpwrm1GEjlFOTzwb5KVQHgc</string>
@@ -96,7 +96,7 @@
 
     <string name="if_your_cookbook_is_public_the_people_you_invite_will_have_a_snapshot_of_this_cookbook">If your cookbook is public, the people you invite will have a snapshot of this cookbook.</string>
     <string name="uh_oh_the_fridge_is_empty_let_s_fill_it_up_with_some_delicious_dishes"> <font color="#000000"><b>Uh oh,</b></font> <font color="#3C4541"> the fridge is empty!\n Let’s fill it up with some delicious dishes!</font></string>
-    <string name="do_you_really_want_to_remove_this_recipe">Do you really want to remove this\nRecipe?</string>
+    <string name="do_you_really_want_to_remove_this_recipe">Do you really want to remove this\nrecipe?</string>
     <string name="do_you_really_want_to_remove_from_list">Do you really want to remove this item\nfrom list?</string>
     <string name="missed_anything">Are you sure you haven\'t missed\nany thing?</string>
     <string name="remove_this_recipe_basket">Do you want to remove this recipe\nand ingredients from your basket?</string>

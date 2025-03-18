@@ -50,7 +50,7 @@ class CreateCookBookFragment : Fragment() {
     private lateinit var commonWorkUtils: CommonWorkUtils
     private lateinit var createCookBookViewModel: CreateCookBookViewModel
     private val selectedButton = arrayOf<RadioButton?>(null)
-    private var status:String?=""
+    private var status:String?="0"
     private var id:String?=""
     private var name:String?=""
     private var image:String?=""

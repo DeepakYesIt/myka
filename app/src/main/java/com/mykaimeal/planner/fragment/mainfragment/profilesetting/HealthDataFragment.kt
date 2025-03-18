@@ -73,7 +73,7 @@ class HealthDataFragment : Fragment() {
 
         binding.spinnerHeight.setItems(listOf("Inch", "Centimeter", "Feet"))
 
-        binding.spinnerweight.setItems(listOf("Kilograms", "Grams","Milligrams","Pounds","Ounces","Stones"))
+        binding.spinnerweight.setItems(listOf("Kilograms","Pounds","Stones"))
 
         binding.imgBackHealthData.setOnClickListener {
             viewModel.clearData()

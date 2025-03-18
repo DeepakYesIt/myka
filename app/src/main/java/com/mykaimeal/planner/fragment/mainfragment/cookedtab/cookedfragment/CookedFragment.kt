@@ -112,7 +112,6 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
         toggleFridgeToFreezer()
 
-
         // Display current week dates
         showWeekDates()
 
@@ -178,14 +177,11 @@ class CookedFragment : Fragment(), OnItemClickListener {
             findNavController().navigate(R.id.addMealCookedFragment)
         }
 
-
         if (BaseApplication.isOnline(requireActivity())) {
             cookedTabApi(currentDateSelected)
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
-
-
 
     }
 
@@ -276,8 +272,6 @@ class CookedFragment : Fragment(), OnItemClickListener {
             // Combine both the day name and the date
 //            dateList.add("$dayName, $date")
             dateList.add(localDate)
-
-
             // Move to the next day
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
@@ -419,11 +413,9 @@ class CookedFragment : Fragment(), OnItemClickListener {
         }
     }
 
-
     private fun showAlertFunction(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)
     }
-
 
     private fun getDaysOfWeek(): List<CalendarDataModel.Day> {
 
@@ -763,12 +755,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
                     dialogAddRecipe
                 )
             }
-
-
-
         }
-
-
     }
 
     private fun getCookBookList(){

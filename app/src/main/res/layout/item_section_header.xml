@@ -25,22 +25,23 @@
         <TextView
             android:id="@+id/textProductName"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/_30sdp"
             android:text="Ketchup"
             android:fontFamily="@font/poppins"
             android:textColor="@color/black"
             android:textStyle="bold"
             android:textSize="@dimen/_10ssp" />
 
-        <TextView
+   <!--     <TextView
             android:id="@+id/textProductQuantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="70 ml"
             android:textStyle="bold"
+            android:visibility="gone"
             android:textColor="#999999"
             android:textSize="@dimen/_10ssp"
-             />
+             />-->
 
         <TextView
             android:id="@+id/productSwap"

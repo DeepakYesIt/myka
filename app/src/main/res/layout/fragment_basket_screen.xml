@@ -111,7 +111,6 @@
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-
             </RelativeLayout>
 
             <RelativeLayout

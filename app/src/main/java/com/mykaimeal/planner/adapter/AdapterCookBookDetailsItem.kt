@@ -20,9 +20,7 @@ import com.mykaimeal.planner.fragment.mainfragment.viewmodel.cookbookviewmodel.a
 class AdapterCookBookDetailsItem(var datalist: MutableList<CookBookDataModel>?, var requireActivity: FragmentActivity, private var onItemClickListener: OnItemClickListener)
     : RecyclerView.Adapter<AdapterCookBookDetailsItem.ViewHolder>() {
 
-    private var isOpened:Boolean?=false
     private var lastIndex:Int=-1
-
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateList(datalistLocal: MutableList<CookBookDataModel>?){
@@ -49,7 +47,7 @@ class AdapterCookBookDetailsItem(var datalist: MutableList<CookBookDataModel>?, 
         }
 
         if (data?.data?.recipe?.label!=null){
-            holder.binding.tvBreakfast.text= data?.data?.recipe.label
+            holder.binding.tvBreakfast.text= data.data.recipe.label
         }
 
         if (data?.data?.recipe?.totalTime!=null){
@@ -106,9 +104,7 @@ class AdapterCookBookDetailsItem(var datalist: MutableList<CookBookDataModel>?, 
         holder.binding.tvRemoveRecipe.setOnClickListener{
             holder.binding.cardViewItems.visibility=View.GONE
             onItemClickListener.itemClick(position,"6","")
-
         }
-
 
         holder.itemView.setOnClickListener {
             onItemClickListener.itemClick(position,"4","")

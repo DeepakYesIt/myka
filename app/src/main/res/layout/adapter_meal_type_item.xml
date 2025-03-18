@@ -82,17 +82,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_3sdp">
+
                 <TextView
                     android:id="@+id/tvBreakfast"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/montserrat_semibold"
-                    android:text="Bread"
-                    android:layout_marginEnd="@dimen/_5sdp"
-                    android:singleLine="true"
+                    android:layout_height="@dimen/_30sdp"
                     android:layout_alignParentStart="true"
                     android:layout_centerInParent="true"
+                    android:layout_marginEnd="@dimen/_5sdp"
                     android:layout_toStartOf="@id/tvRatingReviews"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:maxLines="2"
+                    android:text="Bread"
                     android:textSize="@dimen/_10sdp" />
                 <TextView
                     android:id="@+id/tvRatingReviews"
@@ -103,7 +104,7 @@
                     android:textColor="#999999"
                     android:fontFamily="@font/montserrat_semibold"
                     android:text="0(0)"
-                    android:layout_centerInParent="true"
+                    android:layout_marginTop="@dimen/_3sdp"
                     android:textSize="@dimen/_8sdp"
                     app:drawableStartCompat="@drawable/star_rating_icon" />
             </RelativeLayout>

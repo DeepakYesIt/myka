@@ -58,84 +58,60 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
         }
 
 
-        binding.rlAddToTescoBasketButton.setOnClickListener {
-            findNavController().navigate(R.id.tescoCartItemFragmentFragment)
+        binding.rlGoToCheckout.setOnClickListener{
+            findNavController().navigate(R.id.checkoutScreenFragment)
         }
 
+     /*   binding.rlAddToTescoBasketButton.setOnClickListener {
+            findNavController().navigate(R.id.tescoCartItemFragmentFragment)
+        }
+*/
         val data1 = DataModel().apply {
-            title = "Ketchup"
-            image = R.drawable.ic_food_image
-
-            quantity = "70 ml"
-            value = 25
+            title = "Fresh Boneless Chicken Breast, 2.75-3.8 lb"
+            image = R.drawable.meat_image
+            valuePrice = 13.80
         }
 
         val data2 = DataModel().apply {
 
-            title = "Ketchup"
-            image = R.drawable.ic_food_image
-            quantity = "70 ml"
-            value = 25
+            title = "Sara Lee Artesano Brioche Bakery Bread"
+            image = R.drawable.sara_lee_bakery_bread_image
+            valuePrice = 3.48
         }
 
         val data3 = DataModel().apply {
 
-            title = "Ketchup"
-            image = R.drawable.ic_food_image
+            title = "Great Value, Large White Eggs, 12 Count\n"
+            image = R.drawable.great_eggs_carate_image
 
-            quantity = "70 ml"
-            value = 25
+            valuePrice = 4.17
         }
 
         val data4 = DataModel().apply {
 
-            title = "Ketchup"
-            image = R.drawable.ic_food_image
-
-            quantity = "70 ml"
-            value = 25
+            title = "Great Value Milk Whole Vitamin D, Half Gallon..."
+            image = R.drawable.great_value_milk_image
+            valuePrice = 1.79
         }
 
         val data5 = DataModel().apply {
 
-            title = "Ketchup"
-            image = R.drawable.ic_food_image
-
-            quantity = "70 ml"
-            value = 25
-        }
-        val data6 = DataModel().apply {
-
-            title = "Ketchup"
-            image = R.drawable.ic_food_image
-
-            quantity = "70 ml"
-            value = 25
+            title = "Great Value Sweet Cream Unsalted Butter..."
+            image = R.drawable.butter_sweet_cream_image
+            valuePrice = 3.96
         }
 
-        val data7 = DataModel().apply {
-
-            title = "Ketchup"
-            image = R.drawable.ic_food_image
-
-            quantity = "70 ml"
-            value = 25
+         val data6 = DataModel().apply {
+            title = "Great Value Greek Plain Nonfat Yogurt, 32 oz Tub"
+            image = R.drawable.great_plain_image
+             valuePrice = 2.76
         }
-        val data8 = DataModel().apply {
 
-            title = "Ketchup"
-            image = R.drawable.ic_food_image
-
-            quantity = "70 ml"
-            value = 25
-        }
 
         val categorizedItems: HashMap<String, List<DataModel>> = hashMapOf(
-            "Baking" to listOf(data1, data2),
-            "Breakfast Foods" to listOf(data3, data4),
-            "Canned Foods" to listOf(data1, data2, data3),
-            "Canned Foods" to listOf(data3, data4, data5),
-            "Canned Foods" to listOf(data6, data7, data8)
+            "Meat" to listOf(data1),
+            "Bakery" to listOf(data2),
+            "Dairy" to listOf(data3, data4, data5,data6)
         )
 
         binding.recyclerItemList.layoutManager = LinearLayoutManager(requireActivity())

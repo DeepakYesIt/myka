@@ -79,7 +79,9 @@ class TurnOnLocationFragment : Fragment() {
         binding!!.rlShareLocation.setOnClickListener {
             status = "1"
 
-            findNavController().navigate(R.id.enterYourAddressFragment)
+//            findNavController().navigate(R.id.enterYourAddressFragment)
+            findNavController().navigate(R.id.turnOnNotificationsFragment)
+
 //            requestLocationPermission()
 
         /*    if (BaseApplication.isOnline(requireActivity())){

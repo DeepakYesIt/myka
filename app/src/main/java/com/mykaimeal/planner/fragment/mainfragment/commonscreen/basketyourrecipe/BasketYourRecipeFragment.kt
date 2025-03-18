@@ -27,6 +27,7 @@ import com.mykaimeal.planner.databinding.FragmentBasketYourRecipeBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketyourrecipe.model.BasketYourRecipeModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketyourrecipe.model.BasketYourRecipeModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketyourrecipe.viewmodel.BasketYourRecipeViewModel
+import com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.CookedTabModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -66,7 +67,6 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
             findNavController().navigateUp()
         }
 
-        adapterInitialize()
     }
 
     private fun getYourRecipeList() {
@@ -74,12 +74,12 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
         lifecycleScope.launch {
             basketYourRecipeViewModel.getYourRecipeUrl {
                 BaseApplication.dismissMe()
-                handleApiyourRecipeResponse(it)
+                handleApiYourRecipeResponse(it)
             }
         }
     }
 
-    private fun handleApiyourRecipeResponse(result: NetworkResult<String>) {
+    private fun handleApiYourRecipeResponse(result: NetworkResult<String>) {
         when (result) {
             is NetworkResult.Success -> handleSuccessYourRecipeResponse(result.data.toString())
             is NetworkResult.Error -> showAlert(result.message, false)
@@ -110,68 +110,68 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
 
     private fun showDataInUI(data: BasketYourRecipeModelData?) {
 
-        if (data!!.Breakfast!=null && data.Dinner.size>0){
+        if (data!!.Breakfast!=null && data.Breakfast.size>0){
+            binding.rcyBreakfast.visibility=View.VISIBLE
+            binding.tvBreakFast.visibility=View.VISIBLE
             yourRecipeAdapter = YourRecipeAdapter(data.Breakfast,requireActivity(), this,"Breakfast")
             binding.rcyBreakfast.adapter = yourRecipeAdapter
+        }else{
+            binding.rcyBreakfast.visibility=View.GONE
+            binding.tvBreakFast.visibility=View.GONE
         }
 
-
         if (data!!.Lunch!=null && data.Lunch.size>0){
+            binding.rcyLunch.visibility=View.VISIBLE
+            binding.tvLunch.visibility=View.VISIBLE
             yourRecipeAdapter = YourRecipeAdapter(data.Lunch,requireActivity(), this,"Lunch")
-            binding.rcyBreakfast.adapter = yourRecipeAdapter
+            binding.rcyLunch.adapter = yourRecipeAdapter
+        }else{
+            binding.rcyLunch.visibility=View.GONE
+            binding.tvLunch.visibility=View.GONE
         }
 
         if (data!!.Dinner!=null && data.Dinner.size>0){
+            binding.rcyDinner.visibility=View.VISIBLE
+            binding.tvDinner.visibility=View.VISIBLE
             yourRecipeAdapter = YourRecipeAdapter(data.Dinner,requireActivity(), this,"Dinner")
-            binding.rcyBreakfast.adapter = yourRecipeAdapter
+            binding.rcyDinner.adapter = yourRecipeAdapter
+        }else{
+            binding.rcyDinner.visibility=View.GONE
+            binding.tvDinner.visibility=View.GONE
         }
 
         if (data!!.Snack!=null && data.Snack.size>0){
+            binding.rcySnacks.visibility=View.VISIBLE
+            binding.tvSnacks.visibility=View.VISIBLE
             yourRecipeAdapter = YourRecipeAdapter(data.Snack,requireActivity(), this,"Snacks")
-            binding.rcyBreakfast.adapter = yourRecipeAdapter
+            binding.rcySnacks.adapter = yourRecipeAdapter
+        }else{
+            binding.rcySnacks.visibility=View.GONE
+            binding.tvSnacks.visibility=View.GONE
         }
 
         if (data!!.Teatime!=null && data.Teatime.size>0){
+            binding.rcyTeaTimes.visibility=View.VISIBLE
+            binding.tvTeaTime.visibility=View.VISIBLE
             yourRecipeAdapter = YourRecipeAdapter(data.Teatime,requireActivity(), this,"Teatime")
-            binding.rcyBreakfast.adapter = yourRecipeAdapter
+            binding.rcyTeaTimes.adapter = yourRecipeAdapter
+        }else{
+            binding.rcyTeaTimes.visibility=View.GONE
+            binding.tvTeaTime.visibility=View.GONE
         }
-
     }
 
     private fun showAlert(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)
     }
 
-    private fun adapterInitialize(){
 
-       /* binding.rcvYourRecipes1.adapter = adapterRecipe1
-        binding.rcvYourRecipes2.adapter = adapterRecipe2
-        binding.rcvYourRecipes3.adapter = adapterRecipe3*/
-
-      /*  val initialList1 = List(6) { index ->
-            if (index % 2 == 0) {
-                YourRecipeItem( "Pot Lentil", R.drawable.ic_food_image,  "Serves 2")
-            } else {
-                YourRecipeItem("Pot Rice",R.drawable.ic_food_image,  "Serves 2")
-            }
-        }*/
-
-
-/*        adapterRecipe1.addItems(initialList1)
-        adapterRecipe2.addItems(initialList1)
-        adapterRecipe3.addItems(initialList1)*/
-
-
-    }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
 
-        if (status=="2"){
-            removeRecipeDialog()
-        }
     }
 
-    private fun removeRecipeDialog() {
+    private fun removeRecipeBasketDialog(recipeId: String?, position: Int?, type: String) {
         val dialogAddItem: Dialog = context?.let { Dialog(it) }!!
         dialogAddItem.setContentView(R.layout.alert_dialog_remove_recipe_basket)
         dialogAddItem.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -187,13 +187,63 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
         }
 
         tvDialogRemoveBtn.setOnClickListener {
-            dialogAddItem.dismiss()
+            if (BaseApplication.isOnline(requireActivity())) {
+                removeBasketRecipeApi(recipeId.toString(), dialogAddItem,position,type)
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+//            dialogAddItem.dismiss()
         }
     }
 
-    override fun itemSelect(position: Int?, status: String?, type: String?) {
+    private fun removeBasketRecipeApi(
+        recipeId: String,
+        dialogRemoveDay: Dialog,
+        position: Int?,
+        type: String
+    ) {
+        BaseApplication.showMe(requireActivity())
+        lifecycleScope.launch {
+            basketYourRecipeViewModel.removeBasketUrlApi({
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        val cookedModel = gson.fromJson(it.data, CookedTabModel::class.java)
+                        if (cookedModel.code == 200 && cookedModel.success) {
 
+                            when (type) {
+                                "Breakfast" -> yourRecipeAdapter?.removeItem(position!!)
+                                "Lunch" -> yourRecipeAdapter?.removeItem(position!!)
+                                "Dinner" -> yourRecipeAdapter?.removeItem(position!!)
+                                "Snacks" -> yourRecipeAdapter?.removeItem(position!!)
+                                "Teatime" -> yourRecipeAdapter?.removeItem(position!!)
+                            }
+                            dialogRemoveDay.dismiss()
+                        } else {
+                            if (cookedModel.code == ErrorMessage.code) {
+                                showAlert(cookedModel.message, true)
+                            } else {
+                                showAlert(cookedModel.message, false)
+                            }
+                        }
+                    }
+
+                    is NetworkResult.Error -> {
+                        showAlert(it.message, false)
+                    }
+
+                    else -> {
+                        showAlert(it.message, false)
+                    }
+                }
+            }, recipeId)
+        }
     }
 
+
+    override fun itemSelect(position: Int?, recipeId: String?, type: String?) {
+            removeRecipeBasketDialog(recipeId,position, type.toString())
+    }
 
 }

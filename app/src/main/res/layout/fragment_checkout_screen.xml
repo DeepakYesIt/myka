@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.mainfragment.commonscreen.CheckoutScreenFragment">
+    tools:context=".fragment.mainfragment.commonscreen.checkoutscreen.CheckoutScreenFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -91,6 +91,7 @@
                     android:textSize="@dimen/_13sdp"/>
 
                 <TextView
+                    android:id="@+id/tvAddressNames"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/light_black"
@@ -149,6 +150,7 @@
                     android:textSize="@dimen/_13sdp"/>
 
                 <TextView
+                    android:id="@+id/tvDeliveryInstructions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/light_green"
@@ -156,7 +158,7 @@
                     android:fontFamily="@font/montserrat"
                     android:layout_marginStart="@dimen/_15sdp"
                     android:layout_below="@+id/tvSetDoorStep"
-                    android:text="Add delivery instructions &amp; photos"
+                    android:text="Add delivery instructions"
                     android:textSize="@dimen/_11sdp"/>
 
                 <ImageView
@@ -400,7 +402,7 @@
                         android:textColor="#4A4A4A" />
 
                     <TextView
-                        android:id="@+id/textRecipeCount"
+                        android:id="@+id/textSubTotalPrices"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -427,7 +429,7 @@
                         android:textColor="#4A4A4A" />
 
                     <TextView
-                        android:id="@+id/textNetTotalProduct"
+                        android:id="@+id/textBagFees"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -481,7 +483,7 @@
                         android:textColor="#4A4A4A" />
 
                     <TextView
-                        android:id="@+id/textDeliveyPrice"
+                        android:id="@+id/textDeliveryPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -519,45 +521,170 @@
 
                 </RelativeLayout>
 
-
-
             </RelativeLayout>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardViewPayment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="@dimen/_10sdp"
                 android:layout_marginHorizontal="@dimen/_15sdp"
-                android:elevation="@dimen/_10sdp"
+                android:elevation="@dimen/_3sdp"
                 android:layout_below="@+id/relBillingDetailAmount">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <TextView
-                        android:id="@+id/tvPaymentMethod"
-                        android:layout_width="wrap_content"
+                    <RelativeLayout
+                        android:id="@+id/relPaymentMethods"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/tvPaymentMethod"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:layout_marginStart="@dimen/_12sdp"
+                            android:layout_marginTop="@dimen/_10sdp"
+                            android:fontFamily="@font/montserrat_semibold"
+                            android:text="Payment Method"
+                            android:textSize="@dimen/_12sdp"/>
+
+                        <ImageView
+                            android:id="@+id/imageAmexCard"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toStartOf="@+id/imageMasterCard"
+                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:layout_marginTop="@dimen/_10sdp"
+                            android:src="@drawable/amex_payment_icon"/>
+
+                        <ImageView
+                            android:id="@+id/imageMasterCard"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:layout_marginTop="@dimen/_10sdp"
+                            android:layout_toStartOf="@+id/imageVisaCard"
+                            android:src="@drawable/mastercard_payment_icon"/>
+
+                        <ImageView
+                            android:id="@+id/imageVisaCard"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:layout_marginTop="@dimen/_10sdp"
+                            android:src="@drawable/visa_payment_icon"/>
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/relDebitCreditCard"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/black"
-                        android:layout_marginStart="@dimen/_7sdp"
-                        android:layout_marginTop="@dimen/_10sdp"
-                        android:fontFamily="@font/montserrat_semibold"
-                        android:text="Payment Method"
-                        android:textSize="@dimen/_13sdp"/>
+                        android:layout_marginTop="@dimen/_15sdp"
+                        android:layout_below="@+id/relPaymentMethods">
 
-                    <ImageView
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:id="@+id/tvDebitCreditCard"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:layout_marginStart="@dimen/_15sdp"
+                            android:fontFamily="@font/montserrat_semibold"
+                            android:text="Debit/Credit Card"
+                            android:textSize="@dimen/_12sdp"/>
+
+                        <TextView
+                            android:id="@+id/tvAddCard"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/light_green"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:layout_marginStart="@dimen/_15sdp"
+                            android:fontFamily="@font/montserrat_medium"
+                            android:text="Add card"
+                            android:textSize="@dimen/_13sdp"/>
+
+                    </RelativeLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rcyDebitCreditCard"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_marginEnd="@dimen/_10sdp"
-                        android:layout_marginTop="@dimen/_10sdp"
-                        android:src="@drawable/visa_payment_icon"/>
+                        android:layout_below="@+id/relDebitCreditCard"
+                        android:layout_marginStart="@dimen/_15sdp"
+                        android:layout_marginTop="@dimen/_10sdp"/>
 
+                    <RelativeLayout
+                        android:id="@+id/relPayWallet"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_15sdp"
+                        android:layout_below="@+id/rcyDebitCreditCard">
 
+                        <TextView
+                            android:id="@+id/tvPayWallet"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:layout_marginStart="@dimen/_15sdp"
+                            android:fontFamily="@font/montserrat_semibold"
+                            android:text="Pay Via Wallet"
+                            android:textSize="@dimen/_13sdp"/>
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/relGooglePay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="@dimen/_15sdp"
+                        android:layout_below="@+id/relPayWallet">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_15sdp"
+                            android:src="@drawable/logos_google_pay_icon"/>
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:src="@drawable/radio_uncheck_gray_icon"/>
+
+                    </RelativeLayout>
+
+          <!--          <View
+                        android:id="@+id/viewGPay"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_1sdp"
+                        android:background="@color/greysss"
+                        android:layout_marginTop="@dimen/_5sdp"
+
+                        android:layout_below="@+id/relGooglePay" />-->
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
 
+            <TextView
+                android:id="@+id/textPayBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginBottom="@dimen/_20sdp"
+                android:layout_below="@+id/cardViewPayment"
+                android:background="@drawable/button_bg"
+                android:layout_marginHorizontal="@dimen/_15sdp"
+                android:fontFamily="@font/poppins"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="Pay"
+                android:textAlignment="center"
+                android:textColor="@color/white" />
         </RelativeLayout>
 
     </ScrollView>

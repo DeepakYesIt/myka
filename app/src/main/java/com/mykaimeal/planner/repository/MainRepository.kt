@@ -10,7 +10,7 @@ interface MainRepository {
     suspend fun bogyGoal(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getDietaryRestrictions(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getFavouriteCuisines(successCallback: (response: NetworkResult<String>) -> Unit)
-    suspend fun getDislikeIngredients(successCallback: (response: NetworkResult<String>) -> Unit)
+    suspend fun getDislikeIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?)
     suspend fun getAllergensIngredients(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getMealRoutine(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getCookingFrequency(successCallback: (response: NetworkResult<String>) -> Unit)
@@ -208,6 +208,7 @@ interface MainRepository {
     suspend fun recipePreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
     suspend fun removeMealApi(successCallback: (response: NetworkResult<String>) -> Unit, cookedId:String?)
+    suspend fun removeBasketUrlApi(successCallback: (response: NetworkResult<String>) -> Unit, recipeId:String?)
     suspend fun getMealByUrl(successCallback: (response: NetworkResult<String>) -> Unit, q:String?)
     suspend fun updatePreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit, userName: String?,cookingForType: String?,
                                      userGender:String?,bodyGoal:String?,partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?,
@@ -222,6 +223,7 @@ interface MainRepository {
 
     suspend fun getBasketUrl(successCallback: (response: NetworkResult<String>) -> Unit,storeId:String?)
     suspend fun getAddressUrl(successCallback: (response: NetworkResult<String>) -> Unit)
+    suspend fun getCheckoutScreenUrl(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getYourRecipeUrl(successCallback: (response: NetworkResult<String>) -> Unit)
 
     suspend fun addAddressUrl(successCallback: (response: NetworkResult<String>) -> Unit,latitude: String?, longitude: String?,streetName:String?,streetNum:String?,apartNum:String?,city:String?,country:String?,
@@ -229,6 +231,10 @@ interface MainRepository {
 
     suspend fun sendOtpUrl(successCallback: (response: NetworkResult<String>) -> Unit,phone: String?)
     suspend fun addPhoneUrl(successCallback: (response: NetworkResult<String>) -> Unit,phone: String?,otp:String?)
+    suspend fun getShoppingList(successCallback: (response: NetworkResult<String>) -> Unit)
+    suspend fun getNotesUrl(successCallback: (response: NetworkResult<String>) -> Unit)
+    suspend fun addNotesUrl(successCallback: (response: NetworkResult<String>) -> Unit,pickup:String?,description:String?)
+    suspend fun getOrderProductUrl(successCallback: (response: NetworkResult<String>) -> Unit)
 
 
 }

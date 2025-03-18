@@ -93,7 +93,6 @@ class AdapterDislikeIngredientItem(private var dislikeIngredientsData: List<Disl
                 notifyDataSetChanged() // Refresh the UI
             }
         }
-
     }
 
     override fun getItemCount(): Int {

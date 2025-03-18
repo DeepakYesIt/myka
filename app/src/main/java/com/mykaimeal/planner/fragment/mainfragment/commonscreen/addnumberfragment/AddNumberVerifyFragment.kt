@@ -9,9 +9,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.basedata.BaseApplication
@@ -44,12 +46,24 @@ class AddNumberVerifyFragment : Fragment() {
         addNumberVerifyViewModel =
             ViewModelProvider(requireActivity())[AddNumberVerifyViewModel::class.java]
 
+        requireActivity().onBackPressedDispatcher.addCallback(
+            requireActivity(),
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
+
         initialize()
 
         return binding!!.root
     }
 
     private fun initialize() {
+
+        binding!!.relBacks.setOnClickListener{
+            findNavController().navigateUp()
+        }
 
         binding!!.etRegPhone.addTextChangedListener(object : TextWatcher {
             @SuppressLint("ResourceAsColor")
@@ -147,16 +161,24 @@ class AddNumberVerifyFragment : Fragment() {
     private fun addNumberUrl() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            addNumberVerifyViewModel.sendOtpUrl({
+            addNumberVerifyViewModel.addPhoneUrl({
                 BaseApplication.dismissMe()
-                handleApiOtpSendResponse(it)
-            }, binding!!.etRegPhone.text.toString().trim())
+                handleApiVerifyResponse(it)
+            }, binding!!.etRegPhone.text.toString().trim(),binding!!.otpView.otp.toString())
         }
     }
 
     private fun handleApiOtpSendResponse(result: NetworkResult<String>) {
         when (result) {
             is NetworkResult.Success -> handleSuccessOtpResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    private fun handleApiVerifyResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessVerifyResponse(result.data.toString())
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
@@ -187,5 +209,25 @@ class AddNumberVerifyFragment : Fragment() {
         }
     }
 
+
+
+    @SuppressLint("SetTextI18n", "ResourceAsColor")
+    private fun handleSuccessVerifyResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, OtpSendModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                Toast.makeText(requireContext(),""+apiModel.message,Toast.LENGTH_LONG).show()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
 
 }

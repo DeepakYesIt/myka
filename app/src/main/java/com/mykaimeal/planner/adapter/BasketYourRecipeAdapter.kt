@@ -32,7 +32,6 @@ class BasketYourRecipeAdapter(private var yourRecipesData: MutableList<Recipes>?
 
         val data= yourRecipesData?.get(position)
 
-
         if (data != null) {
             holder.binding.tvFoodName.text=data.data!!.recipe?.label
             if (data.data.recipe?.images?.SMALL?.url!=null){
@@ -66,7 +65,10 @@ class BasketYourRecipeAdapter(private var yourRecipesData: MutableList<Recipes>?
             }else{
                 holder.binding.layProgess.root.visibility= View.GONE
             }
+        }
 
+        holder.binding.imageCross.setOnClickListener{
+            onItemSelectListener.itemSelect(position,data!!.id.toString(),"YourRecipe")
         }
 
     }
@@ -79,42 +81,3 @@ class BasketYourRecipeAdapter(private var yourRecipesData: MutableList<Recipes>?
     }
 
 }
-
-/*
-class YourRecipeAdapter(var context: Context, private var itemList: MutableList<YourRecipeItem>,private var onItemClickListener: OnItemClickListener) : RecyclerView.Adapter<YourRecipeAdapter.ViewHolder>() {
-
-    inner class ViewHolder(private val binding: AdapterLayoutYourRecipeItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: YourRecipeItem, position: Int) {
-            with(binding) {
-                // Bind data to views
-                imageFood.setImageResource(item.imageRes)
-                tvFoodName.text = item.name
-                textServes.text = item.textServes
-
-                imageCross.setOnClickListener {
-                    onItemClickListener.itemClick(position,"2","")
-                }
-            }
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = AdapterLayoutYourRecipeItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(itemList[position], position)
-
-
-    }
-
-    override fun getItemCount(): Int = itemList.size
-
-    // Add items dynamically
-    fun addItems(newItems: List<YourRecipeItem>) {
-        val startPosition = itemList.size
-        itemList.addAll(newItems)
-        notifyItemRangeInserted(startPosition, newItems.size)
-    }
-}*/

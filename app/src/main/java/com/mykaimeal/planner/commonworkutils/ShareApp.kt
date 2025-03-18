@@ -1,4 +1,4 @@
-package com.mykaimeal.planner.commonworkutils
+ package com.mykaimeal.planner.commonworkutils
 
 import com.appsflyer.share.ShareInviteHelper
 import com.appsflyer.share.LinkGenerator

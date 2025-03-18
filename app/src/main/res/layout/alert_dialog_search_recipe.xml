@@ -134,7 +134,7 @@
                     android:paddingHorizontal="@dimen/_15sdp"
                     android:paddingVertical="@dimen/_10sdp"
                     android:singleLine="true"
-                    android:text="From the Web"
+                    android:text="Add Recipe From Web"
                     android:textColor="@color/light_black"
                     android:textColorHint="@color/light_black"
                     android:textSize="@dimen/_14sdp" />

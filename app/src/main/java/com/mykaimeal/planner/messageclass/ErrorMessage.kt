@@ -20,6 +20,8 @@ object ErrorMessage {
 
      const val apiKey:String="AIzaSyC9NuN_f-wESHh3kihTvpbvdrmKlTQurxw"
      const val emailPhone:String="Please Enter Email/Phone"
+     const val deliveryInstructions:String="Please Enter Delivery Instructions"
+     const val selectLists:String="Please select atleast one"
      const val recipeName:String="Please Enter Recipe Name"
      const val postCode:String="Please Enter Post Code"
      const val selectGender:String="Please select gender"
@@ -109,6 +111,7 @@ object ErrorMessage {
      const val addressUpload:String="Please upload Address Proof."
      const val idProofUpload:String="Please upload Id Proof."
      const val changeScheduleDate:String="Please select change date"
+     const val changeScheduleItem:String="Please add tile of the list"
      const val selfieProofUpload:String="Please upload Selfie Proof."
      const val cookbookUpload:String="Please upload cookbook image."
 

@@ -165,8 +165,12 @@ class CreateRecipeImageFragment : Fragment() {
         val request = Request(image, features)
         val visionRequest = VisionRequest(listOf(request))
 
-       // Pass your API key (this is just for demonstration, don't hardcode your API key)
-        val apiKey = "AIzaSyB1WtrB2oHQmyIX1ZpaXzbI9kOA2FlkCXk"
+        /*/////old api key
+        // Pass your API key (this is just for demonstration, don't hardcode your API key)
+        val apiKey = "AIzaSyB1WtrB2oHQmyIX1ZpaXzbI9kOA2FlkCXk"*/
+
+        /////new api key
+        val apiKey = "AIzaSyDBGkONqxKXls4kQ9DlyZmfjvuUKbDUHUw"
 
         val call = visionApiService.annotateImage(apiKey, visionRequest)
         call.enqueue(object : retrofit2.Callback<VisionResponse> {
@@ -186,13 +190,13 @@ class CreateRecipeImageFragment : Fragment() {
                         }
                     }
                 }else{
-                    Toast.makeText(requireContext(),"Name :-"+response.message(),Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(),"Failed :-"+response.message(),Toast.LENGTH_LONG).show()
                 }
             }
 
             override fun onFailure(call: Call<VisionResponse>, t: Throwable) {
                 Log.e("Google Vision", "API call failed", t)
-                Toast.makeText(requireContext(),"Name :-"+t.message,Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(),"Error :-"+t.message,Toast.LENGTH_LONG).show()
             }
         })
     }

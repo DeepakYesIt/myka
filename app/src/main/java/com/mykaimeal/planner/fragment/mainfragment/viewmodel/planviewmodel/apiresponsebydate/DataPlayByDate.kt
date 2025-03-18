@@ -11,5 +11,6 @@ data class DataPlayByDate(
     val fat:Double?,
     val protein:Double?,
     val kcal:Double?,
-    val carbs:Double?
+    val carbs:Double?,
+    var show:Int
 )

@@ -163,8 +163,9 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
     private fun handleSuccessResponse(data: String) {
         try {
             val apiModel = Gson().fromJson(data, RecipeDetailsApiResponse::class.java)
-            Log.d("@@@ Recipe Details ", "message :- $data")
+            Log.d("@@@ Recipe Details", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
+                Log.d("@@@ Recipe Detailsssss", "message :- $apiModel")
                 if (apiModel.data != null && apiModel.data.size > 0) {
                     showData(apiModel.data)
                 } else {
@@ -263,15 +264,12 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             binding!!.layBottom.visibility = View.GONE
         }
 
-
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines != null && viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines!!.size > 0) {
             adapterRecipeItem = AdapterRecipeItem(viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines!!, requireActivity())
             binding!!.layBottom.visibility = View.VISIBLE
         } else {
             binding!!.layBottom.visibility = View.GONE
         }
-
-
     }
 
     private fun showAlert(message: String?, status: Boolean) {

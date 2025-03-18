@@ -21,8 +21,15 @@ interface ApiInterface {
     @GET(ApiEndPoint.favouriteCuisines)
     suspend fun getFavouriteCuisines(): Response<JsonObject>
 
-    @GET(ApiEndPoint.dislikeIngredients)
-    suspend fun getDislikeIngredients(): Response<JsonObject>
+   /* @GET(ApiEndPoint.dislikeIngredients)
+    suspend fun getDislikeIngredients(): Response<JsonObject>*/
+
+
+    @GET(ApiEndPoint.dislikeIngredients+"/{value}")
+    suspend fun getDislikeIngredients(@Path("value") value: String?): Response<JsonObject>
+
+    @GET(ApiEndPoint.dislikeIngredients+"/{value}/{value1}")
+    suspend fun getDislikeSearchIngredients(@Path("value") country:String?, @Path("value1") state :String?) : Response<JsonObject>
 
     @GET(ApiEndPoint.allergensIngredients)
     suspend fun getAllergensIngredients(): Response<JsonObject>
@@ -528,6 +535,12 @@ interface ApiInterface {
     ): Response<JsonObject>
 
     @FormUrlEncoded
+    @POST(ApiEndPoint.removeBasketUrl)
+    suspend fun removeBasketUrlApi(
+        @Field("id") id: String?
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
     @POST(ApiEndPoint.getMissingIngUrl)
     suspend fun getMissingIngredientsApi(
         @Field("uri") uri: String?,
@@ -582,6 +595,24 @@ interface ApiInterface {
 
     @POST(ApiEndPoint.getAddressUrl)
     suspend fun getAddressUrl(): Response<JsonObject>
+
+    @POST(ApiEndPoint.getNotesUrl)
+    suspend fun getNotesUrl(): Response<JsonObject>
+
+   @POST(ApiEndPoint.getShoppingListUrl)
+    suspend fun getShoppingListUrl(): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.addNotesUrl)
+    suspend fun addNotesUrl(@Field("pickup") pickup:String?,
+                            @Field("description") description:String?):Response<JsonObject>
+
+    @POST(ApiEndPoint.getCheckoutUrl)
+    suspend fun getCheckoutScreenUrl():Response<JsonObject>
+
+
+    @POST(ApiEndPoint.getOrderProductUrl)
+    suspend fun getOrderProductUrl():Response<JsonObject>
 
     @GET(ApiEndPoint.addAddressUrl)
     suspend fun addAddressUrl(@Query("latitude") latitude:String?,

@@ -11,8 +11,8 @@ class DislikeIngredientsViewModel @Inject constructor(private val repository: Ma
 
     private var dislikeIngLocalData: MutableList<DislikedIngredientsModelData>?=null
 
-    suspend fun getDislikeIngredients(successCallback: (response: NetworkResult<String>) -> Unit){
-        repository.getDislikeIngredients { successCallback(it) }
+    suspend fun getDislikeIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?){
+        repository.getDislikeIngredients({ successCallback(it) },itemCount)
     }
 
     fun setDislikeIngData(data: MutableList<DislikedIngredientsModelData>) {

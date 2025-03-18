@@ -70,10 +70,20 @@ class YourRecipeAdapter(private var yourRecipesData: MutableList<Dinner?>,
 
         }
 
+        holder.binding.imageCross.setOnClickListener{
+            onItemSelectListener.itemSelect(position,data!!.basket_id.toString(),type)
+        }
+
+    }
+
+    fun removeItem(position: Int) {
+        yourRecipesData.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, yourRecipesData.size) // Optional, updates the positions of remaining items
     }
 
     override fun getItemCount(): Int {
-        return yourRecipesData!!.size
+        return yourRecipesData.size
     }
 
     class ViewHolder(var binding: AdapterLayoutYourRecipeItemBinding) : RecyclerView.ViewHolder(binding.root){

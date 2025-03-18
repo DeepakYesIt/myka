@@ -109,7 +109,6 @@
                     android:textSize="@dimen/_12ssp"
                     android:textStyle="bold" />
 
-
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rcvIngredients"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -119,7 +118,6 @@
                     android:layout_marginTop="@dimen/_10sdp"
                     android:nestedScrollingEnabled="false"
                     android:orientation="vertical" />
-
 
                 <RelativeLayout
                     android:id="@+id/rlAddPlanButton"

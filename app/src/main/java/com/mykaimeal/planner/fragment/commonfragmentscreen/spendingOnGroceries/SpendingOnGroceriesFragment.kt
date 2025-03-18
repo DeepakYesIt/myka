@@ -184,11 +184,32 @@ class SpendingOnGroceriesFragment : Fragment() {
             }
         }
 
+
         binding!!.etSpendingAmount.addTextChangedListener(object :
             TextWatcher {
+            private var isEditing = false
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(editable: Editable) {
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                if (isEditing) return
+
+                isEditing = true
+
+                val text = s.toString()
+
+                if (text.isNotEmpty()) {
+                    if (!text.startsWith("$")) {
+                        binding!!.etSpendingAmount.setText("$$text")
+                        binding!!.etSpendingAmount.setSelection(binding!!.etSpendingAmount.text.length) // Move cursor to end
+                    }
+                }
+
+                isEditing = false
+            }
+            override fun afterTextChanged(editText: Editable) {
+
+                if (editText.length == 1 && editText.toString() == "$") {
+                    editText.clear() // Remove the dollar sign if it's the only character left
+                }
                 searchable()
             }
         })

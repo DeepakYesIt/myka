@@ -179,7 +179,6 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
         }
     }
 
-
     private fun getAddress(lat: Double, longi: Double): String? {
         var address = ""
         try {
@@ -210,6 +209,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
     }
+
     private fun  userDeleteData(dialog: Dialog) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
@@ -241,7 +241,6 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     }
 
     private fun handleApiResponse(result: NetworkResult<String>) {
-
         when (result) {
             is NetworkResult.Success -> processSuccessResponse(result.data.toString())
             is NetworkResult.Error -> showAlert(result.message, false)
@@ -298,7 +297,6 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
             showAlert(e.message, false)
         }
     }
-
 
     @SuppressLint("SetTextI18n")
     private fun updateUI(data: Data) {

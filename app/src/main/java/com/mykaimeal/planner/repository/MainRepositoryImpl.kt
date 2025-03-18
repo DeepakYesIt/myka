@@ -58,9 +58,9 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
-    override suspend fun getDislikeIngredients(successCallback: (response: NetworkResult<String>) -> Unit) {
+    override suspend fun getDislikeIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?) {
         try {
-            api.getDislikeIngredients().apply {
+            api.getDislikeIngredients(itemCount).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -1590,6 +1590,25 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
+    override suspend fun removeBasketUrlApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        recipeId: String?
+    ) {
+        try {
+            api.removeBasketUrlApi(recipeId).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
 
     override suspend fun getMissingIngredientsApi(
         successCallback: (response: NetworkResult<String>) -> Unit,
@@ -1841,6 +1860,99 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
     ) {
         try {
             api.addAddressUrl(latitude, longitude,streetName,streetNum,apartNum,city,country,zipcode, primary, id, type).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+    override suspend fun getShoppingList(
+        successCallback: (response: NetworkResult<String>) -> Unit
+    ) {
+        try {
+            api.getShoppingListUrl().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun getNotesUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit
+    ) {
+        try {
+            api.getNotesUrl().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+    override suspend fun addNotesUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        pickup:String?,description:String?
+    ) {
+        try {
+            api.addNotesUrl(pickup,description).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+    override suspend fun getCheckoutScreenUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit
+    ) {
+        try {
+            api.getCheckoutScreenUrl().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun getOrderProductUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit
+    ) {
+        try {
+            api.getOrderProductUrl().apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

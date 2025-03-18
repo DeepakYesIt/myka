@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_10sdp"
             android:layout_below="@+id/textTakeAway"
-            android:text="What are your reasons for getting takeaway?"
+            android:text="What are your reasons for getting takeout?"
             android:textColor="@color/light_black"
             android:textSize="@dimen/_13sdp" />
 
