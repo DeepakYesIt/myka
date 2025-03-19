@@ -23,35 +23,47 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.gson.Gson
+import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
+import com.mykaimeal.planner.adapter.AdapterCardPreferredItem
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentCheckoutScreenBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.model.CheckoutScreenModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.model.CheckoutScreenModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.viewmodel.CheckoutScreenViewModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.productpaymentscreen.model.GetCardMealMeModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.productpaymentscreen.model.GetCardMealMeModelData
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class CheckoutScreenFragment : Fragment(),OnMapReadyCallback {
-    private var binding: FragmentCheckoutScreenBinding?=null
+class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListener {
+    private var binding: FragmentCheckoutScreenBinding? = null
     private lateinit var mapView: MapView
     private var mMap: GoogleMap? = null
-    private var status:Boolean=false
+    private var status: Boolean = false
     private lateinit var checkoutScreenViewModel: CheckoutScreenViewModel
+    private lateinit var adapterPaymentCreditDebitItem: AdapterCardPreferredItem
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         // Inflate the layout for this fragment
-        binding= FragmentCheckoutScreenBinding.inflate(layoutInflater, container, false)
-        checkoutScreenViewModel = ViewModelProvider(requireActivity())[CheckoutScreenViewModel::class.java]
+        binding = FragmentCheckoutScreenBinding.inflate(layoutInflater, container, false)
+        checkoutScreenViewModel =
+            ViewModelProvider(requireActivity())[CheckoutScreenViewModel::class.java]
         // Load saved instance state
 //        var mapViewBundle: Bundle? = null
 //        if (savedInstanceState != null) {
 //            mapViewBundle= savedInstanceState.getBundle("MapViewBundleKey")
 ////            mapViewBundle = savedInstanceState.getBundle("AIzaSyA-e6IRZ8axxpwrm1GEjlFOTzwb5KVQHgc")
 //        }
+
         mapView = binding!!.mapView
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
@@ -71,57 +83,57 @@ class CheckoutScreenFragment : Fragment(),OnMapReadyCallback {
 
     private fun initialize() {
 
-        if (BaseApplication.isOnline(requireContext())){
+        if (BaseApplication.isOnline(requireContext())) {
             getCheckoutApi()
-        }else{
+        } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
-        binding!!.imageBackIcon.setOnClickListener{
+        binding!!.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.relSetHomes.setOnClickListener{
+        binding!!.relSetHomes.setOnClickListener {
             addressDialog()
 //            findNavController().navigate(R.id.addressMapFullScreenFragment)
         }
 
-        binding!!.textPayBtn.setOnClickListener{
+        binding!!.textPayBtn.setOnClickListener {
             findNavController().navigate(R.id.addTipScreenFragment)
         }
 
-        binding!!.relSetMeetAtDoor.setOnClickListener{
+        binding!!.relSetMeetAtDoor.setOnClickListener {
             findNavController().navigate(R.id.dropOffOptionsScreenFragment)
         }
 
-        binding!!.relAddNumber.setOnClickListener{
+        binding!!.relAddNumber.setOnClickListener {
             findNavController().navigate(R.id.addNumberVerifyFragment)
         }
 
-        binding!!.tvAddCard.setOnClickListener{
+        binding!!.tvAddCard.setOnClickListener {
             findNavController().navigate(R.id.paymentCreditDebitFragment)
         }
 
-        binding!!.imageCheckRadio.setOnClickListener{
-            if (status){
-                status=false
+        binding!!.imageCheckRadio.setOnClickListener {
+            if (status) {
+                status = false
                 binding!!.imageCheckRadio.setImageResource(R.drawable.radio_uncheck_gray_icon)
-            }else{
+            } else {
                 binding!!.imageCheckRadio.setImageResource(R.drawable.radio_green_icon)
-                status=true
+                status = true
 
             }
         }
 
-       /* binding!!.mapView.setOnClickListener{
-            findNavController().navigate(R.id.addressMapFullScreenFragment)
-        }*/
+        /* binding!!.mapView.setOnClickListener{
+             findNavController().navigate(R.id.addressMapFullScreenFragment)
+         }*/
     }
 
     private fun getCheckoutApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            checkoutScreenViewModel.getCheckoutScreenUrl{
+            checkoutScreenViewModel.getCheckoutScreenUrl {
                 BaseApplication.dismissMe()
                 handleApiCheckoutResponse(it)
             }
@@ -160,35 +172,101 @@ class CheckoutScreenFragment : Fragment(),OnMapReadyCallback {
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
+
+        getCardMealMe()
+
+    }
+
+
+    private fun getCardMealMe() {
+        if (BaseApplication.isOnline(requireActivity())) {
+            fetchUserCardData()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
+    private fun fetchUserCardData() {
+//        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            checkoutScreenViewModel.getCardMealMeUrl { result ->
+                BaseApplication.dismissMe()
+                handleGetCardApiResponse(result)
+            }
+        }
+    }
+
+    private fun handleGetCardApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> processGetCardSuccessResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    private fun processGetCardSuccessResponse(response: String) {
+        try {
+            val apiModel = Gson().fromJson(response, GetCardMealMeModel::class.java)
+            Log.d("@@@ Response cardBank ", "message :- $response")
+            if (apiModel.code == 200 && apiModel.success==true) {
+                showDataInUi(apiModel.data)
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun showDataInUi(data: MutableList<GetCardMealMeModelData>?) {
+
+        if (data!=null && data.size>0){
+            binding!!.rcyDebitCreditCard.visibility=View.VISIBLE
+            adapterPaymentCreditDebitItem = AdapterCardPreferredItem(requireContext(), data,  this,0)
+            binding!!.rcyDebitCreditCard.adapter = adapterPaymentCreditDebitItem
+        }else{
+            binding!!.rcyDebitCreditCard.visibility=View.GONE
+        }
+
     }
 
     private fun showDataInUI(data: CheckoutScreenModelData?) {
 
-        if (data!!.phone!=null){
-            binding!!.tvAddNumber.text=data.phone.toString()
+        if (data!!.phone != null) {
+            binding!!.tvAddNumber.text = data.phone.toString()
             binding!!.tvAddNumber.setTextColor(Color.parseColor("#000000"))
         }
 
-        if (data.note!!.pickup!=null){
-            binding!!.tvSetDoorStep.text=data.note.pickup.toString()
-        }
+        if (data.note != null) {
+            if (data.note.pickup != null) {
+                binding!!.tvSetDoorStep.text = data.note.pickup.toString()
+            }
 
-        if (data.note.description!=null){
-            binding!!.tvDeliveryInstructions.text=data.note.description.toString()
-            binding!!.tvDeliveryInstructions.setTextColor(Color.parseColor("#000000"))
-        }
-
-        if (data.subtotal!=null){
-            binding!!.textSubTotalPrices.text=data.subtotal.toString()
-        }
-
-        if (data.bagfee!=null){
-            binding!!.textBagFees.text=data.bagfee.toString()
+            if (data.note.description != null) {
+                binding!!.tvDeliveryInstructions.text = data.note.description.toString()
+                binding!!.tvDeliveryInstructions.setTextColor(Color.parseColor("#000000"))
+            }
         }
 
 
-        if (data.delivery!=null){
-            binding!!.textDeliveryPrice.text=data.delivery.toString()
+        if (data.subtotal != null) {
+            binding!!.textSubTotalPrices.text = data.subtotal.toString()
+        }
+
+        if (data.bagfee != null) {
+            binding!!.textBagFees.text = data.bagfee.toString()
+        }
+
+        if (data.service!=null){
+            binding!!.textServicesPrice.text=data.service.toString()
+        }
+
+        if (data.delivery != null) {
+            binding!!.textDeliveryPrice.text = data.delivery.toString()
         }
 
 
@@ -199,7 +277,10 @@ class CheckoutScreenFragment : Fragment(),OnMapReadyCallback {
         dialogMiles.setContentView(R.layout.alert_dialog_addresses_popup)
         dialogMiles.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialogMiles.setCancelable(false)
-        dialogMiles.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialogMiles.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
         val relDone = dialogMiles.findViewById<RelativeLayout>(R.id.relDone)
         dialogMiles.show()
         dialogMiles.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
@@ -211,9 +292,9 @@ class CheckoutScreenFragment : Fragment(),OnMapReadyCallback {
     override fun onMapReady(gmap: GoogleMap) {
         mMap = gmap
         val newYork = LatLng(40.7128, -74.0060)
-/*
-        val newYork = LatLng(28.6070135, 77.4075354)
-*/
+        /*
+                val newYork = LatLng(28.6070135, 77.4075354)
+        */
         mMap?.addMarker(MarkerOptions().position(newYork).title("Marker in New York"))
         mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(newYork, 12f))
     }
@@ -247,6 +328,10 @@ class CheckoutScreenFragment : Fragment(),OnMapReadyCallback {
     override fun onLowMemory() {
         super.onLowMemory()
         mapView.onLowMemory()
+    }
+
+    override fun itemSelect(position: Int?, status: String?, type: String?) {
+
     }
 
 }

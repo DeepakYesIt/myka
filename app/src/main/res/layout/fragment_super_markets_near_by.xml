@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragment.mainfragment.commonscreen.supermarktesnearbyscreen.SuperMarketsNearByFragment">
 
     <ScrollView
@@ -40,22 +40,21 @@
                     android:layout_centerInParent="true"
                     android:layout_marginEnd="@dimen/_10sdp"
                     android:fontFamily="@font/montserrat_medium"
-                    android:text="Supermarkets Nearby"
+                    android:text="Grocery Stores Nearby"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/_13ssp"
+                    android:textSize="@dimen/_14sdp"
                     android:textStyle="bold" />
 
 
             </RelativeLayout>
 
             <androidx.cardview.widget.CardView
-
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="@dimen/_4sdp"
-                app:cardCornerRadius="@dimen/_5sdp"
+                android:layout_marginHorizontal="@dimen/_15sdp"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:layout_marginHorizontal="@dimen/_15sdp">
+                app:cardCornerRadius="@dimen/_5sdp"
+                app:cardElevation="@dimen/_2sdp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -67,55 +66,61 @@
                         android:id="@+id/textDelivery"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textAlignment="center"
-                        android:paddingVertical="@dimen/_5sdp"
-                        android:textColor="@color/white"
-                        android:fontFamily="@font/poppins"
-                        android:textSize="@dimen/_11ssp"
-                        android:layout_marginVertical="@dimen/_5sdp"
-                        android:background="@drawable/selected_button_bg"
                         android:layout_marginHorizontal="@dimen/_10sdp"
-                        android:text="Delivery "/>
+                        android:layout_marginVertical="@dimen/_5sdp"
+                        android:layout_weight="1"
+                        android:background="@drawable/selected_button_bg"
+                        android:fontFamily="@font/poppins"
+                        android:paddingVertical="@dimen/_5sdp"
+                        android:text="Delivery "
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_11ssp" />
 
                     <TextView
                         android:id="@+id/textCollect"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/poppins"
-                        android:textSize="@dimen/_11ssp"
-                        android:layout_marginVertical="@dimen/_5sdp"
                         android:layout_marginHorizontal="@dimen/_10sdp"
-                        android:textAlignment="center"
-                        android:paddingVertical="@dimen/_5sdp"
+                        android:layout_marginVertical="@dimen/_5sdp"
+                        android:layout_weight="1"
                         android:background="@drawable/unselected_button_bg"
-                        android:text="Click &amp; Collect"/>
+                        android:fontFamily="@font/poppins"
+                        android:paddingVertical="@dimen/_5sdp"
+                        android:text="Pick up"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/_11ssp" />
 
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
-            <ImageView
-                android:id="@+id/imagesMap"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/relCardView"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_150sdp"
-                android:src="@drawable/map_image"
-                android:layout_margin="@dimen/_10sdp"/>
+                android:layout_marginHorizontal="@dimen/_18sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:background="@color/grey3"
+                app:cardCornerRadius="@dimen/_10sdp">
+
+                <com.google.android.gms.maps.MapView
+                    android:id="@+id/mapView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recySuperMarket"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_15sdp"
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                app:spanCount="3"
-                android:layout_below="@+id/tvSuperMarket"/>
+                app:spanCount="3" />
 
         </LinearLayout>
-
     </ScrollView>
-
-
 
 </RelativeLayout>

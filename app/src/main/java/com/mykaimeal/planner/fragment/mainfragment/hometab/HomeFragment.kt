@@ -33,19 +33,20 @@ import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.OnItemLongClickListener
+import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
-import com.mykaimeal.planner.adapter.AdapterSuperMarket
 import com.mykaimeal.planner.adapter.RecipeCookedAdapter
+import com.mykaimeal.planner.adapter.SuperMarketListAdapter
 import com.mykaimeal.planner.apiInterface.BaseUrl
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentHomeBinding
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Store
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.HomeViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.HomeApiResponse
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModel
-import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModelData
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
@@ -55,13 +56,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
+class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnItemSelectListener,
     OnItemLongClickListener {
 
     private var binding: FragmentHomeBinding? = null
     private var dataList3: MutableList<DataModel> = mutableListOf()
     private var recipeCookedAdapter: RecipeCookedAdapter? = null
-    private var adapterSuperMarket: AdapterSuperMarket? = null
+    private var adapterSuperMarket: SuperMarketListAdapter? = null
     private var recySuperMarket: RecyclerView? = null
     private lateinit var sessionManagement: SessionManagement
     private lateinit var viewModel: HomeViewModel
@@ -182,10 +183,10 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
         }
     }
 
-    private fun showUIData(data: List<SuperMarketModelData>?) {
+    private fun showUIData(data: MutableList<Store>?) {
         try {
             if (data!=null){
-                adapterSuperMarket = AdapterSuperMarket(data, requireActivity(), this)
+                adapterSuperMarket = SuperMarketListAdapter(data, requireActivity(), this,0)
                 recySuperMarket!!.adapter = adapterSuperMarket
             }
 
@@ -896,6 +897,10 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
     }
 
     override fun itemLongClick(position: Int?, status: String?, type: String?) {
+
+    }
+
+    override fun itemSelect(position: Int?, status: String?, type: String?) {
 
     }
 }

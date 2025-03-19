@@ -48,7 +48,7 @@
             <androidx.cardview.widget.CardView
                 android:id="@+id/relCardView"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_220sdp"
+                android:layout_height="@dimen/_150sdp"
                 android:layout_marginTop="@dimen/_15sdp"
                 app:cardCornerRadius="@dimen/_10sdp"
                 android:layout_marginHorizontal="@dimen/_20sdp"
@@ -58,7 +58,7 @@
                 <com.google.android.gms.maps.MapView
                     android:id="@+id/mapView"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_400sdp"/>
+                    android:layout_height="match_parent"/>
 
             </androidx.cardview.widget.CardView>
 
@@ -408,7 +408,7 @@
                         android:layout_alignParentEnd="true"
                         android:fontFamily="@font/poppins"
                         android:paddingHorizontal="@dimen/_20sdp"
-                        android:text="$30"
+                        android:text="$00"
                         android:textColor="#4A4A4A" />
 
                 </RelativeLayout>
@@ -435,13 +435,13 @@
                         android:layout_alignParentEnd="true"
                         android:fontFamily="@font/poppins"
                         android:paddingHorizontal="@dimen/_20sdp"
-                        android:text="$0.20"
+                        android:text="$0.00"
                         android:textColor="#4A4A4A" />
 
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/relTax"
+                    android:id="@+id/relFees"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/relNetTotalProduct"
@@ -452,17 +452,51 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_medium"
-                        android:text="Tax"
+                        android:text="Fee"
+                        android:textColor="#4A4A4A" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/textTax"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:src="@drawable/ic_info_icon"/>
+
+<!--                    <TextView-->
+<!--                        android:id="@+id/textTaxPrice"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_alignParentEnd="true"-->
+<!--                        android:fontFamily="@font/poppins"-->
+<!--                        android:paddingHorizontal="@dimen/_20sdp"-->
+<!--                        android:text="$00"-->
+<!--                        android:textColor="#4A4A4A" />-->
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/relServices"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/relFees"
+                    android:layout_marginTop="@dimen/_5sdp">
+
+                    <TextView
+                        android:id="@+id/textServices"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_medium"
+                        android:text="Services"
                         android:textColor="#4A4A4A" />
 
                     <TextView
-                        android:id="@+id/textTaxPrice"
+                        android:id="@+id/textServicesPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:fontFamily="@font/poppins"
                         android:paddingHorizontal="@dimen/_20sdp"
-                        android:text="$20"
+                        android:text="$00"
                         android:textColor="#4A4A4A" />
 
                 </RelativeLayout>
@@ -471,7 +505,7 @@
                     android:id="@+id/relDelivery"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/relTax"
+                    android:layout_below="@+id/relServices"
                     android:layout_marginTop="@dimen/_5sdp">
 
                     <TextView
@@ -489,35 +523,37 @@
                         android:layout_alignParentEnd="true"
                         android:fontFamily="@font/poppins"
                         android:paddingHorizontal="@dimen/_20sdp"
-                        android:text="$10"
+                        android:text="$00"
                         android:textColor="#4A4A4A" />
 
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/relProcessingFees"
+                    android:id="@+id/relTotal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/relDelivery"
                     android:layout_marginTop="@dimen/_5sdp">
 
                     <TextView
-                        android:id="@+id/textProcessingFees"
+                        android:id="@+id/textTotalAmount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/montserrat_medium"
-                        android:text="Processing Fee"
-                        android:textColor="#4A4A4A" />
+                        android:fontFamily="@font/montserrat_semibold"
+                        android:text="Total"
+                        android:textSize="@dimen/_12sdp"
+                        android:textColor="@color/black" />
 
                     <TextView
-                        android:id="@+id/textProcessingAmount"
+                        android:id="@+id/textTotalAmounts"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:fontFamily="@font/poppins"
+                        android:fontFamily="@font/montserrat_semibold"
                         android:paddingHorizontal="@dimen/_20sdp"
-                        android:text="2.9%"
-                        android:textColor="#4A4A4A" />
+                        android:text="$00"
+                        android:textSize="@dimen/_12sdp"
+                        android:textColor="@color/black" />
 
                 </RelativeLayout>
 
@@ -617,6 +653,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/_15sdp"
                         android:layout_marginTop="@dimen/_10sdp"
+                        android:visibility="gone"
                         android:layout_below="@+id/relDebitCreditCard">
 
                         <ImageView
@@ -668,6 +705,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/relCardDetails"
+                        android:orientation="vertical"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         android:layout_marginStart="@dimen/_15sdp"
                         android:layout_marginTop="@dimen/_10sdp"/>
 

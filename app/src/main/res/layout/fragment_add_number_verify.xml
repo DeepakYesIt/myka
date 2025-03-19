@@ -31,7 +31,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/_10sdp"
+                        android:padding="@dimen/_8sdp"
                         android:src="@drawable/back_icon" />
                 </RelativeLayout>
 
@@ -42,7 +42,9 @@
                     android:layout_marginStart="@dimen/_5sdp"
                     android:text="Add number"
                     android:textColor="#000000"
+                    android:fontFamily="@font/montserrat_semibold"
                     android:textSize="@dimen/_15sdp" />
+
             </RelativeLayout>
 
             <TextView
@@ -77,7 +79,7 @@
 
                 <RelativeLayout
                     android:id="@+id/relPhoneNumber"
-                    android:layout_width="@dimen/_150sdp"
+                    android:layout_width="@dimen/_60sdp"
                     android:layout_height="@dimen/_40sdp"
                     android:background="@drawable/circular_edittext_bg">
 
@@ -86,10 +88,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
+                        android:visibility="visible"
                         android:layout_marginStart="@dimen/_8sdp"
                         android:src="@drawable/us_flag_icon" />
 
-                    <com.hbb20.CountryCodePicker
+                    <!--<com.hbb20.CountryCodePicker
                         app:ccp_defaultNameCode="IND"
                         android:id="@+id/country_code"
                         android:layout_width="match_parent"
@@ -98,14 +101,15 @@
                         app:ccp_showFlag="true"
                         app:ccp_showNameCode="false"
                         app:ccp_showFullName="false">
-                    </com.hbb20.CountryCodePicker>
+
+                    </com.hbb20.CountryCodePicker>-->
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         android:layout_marginEnd="@dimen/_8sdp"
                         android:src="@drawable/drop_down_icon"
                         app:tint="@color/orange" />
@@ -125,6 +129,7 @@
                     android:hint="Enter your phone number"
                     android:maxLength="10"
                     android:padding="@dimen/_10sdp"
+                    android:inputType="number"
                     android:singleLine="true"
                     android:text=""
                     android:textColor="@color/black"
@@ -141,7 +146,7 @@
                     android:layout_marginEnd="@dimen/_10sdp"
                     android:fontFamily="@font/montserrat_medium"
                     android:text="Verify"
-                    android:textColor="@color/light_green"
+                    android:textColor="@color/grey5"
                     android:textSize="@dimen/_14sdp" />
 
             </RelativeLayout>

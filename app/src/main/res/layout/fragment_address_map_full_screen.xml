@@ -5,9 +5,24 @@
     android:layout_height="match_parent"
     tools:context=".fragment.mainfragment.commonscreen.AddressMapFullScreenFragment">
 
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/gmsMapView"
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <fragment
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </RelativeLayout>
+
+    </ScrollView>
+
 
 </RelativeLayout>

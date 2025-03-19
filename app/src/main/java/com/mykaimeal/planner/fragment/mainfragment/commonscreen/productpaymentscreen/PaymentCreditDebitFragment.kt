@@ -156,7 +156,6 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
 
     private fun showDataInUi(data: MutableList<GetCardMealMeModelData>?) {
 
-
         if (data!=null && data.size>0){
             binding.cvDebitCard3.visibility=View.GONE
             adapterPaymentCreditDebitItem = AdapterPaymentCreditDebitItem(requireContext(), data,  this)
@@ -164,8 +163,6 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
         }else{
             binding.cvDebitCard3.visibility=View.VISIBLE
         }
-
-
 
     }
 

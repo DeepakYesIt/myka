@@ -104,7 +104,7 @@ class CategoryProductAdapter(
                 // Increase quantity logic
             }
 
-            binding.productSwap.setOnClickListener {
+            binding.imageSwap.setOnClickListener {
                 onItemSelectListener.itemSelect(0,"2","")
             }
         }

@@ -1,6 +1,7 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen.addnumberfragment
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -23,15 +24,15 @@ import com.mykaimeal.planner.databinding.FragmentAddNumberVerifyBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addnumberfragment.model.OtpSendModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addnumberfragment.viewmodel.AddNumberVerifyViewModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
+import dagger.hilt.android.AndroidEntryPoint
 import `in`.aabhasjindal.otptextview.OTPListener
 import kotlinx.coroutines.launch
-import java.util.regex.Pattern
 
-
+@AndroidEntryPoint
 class AddNumberVerifyFragment : Fragment() {
     private var binding: FragmentAddNumberVerifyBinding? = null
     private lateinit var addNumberVerifyViewModel: AddNumberVerifyViewModel
-    var lastNumber: String? = null
+    var lastNumber: String =""
     private lateinit var commonWorkUtils: CommonWorkUtils
 
     override fun onCreateView(
@@ -65,17 +66,28 @@ class AddNumberVerifyFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        binding!!.etRegPhone.addTextChangedListener(object : TextWatcher {
+        binding?.etRegPhone?.addTextChangedListener(object : TextWatcher {
             @SuppressLint("ResourceAsColor")
             override fun afterTextChanged(s: Editable?) {
                 val input = s.toString()
+                // Enable button only if the phone number is valid (10 digits)
 
-                // Enable the button only if the input is different from the last entered number
-                binding!!.tvVerify.isClickable = input.isNotEmpty() && input != lastNumber
-                // Update lastNumber when textView becomes clickable
-                if (binding!!.tvVerify.isClickable) {
-                    lastNumber = input
+                if (input==lastNumber){
+                    binding?.tvVerify?.isClickable = false
+                    binding?.tvVerify?.isEnabled = false
+                    binding?.tvVerify?.setTextColor(Color.parseColor("#D7D7D7")) // Gray color for inactive state
+                }else{
+                    if (input.length >= 10) {
+                        binding?.tvVerify?.isClickable = true
+                        binding?.tvVerify?.isEnabled = true
+                        binding?.tvVerify?.setTextColor(Color.parseColor("#06C169")) // Green color for active state
+                    } else {
+                        binding?.tvVerify?.isClickable = false
+                        binding?.tvVerify?.isEnabled = false
+                        binding?.tvVerify?.setTextColor(Color.parseColor("#D7D7D7")) // Gray color for inactive state
+                    }
                 }
+
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -83,8 +95,8 @@ class AddNumberVerifyFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-
-        binding!!.tvVerify.setOnClickListener {
+        // Click Listener
+        binding?.tvVerify?.setOnClickListener {
             if (validate()) {
                 if (BaseApplication.isOnline(requireActivity())) {
                     getOtpUrl()
@@ -93,6 +105,18 @@ class AddNumberVerifyFragment : Fragment() {
                 }
             }
         }
+
+
+        binding!!.textResend.setOnClickListener {
+            if (validate()) {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    getOtpUrl()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
+        }
+
 
         binding!!.rlVerificationVerify.setOnClickListener{
             if (BaseApplication.isOnline(requireActivity())) {
@@ -114,6 +138,37 @@ class AddNumberVerifyFragment : Fragment() {
             }
         }
     }
+
+/*    private fun fetchCountries() {
+        BaseApplication.showMe(requireContext())
+        RetrofitClient.instance.getCountries().enqueue(object : Callback<List<Country>> {
+            override fun onResponse(call: Call<List<Country>>, response: Response<List<Country>>) {
+                BaseApplication.dismissMe()
+                if (response.isSuccessful) {
+                    val countryList = response.body() ?: emptyList()
+                    Log.d("response ","****"+ countryList.toString())
+
+                    for (country in countryList) {
+                        val countryName = country.name.common
+                        val dialCode = if (country.idd.root != null && !country.idd.suffixes.isNullOrEmpty()) {
+                            country.idd.root + country.idd.suffixes.first()
+                        } else {
+                            country.idd.root ?: country.idd.suffixes?.firstOrNull() ?: ""
+                        }
+                        val flagUrl = country.flags.png
+
+                        Log.d("CountryData", "Name: $countryName, Code: ${country.idd}, Flag: $flagUrl")
+                    }
+                } else {
+                    Log.e("API_ERROR", "Response failed: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<List<Country>>, t: Throwable) {
+                Log.e("API_ERROR", "Network Error: ${t.message}")
+            }
+        })
+    }*/
 
     /// add validation based on valid email or phone
     private fun validate(): Boolean {
@@ -171,7 +226,11 @@ class AddNumberVerifyFragment : Fragment() {
     private fun handleApiOtpSendResponse(result: NetworkResult<String>) {
         when (result) {
             is NetworkResult.Success -> handleSuccessOtpResponse(result.data.toString())
-            is NetworkResult.Error -> showAlert(result.message, false)
+            is NetworkResult.Error -> {
+                binding?.tvVerify?.isClickable = true
+                binding?.tvVerify?.isEnabled = true
+                binding?.tvVerify?.setTextColor(Color.parseColor("#06C169")) // Green color for active state
+                showAlert(result.message, false)}
             else -> showAlert(result.message, false)
         }
     }
@@ -194,10 +253,15 @@ class AddNumberVerifyFragment : Fragment() {
             val apiModel = Gson().fromJson(data, OtpSendModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
+                lastNumber=binding?.etRegPhone?.text.toString().trim()
+                binding?.tvVerify?.isClickable = false
+                binding?.tvVerify?.isEnabled = false
                 binding!!.tvVerify.setTextColor(R.color.grey5)
                 binding!!.relPhoneValidation.visibility = View.VISIBLE
-                binding!!.tvVerify.isClickable=false
             } else {
+                binding?.tvVerify?.isClickable = true
+                binding?.tvVerify?.isEnabled = true
+                binding?.tvVerify?.setTextColor(Color.parseColor("#06C169")) // Green color for active state
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
                 } else {

@@ -37,22 +37,34 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/imageBackIcon"
+                    android:layout_marginTop="@dimen/_10sdp"
                     android:layout_marginStart="@dimen/_3sdp">
 
 
-                <ImageView
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/tescoLogoImage"
+                        android:layout_width="@dimen/_85sdp"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_margin="@dimen/_3sdp"
+                        android:elevation="@dimen/_10sdp"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/ic_walmart_star_icon"
+                        app:shapeAppearanceOverlay="@style/RoundedSquare" />
+
+              <!--  <ImageView
                     android:id="@+id/tescoLogoImage"
                     android:layout_width="@dimen/_85sdp"
                     android:layout_height="@dimen/_40sdp"
                     android:padding="@dimen/_4sdp"
                     android:scaleType="fitXY"
-                    android:src="@drawable/ic_walmart_star_icon" />
+                    android:src="@drawable/ic_walmart_star_icon" />-->
 
                     <include
                         android:id="@+id/lay_progess"
                         layout="@layout/progess_loader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:visibility="gone"
                         android:layout_centerInParent="true" />
 
                 <ImageView
@@ -108,7 +120,7 @@
                     android:id="@+id/textPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="$35.22"
+                    android:text="$00"
                     android:fontFamily="@font/montserrat_bold"
                     android:textStyle="bold"
                     android:textSize="@dimen/_13sdp"

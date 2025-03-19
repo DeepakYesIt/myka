@@ -37,14 +37,15 @@ import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.AdapterSuperMarket
 import com.mykaimeal.planner.adapter.CategoryProductAdapter
+import com.mykaimeal.planner.adapter.SuperMarketListAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentBasketDetailSuperMarketBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.model.BasketDetailsSuperMarketModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.model.BasketDetailsSuperMarketModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.viewmodel.BasketDetailsSuperMarketViewModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Store
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModel
-import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModelData
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import com.mykaimeal.planner.model.DataModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,8 +57,7 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
     private lateinit var binding: FragmentBasketDetailSuperMarketBinding
     private lateinit var itemSectionAdapter: CategoryProductAdapter
     private var bottomSheetDialog: BottomSheetDialog? = null
-    private var adapterSuperMarket: AdapterSuperMarket? = null
-
+    private var adapter: AdapterSuperMarket? = null
     private var rcvBottomDialog: RecyclerView? = null
     private lateinit var basketDetailsSuperMarketViewModel: BasketDetailsSuperMarketViewModel
 
@@ -91,9 +91,6 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
 
         return binding.root
     }
-
-
-
 
     private fun getBasketDetailsApi() {
         BaseApplication.showMe(requireContext())
@@ -238,7 +235,7 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
     private fun showDataInUI(data: BasketDetailsSuperMarketModelData?) {
 
         if (data!!.total!=null){
-            binding.textPrice.text="$"+data.total.toString()
+            binding.textPrice.text=data.total.toString()
         }
 
         if (data.product != null && data.product.size > 0) {
@@ -344,89 +341,16 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
         }
     }
 
-    private fun showUIData(data: List<SuperMarketModelData>?) {
+    private fun showUIData(data: MutableList<Store>?) {
         try {
             if (data!=null){
-                adapterSuperMarket = AdapterSuperMarket(data, requireActivity(), this)
-                rcvBottomDialog!!.adapter = adapterSuperMarket
+                adapter = AdapterSuperMarket(data, requireActivity(), this,0)
+                rcvBottomDialog!!.adapter = adapter
             }
 
         }catch (e:Exception){
             showAlert(e.message, false)
         }
-    }
-
-
-    private fun superMarketModel() {
-        val dataList1: MutableList<DataModel> = mutableListOf()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-        val data6 = DataModel()
-        val data7 = DataModel()
-        val data8 = DataModel()
-        val data9 = DataModel()
-
-        data1.title = "Tesco"
-        data1.isOpen = false
-        data1.type = "SuperMarket"
-        data1.price = "25"
-        data1.image = R.drawable.super_market_tesco_image
-
-        data2.title = "Coop"
-        data2.isOpen = false
-        data2.price = "28"
-        data2.image = R.drawable.super_market_coop_image
-
-        data3.title = "Iceland"
-        data3.isOpen = false
-        data3.price = "30"
-        data3.image = R.drawable.super_market_iceland_image
-
-        data4.title = "Albertsons"
-        data4.isOpen = false
-        data4.price = "32"
-        data4.image = R.drawable.super_market_albertsons
-
-        data5.title = "Aldi"
-        data5.isOpen = false
-        data5.price = "35"
-        data5.image = R.drawable.super_market_aldi_image
-
-        data6.title = "Costco"
-        data6.isOpen = false
-        data6.price = "35"
-        data6.image = R.drawable.super_market_costco_image
-
-        data7.title = "Albertsons"
-        data7.isOpen = false
-        data7.price = "32"
-        data7.image = R.drawable.super_market_albertsons
-
-        data8.title = "Aldi"
-        data8.isOpen = false
-        data8.price = "35"
-        data8.image = R.drawable.super_market_aldi_image
-
-        data9.title = "Costco"
-        data9.isOpen = false
-        data9.price = "35"
-        data9.image = R.drawable.super_market_costco_image
-
-        dataList1.add(data1)
-        dataList1.add(data2)
-        dataList1.add(data3)
-        dataList1.add(data4)
-        dataList1.add(data5)
-        dataList1.add(data6)
-        dataList1.add(data7)
-        dataList1.add(data8)
-        dataList1.add(data9)
-
-        /* adapterSuperMarket = AdapterSuperMarket(dataList1, requireActivity(), this)
-         rcvBottomDialog!!.adapter = adapterSuperMarket*/
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {

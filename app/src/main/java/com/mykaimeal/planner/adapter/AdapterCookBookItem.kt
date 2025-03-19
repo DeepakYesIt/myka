@@ -25,7 +25,7 @@ class AdapterCookBookItem(var datalist: MutableList<Data>, private var requireAc
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding: AdapterCookbookItemBinding =
-            AdapterCookbookItemBinding.inflate(inflater, parent, false);
+            AdapterCookbookItemBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 

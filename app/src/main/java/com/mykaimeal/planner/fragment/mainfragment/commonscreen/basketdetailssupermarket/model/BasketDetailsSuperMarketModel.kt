@@ -26,7 +26,7 @@ data class Product(
     val pro_name: String?,
     val pro_price: String?,
     val product_id: Any,
-    val quantity: Any,
+    val quantity: Int,
     val sch_id: Int?,
     val status: Int?,
     val updated_at: String?,

@@ -1,24 +1,62 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen.supermarktesnearbyscreen
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.LocationManager
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.gson.Gson
 import com.mykaimeal.planner.OnItemClickListener
+import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.AdapterSuperMarket
+import com.mykaimeal.planner.basedata.BaseApplication
+import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentSuperMarketsNearByBinding
-import com.mykaimeal.planner.model.DataModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.viewmodel.BasketDetailsSuperMarketViewModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Store
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModel
+import com.mykaimeal.planner.messageclass.ErrorMessage
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 
-class SuperMarketsNearByFragment : Fragment(),OnItemClickListener {
+@AndroidEntryPoint
+class SuperMarketsNearByFragment : Fragment(),OnItemSelectListener,
+    OnMapReadyCallback {
     private lateinit var binding: FragmentSuperMarketsNearByBinding
-    private var adapterSuperMarket: AdapterSuperMarket? = null
-    private var dataList1: MutableList<DataModel> = mutableListOf()
+    private var adapter: AdapterSuperMarket? = null
+    private lateinit var basketDetailsSuperMarketViewModel: BasketDetailsSuperMarketViewModel
+    private var fusedLocationClient: FusedLocationProviderClient? = null
+    private var latitude = "0.0"
+    private var longitude = "0.0"
+    private lateinit var mapView: MapView
+    private var mMap: GoogleMap? = null
+
+    private val storeLocations = mutableListOf<LatLng>() // List to store locations
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,14 +65,21 @@ class SuperMarketsNearByFragment : Fragment(),OnItemClickListener {
         // Inflate the layout for this fragment
         binding=FragmentSuperMarketsNearByBinding.inflate(layoutInflater, container, false)
 
+        basketDetailsSuperMarketViewModel = ViewModelProvider(requireActivity())[BasketDetailsSuperMarketViewModel::class.java]
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
         })
 
+        mapView = binding.mapView
+        mapView.onCreate(savedInstanceState)
+        mapView.getMapAsync(this)
+
         initialize()
-        superMarketModel()
 
         return binding.root
     }
@@ -60,81 +105,221 @@ class SuperMarketsNearByFragment : Fragment(),OnItemClickListener {
             binding.textCollect.setTextColor(Color.WHITE)
 
         }
-    }
 
-    private fun superMarketModel() {
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-        val data6 = DataModel()
-        val data7 = DataModel()
-        val data8 = DataModel()
-        val data9 = DataModel()
-
-        data1.title = "Tesco"
-        data1.isOpen = false
-        data1.type = "SuperMarket"
-        data1.price = "25"
-        data1.image = R.drawable.super_market_tesco_image
-
-        data2.title = "Coop"
-        data2.isOpen = false
-        data2.price = "28"
-        data2.image = R.drawable.super_market_coop_image
-
-        data3.title = "Iceland"
-        data3.isOpen = false
-        data3.price = "30"
-        data3.image = R.drawable.super_market_iceland_image
-
-        data4.title = "Albertsons"
-        data4.isOpen = false
-        data4.price = "32"
-        data4.image = R.drawable.super_market_albertsons
-
-        data5.title = "Aldi"
-        data5.isOpen = false
-        data5.price = "35"
-        data5.image = R.drawable.super_market_aldi_image
-
-        data6.title = "Costco"
-        data6.isOpen = false
-        data6.price = "35"
-        data6.image = R.drawable.super_market_costco_image
-
-        data7.title = "Albertsons"
-        data7.isOpen = false
-        data7.price = "32"
-        data7.image = R.drawable.super_market_albertsons
-
-        data8.title = "Aldi"
-        data8.isOpen = false
-        data8.price = "35"
-        data8.image = R.drawable.super_market_aldi_image
-
-        data9.title = "Costco"
-        data9.isOpen = false
-        data9.price = "35"
-        data9.image = R.drawable.super_market_costco_image
-
-        dataList1.add(data1)
-        dataList1.add(data2)
-        dataList1.add(data3)
-        dataList1.add(data4)
-        dataList1.add(data5)
-        dataList1.add(data6)
-        dataList1.add(data7)
-        dataList1.add(data8)
-        dataList1.add(data9)
-
-        /*adapterSuperMarket = AdapterSuperMarket(dataList1, requireActivity(), this)
-        binding.recySuperMarket.adapter = adapterSuperMarket*/
-    }
-
-    override fun itemClick(position: Int?, status: String?, type: String?) {
+        if (BaseApplication.isOnline(requireActivity())){
+            // This condition for check location run time permission
+            if (ContextCompat.checkSelfPermission(
+                    requireActivity(),
+                    android.Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                    requireActivity(),
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                getCurrentLocation()
+            } else {
+                requestPermissions(
+                    arrayOf(
+                        android.Manifest.permission.ACCESS_FINE_LOCATION,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION
+                    ), 100
+                )
+            }
+        }else{
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
 
     }
+
+
+    @SuppressLint("MissingPermission")
+    private fun getCurrentLocation() {
+        // Initialize Location manager
+        val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        // Check condition
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+                LocationManager.NETWORK_PROVIDER
+            )
+        ) {
+            // When location service is enabled
+            // Get last location
+            fusedLocationClient!!.lastLocation.addOnCompleteListener { task ->
+                // Initialize location
+                // Check condition
+                if (task.isSuccessful && task.result != null) {
+                    val location = task.result
+                    // When location result is not
+                    // null set latitude
+                    latitude = location.latitude.toString()
+                    longitude = location.longitude.toString()
+
+                    getSuperMarketsList()
+
+                } else {
+                    // When location result is null
+                    // initialize location request
+                    val locationRequest = LocationRequest()
+                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                        .setInterval(10000)
+                        .setFastestInterval(1000)
+                    // Initialize location call back
+                    val locationCallback: LocationCallback = object : LocationCallback() {
+                        override fun onLocationResult(locationResult: LocationResult) {
+                            // location
+                            val location1 = locationResult.lastLocation
+                            latitude = location1!!.latitude.toString()
+                            longitude = location1.longitude.toString()
+
+                            getSuperMarketsList()
+
+                        }
+                    }
+                    fusedLocationClient!!.requestLocationUpdates(
+                        locationRequest,
+                        locationCallback,
+                        Looper.myLooper()
+                    )
+                }
+            }
+        } else {
+            requestPermissions(
+                arrayOf(
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ), 100
+            )
+        }
+    }
+
+
+
+    private fun getSuperMarketsList() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            basketDetailsSuperMarketViewModel.getSuperMarket({
+                BaseApplication.dismissMe()
+                handleMarketApiResponse(it)
+            },latitude, longitude)
+        }
+    }
+
+    private fun handleMarketApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleMarketSuccessResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    private fun showAlert(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
+    }
+
+
+
+    @SuppressLint("SetTextI18n")
+    private fun handleMarketSuccessResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SuperMarketModel::class.java)
+            Log.d("@@@ Recipe Details ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success==true) {
+                showUIData(apiModel.data)
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun showUIData(data: MutableList<Store>?) {
+        try {
+            if (!data.isNullOrEmpty()) {
+                // Set adapter
+                adapter = AdapterSuperMarket(data, requireActivity(), this, 0)
+                binding.recySuperMarket.adapter = adapter
+
+                // Extract LatLng and store in list
+                storeLocations.clear()
+                for (store in data) {
+                    val address = store.address
+                    val latitude = address?.lat ?: 0.0  // Default to 0.0 if null
+                    val longitude = address?.lon ?: 0.0 // Default to 0.0 if null
+
+                    storeLocations.add(LatLng(latitude, longitude))
+                }
+
+                // Update Google Map
+                mMap?.let { updateMap(it) }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message ?: "An error occurred", false)
+        }
+    }
+
+    // Add markers to map
+    private fun updateMap(map: GoogleMap) {
+        map.clear()
+        for (location in storeLocations) {
+            map.addMarker(MarkerOptions().position(location).title("Store Location"))
+        }
+
+        // Move camera to first store location
+        if (storeLocations.isNotEmpty()) {
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(storeLocations[0], 12f))
+        }
+    }
+
+    override fun itemSelect(position: Int?, status: String?, type: String?) {
+
+    }
+
+    override fun onMapReady(gmap: GoogleMap) {
+        mMap = gmap
+        // Add markers for all store locations
+        if (storeLocations.isNotEmpty()) {
+            updateMap(mMap!!)
+        }
+        /*mMap = gmap
+        val newYork = LatLng(40.7128, -74.0060)
+        mMap?.addMarker(MarkerOptions().position(newYork).title("Marker in New York"))
+        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(newYork, 12f))*/
+    }
+
+    // Manage MapView Lifecycle
+    override fun onResume() {
+        super.onResume()
+        mapView.onResume()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mapView.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapView.onStop()
+    }
+
+    override fun onPause() {
+        mapView.onPause()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        mapView.onDestroy()
+        super.onDestroy()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
+    }
+
 
 }

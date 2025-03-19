@@ -1,14 +1,30 @@
 package com.mykaimeal.planner.adapter
 
+import android.annotation.SuppressLint
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.mykaimeal.planner.OnItemClickListener
+import com.mykaimeal.planner.OnItemSelectListener
+import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterSuperMarketItemBinding
-import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModelData
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Store
 
-class AdapterSuperMarket(private var datalist: List<SuperMarketModelData>?, private var requireActivity: FragmentActivity, private var onItemClickListener: OnItemClickListener): RecyclerView.Adapter<AdapterSuperMarket.ViewHolder>() {
+class AdapterSuperMarket(private var storesData: MutableList<Store>?,
+                         private var requireActivity: FragmentActivity,
+                         private var onItemSelectListener: OnItemSelectListener,
+                         private var pos: Int
+): RecyclerView.Adapter<AdapterSuperMarket.ViewHolder>() {
+
+    private var selectedPosition = pos // Default no selection
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -16,15 +32,68 @@ class AdapterSuperMarket(private var datalist: List<SuperMarketModelData>?, priv
         return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
 
-        holder.binding.textName.text=datalist!![position].store_name
-        /*holder.binding.textAmounts.text="$"+datalist[position].price
-        holder.binding.imgSuperMarket.setImageResource(datalist[position].image)*/
+//        holder.binding.textName.text=datalist!![position].store_name
+        val data = storesData?.get(position)
+
+        // ✅ Correctly update the background based on selection
+        if (selectedPosition == position) {
+            holder.binding.relativeLayoutMain.setBackgroundResource(R.drawable.supermarket_selection_bg) // Default
+        } else {
+            holder.binding.relativeLayoutMain.background=null // Selected
+        }
+
+        data?.let {
+            holder.binding.tvSuperMarketItems.text = it.store_name ?: ""
+
+            // ✅ Load image with Glide
+            Glide.with(requireActivity)
+                .load(it.image)
+                .error(R.drawable.no_image)
+                .placeholder(R.drawable.no_image)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        holder.binding.layProgess.root.visibility = View.GONE
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        holder.binding.layProgess.root.visibility = View.GONE
+                        return false
+                    }
+                })
+                .into(holder.binding.imageSuperMarket)
+        } ?: run {
+            holder.binding.layProgess.root.visibility = View.GONE
+        }
+
+        // ✅ Click event for selection
+        holder.binding.relativeLayoutMain.setOnClickListener {
+            val previousPosition = selectedPosition
+            selectedPosition = position // ✅ Use `position` instead of `holder.adapterPosition`
+            // Refresh the UI for both previously selected and newly selected item
+            notifyItemChanged(previousPosition)
+            notifyItemChanged(selectedPosition)
+
+            // ✅ Notify selection change
+            onItemSelectListener.itemSelect(position, data!!.store_uuid.toString(), "SuperMarket")
+        }
     }
 
     override fun getItemCount(): Int {
-        return datalist!!.size
+        return storesData!!.size
     }
 
     class ViewHolder(var binding: AdapterSuperMarketItemBinding) : RecyclerView.ViewHolder(binding.root){

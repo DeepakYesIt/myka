@@ -13,5 +13,8 @@ class CheckoutScreenViewModel @Inject constructor(private val repository: MainRe
         repository.getCheckoutScreenUrl{ successCallback(it) }
     }
 
+    suspend fun getCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.getCardMealMeUrl{ successCallback(it) }
+    }
 
 }
