@@ -79,7 +79,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_margin="@dimen/_8sdp"
                         android:src="@drawable/yellow_search_icon" />
 
                 </RelativeLayout>
@@ -209,7 +208,7 @@
                         android:background="@drawable/selected_button_bg"
                         android:fontFamily="@font/poppins"
                         android:paddingVertical="@dimen/_5sdp"
-                        android:text="Fridge"
+                        android:text="Fridge(0)"
                         android:textAlignment="center"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_12sdp" />
@@ -224,7 +223,7 @@
                         android:background="@drawable/unselected_button_bg"
                         android:fontFamily="@font/poppins"
                         android:paddingVertical="@dimen/_5sdp"
-                        android:text="Freezer"
+                        android:text="Freezer(0)"
                         android:textAlignment="center"
                         android:textSize="@dimen/_12sdp" />
 
@@ -248,6 +247,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+                    <RelativeLayout
+                        android:id="@+id/relImagesFood"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/imgIngRecipe"
                         android:layout_width="@dimen/_50sdp"
@@ -265,13 +270,14 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true" />
 
+                    </RelativeLayout>
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="@dimen/_7sdp"
-                        android:layout_toEndOf="@id/imgIngRecipe">
+                        android:layout_toEndOf="@id/relImagesFood">
 
                         <TextView
                             android:id="@+id/tvTitleName"

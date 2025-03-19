@@ -103,8 +103,13 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
             binding!!.textFreezer.setTextColor(Color.BLACK)
             planType="1"
 
-         /*   binding!!.textFridge.text="Fridge (1)"
-            binding!!.textFreezer.text="Freezer (0)"*/
+            if (status=="2"){
+                binding!!.textFridge.text="Fridge (1)"
+                binding!!.textFreezer.text="Freezer (0)"
+            }else{
+                binding!!.textFridge.text="Fridge (0)"
+                binding!!.textFreezer.text="Freezer (0)"
+            }
 
         }
 
@@ -115,8 +120,13 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
             binding!!.textFreezer.setTextColor(Color.WHITE)
             planType="2"
 
-          /*  binding!!.textFridge.text="Fridge (0)"
-            binding!!.textFreezer.text="Freezer (1)"*/
+            if (status=="2"){
+                binding!!.textFridge.text="Fridge (0)"
+                binding!!.textFreezer.text="Freezer (1)"
+            }else{
+                binding!!.textFridge.text="Fridge (0)"
+                binding!!.textFreezer.text="Freezer (0)"
+            }
 
         }
 
@@ -337,6 +347,14 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
     }
 
     override fun itemClick(position: Int?, uri: String?, type: String?) {
+
+        if (planType=="1"){
+            binding!!.textFridge.text="Fridge (1)"
+            binding!!.textFreezer.text="Freezer (0)"
+        }else{
+            binding!!.textFridge.text="Fridge (0)"
+            binding!!.textFreezer.text="Freezer (1)"
+        }
 
         mealType=type.toString()
         recipeUri= uri.toString()
