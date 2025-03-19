@@ -12,8 +12,8 @@ class AllergenIngredientViewModel @Inject constructor(private val repository: Ma
 
     private var allergensLocalData: MutableList<AllergensIngredientModelData>?=null
 
-    suspend fun getAllergensIngredients(successCallback: (response: NetworkResult<String>) -> Unit){
-        repository.getAllergensIngredients { successCallback(it) }
+    suspend fun getAllergensIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?){
+        repository.getAllergensIngredients({ successCallback(it) },itemCount)
     }
 
     fun setAllergensData(data: MutableList<AllergensIngredientModelData>) {

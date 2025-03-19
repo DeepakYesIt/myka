@@ -96,7 +96,8 @@ class AdapterDislikeIngredientItem(private var dislikeIngredientsData: List<Disl
     }
 
     override fun getItemCount(): Int {
-        return if (isExpanded) dislikeIngredientsData.size else Math.min(3, dislikeIngredientsData.size)
+        return dislikeIngredientsData.size
+//        return if (isExpanded) dislikeIngredientsData.size else Math.min(3, dislikeIngredientsData.size)
     }
 
     fun setExpanded(expanded: Boolean) {

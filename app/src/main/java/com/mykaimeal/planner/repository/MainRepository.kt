@@ -11,7 +11,7 @@ interface MainRepository {
     suspend fun getDietaryRestrictions(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getFavouriteCuisines(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getDislikeIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?)
-    suspend fun getAllergensIngredients(successCallback: (response: NetworkResult<String>) -> Unit)
+    suspend fun getAllergensIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?)
     suspend fun getMealRoutine(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getCookingFrequency(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getEatingOut(successCallback: (response: NetworkResult<String>) -> Unit)

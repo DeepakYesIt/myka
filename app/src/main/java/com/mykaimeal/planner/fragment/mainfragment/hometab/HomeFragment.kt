@@ -96,7 +96,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
         cookbookList.clear()
         val data =
             com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
-                "", "", 0, "", "Favourites", 0, "", 0
+                "", "", 0, "", "Favorites", 0, "", 0
             )
         cookbookList.add(0, data)
 
@@ -222,8 +222,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
             if (userDataLocal.userData != null && userDataLocal.userData!!.size > 0) {
                 binding!!.relPlanMeal.visibility = View.GONE
                 binding!!.llRecipesCooked.visibility = View.VISIBLE
-                recipeCookedAdapter =
-                    RecipeCookedAdapter(userDataLocal.userData, requireActivity(), this)
+                recipeCookedAdapter = RecipeCookedAdapter(userDataLocal.userData, requireActivity(), this)
                 binding!!.rcyRecipesCooked.adapter = recipeCookedAdapter
             } else {
                 binding!!.relPlanMeal.visibility = View.VISIBLE
@@ -247,14 +246,10 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
             }*/
 
             if (userDataLocal.date != null && !userDataLocal.date.equals("", true)) {
-                val name = BaseApplication.getColoredSpanned(
-                    "Next meal to be cooked on ",
-                    "#3C4541"
-                ) + BaseApplication.getColoredSpanned(data.date + ".", "#06C169")
+                val name = BaseApplication.getColoredSpanned("Next meal to be cooked on ", "#3C4541") + BaseApplication.getColoredSpanned(data.date + ".", "#06C169")
                 binding!!.tvHomeDesc.text = Html.fromHtml(name)
             } else {
-                binding!!.tvHomeDesc.text =
-                    "Your cooking schedule is empty! Tap the button below to add a meal and get started."
+                binding!!.tvHomeDesc.text = "Your cooking schedule is empty! Tap the button below to add a meal and get started."
             }
 
             fun updateCount(breakfast: Int?) {

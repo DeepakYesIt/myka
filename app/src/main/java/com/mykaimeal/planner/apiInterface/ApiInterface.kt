@@ -31,8 +31,8 @@ interface ApiInterface {
     @GET(ApiEndPoint.dislikeIngredients+"/{value}/{value1}")
     suspend fun getDislikeSearchIngredients(@Path("value") country:String?, @Path("value1") state :String?) : Response<JsonObject>
 
-    @GET(ApiEndPoint.allergensIngredients)
-    suspend fun getAllergensIngredients(): Response<JsonObject>
+    @GET(ApiEndPoint.allergensIngredients+"/{value}")
+    suspend fun getAllergensIngredients(@Path("value") value: String?): Response<JsonObject>
 
     @GET(ApiEndPoint.mealRoutine)
     suspend fun getMealRoutine(): Response<JsonObject>
@@ -252,14 +252,11 @@ interface ApiInterface {
         @Field("rating") ratingBarcount: String
     ): Response<JsonObject>
 
-
     @POST(ApiEndPoint.homeUrl)
     suspend fun homeDetailsRequestApi(): Response<JsonObject>
 
-
     @POST(ApiEndPoint.addBasketeDetailsUrl)
     suspend fun recipeAddBasketRequestApi(@Body jsonObject: JsonObject): Response<JsonObject>
-
 
     @POST(ApiEndPoint.addMealUrl)
     suspend fun recipeAddToPlanRequestApi(@Body jsonObject: JsonObject): Response<JsonObject>

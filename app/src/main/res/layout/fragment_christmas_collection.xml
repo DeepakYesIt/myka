@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragment.mainfragment.commonscreen.ChristmasCollectionFragment">
+
     <RelativeLayout
         android:id="@+id/rlToolbar"
         android:layout_width="match_parent"
@@ -19,20 +20,20 @@
             android:layout_centerVertical="true"
             android:layout_centerInParent="true"
             android:src="@drawable/black_images_back" />
+
         <TextView
             android:id="@+id/tvName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_centerInParent="true"
             android:layout_alignStart="@id/imgBackChristmas"
             android:layout_alignEnd="@id/imgThreeDotIcon"
-            android:fontFamily="@font/montserrat_semibold"
-            android:text=""
-            android:gravity="center"
+            android:layout_centerInParent="true"
             android:layout_marginHorizontal="@dimen/_20sdp"
-            android:textSize="@dimen/_13sdp" />
+            android:fontFamily="@font/montserrat_semibold"
+            android:gravity="center"
+            android:text=""
+            android:textSize="@dimen/_15sdp" />
+
         <ImageView
             android:id="@+id/imgThreeDotIcon"
             android:layout_width="wrap_content"

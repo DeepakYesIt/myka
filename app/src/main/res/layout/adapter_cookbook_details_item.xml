@@ -126,11 +126,10 @@
                 <TextView
                     android:id="@+id/tvBreakfast"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/_35sdp"
                     android:fontFamily="@font/montserrat_semibold"
                     android:text=""
-                    android:singleLine="true"
-                    android:textSize="@dimen/_13sdp" />
+                    android:textSize="@dimen/_12sdp" />
 
             </RelativeLayout>
 

@@ -128,7 +128,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         }
 
         val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
-                "", "", 0, "", "Favourites", 0, "", 0)
+                "", "", 0, "", "Favorites", 0, "", 0)
         cookbookList.add(0, data)
 
         if (sessionManagement.getUserName() != null) {

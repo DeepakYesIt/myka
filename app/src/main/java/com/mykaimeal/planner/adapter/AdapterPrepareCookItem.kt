@@ -15,6 +15,8 @@ import com.bumptech.glide.request.target.Target
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterPrepareCookItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.recipedetails.apiresponse.IngredientsModel
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 
 class AdapterPrepareCookItem(private var datalist: MutableList<IngredientsModel>?, private var requireActivity: FragmentActivity): RecyclerView.Adapter<AdapterPrepareCookItem.ViewHolder>() {
@@ -73,12 +75,16 @@ class AdapterPrepareCookItem(private var datalist: MutableList<IngredientsModel>
         }
 
         if (data.quantity!=null){
+            val roundedQuantity = data.quantity.let {
+                BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+            }
             if (!data.measure.equals("<unit>")){
-                holder.binding.tvTitleDesc.text =""+data.quantity+" "+data.measure
+                holder.binding.tvTitleDesc.text =""+roundedQuantity+" "+data.measure
             }else{
-                holder.binding.tvTitleDesc.text =""+data.quantity
+                holder.binding.tvTitleDesc.text =""+roundedQuantity
             }
         }
+
     }
 
     override fun getItemCount(): Int {

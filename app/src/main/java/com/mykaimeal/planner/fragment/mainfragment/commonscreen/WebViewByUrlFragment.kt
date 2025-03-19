@@ -54,7 +54,7 @@ class WebViewByUrlFragment : Fragment() {
         binding!!.webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
                 // Capture the clicked URL
-                Toast.makeText(requireContext(), "Clicked URL: $url", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(requireContext(), "Clicked URL: $url", Toast.LENGTH_SHORT).show()
                 Log.d("Clicked URL:", "***$url")
                 // Decide whether to load the URL in the WebView
                 view.loadUrl(url) // Load the URL in the WebView

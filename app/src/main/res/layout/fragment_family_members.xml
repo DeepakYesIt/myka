@@ -75,7 +75,7 @@
                 android:layout_marginTop="@dimen/_10sdp"
                 android:text="Let's get to know your family! Enter their name and ages."
                 android:textColor="@color/light_black"
-                android:textSize="@dimen/_13sdp" />
+                android:textSize="@dimen/_15sdp" />
 
             <RelativeLayout
                 android:id="@+id/relMembersName"

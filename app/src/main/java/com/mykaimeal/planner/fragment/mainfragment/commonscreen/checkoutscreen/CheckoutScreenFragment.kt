@@ -40,6 +40,7 @@ class CheckoutScreenFragment : Fragment(),OnMapReadyCallback {
     private var binding: FragmentCheckoutScreenBinding?=null
     private lateinit var mapView: MapView
     private var mMap: GoogleMap? = null
+    private var status:Boolean=false
     private lateinit var checkoutScreenViewModel: CheckoutScreenViewModel
 
     override fun onCreateView(
@@ -49,17 +50,17 @@ class CheckoutScreenFragment : Fragment(),OnMapReadyCallback {
         // Inflate the layout for this fragment
         binding= FragmentCheckoutScreenBinding.inflate(layoutInflater, container, false)
 
-        checkoutScreenViewModel =
-            ViewModelProvider(requireActivity())[CheckoutScreenViewModel::class.java]
+        checkoutScreenViewModel = ViewModelProvider(requireActivity())[CheckoutScreenViewModel::class.java]
 
         // Load saved instance state
         var mapViewBundle: Bundle? = null
         if (savedInstanceState != null) {
-            mapViewBundle = savedInstanceState.getBundle(R.string.api_key.toString())
+            mapViewBundle= savedInstanceState.getBundle("MapViewBundleKey")
+//            mapViewBundle = savedInstanceState.getBundle("AIzaSyA-e6IRZ8axxpwrm1GEjlFOTzwb5KVQHgc")
         }
 
         mapView = binding!!.mapView
-        mapView.onCreate(savedInstanceState)
+        mapView.onCreate(mapViewBundle)
         mapView.getMapAsync(this@CheckoutScreenFragment)
 
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -106,6 +107,17 @@ class CheckoutScreenFragment : Fragment(),OnMapReadyCallback {
 
         binding!!.tvAddCard.setOnClickListener{
             findNavController().navigate(R.id.paymentCreditDebitFragment)
+        }
+
+        binding!!.imageCheckRadio.setOnClickListener{
+            if (status){
+                status=false
+                binding!!.imageCheckRadio.setImageResource(R.drawable.radio_uncheck_gray_icon)
+            }else{
+                binding!!.imageCheckRadio.setImageResource(R.drawable.radio_green_icon)
+                status=true
+
+            }
         }
 
        /* binding!!.mapView.setOnClickListener{

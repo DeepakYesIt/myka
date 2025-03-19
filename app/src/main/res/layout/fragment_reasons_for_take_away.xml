@@ -72,7 +72,7 @@
             android:layout_below="@+id/textTakeAway"
             android:text="What are your reasons for getting takeout?"
             android:textColor="@color/light_black"
-            android:textSize="@dimen/_13sdp" />
+            android:textSize="@dimen/_15sdp" />
 
 
         <androidx.recyclerview.widget.RecyclerView

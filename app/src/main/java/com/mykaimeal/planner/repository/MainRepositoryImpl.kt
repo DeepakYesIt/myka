@@ -74,9 +74,9 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
-    override suspend fun getAllergensIngredients(successCallback: (response: NetworkResult<String>) -> Unit) {
+    override suspend fun getAllergensIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?) {
         try {
-            api.getAllergensIngredients().apply {
+            api.getAllergensIngredients(itemCount).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

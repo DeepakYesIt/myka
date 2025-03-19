@@ -58,7 +58,7 @@
                 <com.google.android.gms.maps.MapView
                     android:id="@+id/mapView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="@dimen/_400sdp"/>
 
             </androidx.cardview.widget.CardView>
 
@@ -611,11 +611,63 @@
 
                     </RelativeLayout>
 
+                    <RelativeLayout
+                        android:id="@+id/relCardDetails"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_15sdp"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:layout_below="@+id/relDebitCreditCard">
+
+                        <ImageView
+                            android:id="@+id/idVisaImages"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/visa_rounded_image"/>
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="@dimen/_10sdp"
+                            android:layout_toEndOf="@+id/idVisaImages">
+
+                            <TextView
+                                android:id="@+id/tvVisaName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="visa"
+                                android:textSize="@dimen/_13sdp"
+                                android:textColor="@color/black"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="**** **** **** 4242"
+                                android:textSize="@dimen/_13sdp"
+                                android:layout_below="@+id/tvVisaName"
+                                android:textColor="@color/black"/>
+
+                        </RelativeLayout>
+
+
+                        <ImageView
+                            android:id="@+id/imageCheckRadio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:src="@drawable/radio_uncheck_gray_icon"/>
+
+
+                    </RelativeLayout>
+
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rcyDebitCreditCard"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/relDebitCreditCard"
+                        android:layout_below="@+id/relCardDetails"
                         android:layout_marginStart="@dimen/_15sdp"
                         android:layout_marginTop="@dimen/_10sdp"/>
 
@@ -660,15 +712,8 @@
 
                     </RelativeLayout>
 
-          <!--          <View
-                        android:id="@+id/viewGPay"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/_1sdp"
-                        android:background="@color/greysss"
-                        android:layout_marginTop="@dimen/_5sdp"
-
-                        android:layout_below="@+id/relGooglePay" />-->
                 </RelativeLayout>
+
             </androidx.cardview.widget.CardView>
 
             <TextView

@@ -44,7 +44,7 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue: Int = 0
     private var status: String? = ""
-    private var itemCount:String = "10"  // Default count
+    private var itemCount:String = "2"  // Default count
     private var dislikeSelectedId = mutableListOf<String>()
     private lateinit var dislikeIngredientsViewModel: DislikeIngredientsViewModel
 
@@ -55,10 +55,13 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
         // Inflate the layout for this fragment
         binding = FragmentIngredientDislikesBinding.inflate(inflater, container, false)
 
-        dislikeIngredientsViewModel =
-            ViewModelProvider(this)[DislikeIngredientsViewModel::class.java]
+        dislikeIngredientsViewModel = ViewModelProvider(this)[DislikeIngredientsViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
+
+        dislikeIngredientsAdapter = AdapterDislikeIngredientItem(dislikeIngredientModelData, requireActivity(), this)
+        binding!!.rcyIngDislikes.adapter = dislikeIngredientsAdapter
+
         if (sessionManagement.getCookingFor().equals("Myself")) {
             binding!!.tvIngDislikes.text = "Pick or search the ingredients you dislike"
             binding!!.progressBar4.max = 10
@@ -195,9 +198,8 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
         }
 
         binding!!.relMoreButton.setOnClickListener { v ->
-            dislikeIngredientsAdapter!!.setExpanded(true)
+//            dislikeIngredientsAdapter!!.setExpanded(true)
             binding!!.relMoreButton.visibility=View.VISIBLE
-
 /*
             binding!!.relMoreButton.visibility = View.GONE // Hide button after expanding
 */
@@ -324,23 +326,18 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
         try {
             if (dislikeIngModelData != null && dislikeIngModelData.isNotEmpty()) {
                 if (dislikeIngredientsViewModel.getDislikeIngData() == null) {
-                    dislikeIngModelData.add(
-                        0,
-                        DislikedIngredientsModelData(id = -1, selected = false, "None")
-                    ) // ID set to -1 as an indicator
+                    dislikeIngModelData.add(0, DislikedIngredientsModelData(id = -1, selected = false, "None")) // ID set to -1 as an indicator
                 }
 
-                if (itemCount=="10"){
+              /*  if (itemCount=="10"){
                     // Show "Show More" button only if there are more than 3 items
                     if (dislikeIngModelData.size > 3) {
                         binding!!.relMoreButton.visibility = View.VISIBLE
                     }
                 }
-
+*/
                 dislikeIngredientModelData = dislikeIngModelData.toMutableList()
-                dislikeIngredientsAdapter =
-                    AdapterDislikeIngredientItem(dislikeIngModelData, requireActivity(), this)
-                binding!!.rcyIngDislikes.adapter = dislikeIngredientsAdapter
+                dislikeIngredientsAdapter?.filterList(dislikeIngredientModelData)
             }
         } catch (e: Exception) {
             Log.d("IngredientDislike", "message:--" + e.message)

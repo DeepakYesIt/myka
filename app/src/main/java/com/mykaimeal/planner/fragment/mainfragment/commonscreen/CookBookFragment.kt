@@ -89,7 +89,7 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         cookbookList.clear()
 
         val data1= com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"000","Add",0,"",R.drawable.add_more_cookbook_icon)
-        val data2= com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"001","Favourites",0,"",R.drawable.favourites_cookbook_image)
+        val data2= com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"001","Favorites",0,"",R.drawable.favourites_cookbook_image)
         cookbookList.add(0,data1)
         cookbookList.add(1,data2)
 

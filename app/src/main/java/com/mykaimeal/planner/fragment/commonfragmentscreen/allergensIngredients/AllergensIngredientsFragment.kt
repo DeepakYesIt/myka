@@ -23,6 +23,7 @@ import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.OnItemClickedListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.AdapterAllergensIngItem
+import com.mykaimeal.planner.adapter.AdapterDislikeIngredientItem
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentAllergensIngredientsBinding
@@ -47,7 +48,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
     private var status: String? = null
     private var allergensSelectedId = mutableListOf<String>()
     private lateinit var allergenIngredientViewModel: AllergenIngredientViewModel
-    private var isExpanded = false
+    private var itemCount:String = "2"  // Default count
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreateView(
@@ -60,6 +61,10 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         allergenIngredientViewModel =
             ViewModelProvider(this)[AllergenIngredientViewModel::class.java]
         sessionManagement = SessionManagement(requireContext())
+
+
+        allergenIngAdapter = AdapterAllergensIngItem(allergenIngModelData, requireActivity(), this)
+        binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
 
         /// checked session value cooking for
         if (sessionManagement.getCookingFor().equals("Myself")) {
@@ -219,9 +224,15 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
 
 
         binding!!.relMoreButton.setOnClickListener { v ->
-            isExpanded = true
-            allergenIngAdapter!!.setExpanded(true)
-            binding!!.relMoreButton.visibility = View.GONE // Hide button after expanding
+            binding!!.relMoreButton.visibility=View.VISIBLE
+
+            itemCount = (itemCount.toInt() + 10).toString()  // Convert to Int, add 10, convert back to String
+            ///checking the device of mobile data in online and offline(show network error message)
+            if (BaseApplication.isOnline(requireContext())) {
+                allergenIngredientApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
     }
 
@@ -281,7 +292,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
     private fun allergenIngredientApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            allergenIngredientViewModel.getAllergensIngredients {
+            allergenIngredientViewModel.getAllergensIngredients({
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
@@ -310,7 +321,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                         showAlertFunction(it.message, false)
                     }
                 }
-            }
+            },itemCount)
         }
     }
 
@@ -323,10 +334,10 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                         AllergensIngredientModelData(id = -1, selected = false, "None")
                     ) // ID set to -1 as an indicator
                 }
-                // Show "Show More" button only if there are more than 3 items
+              /*  // Show "Show More" button only if there are more than 3 items
                 if (allergensModelData.size > 3) {
                     binding!!.relMoreButton.visibility = View.VISIBLE
-                }
+                }*/
                 allergenIngModelData = allergensModelData.toMutableList()
                 allergenIngAdapter = AdapterAllergensIngItem(allergensModelData, requireActivity(), this)
                 binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
@@ -334,7 +345,6 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         }catch (e:Exception){
             Log.d("allergens","message:--"+e.message)
         }
-
     }
 
 
@@ -354,13 +364,15 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                     )
                 }
 
-                // Show "Show More" button only if there are more than 3 items
+             /*   // Show "Show More" button only if there are more than 3 items
                 if (allergensModelData.size > 3) {
                     binding!!.relMoreButton.visibility = View.VISIBLE
-                }
+                }*/
                 allergenIngModelData = allergensModelData.toMutableList()
-                allergenIngAdapter = AdapterAllergensIngItem(allergensModelData, requireActivity(), this)
-                binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
+                allergenIngModelData = allergensModelData.toMutableList()
+                allergenIngAdapter?.filterList(allergenIngModelData)
+//                allergenIngAdapter = AdapterAllergensIngItem(allergensModelData, requireActivity(), this)
+//                binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
             }
         }catch (e:Exception){
             Log.d("allergens","message:---"+e.message)

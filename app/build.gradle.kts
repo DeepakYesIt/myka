@@ -117,6 +117,7 @@ dependencies {
     //bar chart
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
+//    implementation("com.google.android.gms:play-services-maps:18.2.0")
     //image picker
     implementation("com.github.Dhaval2404:ImagePicker:v2.1")
 
@@ -128,7 +129,7 @@ dependencies {
     //google Firebase
     implementation("com.google.android.libraries.places:places:3.2.0")
     implementation("com.google.firebase:firebase-messaging:23.2.1")
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.android.gms:play-services-auth:21.1.1")
 

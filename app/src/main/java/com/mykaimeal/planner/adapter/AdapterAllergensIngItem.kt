@@ -96,7 +96,8 @@ class AdapterAllergensIngItem(private var allergensIngredientsData: List<Allerge
     }
 
     override fun getItemCount(): Int {
-        return if (isExpanded) allergensIngredientsData.size else Math.min(3, allergensIngredientsData.size)
+        return allergensIngredientsData.size
+//        return if (isExpanded) allergensIngredientsData.size else Math.min(3, allergensIngredientsData.size)
     }
 
     fun setExpanded(expanded: Boolean) {

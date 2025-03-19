@@ -131,7 +131,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 "",
                 0,
                 "",
-                "Favourites",
+                "Favorites",
                 0,
                 "",
                 0
@@ -499,7 +499,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 }
             }
 
-//            binding!!.llCalculateBmr.visibility=View.GONE
+            binding!!.llCalculateBmr.visibility=View.GONE
 
             // Breakfast
             if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
@@ -570,20 +570,18 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 ) {
                     if (recipesDateModel!!.show == 1){
                         binding!!.tvCalories.text = String.format("%.2f", recipesDateModel!!.kcal)
-                        binding!!.tvCalories.text = binding!!.tvCalories.text.toString().take(5) // Allows only the first 5 characters
+                        binding!!.tvCalories.text = binding!!.tvCalories.text.toString().take(6) // Allows only the first 5 characters
                         binding!!.tvFats.text = String.format("%.2f", recipesDateModel!!.fat)
-                        binding!!.tvFats.text = binding!!.tvFats.text.toString().take(5) // Allows only the first 5 characters
+                        binding!!.tvFats.text = binding!!.tvFats.text.toString().take(6) // Allows only the first 5 characters
                         binding!!.tvCarbohydrates.text = String.format("%.2f", recipesDateModel!!.carbs)
-                        binding!!.tvCarbohydrates.text = binding!!.tvCarbohydrates.text.toString().take(5) // Allows only the first 5 characters
+                        binding!!.tvCarbohydrates.text = binding!!.tvCarbohydrates.text.toString().take(6) // Allows only the first 5 characters
                         binding!!.tvProteins.text = String.format("%.2f", recipesDateModel!!.protein)
-                        binding!!.tvProteins.text = binding!!.tvProteins.text.toString().take(5) // Allows only the first 5 characters
+                        binding!!.tvProteins.text = binding!!.tvProteins.text.toString().take(6) // Allows only the first 5 characters
                     }
                 }
             }
 
-
             var status = false
-
 
             fun setupMealAdapter(
                 mealRecipes: MutableList<BreakfastModelPlanByDate>?,

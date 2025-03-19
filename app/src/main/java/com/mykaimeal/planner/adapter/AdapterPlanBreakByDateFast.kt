@@ -18,10 +18,8 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterMealTypeHorizentalBinding
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.BreakfastModelPlanByDate
 
-
 class AdapterPlanBreakByDateFast(var datalist: MutableList<BreakfastModelPlanByDate>?, var requireActivity: FragmentActivity,
                                  private var onItemClickListener: OnItemSelectPlanTypeListener, var type:String): RecyclerView.Adapter<AdapterPlanBreakByDateFast.ViewHolder>() {
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -89,11 +87,9 @@ class AdapterPlanBreakByDateFast(var datalist: MutableList<BreakfastModelPlanByD
             holder.binding.tvCarbs.text = "" + data.recipe.totalNutrients.CHOCDF.quantity.toInt()
         }
 
-
         holder.binding.tvSwap.setOnClickListener {
             onItemClickListener.itemSelectPlayByDate(position,"1",type)
         }
-
 
         holder.binding.minus.setOnClickListener{
             if (data?.servings!! > 1) {

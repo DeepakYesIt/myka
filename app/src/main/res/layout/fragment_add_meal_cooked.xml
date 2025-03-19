@@ -64,7 +64,7 @@
                     android:hint="Search Cooked Dishes"
                     android:paddingVertical="@dimen/_8sdp"
                     android:singleLine="true"
-                    android:textSize="@dimen/_12sdp" />
+                    android:textSize="@dimen/_13sdp" />
 
                 <RelativeLayout
                     android:id="@+id/relSearch"
@@ -79,7 +79,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:padding="@dimen/_6sdp"
+                        android:layout_margin="@dimen/_8sdp"
                         android:src="@drawable/yellow_search_icon" />
 
                 </RelativeLayout>
@@ -209,7 +209,7 @@
                         android:background="@drawable/selected_button_bg"
                         android:fontFamily="@font/poppins"
                         android:paddingVertical="@dimen/_5sdp"
-                        android:text="Fridge (1)"
+                        android:text="Fridge"
                         android:textAlignment="center"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_12sdp" />
@@ -224,7 +224,7 @@
                         android:background="@drawable/unselected_button_bg"
                         android:fontFamily="@font/poppins"
                         android:paddingVertical="@dimen/_5sdp"
-                        android:text="Freezer (0)"
+                        android:text="Freezer"
                         android:textAlignment="center"
                         android:textSize="@dimen/_12sdp" />
 

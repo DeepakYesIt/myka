@@ -90,7 +90,7 @@
                 android:layout_marginTop="@dimen/_10sdp"
                 android:text=""
                 android:textColor="@color/light_black"
-                android:textSize="@dimen/_14sdp" />
+                android:textSize="@dimen/_15sdp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rcyBodyGoals"

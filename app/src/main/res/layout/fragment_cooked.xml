@@ -176,36 +176,47 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:layout_marginTop="@dimen/_5sdp"
-                android:visibility="gone">
+                android:visibility="visible">
 
-                <ImageView
-                    android:layout_width="@dimen/_80sdp"
-                    android:layout_height="@dimen/_80sdp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginVertical="@dimen/_40sdp"
-                    android:src="@drawable/empty_fridge_icon" />
-
-                <TextView
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/_20sdp"
-                    android:fontFamily="@font/poppins"
-                    android:text="@string/uh_oh_the_fridge_is_empty_let_s_fill_it_up_with_some_delicious_dishes"
-                    android:textAlignment="center" />
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/textAddMeals"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/_20sdp"
-                    android:layout_marginTop="@dimen/_10sdp"
-                    android:background="@drawable/button_bg"
-                    android:paddingVertical="@dimen/_10sdp"
-                    android:text="Add Meal"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_12ssp" />
+                    <ImageView
+                        android:id="@+id/imagesCookedTabs"
+                        android:layout_width="@dimen/_80sdp"
+                        android:layout_height="@dimen/_80sdp"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/empty_fridge_icon" />
+
+                    <TextView
+                        android:id="@+id/tvNoSpaces"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_15sdp"
+                        android:layout_marginHorizontal="@dimen/_20sdp"
+                        android:layout_below="@+id/imagesCookedTabs"
+                        android:fontFamily="@font/poppins"
+                        android:text="@string/uh_oh_the_fridge_is_empty_let_s_fill_it_up_with_some_delicious_dishes"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:id="@+id/textAddMeals"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/_20sdp"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:background="@drawable/button_bg"
+                        android:paddingVertical="@dimen/_10sdp"
+                        android:layout_below="@+id/tvNoSpaces"
+                        android:text="Add Meal"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_12ssp" />
+
+                </RelativeLayout>
 
             </LinearLayout>
             <LinearLayout

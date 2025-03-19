@@ -70,7 +70,7 @@
             android:fontFamily="@font/poppins"
             android:text="Search and select the ingredients you dislike"
             android:textColor="@color/light_black"
-            android:textSize="@dimen/_13sdp" />
+            android:textSize="@dimen/_15sdp" />
 
         <RelativeLayout
             android:id="@+id/relIngSearchBar"
@@ -98,7 +98,7 @@
                 android:layout_marginHorizontal="@dimen/_10sdp"
                 android:paddingVertical="@dimen/_8sdp"
                 android:background="@null"
-                android:textSize="@dimen/_12sdp"
+                android:textSize="@dimen/_13sdp"
                 android:hint="Search ingredients"
                 android:singleLine="true"/>
 
@@ -121,6 +121,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
+                    android:nestedScrollingEnabled="false"
                     android:orientation="vertical"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 

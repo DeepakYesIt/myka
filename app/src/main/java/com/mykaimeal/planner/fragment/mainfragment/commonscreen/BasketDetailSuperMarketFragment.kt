@@ -25,7 +25,6 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
     private lateinit var itemSectionAdapter: ItemSectionAdapter
     private var bottomSheetDialog: BottomSheetDialog? = null
     private var rcvBottomDialog: RecyclerView? = null
-    private var adapterSuperMarket: AdapterSuperMarket? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,14 +48,13 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
 
     private fun initialize() {
 
-        binding.relTescoMarket.setOnClickListener{
+        /*binding.relTescoMarket.setOnClickListener{
             bottomSheetDialog()
-        }
+        }*/
 
         binding.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()
         }
-
 
         binding.rlGoToCheckout.setOnClickListener{
             findNavController().navigate(R.id.checkoutScreenFragment)

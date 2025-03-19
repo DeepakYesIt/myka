@@ -64,7 +64,7 @@
 
                 <data
                     android:host="mykaimealplanner.onelink.me"
-                    android:pathPrefix="/LQhk"
+                    android:pathPrefix="/mPqu"
                     android:scheme="https" />
             </intent-filter>
 
@@ -121,6 +121,10 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyA-e6IRZ8axxpwrm1GEjlFOTzwb5KVQHgc" />
+
         <service
             android:name=".fcm.MyFirebaseMessagingService"
             android:enabled="true"
@@ -145,9 +149,6 @@
             </intent-filter>
         </receiver>
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA-e6IRZ8axxpwrm1GEjlFOTzwb5KVQHgc" />
 
 
     </application>

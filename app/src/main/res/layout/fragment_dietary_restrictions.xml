@@ -69,7 +69,7 @@
             android:layout_marginTop="@dimen/_10sdp"
             android:text="“Do you have any dietary restrictions”"
             android:textColor="@color/light_black"
-            android:textSize="@dimen/_13sdp" />
+            android:textSize="@dimen/_15sdp" />
 
         <ScrollView
             android:layout_width="match_parent"

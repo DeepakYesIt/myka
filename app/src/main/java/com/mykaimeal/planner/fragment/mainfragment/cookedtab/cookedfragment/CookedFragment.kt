@@ -92,7 +92,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
         cookedTabViewModel = ViewModelProvider(this)[CookedTabViewModel::class.java]
         cookbookList.clear()
 
-        val data= com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favourites",0,"",0)
+        val data= com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favorites",0,"",0)
         cookbookList.add(0,data)
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),

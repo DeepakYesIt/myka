@@ -94,7 +94,7 @@
                     android:fontFamily="@font/montserrat_semibold"
                     android:maxLines="2"
                     android:text="Bread"
-                    android:textSize="@dimen/_10sdp" />
+                    android:textSize="@dimen/_11sdp" />
                 <TextView
                     android:id="@+id/tvRatingReviews"
                     android:layout_width="wrap_content"

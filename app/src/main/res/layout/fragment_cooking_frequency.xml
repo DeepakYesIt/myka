@@ -70,7 +70,7 @@
             android:fontFamily="@font/poppins"
             android:text="How often do you cook meals at home?"
             android:textColor="@color/light_black"
-            android:textSize="@dimen/_13sdp" />
+            android:textSize="@dimen/_15sdp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcyCookingFreq"

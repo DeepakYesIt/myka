@@ -103,8 +103,8 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
             binding!!.textFreezer.setTextColor(Color.BLACK)
             planType="1"
 
-            binding!!.textFridge.text="Fridge (1)"
-            binding!!.textFreezer.text="Freezer (0)"
+         /*   binding!!.textFridge.text="Fridge (1)"
+            binding!!.textFreezer.text="Freezer (0)"*/
 
         }
 
@@ -115,8 +115,8 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
             binding!!.textFreezer.setTextColor(Color.WHITE)
             planType="2"
 
-            binding!!.textFridge.text="Fridge (0)"
-            binding!!.textFreezer.text="Freezer (1)"
+          /*  binding!!.textFridge.text="Fridge (0)"
+            binding!!.textFreezer.text="Freezer (1)"*/
 
         }
 

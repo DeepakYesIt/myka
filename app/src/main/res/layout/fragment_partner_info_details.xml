@@ -72,7 +72,7 @@
             android:layout_marginTop="@dimen/_10sdp"
             android:text="What's your partner's name and age?"
             android:textColor="@color/light_black"
-            android:textSize="@dimen/_13sdp" />
+            android:textSize="@dimen/_15sdp" />
 
         <RelativeLayout
             android:id="@+id/relPartnerName"

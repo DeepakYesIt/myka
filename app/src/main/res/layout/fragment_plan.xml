@@ -153,10 +153,12 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewWeekDays"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:overScrollMode="never"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginStart="@dimen/_5sdp"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
                 <RelativeLayout
@@ -270,7 +272,7 @@
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
-                                    android:maxLength="5"
+                                    android:maxLength="6"
                                     android:text="0"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
@@ -313,7 +315,7 @@
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
                                     android:text="0"
-                                    android:maxLength="5"
+                                    android:maxLength="6"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
@@ -355,7 +357,7 @@
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
                                     android:text="0"
-                                    android:maxLength="5"
+                                    android:maxLength="6"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
@@ -397,7 +399,7 @@
                                     android:fontFamily="@font/poppins_medium"
                                     android:padding="@dimen/_5sdp"
                                     android:text="0"
-                                    android:maxLength="5"
+                                    android:maxLength="6"
                                     android:textColor="#000000"
                                     android:textSize="@dimen/_11sdp" />
                             </LinearLayout>
@@ -410,7 +412,8 @@
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/bmr_no_add" />
+                        android:src="@drawable/bmr_no_add"
+                        android:visibility="visible" />
                 </RelativeLayout>
 
                 <LinearLayout

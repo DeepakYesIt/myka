@@ -88,7 +88,7 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         viewModel = ViewModelProvider(requireActivity())[CookBookViewModel::class.java]
         cookbookList.clear()
 
-        val data= com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favourites",0,"",0)
+        val data= com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favorites",0,"",0)
         cookbookList.add(0,data)
 
          id=sessionManagement.getCookBookId()
@@ -178,7 +178,7 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
     private fun handleSuccessCookBookResponse(data: String) {
         try {
             val apiModel = Gson().fromJson(data, CookBookListApiResponse::class.java)
-            Log.d("@@@ addMea List ", "message :- $data")
+            Log.d("@@@ addMea List Collection", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 localData.clear()
                 apiModel.data?.let { localData.addAll(it) }

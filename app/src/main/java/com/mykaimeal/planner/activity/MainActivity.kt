@@ -295,6 +295,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             }/* else if (isValidUrl(etPasteURl.text.toString().trim())){
                 commonWorkUtils.alertDialog(this, ErrorMessage.validUrl, false)
             }*/ else {
+                binding!!.cardViewAddRecipe.visibility = View.GONE
                 val bundle = Bundle().apply {
                     putString("url",etPasteURl.text.toString().trim())
                 }
