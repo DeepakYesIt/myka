@@ -109,8 +109,6 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
             }
         }
 
-
-
         setData()
 
         return binding!!.root

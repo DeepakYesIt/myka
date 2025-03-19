@@ -2,16 +2,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/_10sdp"
-    android:layout_marginEnd="@dimen/_10sdp"
+    android:layout_marginHorizontal="@dimen/_20sdp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cardViewMenuPopUp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_3sdp"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="@dimen/_22sdp"
+        android:layout_marginTop="@dimen/_15sdp"
         android:visibility="visible"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="@dimen/_15sdp">
@@ -36,7 +36,7 @@
                     android:drawableStart="@drawable/logout_icon"
                     android:drawablePadding="@dimen/_10sdp"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/_10sdp" />
+                    android:textSize="@dimen/_13sdp" />
 
             </RelativeLayout>
 
@@ -57,7 +57,7 @@
                     android:drawablePadding="@dimen/_10sdp"
                     android:drawableStart="@drawable/delete_account_icon"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/_10sdp" />
+                    android:textSize="@dimen/_13sdp" />
             </RelativeLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

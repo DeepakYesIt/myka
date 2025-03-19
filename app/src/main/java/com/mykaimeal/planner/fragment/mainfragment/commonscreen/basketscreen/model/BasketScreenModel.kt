@@ -13,20 +13,26 @@ data class BasketScreenModel(
 data class BasketScreenModelData(
     val ingredient: MutableList<Ingredient>?,
     val recipe: MutableList<Recipes>?,
-    val stores: MutableList<Store>?
+    val stores: MutableList<Store>?,
+    val billing:BillingAddress?
 )
 
 data class Ingredient(
     val created_at: String?,
     val deleted_at: Any,
-    val food: String?,
-    val foodCategory: String?,
+    val food_id: String?,
     val id: Int?,
-    val image: String?,
-    val measure: String?,
+    val market_id: Any,
     val name: String?,
-    val quantity: Int?,
-    val serving: Int?,
+    val price: Any,
+    val pro_id: String?,
+    val pro_img: String?,
+    val pro_name: String?,
+    val pro_price: String?,
+    val product_id: String?,
+    val quantity: Any,
+    val sch_id: Int?,
+    val status: Int?,
     val updated_at: String?,
     val user_id: Int?
 )
@@ -36,7 +42,8 @@ data class Store(
     val distance: Double?,
     val operational_hours: OperationalHours?,
     val store_name: String?,
-    val store_uuid: String?
+    val store_uuid: String?,
+    val image:String?
 )
 
 data class Address(
@@ -48,6 +55,17 @@ data class Address(
     val street_addr: String?,
     val zipcode: String?
 )
+
+data class BillingAddress(
+    val recipes:Int?,
+    val net_total:Int?,
+    val tax:Int?,
+    val delivery:Int?,
+    val processing:Double?,
+    val total:Int?
+
+)
+
 
 data class OperationalHours(
     val Friday: String?,
@@ -84,3 +102,6 @@ data class Self(
     val href: String?,
     val title: String?
 )
+
+
+

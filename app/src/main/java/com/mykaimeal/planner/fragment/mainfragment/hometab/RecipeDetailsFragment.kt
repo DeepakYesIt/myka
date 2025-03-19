@@ -773,7 +773,6 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
-
     }
 
 

@@ -34,8 +34,9 @@
                  android:layout_marginStart="@dimen/_8sdp"
                  android:fontFamily="@font/poppins_semibold"
                  android:singleLine="true"
-                 android:text=""
+                 android:text="Card Number"
                  android:textColor="@color/black" />
+
              <TextView
                  android:id="@+id/textDes"
                  android:layout_width="wrap_content"
@@ -43,10 +44,11 @@
                  android:layout_marginStart="@dimen/_8sdp"
                  android:fontFamily="@font/poppins"
                  android:singleLine="true"
-                 android:text=""
+                 android:text="xgfgg"
                  android:textColor="#9A9A9A"
                  android:textSize="@dimen/_10ssp"
                  />
+
          </LinearLayout>
 
         <LinearLayout

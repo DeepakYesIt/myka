@@ -144,7 +144,7 @@ class HealthDataFragment : Fragment() {
 
     private fun isValidation(): Boolean {
 
-        if (binding.etDateOfBirth.text.toString().equals("dd/mm/yyyy", true)) {
+        if (binding.etDateOfBirth.text.toString().equals("mm/dd/yyyy", true)) {
             BaseApplication.alertError(requireContext(), ErrorMessage.dobError, false)
             return false
         } else if (binding.etHeight.text.toString().trim().isEmpty()) {
@@ -178,11 +178,14 @@ class HealthDataFragment : Fragment() {
             requireContext(),
             { _, selectedYear, selectedMonth, selectedDay ->
 
-
                 // Update the TextView with the selected date
                 val date = "${selectedMonth + 1}/$selectedDay/$selectedYear"
                 Log.d("******", "" + date)
+
+/*
                 binding.etDateOfBirth.text = BaseApplication.changeDateFormatHealth(date)
+*/
+                binding.etDateOfBirth.text = date
             },
             year,
             month,

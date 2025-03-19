@@ -321,7 +321,7 @@
         tools:layout="@layout/fragment_add_more_items" />
     <fragment
         android:id="@+id/basketDetailSuperMarketFragment"
-        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.BasketDetailSuperMarketFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.BasketDetailSuperMarketFragment"
         android:label="fragment_basket_detail_super_market"
         tools:layout="@layout/fragment_basket_detail_super_market" />
     <fragment

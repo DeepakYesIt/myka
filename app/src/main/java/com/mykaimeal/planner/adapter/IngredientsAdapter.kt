@@ -32,12 +32,15 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
 
         val data= ingredientsData?.get(position)
 
+        if (data!!.sch_id!=null){
+            holder.binding.textCount.text=data.sch_id.toString()
+        }
 
         if (data != null) {
             holder.binding.tvFoodName.text=data.name
-            if (data.image!=null){
+            if (data.pro_img!=null){
                 Glide.with(requireActivity)
-                    .load(data.image)
+                    .load(data.pro_img)
                     .error(R.drawable.no_image)
                     .placeholder(R.drawable.no_image)
                     .listener(object : RequestListener<Drawable> {

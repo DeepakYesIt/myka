@@ -1967,4 +1967,61 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
     }
 
 
+    override suspend fun getStoreProductUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit
+    ) {
+        try {
+            api.getStoreProductUrl().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun addCardMealMeUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,cardNumber:String?,expMonth:String?,expYear:String?,cvv:String?
+    ) {
+        try {
+            api.addCardMealMeUrl(cardNumber,expMonth,expYear,cvv).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun getCardMealMeUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit
+    ) {
+        try {
+            api.getCardMealMeUrl().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
 }

@@ -235,6 +235,9 @@ interface MainRepository {
     suspend fun getNotesUrl(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun addNotesUrl(successCallback: (response: NetworkResult<String>) -> Unit,pickup:String?,description:String?)
     suspend fun getOrderProductUrl(successCallback: (response: NetworkResult<String>) -> Unit)
+    suspend fun getStoreProductUrl(successCallback: (response: NetworkResult<String>) -> Unit)
+    suspend fun getCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit)
+    suspend fun addCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit,cardNumber:String?,expMonth:String?,expYear:String?,cvv:String?)
 
 
 }

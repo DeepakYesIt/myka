@@ -51,7 +51,7 @@ object ApiEndPoint {
     const val addBasketeUrl="add-to-basket"
     const val addBasketeDetailsUrl="ingredient-basket"
 
-    const val getUserPreferences="user-prefrence"
+    const val  getUserPreferences="user-prefrence"
 
     const val  updateUserPreferences="update-user-prefrence"
     const val recipeSearch="recipe"
@@ -88,6 +88,10 @@ object ApiEndPoint {
     const val getNotesUrl="get-notes"
     const val getCheckoutUrl="checkout"
     const val getOrderProductUrl="order-product"
+
+    const val getStoreProductsUrl="store-products"
+    const val getCardMealMeUrl="get-card-mealme"
+    const val addCardMealMeUrl="add-card-mealme"
 
 
 }

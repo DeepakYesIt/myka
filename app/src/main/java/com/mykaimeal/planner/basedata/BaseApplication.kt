@@ -144,6 +144,11 @@ object BaseApplication {
         return dateFormat.format(date)
     }
 
+    fun formatOnlyMonthYear(date: Date): String {
+        val dateFormat = SimpleDateFormat("MMM, yyyy", Locale.getDefault())
+        return dateFormat.format(date)
+    }
+
     fun formatDate(input: String): String? {
         return try {
             // Define the format of the input date string

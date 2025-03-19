@@ -31,7 +31,6 @@ class BodyGoalAdapter(private var datalist: List<BodyGoalModelData>, private var
         } else {
             holder.binding.imageRightTick.visibility = View.GONE
             holder.binding.relMainLayout.setBackgroundResource(R.drawable.gray_box_border_bg)
-
         }
 
         // Handle click event for the item

@@ -1346,13 +1346,14 @@
 
                 <TextView
                     android:id="@+id/tvAddAnotherMealBtn"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:background="@drawable/outline_green_border_bg"
                     android:gravity="center"
                     android:padding="@dimen/_5sdp"
+
                     android:text="Add Another Meal Type"
                     android:textColor="@color/light_green"
                     android:textSize="@dimen/_12sdp" />
@@ -1366,6 +1367,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/green_fill_corner_bg"
                     android:gravity="center"
+                    android:visibility="gone"
                     android:padding="@dimen/_5sdp"
                     android:text="Confirm"
                     android:textColor="@color/white"

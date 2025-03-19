@@ -114,7 +114,7 @@
                         android:layout_marginHorizontal="@dimen/_10sdp"
                         android:layout_marginTop="@dimen/_10sdp"
                         android:layout_marginBottom="@dimen/_20sdp"
-                        android:visibility="visible"
+                        android:visibility="gone"
                         app:cardCornerRadius="@dimen/_10sdp">
 
 
@@ -1550,7 +1550,7 @@
                     android:layout_marginTop="@dimen/_10sdp"
                     android:layout_marginBottom="@dimen/_30sdp"
                     android:orientation="vertical"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
 
                     <LinearLayout

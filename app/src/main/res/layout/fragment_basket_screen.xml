@@ -263,7 +263,7 @@
                         android:layout_alignParentEnd="true"
                         android:fontFamily="@font/poppins"
                         android:paddingHorizontal="@dimen/_20sdp"
-                        android:text="7"
+                        android:text=""
                         android:textColor="#4A4A4A" />
 
                 </RelativeLayout>
@@ -291,7 +291,7 @@
                         android:layout_alignParentEnd="true"
                         android:fontFamily="@font/poppins"
                         android:paddingHorizontal="@dimen/_20sdp"
-                        android:text="200"
+                        android:text=""
                         android:textColor="#4A4A4A" />
 
                 </RelativeLayout>
@@ -319,7 +319,7 @@
                         android:layout_alignParentEnd="true"
                         android:fontFamily="@font/poppins"
                         android:paddingHorizontal="@dimen/_20sdp"
-                        android:text="$20"
+                        android:text=""
                         android:textColor="#4A4A4A" />
 
                 </RelativeLayout>
@@ -347,7 +347,7 @@
                         android:layout_alignParentEnd="true"
                         android:fontFamily="@font/poppins"
                         android:paddingHorizontal="@dimen/_20sdp"
-                        android:text="$10"
+                        android:text=""
                         android:textColor="#4A4A4A" />
 
                 </RelativeLayout>
@@ -408,7 +408,7 @@
                         android:textAlignment="textEnd"
                         android:layout_gravity="end"
                         android:fontFamily="@font/poppins"
-                        android:text="$200*"
+                        android:text=""
                         android:textColor="#FFFFFF" />
 
                 </LinearLayout>

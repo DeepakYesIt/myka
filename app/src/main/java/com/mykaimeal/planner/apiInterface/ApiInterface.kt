@@ -611,6 +611,21 @@ interface ApiInterface {
     @POST(ApiEndPoint.getOrderProductUrl)
     suspend fun getOrderProductUrl():Response<JsonObject>
 
+    @POST(ApiEndPoint.getStoreProductsUrl)
+    suspend fun getStoreProductUrl():Response<JsonObject>
+
+
+   @POST(ApiEndPoint.getCardMealMeUrl)
+    suspend fun getCardMealMeUrl():Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.addCardMealMeUrl)
+    suspend fun addCardMealMeUrl(@Field("card_number") card_number:String?,
+                                 @Field("exp_month") exp_month:String?,
+                                 @Field("exp_year") exp_year:String?,
+                                 @Field("cvv") cvv:String?
+                                 ):Response<JsonObject>
+
     @GET(ApiEndPoint.addAddressUrl)
     suspend fun addAddressUrl(@Query("latitude") latitude:String?,
                                @Query("longitude") longitude:String?,

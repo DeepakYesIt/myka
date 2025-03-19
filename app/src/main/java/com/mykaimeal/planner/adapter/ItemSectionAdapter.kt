@@ -6,9 +6,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.databinding.ItemProductCardBinding
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.model.Product
 import com.mykaimeal.planner.model.DataModel
 
-class ItemSectionAdapter (private val data: HashMap<String, List<DataModel>>,private var onItemSelectListener: OnItemSelectListener) : RecyclerView.Adapter<ItemSectionAdapter.CategoryCardViewHolder>() {
+class ItemSectionAdapter(private val data: List<Pair<String, List<DataModel>>>, private var onItemSelectListener: OnItemSelectListener) : RecyclerView.Adapter<ItemSectionAdapter.CategoryCardViewHolder>() {
 
     private val categoryList: List<Pair<String, List<DataModel>>> = data.toList()
 
@@ -28,10 +29,10 @@ class ItemSectionAdapter (private val data: HashMap<String, List<DataModel>>,pri
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(category: String, products: List<DataModel>) {
-            binding.categoryTitle.text = category
+       /*     binding.categoryTitle.text = category
             val adapter = CategoryProductAdapter(products,onItemSelectListener)
             binding.productRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
-            binding.productRecyclerView.adapter = adapter
+            binding.productRecyclerView.adapter = adapter*/
 
         }
     }

@@ -284,7 +284,7 @@
                     android:inputType="number"
                     android:singleLine="true"
                     android:paddingHorizontal="@dimen/_10sdp"
-                    android:hint="Add total time in minutes"
+                    android:hint="Add the total time it takes to make this recipe in mins"
                     android:textSize="@dimen/_13sdp" />
 
             </LinearLayout>
@@ -426,7 +426,7 @@
                 android:background="@drawable/edittext_bg"
                 android:fontFamily="@font/poppins"
                 android:foreground="?attr/selectableItemBackground"
-                android:hint="Select cookbook"
+                android:hint="Select a cookbook"
                 android:padding="@dimen/_10sdp"
                 android:paddingStart="@dimen/_20sdp"
                 android:textColor="#3C4541"

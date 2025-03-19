@@ -111,8 +111,10 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         // Inflate the layout for this fragment
         binding = FragmentPlanBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[PlanViewModel::class.java]
+
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
+
         sessionManagement = SessionManagement(requireContext())
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
@@ -192,7 +194,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         // Print the dates
         println("Days between $startDate and ${endDate}:")
         daysBetween.forEach { println(it) }
-        binding!!.tvDate.text = BaseApplication.formatonlyMonthYear(startDate)
+        binding!!.tvDate.text = BaseApplication.formatOnlyMonthYear(startDate)
         binding!!.textWeekRange.text = "" + formatDate(startDate) + "-" + formatDate(endDate)
 
         tvWeekRange?.text = "" + formatDate(startDate) + "-" + formatDate(endDate)
@@ -361,6 +363,13 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
+        }
+
+        // Fetch data for the selected date if online
+        if (BaseApplication.isOnline(requireActivity())) {
+            dataFatchByDate(currentDateSelected)
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
     }
 

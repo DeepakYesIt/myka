@@ -71,6 +71,7 @@
     <string name="you_want_to_remove_this_meal_from_the_schedule_day">You want to remove this Meal from the\n schedule day?</string>
     <string name="feedback_support"><![CDATA[Feedback & Support]]></string>
     <string name="your_macronutrient_targets"><font color="#000000">Your Macronutrient</font><font color="#06C169"> Targets</font></string>
+    <string name="daily_macro_targets"><font color="#000000">Daily Macro</font><font color="#06C169"> Targets</font></string>
 
 
     <string name="terms_and_conditions">
@@ -101,7 +102,7 @@
     <string name="missed_anything">Are you sure you haven\'t missed\nany thing?</string>
     <string name="remove_this_recipe_basket">Do you want to remove this recipe\nand ingredients from your basket?</string>
     <string name="do_you_really_want_to_remove_this_meal">Do you really want to remove this\nmeal?</string>
-    <string name="do_you_really_want_to_remove_this_cookbook">Do you really want to remove this\nCookbook?</string>
+    <string name="do_you_really_want_to_remove_this_cookbook">Do you really want to remove this\ncookbook?</string>
     <string name="your_recipe_has_been_saved_n_successfully">Your Recipe has been saved\n successfully.</string>
     <string name="your_didn_t_save_the_recipe">Your didn’t save the recipe. Do you want to discard changes.</string>
     <string name="ingredients_missing_in_your_recipe"><font color="#3C4541">Ingredients missing in your</font><b><font color="#06C169"> recipe</font></b></string>
@@ -115,6 +116,7 @@
     <string name="are_you_sure_to_remove_this_account">Are you sure to remove this account ?</string>
     <string name="rate_your_recipe">Rate your recipe</string>
     <string name="no_data_found">No Data Found</string>
+    <string name="no_recipes_yet">No recipes yet</string>
 
 
 </resources>

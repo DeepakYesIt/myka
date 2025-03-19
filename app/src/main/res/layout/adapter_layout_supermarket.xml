@@ -5,34 +5,46 @@
     android:id="@+id/cardViewMainLayout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardElevation="@dimen/_4sdp"
-    android:layout_marginStart="@dimen/_1sdp"
+    android:layout_marginStart="@dimen/_3sdp"
     android:layout_marginEnd="@dimen/_10sdp"
     android:layout_marginBottom="@dimen/_10sdp"
     app:cardCornerRadius="@dimen/_10sdp">
 
     <RelativeLayout
+        android:id="@+id/relativeLayoutMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/_5sdp">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/imageSuperMarket"
-            android:layout_width="@dimen/_100sdp"
-            android:layout_height="@dimen/_85sdp"
-            android:layout_marginStart="@dimen/_4sdp"
-            android:layout_marginTop="@dimen/_4sdp"
-            android:layout_marginEnd="@dimen/_4sdp"
-            android:layout_marginBottom="@dimen/_4sdp"
-            android:elevation="@dimen/_10sdp"
-            android:scaleType="fitXY"
-            android:src="@drawable/ic_welmart_super_market"
-            app:shapeAppearanceOverlay="@style/RoundedSquare" />
+        <RelativeLayout
+            android:id="@+id/relSuperMarkets"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imageSuperMarket"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="@dimen/_85sdp"
+                android:layout_margin="@dimen/_3sdp"
+                android:elevation="@dimen/_10sdp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_welmart_super_market"
+                app:shapeAppearanceOverlay="@style/RoundedSquare" />
+
+            <include
+                android:id="@+id/lay_progess"
+                layout="@layout/progess_loader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true" />
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/tvSuperMarketItems"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/imageSuperMarket"
+            android:layout_below="@+id/relSuperMarkets"
             android:layout_centerHorizontal="true"
             android:fontFamily="@font/poppins"
             android:singleLine="true"

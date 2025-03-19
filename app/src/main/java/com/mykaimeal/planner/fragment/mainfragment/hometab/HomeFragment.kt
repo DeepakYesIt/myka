@@ -547,7 +547,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener,
         }
     }
 
-
     @SuppressLint("MissingPermission")
     private fun getCurrentLocation() {
         // Initialize Location manager

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragment.mainfragment.commonscreen.BasketDetailSuperMarketFragment">
+    tools:context=".fragment.mainfragment.commonscreen.basketdetailssupermarket.BasketDetailSuperMarketFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -39,6 +39,7 @@
                     android:layout_below="@+id/imageBackIcon"
                     android:layout_marginStart="@dimen/_3sdp">
 
+
                 <ImageView
                     android:id="@+id/tescoLogoImage"
                     android:layout_width="@dimen/_85sdp"
@@ -46,6 +47,13 @@
                     android:padding="@dimen/_4sdp"
                     android:scaleType="fitXY"
                     android:src="@drawable/ic_walmart_star_icon" />
+
+                    <include
+                        android:id="@+id/lay_progess"
+                        layout="@layout/progess_loader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true" />
 
                 <ImageView
                     android:layout_width="wrap_content"

@@ -492,7 +492,7 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
         try {
             val apiModel = Gson().fromJson(response, CradApiResponse::class.java)
             Log.d("@@@ Response cardBank ", "message :- $response")
-            if (apiModel.code == 200) {
+            if (apiModel.code == 200 && apiModel.success) {
                 apiModel.data?.let { updateUI(it) } ?: run {
                     // Code for the else condition
                     binding.llBankAccount.visibility = View.VISIBLE
@@ -902,8 +902,7 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
         val cvvNumber: String =
             Objects.requireNonNull(binding.etCVVNumber.text.toString()).toString()
         val name: String = binding.etName.text.toString()
-        val card =
-            CardParams(cardNumber, Integer.valueOf(month), Integer.valueOf(year), cvvNumber, name)
+        val card = CardParams(cardNumber, Integer.valueOf(month), Integer.valueOf(year), cvvNumber, name)
         stripe!!.createCardToken(card, null, null, object : ApiResultCallback<Token> {
             override fun onError(e: Exception) {
                 BaseApplication.dismissMe()

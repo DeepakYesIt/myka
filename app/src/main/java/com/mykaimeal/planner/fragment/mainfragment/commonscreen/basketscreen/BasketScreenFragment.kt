@@ -41,6 +41,8 @@ import com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.mode
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @AndroidEntryPoint
 class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListener,
@@ -53,6 +55,7 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private lateinit var basketScreenViewModel: BasketScreenViewModel
     private var rcySavedAddress: RecyclerView? = null
     private var recipe: MutableList<Recipes>?=null
+    private var storeUid:String?=""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -103,7 +106,10 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         binding!!.textConfirmOrder.setOnClickListener {
-            findNavController().navigate(R.id.basketDetailSuperMarketFragment)
+            val bundle = Bundle().apply {
+                putString("storeUid","")
+            }
+            findNavController().navigate(R.id.basketDetailSuperMarketFragment,bundle)
 //             findNavController().navigate(R.id.tescoCartItemFragmentFragment)
         }
 
@@ -204,9 +210,39 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
     private fun showDataInUI(data: BasketScreenModelData) {
 
+        if (data.billing!=null){
+            if (data.billing.recipes!=null){
+                binding!!.textRecipeCount.text=data.billing.recipes.toString()
+            }
+
+            if (data.billing.net_total!=null){
+                binding!!.textNetTotalProduct.text=data.billing.net_total.toString()
+            }
+
+            if (data.billing.tax!=null){
+                binding!!.textTaxPrice.text="$"+data.billing.tax.toString()
+            }
+
+            if (data.billing.delivery!=null){
+                binding!!.textDeliveyPrice.text="$"+data.billing.delivery.toString()
+            }
+
+            if (data.billing.processing!=null){
+                val roundedQuantity = data.billing.processing.let {
+                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+                }
+                binding!!.textProcessingAmount.text=roundedQuantity.toString()+"%"
+            }
+
+            if (data.billing.total!=null){
+                binding!!.textTotalAmount.text="$"+data.billing.total.toString()+"*"
+            }
+
+        }
+
         if (data.stores != null && data.stores.size > 0) {
             binding!!.rlSuperMarket.visibility=View.VISIBLE
-            adapter = SuperMarketListAdapter(data.stores, requireActivity(), this)
+            adapter = SuperMarketListAdapter(data.stores, requireActivity(), this,0)
             binding!!.rcvSuperMarket.adapter = adapter
         }else{
             binding!!.rlSuperMarket.visibility=View.GONE
@@ -345,6 +381,8 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
         if (type=="YourRecipe"){
             removeRecipeBasketDialog(recipeId,position)
+        }else if (type=="SuperMarket"){
+            storeUid=recipeId
         }
         /*findNavController().navigate(R.id.basketDetailSuperMarketFragment)*/
 

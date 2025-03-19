@@ -165,8 +165,6 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
         BaseApplication.alertError(requireContext(), message, status)
     }
 
-
-
     override fun itemClick(position: Int?, status: String?, type: String?) {
 
     }

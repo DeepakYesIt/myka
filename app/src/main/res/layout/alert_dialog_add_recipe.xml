@@ -54,7 +54,7 @@
                     android:paddingHorizontal="@dimen/_15sdp"
                     android:paddingVertical="@dimen/_9sdp"
                     android:singleLine="true"
-                    android:text="Create new CookBook"
+                    android:text="Create new cookBook"
                     android:textColor="@color/light_black"
                     android:textColorHint="@color/light_black"
                     android:textSize="@dimen/_14sdp" />
@@ -71,7 +71,7 @@
                 android:background="@drawable/edittext_bg"
                 android:fontFamily="@font/poppins"
                 android:foreground="?attr/selectableItemBackground"
-                android:hint="Select Cook Book"
+                android:hint="Select a cookbook"
                 android:padding="@dimen/_10sdp"
                 android:paddingStart="@dimen/_20sdp"
                 android:textColor="#3C4541"
