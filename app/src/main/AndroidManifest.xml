@@ -121,9 +121,7 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA-e6IRZ8axxpwrm1GEjlFOTzwb5KVQHgc" />
+
 
         <service
             android:name=".fcm.MyFirebaseMessagingService"
@@ -140,6 +138,10 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/api_key" />
 
         <receiver
             android:name="com.appsflyer.MultipleInstallBroadcastReceiver"

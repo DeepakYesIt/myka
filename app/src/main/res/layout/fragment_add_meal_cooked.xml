@@ -85,6 +85,7 @@
 
             </RelativeLayout>
 
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardViewSearchRecipe"
                 android:layout_width="match_parent"
@@ -97,13 +98,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <include
-                        android:id="@+id/layProgress"
-                        layout="@layout/progess_loader"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:visibility="visible" />
+
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -145,11 +140,35 @@
                 android:layout_marginTop="@dimen/_30sdp"
                 android:src="@drawable/add_meal_icon"/>
 
+
+            <TextView
+                android:id="@+id/tv_name"
+                android:layout_below="@id/imageLogo"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_centerInParent="true"
+                android:textSize="@dimen/_11sdp"
+                android:visibility="invisible"
+                android:textColor="@color/black"
+                android:fontFamily="@font/poppins_bold"
+                android:layout_height="wrap_content"
+                />
+
+            <include
+
+                layout="@layout/progess_loader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relCookedMeals"
+                android:layout_above="@id/cardViewDateCooked"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone" />
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardViewDateCooked"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/imageLogo"
+                android:layout_below="@+id/tv_name"
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:layout_marginTop="@dimen/_18sdp"
                 android:layout_marginBottom="@dimen/_10sdp"
@@ -273,9 +292,12 @@
                     </RelativeLayout>
 
                     <RelativeLayout
-                        android:layout_width="wrap_content"
+                        android:id="@+id/laytype"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/layserver"
+                        android:layout_marginEnd="@dimen/_5sdp"
                         android:layout_marginStart="@dimen/_7sdp"
                         android:layout_toEndOf="@id/relImagesFood">
 
@@ -285,11 +307,14 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/poppins_bold"
                             android:text=""
+                            android:drawablePadding="@dimen/_10sdp"
+                            android:drawableEnd="@drawable/drop_down_icon"
                             android:textColor="@color/black" />
 
                     </RelativeLayout>
 
                     <LinearLayout
+                        android:id="@+id/layserver"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -352,6 +377,14 @@
         </RelativeLayout>
 
     </ScrollView>
+
+    <com.mykaimeal.planner.commonworkutils.RSLoadingView
+        android:id="@+id/layProgress"
+        android:layout_width="@dimen/_100sdp"
+        android:layout_height="@dimen/_100sdp"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"/>
 
 
 </RelativeLayout>

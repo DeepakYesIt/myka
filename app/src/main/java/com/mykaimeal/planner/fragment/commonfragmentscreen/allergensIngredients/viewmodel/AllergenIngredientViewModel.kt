@@ -11,13 +11,20 @@ import javax.inject.Inject
 class AllergenIngredientViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
     private var allergensLocalData: MutableList<AllergensIngredientModelData>?=null
+    private var value: String=""
+
 
     suspend fun getAllergensIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?){
         repository.getAllergensIngredients({ successCallback(it) },itemCount)
     }
 
-    fun setAllergensData(data: MutableList<AllergensIngredientModelData>) {
+    suspend fun getAllergensSearchIngredients(successCallback: (response: NetworkResult<String>) -> Unit,data:String,itemCount:String?,type:String){
+        repository.getAllergensSearchIngredients({ successCallback(it) },data,itemCount,type)
+    }
+
+    fun setAllergensData(data: MutableList<AllergensIngredientModelData>,value:String) {
         allergensLocalData=data
+        this.value=value
     }
 
     // Method to clear data
@@ -26,12 +33,20 @@ class AllergenIngredientViewModel @Inject constructor(private val repository: Ma
         // Reset other variables
     }
 
+    fun getEditStatus(): String? {
+        return value
+    }
+
     fun getAllergensData(): MutableList<AllergensIngredientModelData>? {
         return allergensLocalData
     }
 
     suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){
         repository.userPreferencesApi{ successCallback(it) }
+    }
+
+    suspend fun userPreferencesAllergiesApi(successCallback: (response: NetworkResult<String>) -> Unit,allergicSearch:String?,allergicNum:String?){
+        repository.userPreferencesAllergiesApi({ successCallback(it) },allergicSearch,allergicNum)
     }
 
     suspend fun updateAllergiesApi(successCallback: (response: NetworkResult<String>) -> Unit,allergies: List<String>?){
