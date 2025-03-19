@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -32,6 +33,8 @@ import com.mykaimeal.planner.fragment.commonfragmentscreen.ingredientDislikes.mo
 import com.mykaimeal.planner.fragment.commonfragmentscreen.ingredientDislikes.viewmodel.DislikeIngredientsViewModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -47,6 +50,8 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
     private var itemCount:String = "2"  // Default count
     private var dislikeSelectedId = mutableListOf<String>()
     private lateinit var dislikeIngredientsViewModel: DislikeIngredientsViewModel
+    private lateinit var textListener: TextWatcher
+    private var textChangedJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -108,6 +113,9 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
 
         }
 
+
+
+
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
             object : OnBackPressedCallback(true) {
@@ -124,7 +132,7 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
     private fun ingredientDislikeSelectApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            dislikeIngredientsViewModel.userPreferencesApi {
+            dislikeIngredientsViewModel.userPreferencesDislikeApi({
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
@@ -132,7 +140,8 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
                             val gson = Gson()
                             val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
                             if (bodyModel.code == 200 && bodyModel.success) {
-                                showDataInUi(bodyModel.data.ingredientdislike)
+//                                showDataInUi(bodyModel.data.ingredientdislike)
+                                showDataFirstUi(bodyModel.data.ingredientdislike,"count")
                             } else {
                                 if (bodyModel.code == ErrorMessage.code) {
                                     showAlertFunction(bodyModel.message, true)
@@ -153,7 +162,7 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
                         showAlertFunction(it.message, false)
                     }
                 }
-            }
+            },"",itemCount)
         }
     }
 
@@ -174,20 +183,106 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
 
         binding!!.tvNextBtn.setOnClickListener {
             if (status == "2") {
-                dislikeIngredientsViewModel.setDislikeIngData(dislikeIngredientModelData)
+                dislikeIngredientsViewModel.setDislikeIngData(dislikeIngredientModelData,binding!!.etIngDislikesSearchBar.text.toString())
                 sessionManagement.setDislikeIngredientList(dislikeSelectedId)
                 findNavController().navigate(R.id.allergensIngredientsFragment)
             }
         }
 
-        binding!!.etIngDislikesSearchBar.addTextChangedListener(object :
-            TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(editable: Editable) {
-                searchable(editable.toString())
+//        binding!!.etIngDislikesSearchBar.addTextChangedListener(object :
+//            TextWatcher {
+//            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+//            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+//            override fun afterTextChanged(editable: Editable) {
+//                searchable(editable.toString())
+//            }
+//        })
+
+
+        textListener = object : TextWatcher {
+            private var searchFor = ""
+
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val searchText = s.toString().trim()
+
+                textChangedJob?.cancel() // Cancel any pending jobs
+
+                if (searchText.isNotEmpty()) {
+                    if (searchText != searchFor) {
+                        searchFor = searchText
+                        textChangedJob = lifecycleScope.launch {
+                            delay(1000)  // Debounce time
+                            if (searchText == searchFor) {
+                                if (BaseApplication.isOnline(requireActivity())) {
+                                    searchable(searchText)
+                                } else {
+                                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Log.d("not data", "Text field is empty")
+                    if (sessionManagement.getCookingScreen().equals("Profile",true)){
+                        if (BaseApplication.isOnline(requireContext())) {
+                            ingredientDislikeSelectApi()
+                        } else {
+                            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                        }
+                    }else{
+                        ///checking the device of mobile data in online and offline(show network error message)
+                        if (BaseApplication.isOnline(requireContext())) {
+                            ingredientDislikeApi()
+                        } else {
+                            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                        }
+                    }
+                }
             }
-        })
+        }
+
+
+
+        /*  textListener = object : TextWatcher {
+              private var searchFor = "" // Or view.editText.text.toString()
+
+              override fun afterTextChanged(s: Editable?) {}
+
+              override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+              override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                  val searchText = s.toString().trim()
+                  if (searchText.length!=0){
+                      if (searchText.trim() != searchFor) {
+                          searchFor = searchText
+                          textChangedJob?.cancel()
+                          // Launch a new coroutine in the lifecycle scope
+                          textChangedJob = lifecycleScope.launch {
+                              delay(1000)  // Debounce time
+                              if (searchText == searchFor) {
+                                  if (BaseApplication.isOnline(requireActivity())) {
+                                      searchable(searchText)
+                                  } else {
+                                      BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                                  }
+                              }
+                          }
+                      }
+                  }else{
+                      Log.d("not data","vyvdsvd")
+                      if (BaseApplication.isOnline(requireContext())) {
+                          ingredientDislikeSelectApi()
+                      } else {
+                          BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                      }
+                  }
+
+              }
+          }*/
 
         binding!!.rlUpdateIngDislike.setOnClickListener {
             if (BaseApplication.isOnline(requireContext())) {
@@ -198,18 +293,20 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
         }
 
         binding!!.relMoreButton.setOnClickListener { v ->
-//            dislikeIngredientsAdapter!!.setExpanded(true)
-            binding!!.relMoreButton.visibility=View.VISIBLE
-/*
-            binding!!.relMoreButton.visibility = View.GONE // Hide button after expanding
-*/
-
             itemCount = (itemCount.toInt() + 10).toString()  // Convert to Int, add 10, convert back to String
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireContext())) {
-                ingredientDislikeApi()
+            if (sessionManagement.getCookingScreen().equals("Profile")) {
+                if (BaseApplication.isOnline(requireContext())) {
+                    ingredientDislikeSelectApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                ///checking the device of mobile data in online and offline(show network error message)
+                if (BaseApplication.isOnline(requireContext())) {
+                    ingredientDislikeApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
     }
@@ -261,7 +358,7 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
                             val gson = Gson()
                             val dietaryModel = gson.fromJson(it.data, DislikedIngredientsModel::class.java)
                             if (dietaryModel.code == 200 && dietaryModel.success) {
-                                showDataFirstUi(dietaryModel.data)
+                                showDataFirstUi(dietaryModel.data,"count")
                             } else {
                                 if (dietaryModel.code == ErrorMessage.code) {
                                     showAlertFunction(dietaryModel.message, true)
@@ -290,55 +387,45 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
         try {
             if (dislikeIngModelData != null && dislikeIngModelData.isNotEmpty()) {
                 if (dislikeIngredientsViewModel.getDislikeIngData() == null) {
-                    dislikeIngModelData.add(
-                        0,
-                        DislikedIngredientsModelData(id = -1, selected = false, "None")
-                    ) // ID set to -1 as an indicator
+                    dislikeIngModelData.add(0, DislikedIngredientsModelData(id = -1, selected = false, "None")) // ID set to -1 as an indicator
                 }
                 var selected = false
-                dislikeIngModelData.forEach {
-                    if (it.selected) selected = true
-                }
-                if (!selected) {
-                    dislikeIngModelData.set(
-                        0, DislikedIngredientsModelData(id = -1, selected = true, "None")
-                    )
-                }
-
-                /*// Show "Show More" button only if there are more than 3 items
-                if (dislikeIngModelData.size > 3) {
-                    binding!!.relMoreButton.visibility = View.VISIBLE
-                }*/
-
-
+                dislikeIngModelData.forEach { if (it.selected) selected = true }
+                if (!selected) { dislikeIngModelData.set(0, DislikedIngredientsModelData(id = -1, selected = true, "None")) }
                 dislikeIngredientModelData = dislikeIngModelData.toMutableList()
+                dislikeIngredientsAdapter?.filterList(dislikeIngredientModelData)
+                /*dislikeIngredientsAdapter = AdapterDislikeIngredientItem(dislikeIngModelData, requireActivity(), this)
+                binding!!.rcyIngDislikes.adapter = dislikeIngredientsAdapter*/
+                if (dislikeIngredientsViewModel.getEditStatus().equals("")){
+                    binding!!.relMoreButton.visibility=View.VISIBLE
+                }else{
+                    binding!!.relMoreButton.visibility=View.GONE
+                }
 
-                dislikeIngredientsAdapter =
-                    AdapterDislikeIngredientItem(dislikeIngModelData, requireActivity(), this)
-                binding!!.rcyIngDislikes.adapter = dislikeIngredientsAdapter
             }
         } catch (e: Exception) {
             Log.d("IngredientDislike", "message:--" + e.message)
         }
     }
 
-    private fun showDataFirstUi(dislikeIngModelData: MutableList<DislikedIngredientsModelData>) {
+    private fun showDataFirstUi(dislikeIngModelData: MutableList<DislikedIngredientsModelData>,type:String) {
         try {
-            if (dislikeIngModelData != null && dislikeIngModelData.isNotEmpty()) {
-                if (dislikeIngredientsViewModel.getDislikeIngData() == null) {
-                    dislikeIngModelData.add(0, DislikedIngredientsModelData(id = -1, selected = false, "None")) // ID set to -1 as an indicator
-                }
-
-              /*  if (itemCount=="10"){
-                    // Show "Show More" button only if there are more than 3 items
-                    if (dislikeIngModelData.size > 3) {
-                        binding!!.relMoreButton.visibility = View.VISIBLE
-                    }
-                }
-*/
-                dislikeIngredientModelData = dislikeIngModelData.toMutableList()
+            if (dislikeIngModelData != null && dislikeIngModelData.size>0) {
+                dislikeIngredientModelData.clear()
+                dislikeIngModelData.add(0, DislikedIngredientsModelData(id = -1, selected = false, "None")) // ID set to -1 as an indicator
+                dislikeIngredientModelData.addAll(dislikeIngModelData.toMutableList())
                 dislikeIngredientsAdapter?.filterList(dislikeIngredientModelData)
+                if (type.equals("search",true)){
+                    binding!!.relMoreButton.visibility=View.GONE
+                }else{
+                    binding!!.relMoreButton.visibility=View.VISIBLE
+                }
+                binding!!.rcyIngDislikes.visibility=View.VISIBLE
+            }else{
+                binding!!.rcyIngDislikes.visibility=View.GONE
             }
+
+
         } catch (e: Exception) {
             Log.d("IngredientDislike", "message:--" + e.message)
         }
@@ -349,7 +436,73 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
     }
 
     private fun searchable(editText: String) {
-        if (editText!=""){
+        binding!!.layProgess.visibility=View.VISIBLE
+        lifecycleScope.launch {
+            dislikeIngredientsViewModel.getDislikeSearchIngredients({
+                binding!!.layProgess.visibility=View.GONE
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        try {
+                            if (sessionManagement.getCookingScreen().toString().equals("Profile", ignoreCase = true)){
+                                val dietaryModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                                if (dietaryModel.code == 200 && dietaryModel.success) {
+                                    showDataFirstUi(dietaryModel.data.ingredientdislike,"search")
+                                } else {
+                                    if (dietaryModel.code == ErrorMessage.code) {
+                                        showAlertFunction(dietaryModel.message, true)
+                                    } else {
+                                        showAlertFunction(dietaryModel.message, false)
+                                    }
+                                }
+                            }else{
+                                val dietaryModel = gson.fromJson(it.data, DislikedIngredientsModel::class.java)
+                                if (dietaryModel.code == 200 && dietaryModel.success) {
+                                    showDataFirstUi(dietaryModel.data,"search")
+                                } else {
+                                    if (dietaryModel.code == ErrorMessage.code) {
+                                        showAlertFunction(dietaryModel.message, true)
+                                    } else {
+                                        showAlertFunction(dietaryModel.message, false)
+                                    }
+                                }
+                            }
+                        }catch (e:Exception){
+                            Log.d("IngredientDislike@@@@", "message:--" + e.message)
+                        }
+                    }
+
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            },editText,sessionManagement.getCookingScreen().toString())
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*    if (editText!=""){
             binding!!.relMoreButton.visibility=View.GONE
             val filteredList: MutableList<DislikedIngredientsModelData> =
                 java.util.ArrayList<DislikedIngredientsModelData>()
@@ -366,7 +519,7 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
             }
         }else{
             binding!!.relMoreButton.visibility=View.VISIBLE
-        }
+        }*/
     }
 
     private fun stillSkipDialog() {
@@ -418,4 +571,16 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
+
+
+    override fun onResume() {
+        super.onResume()
+        binding!!.etIngDislikesSearchBar.addTextChangedListener(textListener)
+    }
+
+    override fun onPause() {
+        binding!!.etIngDislikesSearchBar.removeTextChangedListener(textListener)
+        super.onPause()
+    }
+
 }

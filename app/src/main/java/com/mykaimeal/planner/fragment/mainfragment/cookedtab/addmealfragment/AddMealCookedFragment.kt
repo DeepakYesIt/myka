@@ -2,20 +2,27 @@ package com.mykaimeal.planner.fragment.mainfragment.cookedtab.addmealfragment
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context.LAYOUT_INFLATER_SERVICE
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CalendarView
+import android.widget.PopupWindow
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -25,13 +32,16 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.mykaimeal.planner.OnItemClickListener
+import com.mykaimeal.planner.OnItemMealTypeListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.activity.SplashActivity
+import com.mykaimeal.planner.adapter.AdapterMealTypeMeal
 import com.mykaimeal.planner.adapter.SearchAdapterItem
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentAddMealCookedBinding
+import com.mykaimeal.planner.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModelData
 import com.mykaimeal.planner.fragment.mainfragment.cookedtab.addmealfragment.viewmodel.AddMealCookedViewModel
 import com.mykaimeal.planner.fragment.mainfragment.plantab.ImagesDeserializer
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.model.Recipe
@@ -41,6 +51,7 @@ import com.mykaimeal.planner.fragment.mainfragment.viewmodel.recipedetails.apire
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -48,7 +59,7 @@ import java.util.Calendar
 import java.util.Locale
 
 @AndroidEntryPoint
-class AddMealCookedFragment : Fragment(),OnItemClickListener {
+class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeListener {
     private var binding: FragmentAddMealCookedBinding?=null
     private lateinit var addMealCookedViewModel: AddMealCookedViewModel
     private var searchAdapterItem:SearchAdapterItem?=null
@@ -61,6 +72,10 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
     private var mealType:String=""
     private var recipeUri:String=""
     private var planType:String="1"
+    var popupWindow:PopupWindow?=null
+    private lateinit var textListener: TextWatcher
+    private var textChangedJob: Job? = null
+    private var mealRoutineList: MutableList<MealRoutineModelData> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -85,7 +100,7 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
         return binding!!.root
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "MissingInflatedId")
     private fun initialize() {
 
         binding!!.relDateCalendar.setOnClickListener{
@@ -94,6 +109,29 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
 
         binding!!.imageBackAddMeal.setOnClickListener {
             findNavController().navigateUp()
+        }
+
+        binding!!.tvTitleName.setOnClickListener {
+
+
+
+
+            if (BaseApplication.isOnline(requireActivity())) {
+                val mainActivity = requireActivity() as MainActivity
+                mainActivity.mealRoutineSelectApi { data ->
+                    mealRoutineList.clear()
+                    mealRoutineList.addAll(data)
+                    if (mealRoutineList.isNotEmpty()) {
+                        mealType()
+                    } else {
+                        // Handle the case where the list is empty
+                        BaseApplication.alertError(requireContext(), "No meal routines available.", false)
+                    }
+                }
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+
         }
 
         binding!!.textFridge.setOnClickListener {
@@ -146,14 +184,14 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
             }
         }
 
-        binding!!.relSearch.setOnClickListener{
-            binding!!.cardViewSearchRecipe.visibility=View.VISIBLE
-            if (BaseApplication.isOnline(requireActivity())) {
-                searchRecipeApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
+//        binding!!.relSearch.setOnClickListener{
+//            binding!!.cardViewSearchRecipe.visibility=View.VISIBLE
+//            if (BaseApplication.isOnline(requireActivity())) {
+////                searchRecipeApi(searchText)
+//            } else {
+//                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+//            }
+//        }
 
         binding!!.testAddMeals.setOnClickListener{
             if (clickable=="2"){
@@ -166,13 +204,45 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
 
         }
 
+
+        textListener = object : TextWatcher {
+            private var searchFor = "" // Or view.editText.text.toString()
+
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val searchText = s.toString().trim()
+                if (searchText.trim() != searchFor) {
+                    searchFor = searchText
+
+                    textChangedJob?.cancel()
+                    // Launch a new coroutine in the lifecycle scope
+                    textChangedJob = lifecycleScope.launch {
+                        delay(1000)  // Debounce time
+                        if (searchText == searchFor) {
+//                            loadList(searchText)
+//                            loadSearchApi(searchText)
+                            if (BaseApplication.isOnline(requireActivity())) {
+                                searchRecipeApi(searchText)
+                            } else {
+                                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
     }
 
     private fun addMealsApi() {
         // Create a JsonObject for the main JSON structure
         val jsonObject = JsonObject()
         if (recipeUri!= null) {
-            jsonObject.addProperty("type", mealType)
+            jsonObject.addProperty("type", binding!!.tvTitleName.text.toString().trim())
             jsonObject.addProperty("plan_type", planType)
             jsonObject.addProperty("uri", recipeUri)
             jsonObject.addProperty("date", selectedDate)
@@ -188,6 +258,27 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
                 handleApiAddToPlanResponse(it)
             }, jsonObject)
         }
+    }
+
+
+    private fun mealType(){
+        val inflater = requireContext().getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater?
+        val popupView: View? = inflater?.inflate(R.layout.item_select_layoutdrop, null)
+        popupWindow = PopupWindow(popupView, 400, RelativeLayout.LayoutParams.WRAP_CONTENT, true)
+        popupWindow?.showAsDropDown(binding!!.laytype,  0, 0, Gravity.CENTER)
+
+            // Access views inside the inflated layout using findViewById
+            val rcyData = popupView?.findViewById<RecyclerView>(R.id.rcy_data)
+////
+            rcyData?.adapter= AdapterMealTypeMeal(mealRoutineList,requireContext(),this)
+
+            binding!!.tvTitleName.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.drop_up_icon, 0)
+
+            // Set the dismiss listener
+            popupWindow?.setOnDismissListener {
+                binding!!.tvTitleName.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.drop_down_icon, 0)
+            }
+
     }
 
     private fun handleApiAddToPlanResponse(
@@ -285,11 +376,11 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
         }
     }
 
-    private fun searchRecipeApi() {
-        binding!!.layProgress.root.visibility=View.VISIBLE
+    private fun searchRecipeApi(searchText: String) {
+        binding!!.layProgress.visibility=View.VISIBLE
         lifecycleScope.launch {
             addMealCookedViewModel.recipeSearchApi({
-                binding!!.layProgress.root.visibility=View.GONE
+                binding!!.layProgress.visibility=View.GONE
                 when (it) {
                     is NetworkResult.Success -> {
                         try {
@@ -302,24 +393,43 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
                             if (searchModel.code == 200 && searchModel.success) {
                                 showDataInUi(searchModel.data)
                             } else {
+//                                binding!!.cardViewSearchRecipe.visibility=View.GONE
+//                                binding!!.rcySearchCooked.visibility=View.GONE
+//                                binding!!.tvNoData.visibility=View.VISIBLE
+                                popupWindow?.dismiss()
                                 if (searchModel.code == ErrorMessage.code) {
                                     showAlertFunction(searchModel.message, true)
                                 }else{
-                                    showAlertFunction(searchModel.message, false)
+                                    if (!searchModel.message.equals("Search query cannot be empty.")){
+                                        showAlertFunction(searchModel.message, false)
+                                    }
                                 }
                             }
                         }catch (e:Exception){
+//                            binding!!.cardViewSearchRecipe.visibility=View.GONE
+//                            binding!!.rcySearchCooked.visibility=View.GONE
+//                            binding!!.tvNoData.visibility=View.VISIBLE
+                                popupWindow?.dismiss()
                             Log.d("AddMeal","message:--"+e.message)
                         }
                     }
                     is NetworkResult.Error -> {
+//                        binding!!.cardViewSearchRecipe.visibility=View.GONE
+//                        binding!!.rcySearchCooked.visibility=View.GONE
+//                        binding!!.tvNoData.visibility=View.VISIBLE
+                            popupWindow?.dismiss()
                         showAlertFunction(it.message, false)
                     }
                     else -> {
+//                        binding!!.cardViewSearchRecipe.visibility=View.GONE
+//                        binding!!.rcySearchCooked.visibility=View.GONE
+//                        binding!!.tvNoData.visibility=View.VISIBLE
+                            popupWindow?.dismiss()
                         showAlertFunction(it.message, false)
                     }
                 }
-            },binding!!.etCookedDishes.text.toString().trim())
+//            },binding!!.etCookedDishes.text.toString().trim())
+            },searchText)
         }
     }
 
@@ -327,19 +437,43 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
         try {
             if (searchModelData!=null){
                 if (searchModelData.recipes!=null && searchModelData.recipes.size>0){
+//                    binding!!.cardViewSearchRecipe.visibility=View.VISIBLE
                     recipes=searchModelData.recipes
-                    binding!!.rcySearchCooked.visibility=View.VISIBLE
-                    binding!!.tvNoData.visibility=View.GONE
-                    searchAdapterItem = SearchAdapterItem(searchModelData.recipes, requireActivity(),this)
-                    binding!!.rcySearchCooked.adapter = searchAdapterItem
+//                    binding!!.rcySearchCooked.visibility=View.VISIBLE
+//                    binding!!.tvNoData.visibility=View.GONE
+//                    searchAdapterItem = SearchAdapterItem(searchModelData.recipes, requireActivity(),this)
+//                    binding!!.rcySearchCooked.adapter = searchAdapterItem
+                    loadSearch()
                 }else{
-                    binding!!.rcySearchCooked.visibility=View.GONE
-                    binding!!.tvNoData.visibility=View.VISIBLE
+//                    binding!!.rcySearchCooked.visibility=View.GONE
+//                    binding!!.tvNoData.visibility=View.VISIBLE
+                    popupWindow?.dismiss()
                 }
             }
         }catch (e:Exception){
+            popupWindow?.dismiss()
             Log.d("AddMeal","message:--"+e.message)
         }
+    }
+
+
+    private fun loadSearch(){
+        val inflater = requireContext().getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater?
+        val popupView: View? = inflater?.inflate(R.layout.item_select_layoutdrop, null)
+
+        // Allows dismissing the popup when touching outside
+        popupWindow?.isOutsideTouchable = true
+
+        popupWindow = PopupWindow(popupView, binding!!.relCookedMeals.width, RelativeLayout.LayoutParams.WRAP_CONTENT, true)
+        popupWindow?.showAsDropDown(binding!!.relCookedMeals,  0, 0, Gravity.CENTER)
+
+            // Access views inside the inflated layout using findViewById
+            val rcyData = popupView?.findViewById<RecyclerView>(R.id.rcy_data)
+//
+//            rcyData?.adapter= TimeArrayCustomListAdapter(requireContext(),data,this,"time")
+
+        searchAdapterItem = recipes?.let { SearchAdapterItem(it, requireActivity(),this) }
+        rcyData!!.adapter = searchAdapterItem
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {
@@ -356,6 +490,8 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
             binding!!.textFreezer.text="Freezer (1)"
         }
 
+        popupWindow?.dismiss()
+        binding!!.etCookedDishes.text.clear()
         mealType=type.toString()
         recipeUri= uri.toString()
         status="2"
@@ -407,10 +543,27 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener {
         }
 
         binding!!.tvTitleName.text=type.toString()
+        binding!!.tvName.visibility=View.VISIBLE
+        binding!!.tvName.text= recipes!![position].recipe?.label
 
         checkable()
 
        /* recipes!![position!!].recipe.image*/
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding!!.etCookedDishes.addTextChangedListener(textListener)
+    }
+
+    override fun onPause() {
+        binding!!.etCookedDishes.removeTextChangedListener(textListener)
+        super.onPause()
+    }
+
+    override fun itemMealTypeSelect(position: Int?, status: String?, type: String?) {
+        popupWindow?.dismiss()
+        binding!!.tvTitleName.text=mealRoutineList[position!!].name
     }
 }

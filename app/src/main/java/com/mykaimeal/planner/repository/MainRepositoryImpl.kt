@@ -74,6 +74,85 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
+    override suspend fun getDislikeSearchIngredients(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        itemCount: String?,
+        type: String
+    ) {
+        try {
+            val response = if (type.equals("Profile", ignoreCase = true)) {
+                api.userPreferencesDislikeApi(itemCount, "100")
+            } else {
+                api.getDislikeSearchIngredients("100", itemCount)
+            }
+
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    successCallback(NetworkResult.Success(it.toString()))
+                } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+            } else {
+                successCallback(NetworkResult.Error(response.errorBody()?.string() ?: ErrorMessage.apiError))
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.localizedMessage ?: "Unknown error occurred"))
+        }
+    }
+
+
+    override suspend fun getAllergensSearchIngredients(successCallback: (response: NetworkResult<String>) -> Unit,data:String, itemCount: String?, type: String) {
+        try {
+            val response = if (type.equals("Profile", ignoreCase = true)) {
+                api.userPreferencesAllergiesApi(data, itemCount)
+            } else {
+                api.getAllergensSearchIngredients(itemCount, data)
+            }
+
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    successCallback(NetworkResult.Success(it.toString()))
+                } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+            } else {
+                successCallback(NetworkResult.Error(response.errorBody()?.string() ?: ErrorMessage.apiError))
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.localizedMessage ?: "Unknown error occurred"))
+        }
+    }
+
+
+//    override suspend fun getDislikeSearchIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?,type: String) {
+//        try {
+//            if (type.equals("Profile",true)){
+//                api.userPreferencesDislikeApi(itemCount,"100").apply {
+//                    if (isSuccessful) {
+//                        body()?.let {
+//                            successCallback(NetworkResult.Success(it.toString()))
+//                        } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+//                    } else {
+//                        successCallback(NetworkResult.Error(errorBody().toString()))
+//                    }
+//                }
+//
+//            }else{
+//                api.getDislikeSearchIngredients("100",itemCount).apply {
+//                    if (isSuccessful) {
+//                        body()?.let {
+//                            successCallback(NetworkResult.Success(it.toString()))
+//                        } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+//                    } else {
+//                        successCallback(NetworkResult.Error(errorBody().toString()))
+//                    }
+//                }
+//            }
+//
+//
+//
+//
+//        } catch (e: Exception) {
+//            successCallback(NetworkResult.Error(e.message.toString()))
+//        }
+//    }
+
     override suspend fun getAllergensIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?) {
         try {
             api.getAllergensIngredients(itemCount).apply {
@@ -1210,6 +1289,44 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
     ) {
         try {
             api.userPreferencesApi().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun userPreferencesDislikeApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,dislike_search:String?,dislike_num:String?
+    ) {
+        try {
+            api.userPreferencesDislikeApi(dislike_search,dislike_num).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun userPreferencesAllergiesApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,allergic_search:String?,allergic_num:String?
+    ) {
+        try {
+            api.userPreferencesAllergiesApi(allergic_search,allergic_num).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

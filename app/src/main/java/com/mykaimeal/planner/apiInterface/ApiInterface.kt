@@ -34,6 +34,9 @@ interface ApiInterface {
     @GET(ApiEndPoint.allergensIngredients+"/{value}")
     suspend fun getAllergensIngredients(@Path("value") value: String?): Response<JsonObject>
 
+    @GET(ApiEndPoint.allergensIngredients+"/{value}/{value1}")
+    suspend fun getAllergensSearchIngredients(@Path("value") country:String?, @Path("value1") state :String?) : Response<JsonObject>
+
     @GET(ApiEndPoint.mealRoutine)
     suspend fun getMealRoutine(): Response<JsonObject>
 
@@ -387,6 +390,15 @@ interface ApiInterface {
 
     @POST(ApiEndPoint.getUserPreferences)
     suspend fun userPreferencesApi(): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.getUserPreferences)
+    suspend fun userPreferencesDislikeApi(@Field("dislike_search") dislike_search:String?, @Field("dislike_num") dislike_num :String?): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.getUserPreferences)
+    suspend fun userPreferencesAllergiesApi(@Field("allergic_search") country:String?, @Field("allergic_num") state :String?): Response<JsonObject>
 
     @FormUrlEncoded
     @POST(ApiEndPoint.updateUserPreferences)

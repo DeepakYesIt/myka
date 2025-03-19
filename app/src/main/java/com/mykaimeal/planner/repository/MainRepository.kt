@@ -11,6 +11,8 @@ interface MainRepository {
     suspend fun getDietaryRestrictions(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getFavouriteCuisines(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getDislikeIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?)
+    suspend fun getDislikeSearchIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?,type: String)
+    suspend fun getAllergensSearchIngredients(successCallback: (response: NetworkResult<String>) -> Unit,data:String,itemCount:String?,type: String)
     suspend fun getAllergensIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?)
     suspend fun getMealRoutine(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getCookingFrequency(successCallback: (response: NetworkResult<String>) -> Unit)
@@ -170,6 +172,7 @@ interface MainRepository {
     suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
     suspend fun updateAllergiesApi(successCallback: (response: NetworkResult<String>) -> Unit, allergies:List<String>?)
+    suspend fun userPreferencesAllergiesApi(successCallback: (response: NetworkResult<String>) -> Unit,allergicSearch:String?,allergicNum:String?)
     suspend fun addToCartUrlApi(successCallback: (response: NetworkResult<String>) -> Unit,foodIds: MutableList<String>?,
                                 schId:String?, foodName:MutableList<String>?,status: MutableList<String>?)
 
@@ -196,6 +199,9 @@ interface MainRepository {
     suspend fun updateFavouriteApi(successCallback: (response: NetworkResult<String>) -> Unit, favouriteId:List<String>?)
 
     suspend fun updateDislikedIngredientsApi(successCallback: (response: NetworkResult<String>) -> Unit, dislikedId:List<String>?)
+
+    suspend fun userPreferencesDislikeApi(successCallback: (response: NetworkResult<String>) -> Unit,dislikeSearch:String?, dislikeum:String?)
+
     suspend fun updatePostCodeApi(successCallback: (response: NetworkResult<String>) -> Unit, postCode:String?,longitude:String?, latitude:String?)
 
     suspend fun recipeSearchApi(successCallback: (response: NetworkResult<String>) -> Unit, itemSearch:String?)

@@ -42,25 +42,19 @@ class CheckoutScreenFragment : Fragment(),OnMapReadyCallback {
     private var status:Boolean=false
     private lateinit var checkoutScreenViewModel: CheckoutScreenViewModel
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         binding= FragmentCheckoutScreenBinding.inflate(layoutInflater, container, false)
-
         checkoutScreenViewModel = ViewModelProvider(requireActivity())[CheckoutScreenViewModel::class.java]
-
         // Load saved instance state
-        var mapViewBundle: Bundle? = null
-        if (savedInstanceState != null) {
-            mapViewBundle= savedInstanceState.getBundle("MapViewBundleKey")
-//            mapViewBundle = savedInstanceState.getBundle("AIzaSyA-e6IRZ8axxpwrm1GEjlFOTzwb5KVQHgc")
-        }
-
+//        var mapViewBundle: Bundle? = null
+//        if (savedInstanceState != null) {
+//            mapViewBundle= savedInstanceState.getBundle("MapViewBundleKey")
+////            mapViewBundle = savedInstanceState.getBundle("AIzaSyA-e6IRZ8axxpwrm1GEjlFOTzwb5KVQHgc")
+//        }
         mapView = binding!!.mapView
-        mapView.onCreate(mapViewBundle)
-        mapView.getMapAsync(this@CheckoutScreenFragment)
+        mapView.onCreate(savedInstanceState)
+        mapView.getMapAsync(this)
 
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),

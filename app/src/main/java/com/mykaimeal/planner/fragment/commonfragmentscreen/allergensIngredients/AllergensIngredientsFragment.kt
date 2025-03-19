@@ -32,8 +32,12 @@ import com.mykaimeal.planner.fragment.commonfragmentscreen.allergensIngredients.
 import com.mykaimeal.planner.fragment.commonfragmentscreen.allergensIngredients.viewmodel.AllergenIngredientViewModel
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
+import com.mykaimeal.planner.fragment.commonfragmentscreen.ingredientDislikes.model.DislikedIngredientsModel
+import com.mykaimeal.planner.fragment.commonfragmentscreen.ingredientDislikes.model.DislikedIngredientsModelData
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -49,6 +53,8 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
     private var allergensSelectedId = mutableListOf<String>()
     private lateinit var allergenIngredientViewModel: AllergenIngredientViewModel
     private var itemCount:String = "2"  // Default count
+    private lateinit var textListener: TextWatcher
+    private var textChangedJob: Job? = null
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreateView(
@@ -58,13 +64,11 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         // Inflate the layout for this fragment
         binding = FragmentAllergensIngredientsBinding.inflate(inflater, container, false)
 
-        allergenIngredientViewModel =
-            ViewModelProvider(this)[AllergenIngredientViewModel::class.java]
+        allergenIngredientViewModel = ViewModelProvider(this)[AllergenIngredientViewModel::class.java]
         sessionManagement = SessionManagement(requireContext())
-
-
         allergenIngAdapter = AdapterAllergensIngItem(allergenIngModelData, requireActivity(), this)
         binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
+
 
         /// checked session value cooking for
         if (sessionManagement.getCookingFor().equals("Myself")) {
@@ -90,7 +94,8 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
             binding!!.llBottomBtn.visibility = View.GONE
             binding!!.rlUpdateAllergens.visibility = View.VISIBLE
             if (BaseApplication.isOnline(requireActivity())) {
-                allergenIngredientSelectApi()
+//                allergenIngredientSelectApi()
+                searchable("","count")
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
@@ -109,7 +114,8 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 ///checking the device of mobile data in online and offline(show network error message)
                 /// allergies api implement
                 if (BaseApplication.isOnline(requireContext())) {
-                    allergenIngredientApi()
+//                    allergenIngredientApi()
+                    searchable("","count")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
@@ -187,7 +193,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
             stillSkipDialog()
         }
 
-        // Add a TextWatcher to monitor changes in the username EditText field.
+       /* // Add a TextWatcher to monitor changes in the username EditText field.
         // The searchable() function is triggered after text changes to search ingredient
         binding!!.etAllergensIngSearchBar.addTextChangedListener(object :
             TextWatcher {
@@ -196,12 +202,12 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
             override fun afterTextChanged(editable: Editable) {
                 searchable(editable.toString())
             }
-        })
+        })*/
 
         /// handle click event for redirect next part
         binding!!.tvNextBtn.setOnClickListener {
             if (status == "2") {
-                allergenIngredientViewModel.setAllergensData(allergenIngModelData)
+                allergenIngredientViewModel.setAllergensData(allergenIngModelData,binding!!.etAllergensIngSearchBar.text.toString())
                 sessionManagement.setAllergenIngredientList(allergensSelectedId)
                 if (sessionManagement.getCookingFor().equals("Myself")) {
                     findNavController().navigate(R.id.mealRoutineFragment)
@@ -229,11 +235,54 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
             itemCount = (itemCount.toInt() + 10).toString()  // Convert to Int, add 10, convert back to String
             ///checking the device of mobile data in online and offline(show network error message)
             if (BaseApplication.isOnline(requireContext())) {
-                allergenIngredientApi()
+//                allergenIngredientApi()
+                searchable("","count")
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
+
+
+
+        textListener = object : TextWatcher {
+            private var searchFor = ""
+
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val searchText = s.toString().trim()
+
+                textChangedJob?.cancel() // Cancel any pending jobs
+
+                if (searchText.isNotEmpty()) {
+                    if (searchText != searchFor) {
+                        searchFor = searchText
+                        textChangedJob = lifecycleScope.launch {
+                            delay(1000)  // Debounce time
+                            if (searchText == searchFor) {
+                                if (BaseApplication.isOnline(requireActivity())) {
+                                    searchable(searchText,"search")
+                                } else {
+                                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Log.d("not data", "Text field is empty")
+                    if (BaseApplication.isOnline(requireContext())) {
+//                            ingredientDislikeSelectApi()
+                        searchable("","count")
+                    } else {
+                        BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                    }
+                }
+            }
+        }
+
+
     }
 
     private fun updateAllergensApi() {
@@ -273,20 +322,56 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         }
     }
 
-    private fun searchable(editText: String) {
-        val filteredList: MutableList<AllergensIngredientModelData> =
-            java.util.ArrayList<AllergensIngredientModelData>()
-        for (item in allergenIngModelData) {
-            if (item.name.toLowerCase().contains(editText.lowercase(Locale.getDefault()))) {
-                filteredList.add(item)
-            }
+    private fun searchable(editText: String,countStatus:String) {
+        binding!!.layProgess.visibility=View.VISIBLE
+        val count = if (countStatus.equals("search", true)) "100" else itemCount
+        lifecycleScope.launch {
+            allergenIngredientViewModel.getAllergensSearchIngredients({
+                binding!!.layProgess.visibility=View.GONE
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        try {
+                            if (sessionManagement.getCookingScreen().toString().equals("Profile", ignoreCase = true)){
+                                val dietaryModel = gson.fromJson(it.data, GetUserPreference::class.java)
+                                if (dietaryModel.code == 200 && dietaryModel.success) {
+                                    showDataFirstUi(dietaryModel.data.allergesingredient,countStatus)
+                                } else {
+                                    if (dietaryModel.code == ErrorMessage.code) {
+                                        showAlertFunction(dietaryModel.message, true)
+                                    } else {
+                                        showAlertFunction(dietaryModel.message, false)
+                                    }
+                                }
+                            }else{
+                                val dietaryModel = gson.fromJson(it.data, AllergensIngredientModel::class.java)
+                                if (dietaryModel.code == 200 && dietaryModel.success) {
+                                    showDataFirstUi(dietaryModel.data,countStatus)
+                                } else {
+                                    if (dietaryModel.code == ErrorMessage.code) {
+                                        showAlertFunction(dietaryModel.message, true)
+                                    } else {
+                                        showAlertFunction(dietaryModel.message, false)
+                                    }
+                                }
+                            }
+                        }catch (e:Exception){
+                            Log.d("IngredientDislike@@@@", "message:--" + e.message)
+                        }
+                    }
+
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            },editText,count,sessionManagement.getCookingScreen().toString())
         }
-        if (filteredList.size > 0) {
-            allergenIngAdapter!!.filterList(filteredList)
-            binding!!.rcyAllergensDesc.visibility = View.VISIBLE
-        } else {
-            binding!!.rcyAllergensDesc.visibility = View.GONE
-        }
+
+
     }
 
     private fun allergenIngredientApi() {
@@ -300,7 +385,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                             val gson = Gson()
                             val dietaryModel = gson.fromJson(it.data, AllergensIngredientModel::class.java)
                             if (dietaryModel.code == 200 && dietaryModel.success) {
-                                showDataFirstUi(dietaryModel.data)
+                                showDataFirstUi(dietaryModel.data,"count")
                             } else {
                                 if (dietaryModel.code == ErrorMessage.code) {
                                     showAlertFunction(dietaryModel.message, true)
@@ -325,22 +410,21 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         }
     }
 
-    private fun showDataFirstUi(allergensModelData: MutableList<AllergensIngredientModelData>) {
+    private fun showDataFirstUi(allergensModelData: MutableList<AllergensIngredientModelData>,type:String) {
         try {
-            if (allergensModelData != null && allergensModelData.isNotEmpty()) {
-                if (allergenIngredientViewModel.getAllergensData() == null) {
-                    allergensModelData.add(
-                        0,
-                        AllergensIngredientModelData(id = -1, selected = false, "None")
-                    ) // ID set to -1 as an indicator
+            if (allergensModelData != null && allergensModelData.size>0) {
+                allergenIngModelData.clear()
+                allergenIngModelData.add(0, AllergensIngredientModelData(id = -1, selected = false, "None")) // ID set to -1 as an indicator
+                allergenIngModelData.addAll(allergensModelData)
+                allergenIngAdapter?.filterList(allergenIngModelData)
+                if (type.equals("search",true)){
+                    binding!!.relMoreButton.visibility=View.GONE
+                }else{
+                    binding!!.relMoreButton.visibility=View.VISIBLE
                 }
-              /*  // Show "Show More" button only if there are more than 3 items
-                if (allergensModelData.size > 3) {
-                    binding!!.relMoreButton.visibility = View.VISIBLE
-                }*/
-                allergenIngModelData = allergensModelData.toMutableList()
-                allergenIngAdapter = AdapterAllergensIngItem(allergensModelData, requireActivity(), this)
-                binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
+                binding!!.rcyAllergensDesc.visibility=View.VISIBLE
+            }else{
+                binding!!.rcyAllergensDesc.visibility=View.GONE
             }
         }catch (e:Exception){
             Log.d("allergens","message:--"+e.message)
@@ -371,6 +455,12 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 allergenIngModelData = allergensModelData.toMutableList()
                 allergenIngModelData = allergensModelData.toMutableList()
                 allergenIngAdapter?.filterList(allergenIngModelData)
+                if (allergenIngredientViewModel.getEditStatus().equals("")){
+                    binding!!.relMoreButton.visibility=View.VISIBLE
+                }else{
+                    binding!!.relMoreButton.visibility=View.GONE
+                }
+
 //                allergenIngAdapter = AdapterAllergensIngItem(allergensModelData, requireActivity(), this)
 //                binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
             }
@@ -432,5 +522,16 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 status = ""
                 binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             }
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        binding!!.etAllergensIngSearchBar.addTextChangedListener(textListener)
+    }
+
+    override fun onPause() {
+        binding!!.etAllergensIngSearchBar.removeTextChangedListener(textListener)
+        super.onPause()
     }
 }

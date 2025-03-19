@@ -181,4 +181,7 @@ dependencies {
     implementation ("androidx.camera:camera-view:1.4.1")
     implementation ("androidx.camera:camera-extensions:1.4.1")
     implementation ("com.google.guava:guava:32.0.1-jre")
+
+
+    implementation ("com.hbb20:ccp:2.6.0")
 }

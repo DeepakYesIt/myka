@@ -10,13 +10,19 @@ import javax.inject.Inject
 class DislikeIngredientsViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
     private var dislikeIngLocalData: MutableList<DislikedIngredientsModelData>?=null
+    private var value: String=""
 
     suspend fun getDislikeIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?){
         repository.getDislikeIngredients({ successCallback(it) },itemCount)
     }
 
-    fun setDislikeIngData(data: MutableList<DislikedIngredientsModelData>) {
+    suspend fun getDislikeSearchIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?,type:String){
+        repository.getDislikeSearchIngredients({ successCallback(it) },itemCount,type)
+    }
+
+    fun setDislikeIngData(data: MutableList<DislikedIngredientsModelData>,value:String) {
         dislikeIngLocalData=data
+        this.value=value
     }
 
     // Method to clear data
@@ -29,8 +35,16 @@ class DislikeIngredientsViewModel @Inject constructor(private val repository: Ma
         return dislikeIngLocalData
     }
 
+    fun getEditStatus(): String? {
+        return value
+    }
+
     suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){
         repository.userPreferencesApi{ successCallback(it) }
+    }
+
+    suspend fun userPreferencesDislikeApi(successCallback: (response: NetworkResult<String>) -> Unit,dislikeSearch:String?, dislikeum:String?){
+        repository.userPreferencesDislikeApi({ successCallback(it) },dislikeSearch,dislikeum)
     }
 
     suspend fun updateDislikedIngredientsApi(successCallback: (response: NetworkResult<String>) -> Unit,dislikeId: List<String>?){

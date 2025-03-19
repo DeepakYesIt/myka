@@ -230,4 +230,12 @@
 
     </RelativeLayout>
 
+    <com.mykaimeal.planner.commonworkutils.RSLoadingView
+        android:id="@+id/lay_progess"
+        android:layout_width="@dimen/_100sdp"
+        android:layout_height="@dimen/_100sdp"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"/>
+
 </RelativeLayout>
