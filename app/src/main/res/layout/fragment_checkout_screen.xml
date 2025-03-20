@@ -6,59 +6,60 @@
     android:layout_height="match_parent"
     tools:context=".fragment.mainfragment.commonscreen.checkoutscreen.CheckoutScreenFragment">
 
+    <RelativeLayout
+        android:id="@+id/rlHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imageBackIcon"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/_4sdp"
+            android:src="@drawable/back_icon"
+            app:tint="@color/black" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:fontFamily="@font/montserrat_medium"
+            android:text="Checkout"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_13ssp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/rlHeader"
+        android:layout_marginTop="@dimen/_8sdp"
         android:fillViewport="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <RelativeLayout
-                android:id="@+id/rlHeader"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_20sdp"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/imageBackIcon"
-                    android:layout_width="@dimen/_18sdp"
-                    android:layout_height="@dimen/_20sdp"
-                    android:layout_centerVertical="true"
-                    android:padding="@dimen/_4sdp"
-                    android:src="@drawable/back_icon"
-                    app:tint="@color/black" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:layout_marginEnd="@dimen/_10sdp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:text="Checkout"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_13ssp"
-                    android:textStyle="bold" />
-
-            </RelativeLayout>
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/relCardView"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_150sdp"
-                android:layout_marginTop="@dimen/_15sdp"
-                app:cardCornerRadius="@dimen/_10sdp"
                 android:layout_marginHorizontal="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_15sdp"
                 android:background="@color/grey3"
-                android:layout_below="@+id/rlHeader">
+                app:cardCornerRadius="@dimen/_10sdp">
 
                 <com.google.android.gms.maps.MapView
                     android:id="@+id/mapView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
 
             </androidx.cardview.widget.CardView>
 
@@ -74,33 +75,33 @@
                     android:id="@+id/imageHome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/home_icon"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="@dimen/_12sdp"
+                    android:src="@drawable/home_icon"
                     app:tint="@color/orange" />
 
                 <TextView
                     android:id="@+id/tvSetType"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/light_black"
-                    android:layout_toEndOf="@+id/imageHome"
                     android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_toEndOf="@+id/imageHome"
                     android:fontFamily="@font/montserrat_semibold"
                     android:text="Set Home"
-                    android:textSize="@dimen/_13sdp"/>
+                    android:textColor="@color/light_black"
+                    android:textSize="@dimen/_13sdp" />
 
                 <TextView
                     android:id="@+id/tvAddressNames"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/light_black"
+                    android:layout_below="@+id/tvSetType"
+                    android:layout_marginStart="@dimen/_15sdp"
                     android:layout_toEndOf="@+id/imageHome"
                     android:fontFamily="@font/montserrat"
-                    android:layout_marginStart="@dimen/_15sdp"
-                    android:layout_below="@+id/tvSetType"
                     android:text="123 Barn Crescent, 975478"
-                    android:textSize="@dimen/_11sdp"/>
+                    android:textColor="@color/light_black"
+                    android:textSize="@dimen/_11sdp" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -108,7 +109,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="@dimen/_5sdp"
-                    android:src="@drawable/forward_icon"/>
+                    android:src="@drawable/forward_icon" />
 
             </RelativeLayout>
 
@@ -116,10 +117,10 @@
                 android:id="@+id/viewHomes"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_1sdp"
-                android:background="@color/greysss"
+                android:layout_below="@+id/relSetHomes"
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:layout_marginTop="@dimen/_15sdp"
-                android:layout_below="@+id/relSetHomes"/>
+                android:background="@color/greysss" />
 
             <RelativeLayout
                 android:id="@+id/relSetMeetAtDoor"
@@ -133,33 +134,33 @@
                     android:id="@+id/imageMeet"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/user_icon_images"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="@dimen/_12sdp"
+                    android:src="@drawable/user_icon_images"
                     app:tint="@color/orange" />
 
                 <TextView
                     android:id="@+id/tvSetDoorStep"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:layout_toEndOf="@+id/imageMeet"
                     android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_toEndOf="@+id/imageMeet"
                     android:fontFamily="@font/montserrat_semibold"
                     android:text="Meet at my door"
-                    android:textSize="@dimen/_13sdp"/>
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
 
                 <TextView
                     android:id="@+id/tvDeliveryInstructions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/light_green"
+                    android:layout_below="@+id/tvSetDoorStep"
+                    android:layout_marginStart="@dimen/_15sdp"
                     android:layout_toEndOf="@+id/imageMeet"
                     android:fontFamily="@font/montserrat"
-                    android:layout_marginStart="@dimen/_15sdp"
-                    android:layout_below="@+id/tvSetDoorStep"
                     android:text="Add delivery instructions"
-                    android:textSize="@dimen/_11sdp"/>
+                    android:textColor="@color/light_green"
+                    android:textSize="@dimen/_11sdp" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -167,7 +168,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="@dimen/_5sdp"
-                    android:src="@drawable/forward_icon"/>
+                    android:src="@drawable/forward_icon" />
 
             </RelativeLayout>
 
@@ -175,10 +176,10 @@
                 android:id="@+id/viewDoorStep"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_1sdp"
-                android:background="@color/greysss"
+                android:layout_below="@+id/relSetMeetAtDoor"
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:layout_marginTop="@dimen/_15sdp"
-                android:layout_below="@+id/relSetMeetAtDoor"/>
+                android:background="@color/greysss" />
 
             <RelativeLayout
                 android:id="@+id/relAddNumber"
@@ -192,21 +193,21 @@
                     android:id="@+id/imageCall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/image_call"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="@dimen/_12sdp"
+                    android:src="@drawable/image_call"
                     app:tint="@color/orange" />
 
                 <TextView
                     android:id="@+id/tvAddNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/light_green"
-                    android:layout_toEndOf="@+id/imageCall"
                     android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_toEndOf="@+id/imageCall"
                     android:fontFamily="@font/montserrat_semibold"
                     android:text="Add number"
-                    android:textSize="@dimen/_13sdp"/>
+                    android:textColor="@color/light_green"
+                    android:textSize="@dimen/_13sdp" />
 
 
                 <ImageView
@@ -215,7 +216,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="@dimen/_5sdp"
-                    android:src="@drawable/forward_icon"/>
+                    android:src="@drawable/forward_icon" />
 
             </RelativeLayout>
 
@@ -223,46 +224,46 @@
                 android:id="@+id/vie"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_1sdp"
-                android:background="@color/greysss"
+                android:layout_below="@+id/relAddNumber"
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:layout_marginTop="@dimen/_15sdp"
-                android:layout_below="@+id/relAddNumber" />
+                android:background="@color/greysss" />
 
             <RelativeLayout
                 android:id="@+id/relDeliveryTimes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/vie"
                 android:layout_marginHorizontal="@dimen/_15sdp"
-                android:layout_marginTop="@dimen/_15sdp"
-                android:layout_below="@+id/vie">
+                android:layout_marginTop="@dimen/_15sdp">
 
                 <ImageView
                     android:id="@+id/imagesTimer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/_12sdp"
-                    android:src="@drawable/image_timer"/>
+                    android:src="@drawable/image_timer" />
 
                 <TextView
                     android:id="@+id/tvDeliveryTimes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/light_black"
-                    android:layout_toEndOf="@+id/imagesTimer"
                     android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_toEndOf="@+id/imagesTimer"
                     android:fontFamily="@font/montserrat_semibold"
                     android:text="Delivery time"
-                    android:textSize="@dimen/_13sdp"/>
+                    android:textColor="@color/light_black"
+                    android:textSize="@dimen/_13sdp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/light_black"
                     android:layout_alignParentEnd="true"
-                    android:fontFamily="@font/montserrat"
                     android:layout_marginStart="@dimen/_15sdp"
+                    android:fontFamily="@font/montserrat"
                     android:text="15-35 min"
-                    android:textSize="@dimen/_11sdp"/>
+                    android:textColor="@color/light_black"
+                    android:textSize="@dimen/_11sdp" />
 
             </RelativeLayout>
 
@@ -270,39 +271,39 @@
                 android:id="@+id/relStandardTimers"
                 android:layout_width="@dimen/_100sdp"
                 android:layout_height="@dimen/_80sdp"
-                android:background="@drawable/line_image_bg"
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_below="@+id/relDeliveryTimes"
                 android:layout_marginStart="@dimen/_25sdp"
-                android:layout_below="@+id/relDeliveryTimes">
+                android:layout_marginTop="@dimen/_15sdp"
+                android:background="@drawable/line_image_bg">
 
                 <TextView
                     android:id="@+id/tvStandard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
                     android:layout_marginStart="@dimen/_7sdp"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:fontFamily="@font/montserrat_semibold"
                     android:text="Standard"
-                    android:textSize="@dimen/_13sdp"/>
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@+id/tvStandard"
                     android:layout_marginStart="@dimen/_7sdp"
                     android:layout_marginTop="@dimen/_10sdp"
-                    android:src="@drawable/image_standard"/>
+                    android:layout_toEndOf="@+id/tvStandard"
+                    android:src="@drawable/image_standard" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/light_black"
                     android:layout_below="@+id/tvStandard"
-                    android:fontFamily="@font/montserrat"
                     android:layout_marginStart="@dimen/_7sdp"
+                    android:fontFamily="@font/montserrat"
                     android:text="15-35 min"
-                    android:textSize="@dimen/_11sdp"/>
+                    android:textColor="@color/light_black"
+                    android:textSize="@dimen/_11sdp" />
 
             </RelativeLayout>
 
@@ -310,28 +311,28 @@
                 android:id="@+id/viewStandard"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_1sdp"
-                android:background="@color/greysss"
+                android:layout_below="@+id/relStandardTimers"
                 android:layout_marginTop="@dimen/_15sdp"
-                android:layout_below="@+id/relStandardTimers" />
+                android:background="@color/greysss" />
 
             <TextView
                 android:id="@+id/tvOrderSummary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/light_black"
-                android:layout_marginStart="@dimen/_20sdp"
                 android:layout_below="@+id/viewStandard"
+                android:layout_marginStart="@dimen/_20sdp"
                 android:fontFamily="@font/montserrat_semibold"
                 android:text="Order summary"
-                android:textSize="@dimen/_15sdp"/>
+                android:textColor="@color/light_black"
+                android:textSize="@dimen/_15sdp" />
 
             <RelativeLayout
                 android:id="@+id/relSuperMarketsItems"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_50sdp"
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_below="@+id/tvOrderSummary"
                 android:layout_marginHorizontal="@dimen/_25sdp"
-                android:layout_below="@+id/tvOrderSummary">
+                android:layout_marginTop="@dimen/_15sdp">
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/imageWelmart"
@@ -345,34 +346,34 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@+id/imageWelmart"
-                    android:layout_marginStart="@dimen/_10sdp">
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:layout_toEndOf="@+id/imageWelmart">
 
                     <TextView
                         android:id="@+id/tvSuperMarketName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Welmart"
                         android:layout_marginTop="@dimen/_5sdp"
-                        android:textSize="@dimen/_13sdp"
                         android:fontFamily="@font/montserrat_semibold"
-                        android:textColor="@color/black"/>
+                        android:text="Welmart"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_13sdp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/tvSuperMarketName"
                         android:text="8 items"
-                        android:textSize="@dimen/_13sdp"
-                        android:textColor="#ADADAD"/>
+                        android:textColor="#ADADAD"
+                        android:textSize="@dimen/_13sdp" />
 
                     <ImageView
                         android:id="@+id/imageDown"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/drop_down_icon"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
+                        android:src="@drawable/drop_down_icon"
                         app:tint="#ADADAD" />
 
                 </RelativeLayout>
@@ -384,8 +385,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/relSuperMarketsItems"
-                android:layout_marginTop="@dimen/_10sdp"
-                android:layout_marginHorizontal="@dimen/_20sdp">
+                android:layout_marginHorizontal="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_10sdp">
 
                 <RelativeLayout
                     android:id="@+id/relRecipes"
@@ -458,19 +459,19 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_toEndOf="@+id/textTax"
                         android:layout_marginStart="@dimen/_4sdp"
-                        android:src="@drawable/ic_info_icon"/>
+                        android:layout_toEndOf="@+id/textTax"
+                        android:src="@drawable/ic_info_icon" />
 
-<!--                    <TextView-->
-<!--                        android:id="@+id/textTaxPrice"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:layout_alignParentEnd="true"-->
-<!--                        android:fontFamily="@font/poppins"-->
-<!--                        android:paddingHorizontal="@dimen/_20sdp"-->
-<!--                        android:text="$00"-->
-<!--                        android:textColor="#4A4A4A" />-->
+                    <!--                    <TextView-->
+                    <!--                        android:id="@+id/textTaxPrice"-->
+                    <!--                        android:layout_width="wrap_content"-->
+                    <!--                        android:layout_height="wrap_content"-->
+                    <!--                        android:layout_alignParentEnd="true"-->
+                    <!--                        android:fontFamily="@font/poppins"-->
+                    <!--                        android:paddingHorizontal="@dimen/_20sdp"-->
+                    <!--                        android:text="$00"-->
+                    <!--                        android:textColor="#4A4A4A" />-->
 
                 </RelativeLayout>
 
@@ -541,8 +542,8 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_semibold"
                         android:text="Total"
-                        android:textSize="@dimen/_12sdp"
-                        android:textColor="@color/black" />
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_12sdp" />
 
                     <TextView
                         android:id="@+id/textTotalAmounts"
@@ -552,8 +553,8 @@
                         android:fontFamily="@font/montserrat_semibold"
                         android:paddingHorizontal="@dimen/_20sdp"
                         android:text="$00"
-                        android:textSize="@dimen/_12sdp"
-                        android:textColor="@color/black" />
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_12sdp" />
 
                 </RelativeLayout>
 
@@ -563,10 +564,10 @@
                 android:id="@+id/cardViewPayment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="@dimen/_10sdp"
+                android:layout_below="@+id/relBillingDetailAmount"
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:elevation="@dimen/_3sdp"
-                android:layout_below="@+id/relBillingDetailAmount">
+                app:cardCornerRadius="@dimen/_10sdp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -581,69 +582,69 @@
                             android:id="@+id/tvPaymentMethod"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/black"
                             android:layout_marginStart="@dimen/_12sdp"
                             android:layout_marginTop="@dimen/_10sdp"
                             android:fontFamily="@font/montserrat_semibold"
                             android:text="Payment Method"
-                            android:textSize="@dimen/_12sdp"/>
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_12sdp" />
 
                         <ImageView
                             android:id="@+id/imageAmexCard"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_toStartOf="@+id/imageMasterCard"
-                            android:layout_marginEnd="@dimen/_10sdp"
                             android:layout_marginTop="@dimen/_10sdp"
-                            android:src="@drawable/amex_payment_icon"/>
+                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:layout_toStartOf="@+id/imageMasterCard"
+                            android:src="@drawable/amex_payment_icon" />
 
                         <ImageView
                             android:id="@+id/imageMasterCard"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/_10sdp"
                             android:layout_marginTop="@dimen/_10sdp"
+                            android:layout_marginEnd="@dimen/_10sdp"
                             android:layout_toStartOf="@+id/imageVisaCard"
-                            android:src="@drawable/mastercard_payment_icon"/>
+                            android:src="@drawable/mastercard_payment_icon" />
 
                         <ImageView
                             android:id="@+id/imageVisaCard"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:layout_marginEnd="@dimen/_10sdp"
                             android:layout_marginTop="@dimen/_10sdp"
-                            android:src="@drawable/visa_payment_icon"/>
+                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:src="@drawable/visa_payment_icon" />
                     </RelativeLayout>
 
                     <RelativeLayout
                         android:id="@+id/relDebitCreditCard"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/_15sdp"
-                        android:layout_below="@+id/relPaymentMethods">
+                        android:layout_below="@+id/relPaymentMethods"
+                        android:layout_marginTop="@dimen/_15sdp">
 
                         <TextView
                             android:id="@+id/tvDebitCreditCard"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/black"
                             android:layout_marginStart="@dimen/_15sdp"
                             android:fontFamily="@font/montserrat_semibold"
                             android:text="Debit/Credit Card"
-                            android:textSize="@dimen/_12sdp"/>
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_12sdp" />
 
                         <TextView
                             android:id="@+id/tvAddCard"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/light_green"
                             android:layout_alignParentEnd="true"
-                            android:layout_marginEnd="@dimen/_10sdp"
                             android:layout_marginStart="@dimen/_15sdp"
+                            android:layout_marginEnd="@dimen/_10sdp"
                             android:fontFamily="@font/montserrat_medium"
                             android:text="Add card"
-                            android:textSize="@dimen/_13sdp"/>
+                            android:textColor="@color/light_green"
+                            android:textSize="@dimen/_13sdp" />
 
                     </RelativeLayout>
 
@@ -651,16 +652,16 @@
                         android:id="@+id/relCardDetails"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_below="@+id/relDebitCreditCard"
                         android:layout_marginStart="@dimen/_15sdp"
                         android:layout_marginTop="@dimen/_10sdp"
-                        android:visibility="gone"
-                        android:layout_below="@+id/relDebitCreditCard">
+                        android:visibility="gone">
 
                         <ImageView
                             android:id="@+id/idVisaImages"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/visa_rounded_image"/>
+                            android:src="@drawable/visa_rounded_image" />
 
                         <RelativeLayout
                             android:layout_width="wrap_content"
@@ -674,16 +675,16 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="visa"
-                                android:textSize="@dimen/_13sdp"
-                                android:textColor="@color/black"/>
+                                android:textColor="@color/black"
+                                android:textSize="@dimen/_13sdp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="**** **** **** 4242"
-                                android:textSize="@dimen/_13sdp"
                                 android:layout_below="@+id/tvVisaName"
-                                android:textColor="@color/black"/>
+                                android:text="**** **** **** 4242"
+                                android:textColor="@color/black"
+                                android:textSize="@dimen/_13sdp" />
 
                         </RelativeLayout>
 
@@ -695,7 +696,7 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="@dimen/_10sdp"
-                            android:src="@drawable/radio_uncheck_gray_icon"/>
+                            android:src="@drawable/radio_uncheck_gray_icon" />
 
 
                     </RelativeLayout>
@@ -705,27 +706,27 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/relCardDetails"
-                        android:orientation="vertical"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         android:layout_marginStart="@dimen/_15sdp"
-                        android:layout_marginTop="@dimen/_10sdp"/>
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:orientation="vertical"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
                     <RelativeLayout
                         android:id="@+id/relPayWallet"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/_15sdp"
-                        android:layout_below="@+id/rcyDebitCreditCard">
+                        android:layout_below="@+id/rcyDebitCreditCard"
+                        android:layout_marginTop="@dimen/_15sdp">
 
                         <TextView
                             android:id="@+id/tvPayWallet"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/black"
                             android:layout_marginStart="@dimen/_15sdp"
                             android:fontFamily="@font/montserrat_semibold"
                             android:text="Pay Via Wallet"
-                            android:textSize="@dimen/_13sdp"/>
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_13sdp" />
 
                     </RelativeLayout>
 
@@ -733,21 +734,21 @@
                         android:id="@+id/relGooglePay"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginVertical="@dimen/_15sdp"
-                        android:layout_below="@+id/relPayWallet">
+                        android:layout_below="@+id/relPayWallet"
+                        android:layout_marginVertical="@dimen/_15sdp">
 
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/_15sdp"
-                            android:src="@drawable/logos_google_pay_icon"/>
+                            android:src="@drawable/logos_google_pay_icon" />
 
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_marginEnd="@dimen/_10sdp"
-                            android:src="@drawable/radio_uncheck_gray_icon"/>
+                            android:src="@drawable/radio_uncheck_gray_icon" />
 
                     </RelativeLayout>
 
@@ -759,11 +760,11 @@
                 android:id="@+id/textPayBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/cardViewPayment"
+                android:layout_marginHorizontal="@dimen/_15sdp"
                 android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginBottom="@dimen/_20sdp"
-                android:layout_below="@+id/cardViewPayment"
                 android:background="@drawable/button_bg"
-                android:layout_marginHorizontal="@dimen/_15sdp"
                 android:fontFamily="@font/poppins"
                 android:paddingVertical="@dimen/_10sdp"
                 android:text="Pay"

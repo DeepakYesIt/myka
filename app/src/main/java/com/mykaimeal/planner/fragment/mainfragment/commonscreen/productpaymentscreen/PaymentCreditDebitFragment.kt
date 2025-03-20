@@ -52,7 +52,6 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
         // Inflate the layout for this fragment
         binding = FragmentPaymentCreditDebitBinding.inflate(layoutInflater, container, false)
 
-
         commonWorkUtils = CommonWorkUtils(requireActivity())
         paymentCreditDebitViewModel = ViewModelProvider(requireActivity())[PaymentCreditDebitViewModel::class.java]
 
@@ -107,6 +106,10 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }
+        }
+
+        binding.textAddCardNumber.setOnClickListener{
+            binding.cvDebitCard3.visibility=View.VISIBLE
         }
     }
 
@@ -167,12 +170,15 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
     }
 
     private fun cardSaveApi() {
+        BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             paymentCreditDebitViewModel.addCardMealMeUrl({
                 BaseApplication.dismissMe()
                 handleApiAddCardResponse(it)
-            }, binding.etCardNumber.text.toString().trim(),binding.etMonth.toString().trim(),
-                binding.etYear.toString().trim(),binding.etCVVNumber.text.toString().trim())
+            }, binding.etCardNumber.text.toString().trim(),
+                binding.etMonth.text.toString().trim(),
+                binding.etYear.text.toString().trim(),
+                binding.etCVVNumber.text.toString().trim())
         }
     }
 
@@ -225,34 +231,36 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
         // Get the current calendar instance
         val calendar = Calendar.getInstance()
         val currentMonth = calendar.get(Calendar.MONTH)
+
         // Array of month names
         val monthNames = arrayOf(
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         )
+
         // Create a dialog
         val dialog = AlertDialog.Builder(requireContext())
         val dialogView = layoutInflater.inflate(R.layout.dialog_month_picker, null)
-        // Get references to the NumberPickers in the custom dialog layout
+
+        // Get references to the NumberPicker
         val monthPicker = dialogView.findViewById<NumberPicker>(R.id.Picker)
+
         // Configure the month picker
         monthPicker.minValue = 0
         monthPicker.maxValue = 11
         monthPicker.displayedValues = monthNames
         monthPicker.value = currentMonth
+
         // Set the custom view in the dialog
         dialog.setView(dialogView)
             .setPositiveButton("OK") { _, _ ->
+                val selectedMonth = monthPicker.value + 1 // Months are 0-based, so add 1
+                val formattedMonth = String.format("%02d", selectedMonth) // Format to two digits
 
-                val selectedMonth = monthPicker.value
-                month = monthPicker.value + 1
-                // Update the TextView with the selected month name and year
-                binding.etMonth.text = monthNames[selectedMonth]
-                Toast.makeText(
-                    requireContext(),
-                    "selectedMonth :- $selectedMonth",
-                    Toast.LENGTH_LONG
-                ).show()
+                // Update the TextView with the formatted month number
+                binding.etMonth.text = formattedMonth
+
+//                Toast.makeText(requireContext(), "Selected Month: $formattedMonth", Toast.LENGTH_LONG).show()
             }
             .setNegativeButton("Cancel", null)
 

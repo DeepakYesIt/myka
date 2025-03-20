@@ -326,7 +326,6 @@
                                 android:layout_marginEnd="@dimen/_5sdp"
                                 android:layout_weight="1"
                                 android:background="@drawable/edittext_bg"
-                                android:drawableEnd="@drawable/ic_drop_down"
                                 android:maxLines="1"
                                 android:maxLength="2"
                                 android:paddingHorizontal="@dimen/_10sdp"
@@ -334,7 +333,8 @@
                                 android:text="Month"
                                 android:textColor="#8B8B8B"
                                 android:textColorHint="#8B8B8B"
-                                android:textSize="@dimen/_10ssp" />
+                                android:textSize="@dimen/_10ssp"
+                                app:drawableEndCompat="@drawable/ic_drop_down" />
 
                             <TextView
                                 android:id="@+id/etYear"
@@ -343,7 +343,6 @@
                                 android:layout_marginStart="@dimen/_5sdp"
                                 android:layout_weight="1"
                                 android:background="@drawable/edittext_bg"
-                                android:drawableEnd="@drawable/ic_drop_down"
                                 android:maxLines="1"
                                 android:maxLength="4"
                                 android:paddingHorizontal="@dimen/_10sdp"
@@ -351,7 +350,8 @@
                                 android:text="Year"
                                 android:textColor="#8B8B8B"
                                 android:textColorHint="#8B8B8B"
-                                android:textSize="@dimen/_10ssp" />
+                                android:textSize="@dimen/_10ssp"
+                                app:drawableEndCompat="@drawable/ic_drop_down" />
 
                         </LinearLayout>
 
