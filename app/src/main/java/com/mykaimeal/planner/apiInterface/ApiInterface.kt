@@ -21,21 +21,27 @@ interface ApiInterface {
     @GET(ApiEndPoint.favouriteCuisines)
     suspend fun getFavouriteCuisines(): Response<JsonObject>
 
-   /* @GET(ApiEndPoint.dislikeIngredients)
-    suspend fun getDislikeIngredients(): Response<JsonObject>*/
+    /* @GET(ApiEndPoint.dislikeIngredients)
+     suspend fun getDislikeIngredients(): Response<JsonObject>*/
 
 
-    @GET(ApiEndPoint.dislikeIngredients+"/{value}")
+    @GET(ApiEndPoint.dislikeIngredients + "/{value}")
     suspend fun getDislikeIngredients(@Path("value") value: String?): Response<JsonObject>
 
-    @GET(ApiEndPoint.dislikeIngredients+"/{value}/{value1}")
-    suspend fun getDislikeSearchIngredients(@Path("value") country:String?, @Path("value1") state :String?) : Response<JsonObject>
+    @GET(ApiEndPoint.dislikeIngredients + "/{value}/{value1}")
+    suspend fun getDislikeSearchIngredients(
+        @Path("value") country: String?,
+        @Path("value1") state: String?
+    ): Response<JsonObject>
 
-    @GET(ApiEndPoint.allergensIngredients+"/{value}")
+    @GET(ApiEndPoint.allergensIngredients + "/{value}")
     suspend fun getAllergensIngredients(@Path("value") value: String?): Response<JsonObject>
 
-    @GET(ApiEndPoint.allergensIngredients+"/{value}/{value1}")
-    suspend fun getAllergensSearchIngredients(@Path("value") country:String?, @Path("value1") state :String?) : Response<JsonObject>
+    @GET(ApiEndPoint.allergensIngredients + "/{value}/{value1}")
+    suspend fun getAllergensSearchIngredients(
+        @Path("value") country: String?,
+        @Path("value1") state: String?
+    ): Response<JsonObject>
 
     @GET(ApiEndPoint.mealRoutine)
     suspend fun getMealRoutine(): Response<JsonObject>
@@ -394,11 +400,17 @@ interface ApiInterface {
 
     @FormUrlEncoded
     @POST(ApiEndPoint.getUserPreferences)
-    suspend fun userPreferencesDislikeApi(@Field("dislike_search") dislike_search:String?, @Field("dislike_num") dislike_num :String?): Response<JsonObject>
+    suspend fun userPreferencesDislikeApi(
+        @Field("dislike_search") dislike_search: String?,
+        @Field("dislike_num") dislike_num: String?
+    ): Response<JsonObject>
 
     @FormUrlEncoded
     @POST(ApiEndPoint.getUserPreferences)
-    suspend fun userPreferencesAllergiesApi(@Field("allergic_search") country:String?, @Field("allergic_num") state :String?): Response<JsonObject>
+    suspend fun userPreferencesAllergiesApi(
+        @Field("allergic_search") country: String?,
+        @Field("allergic_num") state: String?
+    ): Response<JsonObject>
 
     @FormUrlEncoded
     @POST(ApiEndPoint.updateUserPreferences)
@@ -575,31 +587,37 @@ interface ApiInterface {
 
     @FormUrlEncoded
     @POST(ApiEndPoint.superMarketsUrl)
-    suspend fun getSuperMarket(@Field("latitude") latitude:String?,
-                               @Field("longitude") longitude:String?): Response<JsonObject>
+    suspend fun getSuperMarket(
+        @Field("latitude") latitude: String?,
+        @Field("longitude") longitude: String?
+    ): Response<JsonObject>
 
 
     @FormUrlEncoded
     @POST(ApiEndPoint.subscriptionGoogleUrl)
-    suspend fun subscriptionGoogle(@Field("purchase_token") purchaseToken:String?,
-                               @Field("subscription_id") subscriptionId:String?): Response<JsonObject>
-
+    suspend fun subscriptionGoogle(
+        @Field("purchase_token") purchaseToken: String?,
+        @Field("subscription_id") subscriptionId: String?
+    ): Response<JsonObject>
 
 
     @FormUrlEncoded
     @POST(ApiEndPoint.getBasketListUrl)
-    suspend fun getBasketListUrl(@Field("store_id") storeId:String?): Response<JsonObject>
+    suspend fun getBasketListUrl(@Field("store_id") storeId: String?): Response<JsonObject>
 
     @POST(ApiEndPoint.getYourRecipeUrl)
     suspend fun getYourRecipeUrl(): Response<JsonObject>
 
     @FormUrlEncoded
     @POST(ApiEndPoint.getSendSmsUrl)
-    suspend fun sendOtpUrl(@Field("phone") phone:String?): Response<JsonObject>
+    suspend fun sendOtpUrl(@Field("phone") phone: String?): Response<JsonObject>
 
     @FormUrlEncoded
     @POST(ApiEndPoint.addPhoneUrl)
-    suspend fun addPhoneUrl(@Field("phone") phone:String?,@Field("otp") otp:String?): Response<JsonObject>
+    suspend fun addPhoneUrl(
+        @Field("phone") phone: String?,
+        @Field("otp") otp: String?
+    ): Response<JsonObject>
 
 
     @POST(ApiEndPoint.getAddressUrl)
@@ -608,49 +626,58 @@ interface ApiInterface {
     @POST(ApiEndPoint.getNotesUrl)
     suspend fun getNotesUrl(): Response<JsonObject>
 
-   @POST(ApiEndPoint.getShoppingListUrl)
+    @POST(ApiEndPoint.getShoppingListUrl)
     suspend fun getShoppingListUrl(): Response<JsonObject>
 
     @FormUrlEncoded
     @POST(ApiEndPoint.addNotesUrl)
-    suspend fun addNotesUrl(@Field("pickup") pickup:String?,
-                            @Field("description") description:String?):Response<JsonObject>
+    suspend fun addNotesUrl(
+        @Field("pickup") pickup: String?,
+        @Field("description") description: String?
+    ): Response<JsonObject>
 
     @POST(ApiEndPoint.getCheckoutUrl)
-    suspend fun getCheckoutScreenUrl():Response<JsonObject>
+    suspend fun getCheckoutScreenUrl(): Response<JsonObject>
 
 
     @POST(ApiEndPoint.getOrderProductUrl)
-    suspend fun getOrderProductUrl():Response<JsonObject>
+    suspend fun getOrderProductUrl(): Response<JsonObject>
 
     @POST(ApiEndPoint.getStoreProductsUrl)
-    suspend fun getStoreProductUrl():Response<JsonObject>
+    suspend fun getStoreProductUrl(): Response<JsonObject>
 
 
-   @POST(ApiEndPoint.getCardMealMeUrl)
-    suspend fun getCardMealMeUrl():Response<JsonObject>
+    @POST(ApiEndPoint.getCardMealMeUrl)
+    suspend fun getCardMealMeUrl(): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.getProductsUrl)
+    suspend fun getProductsUrl(@Field("query") query:String?): Response<JsonObject>
 
     @FormUrlEncoded
     @POST(ApiEndPoint.addCardMealMeUrl)
-    suspend fun addCardMealMeUrl(@Field("card_number") card_number:String?,
-                                 @Field("exp_month") exp_month:String?,
-                                 @Field("exp_year") exp_year:String?,
-                                 @Field("cvv") cvv:String?
-                                 ):Response<JsonObject>
+    suspend fun addCardMealMeUrl(
+        @Field("card_number") card_number: String?,
+        @Field("exp_month") exp_month: String?,
+        @Field("exp_year") exp_year: String?,
+        @Field("cvv") cvv: String?
+    ): Response<JsonObject>
 
     @GET(ApiEndPoint.addAddressUrl)
-    suspend fun addAddressUrl(@Query("latitude") latitude:String?,
-                               @Query("longitude") longitude:String?,
-                               @Query("street_name") streetName:String?,
-                               @Query("street_num") streetNum:String?,
-                               @Query("apart_num") apartNum:String?,
-                               @Query("city") city:String?,
-                               @Query("country") country:String?,
-                               @Query("zipcode") zipcode:String?,
-                               @Query("primary") primary:String?,
-                               @Query("id") id:String?,
-                               @Query("type") type:String?,
-                                   ): Response<JsonObject>
+    suspend fun addAddressUrl(
+        @Query("latitude") latitude: String?,
+        @Query("longitude") longitude: String?,
+        @Query("street_name") streetName: String?,
+        @Query("street_num") streetNum: String?,
+        @Query("apart_num") apartNum: String?,
+        @Query("city") city: String?,
+        @Query("country") country: String?,
+        @Query("zipcode") zipcode: String?,
+        @Query("primary") primary: String?,
+        @Query("id") id: String?,
+        @Query("type") type: String?,
+    ): Response<JsonObject>
 
     /*   @POST("v1/images:annotate")
        fun annotateImage(@Body request: VisionRequest): Call<VisionResponse>*/

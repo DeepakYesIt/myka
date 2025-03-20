@@ -341,7 +341,7 @@
         tools:layout="@layout/fragment_tesco_cart_item_fragment" />
     <fragment
         android:id="@+id/basketProductDetailsFragment"
-        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.BasketProductDetailsFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.BasketProductDetailsFragment"
         android:label="fragment_basket_product_details"
         tools:layout="@layout/fragment_basket_product_details" />
     <fragment

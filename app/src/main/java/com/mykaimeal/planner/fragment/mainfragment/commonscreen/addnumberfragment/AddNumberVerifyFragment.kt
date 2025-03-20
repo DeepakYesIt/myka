@@ -66,6 +66,58 @@ class AddNumberVerifyFragment : Fragment() {
             findNavController().navigateUp()
         }
 
+
+//        binding!!.relPhoneNumber.setOnClickListener {
+//            if (BaseApplication.isOnline(requireActivity())) {
+//                fetchCountries()
+//            } else {
+//                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+//            }
+//        }
+
+//        binding!!.etRegPhone.addTextChangedListener(object : TextWatcher {
+//            @SuppressLint("ResourceAsColor")
+//            override fun afterTextChanged(s: Editable?) {
+//                val input = s.toString()
+////                // Enable the button only if the input is different from the last entered number
+////                binding!!.tvVerify.isClickable = input.isNotEmpty() && input != lastNumber
+////                // Update lastNumber when textView becomes clickable
+////                if (binding!!.tvVerify.isClickable) {
+////                    lastNumber = input
+////                }
+//
+//                if (input.length<=9){
+//                    binding!!.tvVerify.isClickable=true
+//                    binding!!.tvVerify.isEnabled=true
+//                    binding!!.tvVerify.setTextColor(Color.parseColor("#D7D7D7"))
+//                }else{
+//                    binding!!.tvVerify.isClickable=false
+//                    binding!!.tvVerify.isEnabled=false
+//                    binding!!.tvVerify.setTextColor(Color.parseColor("#06C169"))
+//                }
+//            }
+//
+//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+//
+//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+//        })
+//
+//
+//
+//
+//
+//        binding!!.tvVerify.setOnClickListener {
+//            if (binding!!.tvVerify.isClickable == true){
+//                if (validate()) {
+//                    if (BaseApplication.isOnline(requireActivity())) {
+//                        getOtpUrl()
+//                    } else {
+//                        BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+//                    }
+//                }
+//            }
+//        }
+
         binding?.etRegPhone?.addTextChangedListener(object : TextWatcher {
             @SuppressLint("ResourceAsColor")
             override fun afterTextChanged(s: Editable?) {
@@ -107,16 +159,6 @@ class AddNumberVerifyFragment : Fragment() {
         }
 
 
-        binding!!.textResend.setOnClickListener {
-            if (validate()) {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    getOtpUrl()
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            }
-        }
-
 
         binding!!.rlVerificationVerify.setOnClickListener{
             if (BaseApplication.isOnline(requireActivity())) {
@@ -147,7 +189,14 @@ class AddNumberVerifyFragment : Fragment() {
                 if (response.isSuccessful) {
                     val countryList = response.body() ?: emptyList()
                     Log.d("response ","****"+ countryList.toString())
-
+//                    for (country in countryList) {
+//                        val countryName = country.name.common
+//                        val dialCode = country.idd.root ?: ("" +
+//                                (country.idd.suffixes?.getOrNull(0) ?: ""))
+//                        val flagUrl = country.flags.png
+//
+//                        Log.d("CountryData", "Name: $countryName, Code: $dialCode, Flag: $flagUrl")
+//                    }
                     for (country in countryList) {
                         val countryName = country.name.common
                         val dialCode = if (country.idd.root != null && !country.idd.suffixes.isNullOrEmpty()) {

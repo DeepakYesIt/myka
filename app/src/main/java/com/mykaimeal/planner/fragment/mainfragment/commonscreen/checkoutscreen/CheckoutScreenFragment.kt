@@ -55,8 +55,9 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentCheckoutScreenBinding.inflate(layoutInflater, container, false)
-        checkoutScreenViewModel =
-            ViewModelProvider(requireActivity())[CheckoutScreenViewModel::class.java]
+
+        checkoutScreenViewModel = ViewModelProvider(requireActivity())[CheckoutScreenViewModel::class.java]
+
         // Load saved instance state
 //        var mapViewBundle: Bundle? = null
 //        if (savedInstanceState != null) {
@@ -251,7 +252,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
                 binding!!.tvDeliveryInstructions.setTextColor(Color.parseColor("#000000"))
             }
         }
-
 
         if (data.subtotal != null) {
             binding!!.textSubTotalPrices.text = data.subtotal.toString()

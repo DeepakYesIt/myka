@@ -105,7 +105,7 @@ class CategoryProductAdapter(
             }
 
             binding.imageSwap.setOnClickListener {
-                onItemSelectListener.itemSelect(0,"2","")
+                onItemSelectListener.itemSelect(0,product.name.toString(),product.pro_id.toString())
             }
         }
     }

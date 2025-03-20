@@ -94,4 +94,7 @@ object ApiEndPoint {
     const val addCardMealMeUrl="add-card-mealme"
 
 
+    const val getProductsUrl="products"
+
+
 }

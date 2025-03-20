@@ -362,10 +362,11 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
 
     override fun itemSelect(position: Int?, status: String?, type: String?) {
 
-        if (status == "2") {
-            findNavController().navigate(R.id.basketProductDetailsFragment)
-        }
+            val bundle = Bundle().apply {
+                putString("SwapProId",type)
+                putString("SwapProName",status)
+            }
+            findNavController().navigate(R.id.basketProductDetailsFragment,bundle)
+
     }
-
-
 }

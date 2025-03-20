@@ -17,4 +17,6 @@ class CheckoutScreenViewModel @Inject constructor(private val repository: MainRe
         repository.getCardMealMeUrl{ successCallback(it) }
     }
 
+
+
 }

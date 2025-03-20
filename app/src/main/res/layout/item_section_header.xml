@@ -6,7 +6,6 @@
     android:orientation="horizontal"
     android:padding="8dp">
 
-
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
@@ -56,7 +55,7 @@
             android:textStyle="bold"
             android:visibility="gone"
             android:textColor="#999999"
-            android:textSize="@dimen/_10ssp"
+            android: textSize="@dimen/_10ssp"
              />-->
 
         <ImageView
