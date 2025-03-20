@@ -60,7 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/layTittle"
-        android:layout_marginHorizontal="@dimen/_15sdp"
+        android:layout_marginHorizontal="@dimen/_10sdp"
         android:layout_marginTop="@dimen/_20sdp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="2" />

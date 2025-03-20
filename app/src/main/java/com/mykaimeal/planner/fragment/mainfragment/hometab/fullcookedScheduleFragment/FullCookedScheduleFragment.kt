@@ -443,11 +443,11 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
                 // TeaTime
                 if (recipesDateModel?.Teatime != null && recipesDateModel?.Teatime?.size!! > 0) {
-                    setupDragScrollForRecyclerView(binding!!.rcySearchTeaTime,"TeaTime")
+                    setupDragScrollForRecyclerView(binding!!.rcySearchTeaTime,"Brunch")
                     binding!!.llTeaTime.visibility = View.VISIBLE
                     ingredientTeaTimeAdapter = IngredientsTeaTimeAdapter(
                         recipesDateModel?.Teatime, requireActivity(), this,
-                        this, "TeaTime"
+                        this, "Brunch"
                     )
                     binding!!.rcySearchTeaTime.adapter = ingredientTeaTimeAdapter
                 } else {
@@ -825,6 +825,12 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             when (dragEvent.action) {
                 DragEvent.ACTION_DRAG_STARTED -> {
                     binding!!.scroll.fullScroll(0)
+                    val draggedPosition = dragEvent.localState as? Int
+                    if (draggedPosition != null) {
+                        Toast.makeText(requireContext(), "Scroll at position: $draggedPosition", Toast.LENGTH_LONG).show()
+                    }
+
+                    Toast.makeText(requireContext(), "Scroll vvvvv:- $type", Toast.LENGTH_LONG).show()
                     true
                 }
 
@@ -838,7 +844,12 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                 }
 
                 DragEvent.ACTION_DRAG_ENDED -> {
-                    Toast.makeText(requireContext(), "Scroll vvvvv:- $type", Toast.LENGTH_LONG).show()
+                    /*val draggedPosition = dragEvent.localState as? Int
+                    if (draggedPosition != null) {
+                        Toast.makeText(requireContext(), "Scroll at position: $draggedPosition", Toast.LENGTH_LONG).show()
+                    }
+
+                    Toast.makeText(requireContext(), "Scroll vvvvv:- $type", Toast.LENGTH_LONG).show()*/
                     true
                 }
 
@@ -866,7 +877,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                 "Lunch" -> recipesDateModel!!.Lunch to ingredientLunchAdapter
                 "Dinner" -> recipesDateModel?.Dinner to ingredientDinnerAdapter
                 "Snacks" -> recipesDateModel!!.Snacks to ingredientSnacksAdapter
-                "TeaTime" -> recipesDateModel!!.Teatime to ingredientTeaTimeAdapter
+                "Brunch" -> recipesDateModel!!.Teatime to ingredientTeaTimeAdapter
                 else -> null to null
             }
 
@@ -887,7 +898,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                 "Lunch" -> recipesDateModel!!.Lunch to ingredientLunchAdapter
                 "Dinner" -> recipesDateModel?.Dinner to ingredientDinnerAdapter
                 "Snacks" -> recipesDateModel!!.Snacks to ingredientSnacksAdapter
-                "TeaTime" -> recipesDateModel!!.Teatime to ingredientTeaTimeAdapter
+                "Brunch" -> recipesDateModel!!.Teatime to ingredientTeaTimeAdapter
                 else -> null to null
             }
 
@@ -914,7 +925,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             "Lunch" -> recipesDateModel!!.Lunch to ingredientLunchAdapter
             "Dinner" -> recipesDateModel?.Dinner to ingredientDinnerAdapter
             "Snacks" -> recipesDateModel!!.Snacks to ingredientSnacksAdapter
-            "TeaTime" -> recipesDateModel!!.Teatime to ingredientTeaTimeAdapter
+            "Brunch" -> recipesDateModel!!.Teatime to ingredientTeaTimeAdapter
             else -> null to null
         }
 
@@ -991,7 +1002,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                     "Lunch" -> ingredientLunchAdapter?.updateList(mealList)
                     "Dinner" -> ingredientDinnerAdapter?.updateList(mealList)
                     "Snacks" -> ingredientSnacksAdapter?.updateList(mealList)
-                    "Teatime" -> ingredientTeaTimeAdapter?.updateList(mealList)
+                    "Brunch" -> ingredientTeaTimeAdapter?.updateList(mealList)
                 }
 
                 // Update the adapter
@@ -1148,7 +1159,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                                 "Lunch" -> ingredientLunchAdapter?.removeItem(position!!)
                                 "Dinner" -> ingredientDinnerAdapter?.removeItem(position!!)
                                 "Snacks" -> ingredientSnacksAdapter?.removeItem(position!!)
-                                "Teatime" -> ingredientTeaTimeAdapter?.removeItem(position!!)
+                                "Brunch" -> ingredientTeaTimeAdapter?.removeItem(position!!)
                             }
                             dialogRemoveDay.dismiss()
                         } else {

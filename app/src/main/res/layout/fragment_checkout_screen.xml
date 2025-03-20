@@ -55,10 +55,34 @@
                 android:background="@color/grey3"
                 android:layout_below="@+id/rlHeader">
 
-                <com.google.android.gms.maps.MapView
-                    android:id="@+id/mapView"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent">
+                    <com.google.android.gms.maps.MapView
+                        android:id="@+id/mapView"
+                        android:layout_width="match_parent"
+                        android:layout_centerInParent="true"
+                        android:layout_height="match_parent"/>
+
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/lay_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        app:cardCornerRadius="@dimen/_30sdp"
+                        android:layout_centerInParent="true"
+                        android:layout_margin="@dimen/_15sdp"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/_8sdp"
+                            android:fontFamily="@font/montserrat_semibold"
+                            android:textSize="@dimen/_13sdp"
+                            android:text="Edit Pin"/>
+                    </androidx.cardview.widget.CardView>
+                </RelativeLayout>
+
 
             </androidx.cardview.widget.CardView>
 

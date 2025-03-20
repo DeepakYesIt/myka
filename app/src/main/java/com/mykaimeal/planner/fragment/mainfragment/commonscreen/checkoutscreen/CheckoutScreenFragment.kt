@@ -100,9 +100,14 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
             findNavController().navigateUp()
         }
 
-        binding!!.relSetHomes.setOnClickListener {
-//            addressDialog()
+
+        binding!!.layEdit.setOnClickListener {
             findNavController().navigate(R.id.addressMapFullScreenFragment)
+        }
+
+
+        binding!!.relSetHomes.setOnClickListener {
+            addressDialog()
         }
 
         binding!!.textPayBtn.setOnClickListener {
@@ -298,9 +303,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     override fun onMapReady(gmap: GoogleMap) {
         mMap = gmap
         val newYork = LatLng(40.7128, -74.0060)
-//        mMap?.addMarker(MarkerOptions().position(newYork).title("Marker in New York"))
-//        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(newYork, 12f))
-        val customMarker = bitmapDescriptorFromVector(R.drawable.marker_icon,100,100) // Change with your drawable
+        val customMarker = bitmapDescriptorFromVector(R.drawable.marker_icon,50,50) // Change with your drawable
         mMap?.addMarker(
             MarkerOptions()
                 .position(newYork)
@@ -309,28 +312,11 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
         mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(newYork, 12f))
     }
 
-   /* private fun bitmapDescriptorFromVector(vectorResId: Int): BitmapDescriptor? {
-        val vectorDrawable: Drawable? = ContextCompat.getDrawable(requireContext(), vectorResId)
-        if (vectorDrawable == null) {
-            return null
-        }
-        val bitmap = Bitmap.createBitmap(
-            vectorDrawable.intrinsicWidth,
-            vectorDrawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
-        val canvas = Canvas(bitmap)
-        vectorDrawable.setBounds(0, 0, canvas.width, canvas.height)
-        vectorDrawable.draw(canvas)
-        return BitmapDescriptorFactory.fromBitmap(bitmap)
-    }*/
-
     private fun bitmapDescriptorFromVector(vectorResId: Int, width: Int, height: Int): BitmapDescriptor? {
         val vectorDrawable: Drawable? = ContextCompat.getDrawable(requireContext(), vectorResId)
         if (vectorDrawable == null) {
             return null
         }
-
         // Create a new bitmap with desired width and height
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
