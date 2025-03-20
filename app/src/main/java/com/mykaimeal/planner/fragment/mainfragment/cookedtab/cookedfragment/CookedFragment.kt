@@ -391,17 +391,9 @@ class CookedFragment : Fragment(), OnItemClickListener {
                     binding!!.relSnacks.visibility = View.GONE
                 }
 
-                // Snacks
-                if (cookedTabModelData.Snacks != null && cookedTabModelData.Snacks.size >0) {
-                    foodListSnacksAdapter = setupMealAdapter(cookedTabModelData.Snacks, binding!!.rcvSnacks, "Snacks")
-                    binding!!.relSnacks.visibility = View.VISIBLE
-                } else {
-                    binding!!.relSnacks.visibility = View.GONE
-                }
-
                 // Teatime
                 if (cookedTabModelData.Teatime != null && cookedTabModelData.Teatime.size >0) {
-                    foodListTeaTimeAdapter = setupMealAdapter(cookedTabModelData.Teatime, binding!!.rcvTeaTime, "Teatime")
+                    foodListTeaTimeAdapter = setupMealAdapter(cookedTabModelData.Teatime, binding!!.rcvTeaTime, "Brunch")
                     binding!!.relTeaTime.visibility = View.VISIBLE
                 } else {
                     binding!!.relTeaTime.visibility = View.GONE

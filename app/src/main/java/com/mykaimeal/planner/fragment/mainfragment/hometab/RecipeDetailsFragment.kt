@@ -758,7 +758,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         }
 
         tvTeatime.setOnClickListener {
-            updateSelection("Teatime", tvTeatime, allViews)
+            updateSelection("Brunch", tvTeatime, allViews)
         }
 
 

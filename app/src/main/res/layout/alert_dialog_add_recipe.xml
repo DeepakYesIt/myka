@@ -54,7 +54,7 @@
                     android:paddingHorizontal="@dimen/_15sdp"
                     android:paddingVertical="@dimen/_9sdp"
                     android:singleLine="true"
-                    android:text="Create new cookBook"
+                    android:text="Create new cookbook"
                     android:textColor="@color/light_black"
                     android:textColorHint="@color/light_black"
                     android:textSize="@dimen/_14sdp" />
