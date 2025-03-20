@@ -871,6 +871,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             /*if (status == "1") {*/
             removeDayDialog(id, position, type)
             /*}*/
+            
         } else if (status == "missingIng") {
             val (mealList) = when (type) {
                 "BreakFast" -> recipesDateModel!!.Breakfast to ingredientBreakFastAdapter
