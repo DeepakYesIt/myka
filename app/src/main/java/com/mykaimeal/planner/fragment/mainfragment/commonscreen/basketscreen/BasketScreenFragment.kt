@@ -81,7 +81,9 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         /*n
                 shoppingPreferencesDialog()
         */
-        addressDialog()
+//        addressDialog()
+
+        getBasketList()
         initialize()
 
         return binding!!.root

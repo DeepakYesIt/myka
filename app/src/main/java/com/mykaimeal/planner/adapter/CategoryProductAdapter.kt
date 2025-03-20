@@ -99,7 +99,7 @@ class CategoryProductAdapter(
 
             if (product.pro_price != null) {
                 if (product.pro_price != "Not available") {
-                    binding.textPrice.text = "$${product.pro_price.toString()}"
+                    binding.textPrice.text = "${product.pro_price.toString()}"
                 }
             }
 

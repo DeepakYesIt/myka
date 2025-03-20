@@ -60,7 +60,6 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
     private var adapter: AdapterSuperMarket? = null
     private var rcvBottomDialog: RecyclerView? = null
     private lateinit var basketDetailsSuperMarketViewModel: BasketDetailsSuperMarketViewModel
-
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private var latitude = "0.0"
     private var longitude = "0.0"

@@ -230,12 +230,23 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 binding!!.llRecipesCooked.visibility = View.GONE
             }
 
-              if (userDataLocal.graph_value == 0) {
+           /*   if (userDataLocal.graph_value == 0) {
                   binding!!.imagePlanMeal.visibility = View.VISIBLE
                   binding!!.imageCheckSav.visibility = View.GONE
               } else {
                   binding!!.imagePlanMeal.visibility = View.GONE
                   binding!!.imageCheckSav.visibility = View.VISIBLE
+              }
+            */
+
+            if (userDataLocal.graph_value == 0) {
+                  binding!!.relMonthlySavingsss.visibility = View.VISIBLE
+                  binding!!.relCheckSavingsss.visibility = View.GONE
+//                  binding!!.imageCheckSav.visibility = View.GONE
+              } else {
+                  binding!!.relMonthlySavingsss.visibility = View.GONE
+//                  binding!!.imageCheckSav.visibility = View.VISIBLE
+                  binding!!.relCheckSavingsss.visibility = View.VISIBLE
               }
 
           /*  if (userDataLocal.graph_value == 0) {
@@ -503,7 +514,11 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 "#06C169"
             ) + BaseApplication.getColoredSpanned(", " + sessionManagement.getUserName(), "#000000")
             binding?.tvName?.text = Html.fromHtml(name)
+            binding?.tvMonthlySavingsDesc?.text = "Good job "+sessionManagement.getUserName()+", you are on track to save £80 this month"
         }
+
+
+
 
 
         binding!!.rlSeeAllBtn.setOnClickListener(this)
@@ -519,6 +534,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         binding!!.rlPlanAMealBtn.setOnClickListener(this)
         binding!!.imgHearRedIcons.setOnClickListener(this)
         binding!!.imagePlanMeal.setOnClickListener(this)
+        binding!!.relMonthlySavingsss.setOnClickListener(this)
 //        binding!!.imageRecipeSeeAll.setOnClickListener(this)
 //        binding!!.relMonthlySavings.setOnClickListener(this)
         binding!!.imageCheckSav.setOnClickListener(this)
@@ -617,6 +633,10 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             }
 
             R.id.imagePlanMeal -> {
+                findNavController().navigate(R.id.planFragment)
+            }
+
+            R.id.relMonthlySavingsss -> {
                 findNavController().navigate(R.id.planFragment)
             }
 
