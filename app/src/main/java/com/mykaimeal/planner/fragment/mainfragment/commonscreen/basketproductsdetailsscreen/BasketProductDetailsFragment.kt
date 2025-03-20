@@ -174,11 +174,10 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
                 })
                 .into(binding.imageSuperMarket)
         }
-
     }
 
     private fun getProductsRelatedApi() {
-//            BaseApplication.showMe(requireContext())
+            BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             basketProductsDetailsViewModel.getProductsUrl({
                 BaseApplication.dismissMe()
