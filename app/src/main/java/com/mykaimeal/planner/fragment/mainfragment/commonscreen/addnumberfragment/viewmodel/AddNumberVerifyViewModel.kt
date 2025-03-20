@@ -15,8 +15,7 @@ class AddNumberVerifyViewModel @Inject constructor(private val repository: MainR
     }
 
 
-    suspend fun addPhoneUrl(
-        successCallback: (response: NetworkResult<String>) -> Unit, phone: String?, otp: String?) {
+    suspend fun addPhoneUrl(successCallback: (response: NetworkResult<String>) -> Unit, phone: String?, otp: String?) {
         repository.addPhoneUrl({ successCallback(it) }, phone, otp)
     }
 

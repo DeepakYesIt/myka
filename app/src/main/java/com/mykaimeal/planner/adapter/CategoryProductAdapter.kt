@@ -41,17 +41,25 @@ class CategoryProductAdapter(
 
         fun bind(product: Product) {
 
-            if (product.name!=null){
+            if (product.name != null || product.sch_id != null) {
                 binding.textProductName.text = product.name
             }
 
-            if (product.sch_id!=null){
-                binding.textProductQuantityValue.text=product.sch_id.toString()
+            if (product.pro_id != null) {
+                if (product.pro_id != "Not available") {
+                    binding.imageSwap.visibility = View.VISIBLE
+                } else {
+                    binding.imageSwap.visibility = View.GONE
+                }
             }
 
-            Log.d("image","******"+product.pro_img)
+            if (product.sch_id != null) {
+                binding.textProductQuantityValue.text = product.sch_id.toString()
+            }
 
-            if (product.pro_img!=null){
+            Log.d("image", "******" + product.pro_img)
+
+            if (product.pro_img != null) {
                 Glide.with(requireActivity)
                     .load(product.pro_img)
                     .error(R.drawable.no_image)
@@ -63,7 +71,7 @@ class CategoryProductAdapter(
                             target: Target<Drawable>?,
                             isFirstResource: Boolean
                         ): Boolean {
-                            binding.layProgess.root.visibility= View.GONE
+                            binding.layProgess.root.visibility = View.GONE
                             return false
                         }
 
@@ -74,24 +82,23 @@ class CategoryProductAdapter(
                             dataSource: DataSource?,
                             isFirstResource: Boolean
                         ): Boolean {
-                            binding.layProgess.root.visibility= View.GONE
+                            binding.layProgess.root.visibility = View.GONE
                             return false
                         }
                     })
                     .into(binding.productImage)
-            }else{
-                binding.layProgess.root.visibility= View.GONE
+            } else {
+                binding.layProgess.root.visibility = View.GONE
             }
-/*
-            binding.productImage.setImageResource(product.image)
-*/
-/*
-            binding.textProductQuantity.text = product.quantity
-*/
+            /*
+                        binding.productImage.setImageResource(product.image)
+            */
+            /*
+                        binding.textProductQuantity.text = product.quantity
+            */
 
-            if (product.pro_price!=null){
-
-                if (product.pro_price!= "Not available"){
+            if (product.pro_price != null) {
+                if (product.pro_price != "Not available") {
                     binding.textPrice.text = "$${product.pro_price.toString()}"
                 }
             }
@@ -105,8 +112,13 @@ class CategoryProductAdapter(
             }
 
             binding.imageSwap.setOnClickListener {
-                onItemSelectListener.itemSelect(0,product.name.toString(),product.pro_id.toString())
-            }
+
+                onItemSelectListener.itemSelect(
+                    product.id,
+                    product.name.toString(),
+                    product.pro_id.toString()
+                )
         }
     }
+}
 }

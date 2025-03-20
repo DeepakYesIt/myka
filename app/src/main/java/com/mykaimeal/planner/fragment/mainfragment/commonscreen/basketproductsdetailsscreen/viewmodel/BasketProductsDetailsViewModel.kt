@@ -13,4 +13,13 @@ class BasketProductsDetailsViewModel @Inject constructor(private val repository:
         repository.getProductsUrl({ successCallback(it) },query)
     }
 
+
+    suspend fun getProductsDetailsUrl(successCallback: (response: NetworkResult<String>) -> Unit,proId:String?){
+        repository.getProductsDetailsUrl({ successCallback(it) },proId)
+    }
+
+    suspend fun getSelectProductsUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?,productId:String?){
+        repository.getSelectProductsUrl({ successCallback(it) },id, productId)
+    }
+
 }

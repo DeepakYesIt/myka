@@ -90,16 +90,17 @@
                         android:visibility="gone" />
 
                     <com.hbb20.CountryCodePicker
+                        android:id="@+id/countryCodePicker"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:visibility="visible"
                         app:ccp_autoDetectCountry="true"
-                        app:ccp_defaultNameCode="IND"
+                        app:ccp_defaultNameCode="GB"
                         app:ccp_showFlag="true"
                         app:ccp_showFullName="false"
                         app:ccp_showNameCode="false"
-                        app:ccp_showPhoneCode="false"/>
+                        app:ccp_showPhoneCode="false" />
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -110,6 +111,7 @@
                         android:src="@drawable/drop_down_icon"
                         android:visibility="gone"
                         app:tint="@color/orange" />
+
                 </RelativeLayout>
 
                 <EditText
@@ -119,7 +121,7 @@
                     android:layout_centerInParent="true"
                     android:layout_marginStart="@dimen/_10sdp"
                     android:layout_marginEnd="@dimen/_5sdp"
-                    android:layout_toLeftOf="@+id/tvVerify"
+                    android:layout_toStartOf="@+id/tvVerify"
                     android:layout_toEndOf="@+id/relPhoneNumber"
                     android:background="@null"
                     android:fontFamily="@font/poppins"

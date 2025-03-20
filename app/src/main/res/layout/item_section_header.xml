@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-    android:padding="8dp">
+    android:padding="@dimen/_6sdp">
 
     <RelativeLayout
+        android:id="@+id/relProImages"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -29,18 +31,19 @@
 
     </RelativeLayout>
 
-
-    <LinearLayout
-        android:layout_width="0dp"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_weight="1"
-        android:paddingStart="8dp">
+        android:layout_toStartOf="@+id/relPriceQuantity"
+       android:layout_toEndOf="@+id/relProImages"
+        android:paddingStart="@dimen/_6sdp"
+        tools:ignore="RtlSymmetry">
 
         <TextView
             android:id="@+id/textProductName"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/_30sdp"
+            android:layout_height="wrap_content"
             android:text="Ketchup"
             android:fontFamily="@font/poppins"
             android:textColor="@color/black"
@@ -63,6 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/swap_btn_icon"
+            android:layout_below="@+id/textProductName"
             android:layout_marginTop="@dimen/_10sdp"/>
 
        <!-- <TextView
@@ -74,13 +78,16 @@
             android:textColor="#06C169"
             android:paddingTop="4dp" />-->
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <!-- Product Price and Controls -->
     <RelativeLayout
+        android:id="@+id/relPriceQuantity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
         android:orientation="vertical"
+        android:layout_centerVertical="true"
         android:layout_marginEnd="@dimen/_10sdp"
         android:gravity="center_vertical">
 
@@ -136,4 +143,4 @@
 
         </LinearLayout>
     </RelativeLayout>
-</LinearLayout>
+</RelativeLayout>

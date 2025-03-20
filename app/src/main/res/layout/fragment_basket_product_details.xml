@@ -32,32 +32,60 @@
 
             </RelativeLayout>
 
-            <ImageView
+            <RelativeLayout
+                android:id="@+id/relProductsImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/relToolbar">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imageSuperMarket"
+                    android:layout_width="@dimen/_120sdp"
+                    android:layout_height="@dimen/_100sdp"
+                    android:layout_margin="@dimen/_3sdp"
+                    android:elevation="@dimen/_10sdp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ketchup_image"
+                    app:shapeAppearanceOverlay="@style/RoundedSquare" />
+
+                <include
+                    android:id="@+id/lay_progess"
+                    layout="@layout/progess_loader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true" />
+
+
+            </RelativeLayout>
+
+            <!--<ImageView
                 android:id="@+id/imageKetChup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ketchup_image"
                 android:layout_marginStart="@dimen/_3sdp"
                 android:layout_below="@id/relToolbar"
-                android:layout_centerHorizontal="true"/>
+                android:layout_centerHorizontal="true"/>-->
 
             <RelativeLayout
                 android:id="@+id/relKetchupDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_15sdp"
-                android:layout_below="@id/imageKetChup">
+                android:layout_below="@id/relProductsImage">
 
                 <TextView
                     android:id="@+id/tvProductName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_semibold"
-                    android:text="ketchup"
+                    android:text=""
                     android:textColor="@color/black"
                     android:textSize="@dimen/_14sdp" />
 
                 <TextView
+                    android:id="@+id/tvDetails"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="View Details"
@@ -67,6 +95,7 @@
                     android:fontFamily="@font/poppins_medium"/>
 
                 <TextView
+                    android:id="@+id/tvProductsprices"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="$25"
@@ -118,6 +147,24 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 android:orientation="vertical"
                 android:layout_below="@+id/relIngSearchBar"/>
+
+            <RelativeLayout
+                android:id="@+id/relNoProductsFound"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/relIngSearchBar"
+                android:visibility="gone"
+                android:padding="@dimen/_6sdp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No Products found"
+                    android:textSize="@dimen/_13sdp"
+                    android:layout_centerInParent="true"
+                    android:textColor="@color/black"/>
+
+            </RelativeLayout>
 
         </RelativeLayout>
 

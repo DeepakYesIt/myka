@@ -1355,7 +1355,6 @@
                     android:background="@drawable/outline_green_border_bg"
                     android:gravity="center"
                     android:padding="@dimen/_5sdp"
-
                     android:text="Add Another Meal Type"
                     android:textColor="@color/light_green"
                     android:textSize="@dimen/_12sdp" />
