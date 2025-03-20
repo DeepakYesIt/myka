@@ -36,6 +36,15 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
             holder.binding.textCount.text=data.sch_id.toString()
         }
 
+        if (data.pro_price!=null){
+            if (data.pro_price!="Not available"){
+                holder.binding.tvFoodPrice.text=data.pro_price.toString()
+            }else{
+                holder.binding.tvFoodPrice.text="$00"
+
+            }
+        }
+
         if (data != null) {
             holder.binding.tvFoodName.text=data.name
             if (data.pro_img!=null){

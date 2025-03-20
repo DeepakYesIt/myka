@@ -3,6 +3,7 @@ package com.mykaimeal.planner.fragment.mainfragment.commonscreen.addnumberfragme
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
+import android.telecom.Call
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -27,12 +28,15 @@ import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import `in`.aabhasjindal.otptextview.OTPListener
 import kotlinx.coroutines.launch
+import retrofit2.Response
+import javax.security.auth.callback.Callback
 
 @AndroidEntryPoint
 class AddNumberVerifyFragment : Fragment() {
     private var binding: FragmentAddNumberVerifyBinding? = null
     private lateinit var addNumberVerifyViewModel: AddNumberVerifyViewModel
     var lastNumber: String =""
+    private var countryCode:String=""
     private lateinit var commonWorkUtils: CommonWorkUtils
 
     override fun onCreateView(
@@ -66,64 +70,14 @@ class AddNumberVerifyFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-
-//        binding!!.relPhoneNumber.setOnClickListener {
-//            if (BaseApplication.isOnline(requireActivity())) {
-//                fetchCountries()
-//            } else {
-//                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-//            }
-//        }
-
-//        binding!!.etRegPhone.addTextChangedListener(object : TextWatcher {
-//            @SuppressLint("ResourceAsColor")
-//            override fun afterTextChanged(s: Editable?) {
-//                val input = s.toString()
-////                // Enable the button only if the input is different from the last entered number
-////                binding!!.tvVerify.isClickable = input.isNotEmpty() && input != lastNumber
-////                // Update lastNumber when textView becomes clickable
-////                if (binding!!.tvVerify.isClickable) {
-////                    lastNumber = input
-////                }
-//
-//                if (input.length<=9){
-//                    binding!!.tvVerify.isClickable=true
-//                    binding!!.tvVerify.isEnabled=true
-//                    binding!!.tvVerify.setTextColor(Color.parseColor("#D7D7D7"))
-//                }else{
-//                    binding!!.tvVerify.isClickable=false
-//                    binding!!.tvVerify.isEnabled=false
-//                    binding!!.tvVerify.setTextColor(Color.parseColor("#06C169"))
-//                }
-//            }
-//
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-//        })
-//
-//
-//
-//
-//
-//        binding!!.tvVerify.setOnClickListener {
-//            if (binding!!.tvVerify.isClickable == true){
-//                if (validate()) {
-//                    if (BaseApplication.isOnline(requireActivity())) {
-//                        getOtpUrl()
-//                    } else {
-//                        BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-//                    }
-//                }
-//            }
-//        }
+        binding!!.countryCodePicker.setDefaultCountryUsingNameCode("GB")
+        binding!!.countryCodePicker.resetToDefaultCountry()
 
         binding?.etRegPhone?.addTextChangedListener(object : TextWatcher {
             @SuppressLint("ResourceAsColor")
             override fun afterTextChanged(s: Editable?) {
                 val input = s.toString()
                 // Enable button only if the phone number is valid (10 digits)
-
                 if (input==lastNumber){
                     binding?.tvVerify?.isClickable = false
                     binding?.tvVerify?.isEnabled = false
@@ -139,13 +93,17 @@ class AddNumberVerifyFragment : Fragment() {
                         binding?.tvVerify?.setTextColor(Color.parseColor("#D7D7D7")) // Gray color for inactive state
                     }
                 }
-
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+
+        binding!!.countryCodePicker.setOnCountryChangeListener {
+            countryCode = binding!!.countryCodePicker.selectedCountryCode
+            Log.d("CountryCode", "Selected Country Code: $countryCode")
+        }
 
         // Click Listener
         binding?.tvVerify?.setOnClickListener {
@@ -157,8 +115,6 @@ class AddNumberVerifyFragment : Fragment() {
                 }
             }
         }
-
-
 
         binding!!.rlVerificationVerify.setOnClickListener{
             if (BaseApplication.isOnline(requireActivity())) {
@@ -181,47 +137,8 @@ class AddNumberVerifyFragment : Fragment() {
         }
     }
 
-/*    private fun fetchCountries() {
-        BaseApplication.showMe(requireContext())
-        RetrofitClient.instance.getCountries().enqueue(object : Callback<List<Country>> {
-            override fun onResponse(call: Call<List<Country>>, response: Response<List<Country>>) {
-                BaseApplication.dismissMe()
-                if (response.isSuccessful) {
-                    val countryList = response.body() ?: emptyList()
-                    Log.d("response ","****"+ countryList.toString())
-//                    for (country in countryList) {
-//                        val countryName = country.name.common
-//                        val dialCode = country.idd.root ?: ("" +
-//                                (country.idd.suffixes?.getOrNull(0) ?: ""))
-//                        val flagUrl = country.flags.png
-//
-//                        Log.d("CountryData", "Name: $countryName, Code: $dialCode, Flag: $flagUrl")
-//                    }
-                    for (country in countryList) {
-                        val countryName = country.name.common
-                        val dialCode = if (country.idd.root != null && !country.idd.suffixes.isNullOrEmpty()) {
-                            country.idd.root + country.idd.suffixes.first()
-                        } else {
-                            country.idd.root ?: country.idd.suffixes?.firstOrNull() ?: ""
-                        }
-                        val flagUrl = country.flags.png
-
-                        Log.d("CountryData", "Name: $countryName, Code: ${country.idd}, Flag: $flagUrl")
-                    }
-                } else {
-                    Log.e("API_ERROR", "Response failed: ${response.code()}")
-                }
-            }
-
-            override fun onFailure(call: Call<List<Country>>, t: Throwable) {
-                Log.e("API_ERROR", "Network Error: ${t.message}")
-            }
-        })
-    }*/
-
     /// add validation based on valid email or phone
     private fun validate(): Boolean {
-
         // Check if email/phone is empty
         if (binding!!.etRegPhone.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.phoneNumber, false)
@@ -258,7 +175,7 @@ class AddNumberVerifyFragment : Fragment() {
             addNumberVerifyViewModel.sendOtpUrl({
                 BaseApplication.dismissMe()
                 handleApiOtpSendResponse(it)
-            }, binding!!.etRegPhone.text.toString().trim())
+            }, countryCode+binding!!.etRegPhone.text.toString().trim())
         }
     }
 

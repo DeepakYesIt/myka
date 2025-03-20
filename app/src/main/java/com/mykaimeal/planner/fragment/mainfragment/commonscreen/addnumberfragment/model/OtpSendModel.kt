@@ -3,5 +3,6 @@ package com.mykaimeal.planner.fragment.mainfragment.commonscreen.addnumberfragme
 data class OtpSendModel(
     val code: Int,
     val message: String,
-    val success: Boolean
+    val success: Boolean,
+    val data:Int
 )

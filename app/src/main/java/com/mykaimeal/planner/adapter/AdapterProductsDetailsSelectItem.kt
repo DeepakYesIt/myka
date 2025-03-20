@@ -20,7 +20,7 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsde
 class AdapterProductsDetailsSelectItem(
     private var datalist: MutableList<BasketProductsDetailsModelData>,
     private var requireActivity: FragmentActivity,
-    onItemSelectListener: OnItemSelectListener
+    private var onItemSelectListener: OnItemSelectListener
 ) : RecyclerView.Adapter<AdapterProductsDetailsSelectItem.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -79,6 +79,11 @@ class AdapterProductsDetailsSelectItem(
         holder.binding.textProductQuantity.text = datalist[position].quantity
         holder.binding.textPrice.text = datalist[position].price
         holder.binding.productImage.setImageResource(datalist[position].image)*/
+
+
+        holder.binding.llProductsClick.setOnClickListener{
+            onItemSelectListener.itemSelect(position,data.product_id,"products")
+        }
 
     }
 

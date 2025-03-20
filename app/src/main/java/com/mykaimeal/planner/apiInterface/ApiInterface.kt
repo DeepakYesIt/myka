@@ -656,6 +656,15 @@ interface ApiInterface {
     suspend fun getProductsUrl(@Field("query") query:String?): Response<JsonObject>
 
     @FormUrlEncoded
+    @POST(ApiEndPoint.getProductsDetailsUrl)
+    suspend fun getProductsDetailsUrl(@Field("id") id:String?): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.getSelectProductsUrl)
+    suspend fun getSelectProductsUrl(@Field("id") id:String?,@Field("product_id") product_id:String?): Response<JsonObject>
+
+    @FormUrlEncoded
     @POST(ApiEndPoint.addCardMealMeUrl)
     suspend fun addCardMealMeUrl(
         @Field("card_number") card_number: String?,

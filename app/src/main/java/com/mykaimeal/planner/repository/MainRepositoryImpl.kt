@@ -2161,4 +2161,42 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
     }
 
 
+    override suspend fun getProductsDetailsUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,proId:String?
+    ) {
+        try {
+            api.getProductsDetailsUrl(proId).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun getSelectProductsUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,id:String?,productId:String?
+    ) {
+        try {
+            api.getSelectProductsUrl(id,productId).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
 }

@@ -238,7 +238,7 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
             binding.textPrice.text=data.total.toString()
         }
 
-        if (data.product != null && data.product.size > 0) {
+        if (data.product!= null) {
             binding.recyclerItemList.layoutManager = LinearLayoutManager(requireActivity())
             /* itemSectionAdapter = ItemSectionAdapter(data.product,this)
              binding.recyclerItemList.adapter = itemSectionAdapter  */
@@ -360,9 +360,10 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
         }
     }
 
-    override fun itemSelect(position: Int?, status: String?, type: String?) {
+    override fun itemSelect(id: Int?, status: String?, type: String?) {
 
             val bundle = Bundle().apply {
+                putString("id",id.toString())
                 putString("SwapProId",type)
                 putString("SwapProName",status)
             }
