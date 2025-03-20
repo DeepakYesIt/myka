@@ -44,9 +44,9 @@
                     android:layout_width="@dimen/_120sdp"
                     android:layout_height="@dimen/_100sdp"
                     android:layout_margin="@dimen/_3sdp"
-                    android:elevation="@dimen/_10sdp"
+                    android:elevation="@dimen/_3sdp"
                     android:scaleType="fitXY"
-                    android:src="@drawable/ketchup_image"
+                    android:src="@drawable/no_image"
                     app:shapeAppearanceOverlay="@style/RoundedSquare" />
 
                 <include

@@ -309,7 +309,17 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
                 .position(newYork)
                 .icon(customMarker)
         )
-        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(newYork, 12f))
+
+        // 🔹 Disable map movement
+        mMap?.uiSettings?.apply {
+            isScrollGesturesEnabled = false  // ❌ Disable scrolling
+            isZoomGesturesEnabled = false    // ❌ Disable zooming
+            isTiltGesturesEnabled = false    // ❌ Disable tilt
+            isRotateGesturesEnabled = false  // ❌ Disable rotation
+        }
+
+
+        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(newYork, 20f))
     }
 
     private fun bitmapDescriptorFromVector(vectorResId: Int, width: Int, height: Int): BitmapDescriptor? {

@@ -65,7 +65,7 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
         mMap = googleMap
         // 🔹 Clear all markers (if any exist)
         mMap.clear()
-        val initialPosition = LatLng(-34.0, 151.0) // Example: Sydney
+        val initialPosition = LatLng(40.7128, -74.0060) // Example: Sydney
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialPosition, 12f))
 
         // 🔹 Change marker image when map is moving

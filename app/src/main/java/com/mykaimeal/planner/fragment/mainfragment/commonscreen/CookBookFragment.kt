@@ -168,17 +168,13 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
                 if (apiModel.data!=null && apiModel.data.size>0){
                     binding!!.llCookBookItems.visibility=View.VISIBLE
                     cookbookList.addAll(apiModel.data)
-                    // OR directly modify the original list
-                    adapterCookBookItem = AdapterCookBookItem(cookbookList, requireActivity(), this)
-                    binding!!.rcyCookBookAdding.adapter = adapterCookBookItem
-                    getCookBookTypeList()
                 }else{
                     binding!!.llCookBookItems.visibility=View.VISIBLE
-                    // OR directly modify the original list
-                    adapterCookBookItem = AdapterCookBookItem(cookbookList, requireActivity(), this)
-                    binding!!.rcyCookBookAdding.adapter = adapterCookBookItem
-                    getCookBookTypeList()
                 }
+                // OR directly modify the original list
+                adapterCookBookItem = AdapterCookBookItem(cookbookList, requireActivity(), this)
+                binding!!.rcyCookBookAdding.adapter = adapterCookBookItem
+                getCookBookTypeList()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
