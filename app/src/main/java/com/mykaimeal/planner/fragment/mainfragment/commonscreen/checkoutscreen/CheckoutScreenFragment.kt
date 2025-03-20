@@ -2,8 +2,11 @@ package com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +15,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.RelativeLayout
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +24,8 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.gson.Gson
@@ -95,8 +101,8 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
         }
 
         binding!!.relSetHomes.setOnClickListener {
-            addressDialog()
-//            findNavController().navigate(R.id.addressMapFullScreenFragment)
+//            addressDialog()
+            findNavController().navigate(R.id.addressMapFullScreenFragment)
         }
 
         binding!!.textPayBtn.setOnClickListener {
@@ -292,12 +298,50 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     override fun onMapReady(gmap: GoogleMap) {
         mMap = gmap
         val newYork = LatLng(40.7128, -74.0060)
-        /*
-                val newYork = LatLng(28.6070135, 77.4075354)
-        */
-        mMap?.addMarker(MarkerOptions().position(newYork).title("Marker in New York"))
+//        mMap?.addMarker(MarkerOptions().position(newYork).title("Marker in New York"))
+//        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(newYork, 12f))
+        val customMarker = bitmapDescriptorFromVector(R.drawable.marker_icon,100,100) // Change with your drawable
+        mMap?.addMarker(
+            MarkerOptions()
+                .position(newYork)
+                .icon(customMarker)
+        )
         mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(newYork, 12f))
     }
+
+   /* private fun bitmapDescriptorFromVector(vectorResId: Int): BitmapDescriptor? {
+        val vectorDrawable: Drawable? = ContextCompat.getDrawable(requireContext(), vectorResId)
+        if (vectorDrawable == null) {
+            return null
+        }
+        val bitmap = Bitmap.createBitmap(
+            vectorDrawable.intrinsicWidth,
+            vectorDrawable.intrinsicHeight,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        vectorDrawable.setBounds(0, 0, canvas.width, canvas.height)
+        vectorDrawable.draw(canvas)
+        return BitmapDescriptorFactory.fromBitmap(bitmap)
+    }*/
+
+    private fun bitmapDescriptorFromVector(vectorResId: Int, width: Int, height: Int): BitmapDescriptor? {
+        val vectorDrawable: Drawable? = ContextCompat.getDrawable(requireContext(), vectorResId)
+        if (vectorDrawable == null) {
+            return null
+        }
+
+        // Create a new bitmap with desired width and height
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        // Set bounds for the drawable
+        vectorDrawable.setBounds(0, 0, canvas.width, canvas.height)
+        vectorDrawable.draw(canvas)
+
+        return BitmapDescriptorFactory.fromBitmap(bitmap)
+    }
+
 
     // Manage MapView Lifecycle
     override fun onResume() {

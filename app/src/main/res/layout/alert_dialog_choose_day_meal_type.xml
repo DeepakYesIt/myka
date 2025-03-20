@@ -194,7 +194,7 @@
                     android:paddingHorizontal="@dimen/_15sdp"
                     android:paddingVertical="@dimen/_9sdp"
                     android:singleLine="true"
-                    android:text="Teatime"
+                    android:text="Brunch"
                     android:textColor="@color/light_black"
                     android:textColorHint="@color/light_black"
                     android:drawablePadding="@dimen/_10sdp"

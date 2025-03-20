@@ -1,5 +1,7 @@
 package com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.model
 
+import com.google.gson.annotations.SerializedName
+
 data class CookedTabModel(
     val code: Int,
     val `data`: CookedTabModelData?,
@@ -12,6 +14,7 @@ data class CookedTabModelData(
     val Dinner: MutableList<Breakfast>?,
     val Lunch: MutableList<Breakfast>?,
     val Snacks: MutableList<Breakfast>?,
+    @SerializedName("Brunch")
     val Teatime: MutableList<Breakfast>?,
     val fridge:Int?,
     val freezer:Int?

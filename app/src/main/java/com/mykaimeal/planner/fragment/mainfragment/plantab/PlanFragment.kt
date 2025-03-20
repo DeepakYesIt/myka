@@ -548,7 +548,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             // TeaTime
             if (recipesModel?.Teatime != null && recipesModel?.Teatime?.size!! > 0) {
                 teaTimeAdapter =
-                    setupMealAdapter(recipesModel?.Teatime, binding!!.rcyTeatime, "TeaTime")
+                    setupMealAdapter(recipesModel?.Teatime, binding!!.rcyTeatime, "Brunch")
                 binding!!.linearTeatime.visibility = View.VISIBLE
             } else {
                 binding!!.linearTeatime.visibility = View.GONE
@@ -696,15 +696,14 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
             // TeaTime
             if (recipesDateModel?.Teatime != null && recipesDateModel?.Teatime?.size!! > 0) {
-                AdapterteaTimeByDateFast =
-                    setupMealAdapter(data?.Teatime, binding!!.rcyTeatime, "TeaTime")
+                AdapterteaTimeByDateFast = setupMealAdapter(data?.Teatime, binding!!.rcyTeatime, "Brunch")
                 binding!!.linearTeatime.visibility = View.VISIBLE
                 status = true
             } else {
                 // TeaTime
                 if (recipesModel?.Teatime != null && recipesModel?.Teatime?.size!! > 0) {
                     teaTimeAdapter =
-                        setupMealTopAdapter(recipesModel?.Teatime, binding!!.rcyTeatime, "TeaTime")
+                        setupMealTopAdapter(recipesModel?.Teatime, binding!!.rcyTeatime, "Brunch")
                     binding!!.linearTeatime.visibility = View.VISIBLE
                 } else {
                     binding!!.linearTeatime.visibility = View.GONE
@@ -718,9 +717,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 binding!!.rlAddDayToBasket.isClickable = false
                 binding!!.rlAddDayToBasket.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             }
-
         }
-
     }
 
     private fun showAlert(message: String?, status: Boolean) {
@@ -790,13 +787,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             findNavController().navigate(R.id.addMealCookedFragment)
         }
 
-        binding!!.tvConfirmBtn.setOnClickListener {
-            /* binding!!.llCalculateBmr.visibility = View.VISIBLE
-             binding!!.relBreakFastsss.visibility = View.VISIBLE
-             binding!!.relBreakFastsLunch.visibility = View.VISIBLE
-             binding!!.rcyBreakFast.visibility = View.GONE
-             binding!!.rcyLunch.visibility = View.GONE*/
-        }
+
 
 
         binding!!.imgBmr.setOnClickListener {
@@ -1021,7 +1012,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
         tvTeatime.setOnClickListener {
-            updateSelection("Teatime", tvTeatime, allViews)
+            updateSelection("Brunch", tvTeatime, allViews)
         }
 
 
@@ -1052,7 +1043,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "Lunch" -> recipesModel?.Lunch to lunchAdapter
             "Dinner" -> recipesModel?.Dinner to dinnerAdapter
             "Snack" -> recipesModel?.Snack to snackesAdapter
-            "TeaTime" -> recipesModel?.Teatime to teaTimeAdapter
+            "Brunch" -> recipesModel?.Teatime to teaTimeAdapter
             else -> null to null
         }
 
@@ -1221,7 +1212,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "Lunch" -> recipesModel?.Lunch to lunchAdapter
             "Dinner" -> recipesModel?.Dinner to dinnerAdapter
             "Snack" -> recipesModel?.Dinner to snackesAdapter
-            "TeaTime" -> recipesModel?.Dinner to teaTimeAdapter
+            "Brunch" -> recipesModel?.Dinner to teaTimeAdapter
             else -> null to null
         }
         // Safely get the item and position
@@ -1430,7 +1421,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "Lunch" -> recipesDateModel?.Lunch to adapterLunchByDateFast
             "Dinner" -> recipesDateModel?.Dinner to adapterDinnerByDateFast
             "Snack" -> recipesDateModel?.Dinner to adapterSnacksByDateFast
-            "TeaTime" -> recipesDateModel?.Dinner to AdapterteaTimeByDateFast
+            "Brunch" -> recipesDateModel?.Dinner to AdapterteaTimeByDateFast
             else -> null to null
         }
 
@@ -1564,85 +1555,13 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
 
     private fun swap(type: String, position: Int?, apiType: String) {
-        /* // Map the type to the corresponding list and adapter
-         val (mealList, adapter) = when (type) {
-             "BreakFast" -> recipesModel?.Breakfast to breakfastAdapter
-             "Lunch" -> recipesModel?.Lunch to lunchAdapter
-             "Dinner" -> recipesModel?.Dinner to dinnerAdapter
-             "Snack" -> recipesModel?.Dinner to snackesAdapter
-             "TeaTime" -> recipesModel?.Dinner to teaTimeAdapter
-             else -> null to null
-         }
-
-         fun setupMealTopAdapter(
-             mealRecipes: MutableList<BreakfastModel>?,
-             recyclerView: RecyclerView,
-             type: String
-         ): AdapterPlanBreakFast? {
-             return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
-                 val adapter = AdapterPlanBreakFast(mealRecipes, requireActivity(), this, type)
-                 recyclerView.adapter = adapter
-                 adapter
-             } else {
-                 null
-             }
-         }
-
-
-
-         if (type.equals("BreakFast",true)){
-             // Breakfast
-             if (mealList != null && mealList?.size!! > 0) {
-                 breakfastAdapter = setupMealTopAdapter(mealList, binding!!.rcyBreakFast, type)
-                 binding!!.linearBreakfast.visibility = View.VISIBLE
-             } else {
-                 binding!!.linearBreakfast.visibility = View.GONE
-             }
-         }
-
-         if (type.equals("Lunch",true)){
-             if (mealList != null && mealList?.size!! > 0) {
-                 lunchAdapter = setupMealTopAdapter(mealList, binding!!.rcyLunch, type)
-                 binding!!.linearLunch.visibility = View.VISIBLE
-             } else {
-                 binding!!.linearLunch.visibility = View.GONE
-             }
-         }
-
-         if (type.equals("Dinner",true)){
-             if (mealList != null && mealList?.size!! > 0) {
-                 dinnerAdapter = setupMealTopAdapter(mealList, binding!!.rcyDinner, type)
-                 binding!!.linearDinner.visibility = View.VISIBLE
-             } else {
-                 binding!!.linearDinner.visibility = View.GONE
-             }
-         }
-
-         if (type.equals("Snack",true)){
-             if (mealList != null && mealList?.size!! > 0) {
-                 snackesAdapter = setupMealTopAdapter(mealList, binding!!.rcySnacks, type)
-                 binding!!.linearSnacks.visibility = View.VISIBLE
-             } else {
-                 binding!!.linearSnacks.visibility = View.GONE
-             }
-         }
-
-         if (type.equals("TeaTime",true)){
-             if (mealList != null && mealList?.size!! > 0) {
-                 teaTimeAdapter = setupMealTopAdapter(mealList, binding!!.rcyTeatime, type)
-                 binding!!.linearTeatime.visibility = View.VISIBLE
-             } else {
-                 binding!!.linearTeatime.visibility = View.GONE
-             }
-         }*/
-
         // Map the type to the corresponding list and adapter
         val (mealList, adapter) = when (type) {
             "BreakFast" -> recipesModel?.Breakfast to breakfastAdapter
             "Lunch" -> recipesModel?.Lunch to lunchAdapter
             "Dinner" -> recipesModel?.Dinner to dinnerAdapter
             "Snack" -> recipesModel?.Snack to snackesAdapter
-            "TeaTime" -> recipesModel?.Teatime to teaTimeAdapter
+            "Brunch" -> recipesModel?.Teatime to teaTimeAdapter
             else -> null to null
         }
 
@@ -1713,7 +1632,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 )
             }
 
-            "TeaTime" -> {
+            "Brunch" -> {
                 teaTimeAdapter = updateMealSection(
                     mealList,
                     binding!!.rcyTeatime,

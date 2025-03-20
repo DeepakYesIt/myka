@@ -451,7 +451,8 @@
                         android:id="@+id/rcyBreakFast"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/_12sdp"
+                        android:layout_marginEnd="@dimen/_12sdp"
+                        android:layout_marginStart="@dimen/_8sdp"
                         android:layout_marginTop="@dimen/_10sdp"
                         android:orientation="horizontal"
                         android:visibility="visible"
@@ -848,7 +849,8 @@
                     android:id="@+id/rcyLunch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_12sdp"
+                    android:layout_marginEnd="@dimen/_12sdp"
+                    android:layout_marginStart="@dimen/_8sdp"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
@@ -1242,7 +1244,8 @@
                     android:id="@+id/rcyDinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_12sdp"
+                    android:layout_marginEnd="@dimen/_12sdp"
+                    android:layout_marginStart="@dimen/_8sdp"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
@@ -1284,7 +1287,8 @@
                     android:id="@+id/rcySnacks"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_12sdp"
+                    android:layout_marginEnd="@dimen/_12sdp"
+                    android:layout_marginStart="@dimen/_8sdp"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
@@ -1309,7 +1313,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_semibold"
-                        android:text="Teatime"
+                        android:text="Brunch"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_14sdp" />
 
@@ -1321,18 +1325,16 @@
                         android:src="@drawable/plus_icons" />
 
                 </RelativeLayout>
-
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rcyTeatime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_12sdp"
+                    android:layout_marginEnd="@dimen/_12sdp"
+                    android:layout_marginStart="@dimen/_8sdp"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
             </LinearLayout>
-
             <LinearLayout
                 android:id="@+id/llBottomBtn"
                 android:layout_width="match_parent"
@@ -1358,26 +1360,8 @@
                     android:textColor="@color/light_green"
                     android:textSize="@dimen/_12sdp" />
 
-                <TextView
-                    android:id="@+id/tvConfirmBtn"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="@dimen/_10sdp"
-                    android:layout_weight="1"
-                    android:background="@drawable/green_fill_corner_bg"
-                    android:gravity="center"
-                    android:visibility="gone"
-                    android:padding="@dimen/_5sdp"
-                    android:text="Confirm"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_12sdp" />
 
             </LinearLayout>
-
-
         </RelativeLayout>
-
     </ScrollView>
-
 </RelativeLayout>
