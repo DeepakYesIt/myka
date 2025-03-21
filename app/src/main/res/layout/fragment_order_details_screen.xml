@@ -24,10 +24,11 @@
                 android:layout_marginHorizontal="@dimen/_16sdp">
 
                 <ImageView
-                    android:id="@+id/imgBackProfileSetting"
+                    android:id="@+id/imgBackOrderDetails"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
+                    android:padding="@dimen/_5sdp"
                     android:src="@drawable/black_images_back" />
 
                 <TextView
@@ -37,7 +38,7 @@
                     android:layout_centerVertical="true"
                     android:fontFamily="@font/montserrat_semibold"
                     android:text="Order #24609"
-                    android:textSize="@dimen/_13sdp" />
+                    android:textSize="@dimen/_15sdp" />
 
             </RelativeLayout>
 

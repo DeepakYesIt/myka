@@ -78,10 +78,12 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 }
             })
 
-        /*n
+        /*
                 shoppingPreferencesDialog()
         */
-        addressDialog()
+//        addressDialog()
+
+        getBasketList()
         initialize()
 
         return binding!!.root
@@ -107,7 +109,7 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
         binding!!.textConfirmOrder.setOnClickListener {
             val bundle = Bundle().apply {
-                putString("storeUid","")
+                putString("storeUId",storeUid)
             }
             findNavController().navigate(R.id.basketDetailSuperMarketFragment,bundle)
 //             findNavController().navigate(R.id.tescoCartItemFragmentFragment)
@@ -208,6 +210,7 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showDataInUI(data: BasketScreenModelData) {
 
         if (data.billing!=null){
@@ -216,28 +219,39 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             }
 
             if (data.billing.net_total!=null){
-                binding!!.textNetTotalProduct.text=data.billing.net_total.toString()
+                val roundedNetTotal = data.billing.net_total.let {
+                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+                }
+                binding!!.textNetTotalProduct.text=roundedNetTotal.toString()
             }
 
             if (data.billing.tax!=null){
-                binding!!.textTaxPrice.text="$"+data.billing.tax.toString()
+                val roundedTax = data.billing.tax.let {
+                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+                }
+                binding!!.textTaxPrice.text= "$$roundedTax"
             }
 
             if (data.billing.delivery!=null){
-                binding!!.textDeliveyPrice.text="$"+data.billing.delivery.toString()
+                val roundedDelivery = data.billing.delivery.let {
+                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+                }
+                binding!!.textDeliveyPrice.text= "$$roundedDelivery"
             }
 
             if (data.billing.processing!=null){
-                val roundedQuantity = data.billing.processing.let {
+                val roundedProcessing = data.billing.processing.let {
                     BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
                 }
-                binding!!.textProcessingAmount.text=roundedQuantity.toString()+"%"
+                binding!!.textProcessingAmount.text= "$roundedProcessing%"
             }
 
             if (data.billing.total!=null){
-                binding!!.textTotalAmount.text="$"+data.billing.total.toString()+"*"
+                val roundedTotal = data.billing.total.let {
+                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+                }
+                binding!!.textTotalAmount.text= "$$roundedTotal*"
             }
-
         }
 
         if (data.stores != null && data.stores.size > 0) {

@@ -4,11 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragment.mainfragment.commonscreen.AddressMapFullScreenFragment">
+
     <fragment
-                android:id="@+id/map"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <ImageView
         android:id="@+id/imageCrossWeb"
@@ -23,42 +24,44 @@
         android:id="@+id/markerImage"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_gravity="center"
         android:layout_centerInParent="true"
-        android:src="@drawable/marker_icon_larg"/>
+        android:layout_gravity="center"
+        android:src="@drawable/marker_icon_larg" />
 
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/_130sdp"
-        android:background="@drawable/map_bg"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/map_bg">
 
         <TextView
             android:id="@+id/tv_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
             android:layout_marginHorizontal="@dimen/_30sdp"
             android:layout_marginTop="@dimen/_20sdp"
+            android:fontFamily="@font/poppins_semibold"
             android:maxLines="3"
             android:text=""
-            android:fontFamily="@font/poppins_semibold"
-            android:textStyle="bold"
             android:textSize="@dimen/_12sdp"
-            android:layout_alignParentTop="true" />
+            android:textStyle="bold" />
+
         <TextView
             android:id="@+id/tvConfirmBtn"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_40sdp"
-            android:layout_gravity="center"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="@dimen/_20sdp"
+            android:layout_gravity="center"
             android:layout_marginHorizontal="@dimen/_30sdp"
+            android:layout_marginBottom="@dimen/_20sdp"
             android:background="@drawable/green_fill_corner_bg"
             android:gravity="center"
             android:padding="@dimen/_5sdp"
             android:text="Confirm"
             android:textColor="@color/white"
             android:textSize="@dimen/_12sdp" />
+
     </RelativeLayout>
 </RelativeLayout>

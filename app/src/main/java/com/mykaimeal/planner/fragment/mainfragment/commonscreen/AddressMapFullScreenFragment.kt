@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.mykaimeal.planner.R
+import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentAddressMapFullScreenBinding
 import com.mykaimeal.planner.databinding.FragmentDropOffOptionsScreenBinding
 import java.util.Locale
@@ -34,9 +35,10 @@ import java.util.Locale
 class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
 
     private var binding: FragmentAddressMapFullScreenBinding? = null
-
+    private lateinit var sessionManagement: SessionManagement
     private lateinit var mMap: GoogleMap
     private var marker: Marker? = null
+    private var address:String?=""
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -49,13 +51,21 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        sessionManagement = SessionManagement(requireContext())
+
         initialize()
+
         return binding!!.root
     }
 
     private fun initialize() {
 
         binding!!.imageCrossWeb.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        binding!!.tvConfirmBtn.setOnClickListener{
+            sessionManagement.setAddress(address.toString())
             findNavController().navigateUp()
         }
 
@@ -95,6 +105,7 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
             val lat = centerPosition.latitude
             val lng = centerPosition.longitude
             binding!!.tvAddress.text = getAddressFromLatLng(lat, lng)
+            address=getAddressFromLatLng(lat,lng)
         }
     }
 
@@ -119,6 +130,7 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
         vectorDrawable?.draw(canvas)
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
+
     // Manage MapView Lifecycle
     override fun onResume() {
         super.onResume()

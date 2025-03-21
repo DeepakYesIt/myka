@@ -13,6 +13,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.mykaimeal.planner.OnItemSelectListener
+import com.mykaimeal.planner.OnItemSelectUnSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.ItemSectionHeaderBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.model.Product
@@ -20,7 +21,7 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssup
 class CategoryProductAdapter(
     private var requireActivity: FragmentActivity,
     private val products: MutableList<Product>?,
-    private var onItemSelectListener: OnItemSelectListener
+    private var onItemSelectListener: OnItemSelectUnSelectListener
 ) : RecyclerView.Adapter<CategoryProductAdapter.ProductViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
@@ -99,7 +100,7 @@ class CategoryProductAdapter(
 
             if (product.pro_price != null) {
                 if (product.pro_price != "Not available") {
-                    binding.textPrice.text = "$${product.pro_price.toString()}"
+                    binding.textPrice.text = "${product.pro_price.toString()}"
                 }
             }
 
@@ -113,11 +114,13 @@ class CategoryProductAdapter(
 
             binding.imageSwap.setOnClickListener {
 
-                onItemSelectListener.itemSelect(
+
+                onItemSelectListener.itemSelectUnSelect(product.id,product.name.toString(),"Product", position)
+              /*  onItemSelectListener.itemSelect(
                     product.id,
                     product.name.toString(),
                     product.pro_id.toString()
-                )
+                )*/
         }
     }
 }

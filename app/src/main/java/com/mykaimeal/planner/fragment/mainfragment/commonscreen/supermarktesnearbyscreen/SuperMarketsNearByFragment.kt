@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.gson.Gson
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.OnItemSelectListener
+import com.mykaimeal.planner.OnItemSelectUnSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.AdapterSuperMarket
 import com.mykaimeal.planner.basedata.BaseApplication
@@ -45,7 +46,7 @@ import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
-class SuperMarketsNearByFragment : Fragment(),OnItemSelectListener,
+class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener,
     OnMapReadyCallback {
     private lateinit var binding: FragmentSuperMarketsNearByBinding
     private var adapter: AdapterSuperMarket? = null
@@ -274,10 +275,6 @@ class SuperMarketsNearByFragment : Fragment(),OnItemSelectListener,
         }
     }
 
-    override fun itemSelect(position: Int?, status: String?, type: String?) {
-
-    }
-
     override fun onMapReady(gmap: GoogleMap) {
         mMap = gmap
         // Add markers for all store locations
@@ -319,6 +316,10 @@ class SuperMarketsNearByFragment : Fragment(),OnItemSelectListener,
     override fun onLowMemory() {
         super.onLowMemory()
         mapView.onLowMemory()
+    }
+
+    override fun itemSelectUnSelect(id: Int?, status: String?, type: String?, position: Int?) {
+
     }
 
 

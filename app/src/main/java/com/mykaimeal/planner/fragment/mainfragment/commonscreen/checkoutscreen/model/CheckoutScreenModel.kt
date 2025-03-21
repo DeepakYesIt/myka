@@ -9,13 +9,17 @@ data class CheckoutScreenModel(
 
 data class CheckoutScreenModelData(
     val address: MutableList<Addres>?,
-    val bagfee: String?,
+    val bagfee: Double?,
     val card: String?,
-    val delivery: String?,
+    val Store: String?,
+    val store_image: String?,
+    val delivery: Double?,
     val note: Note?,
     val phone: Any?,
-    val service: String?,
-    val subtotal: String?
+    val service: Double?,
+    val subtotal: Double?,
+    val total: Double?,
+    val ingredient_count: Int?,
 )
 
 data class Addres(

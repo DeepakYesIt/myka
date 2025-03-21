@@ -22,6 +22,7 @@ class AppConstant {
         const val RememberMe:String="RememberMe"
         val Id: String?="ID"
         val NAME: String? ="NAME"
+        val Address: String? ="UserAddress"
 
         val userId: String? ="UserId"
         val CookBookName: String? ="CookBookName"

@@ -20,6 +20,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -34,6 +39,7 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.AdapterCardPreferredItem
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentCheckoutScreenBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.model.CheckoutScreenModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.model.CheckoutScreenModelData
@@ -43,6 +49,8 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.productpaymentsc
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @AndroidEntryPoint
 class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListener {
@@ -52,6 +60,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     private var status: Boolean = false
     private lateinit var checkoutScreenViewModel: CheckoutScreenViewModel
     private lateinit var adapterPaymentCreditDebitItem: AdapterCardPreferredItem
+    private lateinit var sessionManagement: SessionManagement
 
 
     override fun onCreateView(
@@ -63,6 +72,9 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
         binding = FragmentCheckoutScreenBinding.inflate(layoutInflater, container, false)
 
         checkoutScreenViewModel = ViewModelProvider(requireActivity())[CheckoutScreenViewModel::class.java]
+
+        sessionManagement = SessionManagement(requireContext())
+
 
         // Load saved instance state
 //        var mapViewBundle: Bundle? = null
@@ -89,6 +101,10 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     }
 
     private fun initialize() {
+
+        if (sessionManagement.getUserAddress()!=""){
+            binding!!.tvAddressNames.text=sessionManagement.getUserAddress().toString()
+        }
 
         if (BaseApplication.isOnline(requireContext())) {
             getCheckoutApi()
@@ -245,11 +261,16 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showDataInUI(data: CheckoutScreenModelData?) {
 
         if (data!!.phone != null) {
             binding!!.tvAddNumber.text = data.phone.toString()
             binding!!.tvAddNumber.setTextColor(Color.parseColor("#000000"))
+        }
+
+        if (data.Store!=null){
+            binding!!.tvSuperMarketName.text=data.Store.toString()
         }
 
         if (data.note != null) {
@@ -263,20 +284,75 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
             }
         }
 
-        if (data.subtotal != null) {
-            binding!!.textSubTotalPrices.text = data.subtotal.toString()
+        if (data.subtotal!=null){
+            val roundedSubTotal = data.subtotal.let {
+                BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+            }
+            binding!!.textSubTotalPrices.text="$"+roundedSubTotal.toString()
         }
 
         if (data.bagfee != null) {
-            binding!!.textBagFees.text = data.bagfee.toString()
+            val roundedBagFees = data.bagfee.let {
+                BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+            }
+            binding!!.textSubTotalPrices.text="$$roundedBagFees"
         }
 
         if (data.service!=null){
-            binding!!.textServicesPrice.text=data.service.toString()
+            val roundedServices = data.service.let {
+                BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+            }
+            binding!!.textServicesPrice.text= "$$roundedServices"
         }
 
         if (data.delivery != null) {
-            binding!!.textDeliveryPrice.text = data.delivery.toString()
+            val roundedDelivery = data.delivery.let {
+                BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+            }
+            binding!!.textDeliveryPrice.text = "$$roundedDelivery"
+        }
+
+        if (data.total != null) {
+            val roundedTotal = data.total.let {
+                BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+            }
+            binding!!.textTotalAmounts.text = "$$roundedTotal"
+        }
+
+        if (data.ingredient_count!=null){
+            binding!!.tvItemsCount.text=data.ingredient_count.toString()+" Items"
+        }
+
+
+        data.let {
+            // ✅ Load image with Glide
+            Glide.with(requireActivity())
+                .load(it.store_image)
+                .error(R.drawable.no_image)
+                .placeholder(R.drawable.no_image)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        binding!!.layProgess.root.visibility = View.GONE
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        binding!!.layProgess.root.visibility = View.GONE
+                        return false
+                    }
+                })
+                .into(binding!!.imageWelmart)
         }
 
 

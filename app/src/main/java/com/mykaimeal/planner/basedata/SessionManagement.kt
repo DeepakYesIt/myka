@@ -41,21 +41,21 @@ class SessionManagement(var context: Context) {
         private const val isIdVerification = "isIdVerification"
     }
 
-/*    fun setRememberMe(remember: MutableList<String>?) {
-        val json = gson.toJson(remember)
-        editor2!!.putString(AppConstant.rememberMe, json)
-        editor2!!.commit()
-    }
-
-    fun getRememberMe(): MutableList<String>? {
-        val json = pref2?.getString(AppConstant.rememberMe, null)
-        return if (json != null) {
-            val type = object : TypeToken<List<String>>() {}.type
-            gson.fromJson(json, type)
-        } else {
-            null
+    /*    fun setRememberMe(remember: MutableList<String>?) {
+            val json = gson.toJson(remember)
+            editor2!!.putString(AppConstant.rememberMe, json)
+            editor2!!.commit()
         }
-    }*/
+
+        fun getRememberMe(): MutableList<String>? {
+            val json = pref2?.getString(AppConstant.rememberMe, null)
+            return if (json != null) {
+                val type = object : TypeToken<List<String>>() {}.type
+                gson.fromJson(json, type)
+            } else {
+                null
+            }
+        }*/
 
     fun getPreferences(): Boolean {
         return pref!!.getBoolean(AppConstant.Preferences, false)
@@ -66,14 +66,14 @@ class SessionManagement(var context: Context) {
         editor!!.commit()
     }
 
-    fun setRememberMe(value : List<RememberMe>){
+    fun setRememberMe(value: List<RememberMe>) {
         editor2!!.putString(AppConstant.rememberMe, Gson().toJson(value))
         editor2!!.apply()
     }
 
 
-    fun getRememberMe() : String{
-        return pref2!!.getString(AppConstant.rememberMe,"")!!
+    fun getRememberMe(): String {
+        return pref2!!.getString(AppConstant.rememberMe, "")!!
     }
 
     fun getLoginSession(): Boolean {
@@ -81,7 +81,7 @@ class SessionManagement(var context: Context) {
     }
 
 
-    fun setFirstTime(status:Boolean){
+    fun setFirstTime(status: Boolean) {
         editorFirstTime!!.putBoolean(AppConstant.SessionFirstTime, status)
         editorFirstTime!!.commit()
     }
@@ -89,7 +89,6 @@ class SessionManagement(var context: Context) {
     fun getFirstTime(): Boolean {
         return prefFirstTime!!.getBoolean(AppConstant.SessionFirstTime, true)
     }
-
 
 
     fun setLoginSession(session: Boolean?) {
@@ -102,41 +101,53 @@ class SessionManagement(var context: Context) {
         editor!!.commit()
     }
 
+    fun setAddress(address: String) {
+        editor!!.putString(AppConstant.Address, address)
+        editor!!.commit()
+    }
+
     fun setCookBookName(name: String) {
         editor!!.putString(AppConstant.CookBookName, name)
         editor!!.commit()
     }
+
     fun setCookBookId(name: String) {
         editor!!.putString(AppConstant.CookBookId, name)
         editor!!.commit()
     }
+
     fun setCookBookImage(name: String) {
         editor!!.putString(AppConstant.CookBookImage, name)
         editor!!.commit()
     }
+
     fun setCookBookType(name: String) {
         editor!!.putString(AppConstant.CookBookType, name)
         editor!!.commit()
     }
 
-    fun getCookBookName():String? {
+    fun getCookBookName(): String? {
         return pref?.getString(AppConstant.CookBookName, "")
     }
 
-    fun getCookBookId():String? {
+    fun getCookBookId(): String? {
         return pref?.getString(AppConstant.CookBookId, "")
     }
 
-    fun getCookBookImage():String? {
+    fun getCookBookImage(): String? {
         return pref?.getString(AppConstant.CookBookImage, "")
     }
 
-    fun getCookBookType():String? {
+    fun getCookBookType(): String? {
         return pref?.getString(AppConstant.CookBookType, "")
     }
 
     fun getUserName(): String? {
         return pref?.getString(AppConstant.NAME, "")
+    }
+
+    fun getUserAddress(): String? {
+        return pref?.getString(AppConstant.Address, "")
     }
 
 
@@ -339,7 +350,6 @@ class SessionManagement(var context: Context) {
     }
 
 
-
     fun setEmail(email: String) {
         editor!!.putString(AppConstant.EMAIL, email)
         editor!!.commit()
@@ -403,7 +413,7 @@ class SessionManagement(var context: Context) {
         return pref?.getString(AppConstant.cookingScreen, "")
     }
 
-    fun sessionClear(){
+    fun sessionClear() {
         editor?.apply()
         editor?.clear()
         editor?.commit()

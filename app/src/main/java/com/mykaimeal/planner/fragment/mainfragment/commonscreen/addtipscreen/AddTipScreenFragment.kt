@@ -140,15 +140,21 @@ class AddTipScreenFragment : Fragment() {
         try {
             val apiModel = Gson().fromJson(data, OrderProductTrackModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
-            if (apiModel.code == 200 && apiModel.success == true) {
-                if (apiModel.response != null) {
-                    showDataInUI(apiModel.response)
-                }
-            } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
+            if (apiModel.code!=null){
+                if (apiModel.code == 200 && apiModel.success == true) {
+                    if (apiModel.response != null) {
+                        showDataInUI(apiModel.response)
+                    }
                 } else {
-                    showAlert(apiModel.message, false)
+                    if (apiModel.code == ErrorMessage.code) {
+                        showAlert(apiModel.message, true)
+                    } else {
+                        showAlert(apiModel.message, false)
+                    }
+                }
+            }else{
+                if (apiModel.response?.error!=null){
+                    showAlert(apiModel.response.error, false)
                 }
             }
         } catch (e: Exception) {

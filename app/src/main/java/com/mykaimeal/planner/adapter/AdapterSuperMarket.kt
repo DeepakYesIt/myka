@@ -14,13 +14,14 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.OnItemSelectListener
+import com.mykaimeal.planner.OnItemSelectUnSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterSuperMarketItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Store
 
 class AdapterSuperMarket(private var storesData: MutableList<Store>?,
                          private var requireActivity: FragmentActivity,
-                         private var onItemSelectListener: OnItemSelectListener,
+                         private var onItemSelectListener: OnItemSelectUnSelectListener,
                          private var pos: Int
 ): RecyclerView.Adapter<AdapterSuperMarket.ViewHolder>() {
 
@@ -87,7 +88,7 @@ class AdapterSuperMarket(private var storesData: MutableList<Store>?,
             notifyItemChanged(selectedPosition)
 
             // ✅ Notify selection change
-            onItemSelectListener.itemSelect(position, data!!.store_uuid.toString(), "SuperMarket")
+            onItemSelectListener.itemSelectUnSelect(position,data!!.store_uuid.toString(),"SuperMarket",position)
         }
     }
 

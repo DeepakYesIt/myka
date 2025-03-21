@@ -58,12 +58,11 @@ data class Address(
 
 data class BillingAddress(
     val recipes:Int?,
-    val net_total:Int?,
-    val tax:Int?,
-    val delivery:Int?,
+    val net_total:Double?,
+    val tax:Double?,
+    val delivery:Double?,
     val processing:Double?,
-    val total:Int?
-
+    val total:Double?
 )
 
 

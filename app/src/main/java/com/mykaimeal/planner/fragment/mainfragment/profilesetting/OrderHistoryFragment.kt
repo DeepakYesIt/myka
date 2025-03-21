@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.findNavController
 import com.mykaimeal.planner.OnItemClickedListener
 import com.mykaimeal.planner.R
@@ -31,14 +32,33 @@ class OrderHistoryFragment : Fragment(),OnItemClickedListener {
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
 
-        binding!!.rlStartOrder.setOnClickListener{
-            binding!!.relNoOrders.visibility=View.GONE
-            binding!!.rcyOrderHistory.visibility=View.VISIBLE
-        }
+        setupBackNavigation()
+
+        initialize()
 
         orderHistoryModel()
 
         return binding!!.root
+    }
+
+    private fun setupBackNavigation() {
+        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                findNavController().navigateUp()
+            }
+        })
+    }
+
+    private fun initialize() {
+
+        binding!!.imgBackOrderHistory.setOnClickListener{
+            findNavController().navigateUp()
+        }
+
+        binding!!.rlStartOrder.setOnClickListener{
+            binding!!.relNoOrders.visibility=View.GONE
+            binding!!.rcyOrderHistory.visibility=View.VISIBLE
+        }
     }
 
 

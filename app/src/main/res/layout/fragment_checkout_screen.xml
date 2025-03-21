@@ -355,23 +355,37 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_50sdp"
                 android:layout_below="@+id/tvOrderSummary"
-                android:layout_marginHorizontal="@dimen/_25sdp"
+                android:layout_marginHorizontal="@dimen/_20sdp"
                 android:layout_marginTop="@dimen/_15sdp">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/imageWelmart"
-                    android:layout_width="@dimen/_50sdp"
-                    android:layout_height="@dimen/_50sdp"
-                    android:elevation="@dimen/_5sdp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/ic_welmart_super_market"
-                    app:shapeAppearanceOverlay="@style/RoundedSquare" />
+                <RelativeLayout
+                    android:id="@+id/relImages"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/imageWelmart"
+                        android:layout_width="@dimen/_50sdp"
+                        android:layout_height="@dimen/_50sdp"
+                        android:elevation="@dimen/_5sdp"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/no_image"
+                        app:shapeAppearanceOverlay="@style/RoundedSquare" />
+
+                    <include
+                        android:id="@+id/lay_progess"
+                        layout="@layout/progess_loader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true" />
+
+                </RelativeLayout>
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/_10sdp"
-                    android:layout_toEndOf="@+id/imageWelmart">
+                    android:layout_toEndOf="@+id/relImages">
 
                     <TextView
                         android:id="@+id/tvSuperMarketName"
@@ -384,6 +398,7 @@
                         android:textSize="@dimen/_13sdp" />
 
                     <TextView
+                        android:id="@+id/tvItemsCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/tvSuperMarketName"

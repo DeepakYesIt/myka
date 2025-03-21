@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
+import androidx.navigation.fragment.findNavController
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.AdapterOrderHistoryDetailsItem
@@ -30,9 +32,28 @@ class OrderDetailsScreenFragment : Fragment() {
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
 
+        setupBackNavigation()
+
+        initialize()
+
         orderHistoryModel()
 
         return binding!!.root
+    }
+
+    private fun initialize() {
+
+        binding!!.imgBackOrderDetails.setOnClickListener{
+            findNavController().navigateUp()
+        }
+    }
+
+    private fun setupBackNavigation() {
+        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                findNavController().navigateUp()
+            }
+        })
     }
 
     private fun orderHistoryModel() {

@@ -1,8 +1,9 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen.addtipscreen.model
 
 data class OrderProductTrackModel(
-    val code: Int,
+    val code: Int?,
     val message: String?,
+    val error: String?,
     val response: Response?,
     val success: Boolean?
 )
@@ -11,6 +12,7 @@ data class Response(
     val final_quote: FinalQuote?,
     val is_sandbox: Boolean?,
     val order_id: String?,
+    val error: String?,
     val order_placed: Boolean?,
     val tracking_link: String?
 )

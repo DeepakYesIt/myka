@@ -64,7 +64,6 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private val calendar = Calendar.getInstance()
     private var currentDate = Date() // Current date
     private var currentDateLocal = Date() // Current date
-    private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
 
     // Define global variables
     private lateinit var startDate: Date
@@ -74,7 +73,6 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private var recipesModel: CookedTabModelData? = null
     private lateinit var spinnerActivityLevel: PowerSpinnerView
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(

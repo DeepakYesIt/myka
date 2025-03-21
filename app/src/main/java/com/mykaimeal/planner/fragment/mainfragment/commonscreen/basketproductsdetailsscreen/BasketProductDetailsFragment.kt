@@ -87,8 +87,6 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
-
-
     }
 
 
@@ -142,7 +140,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
             }
 
             if (data.price != null) {
-                binding.tvProductsprices.text = data.price.toString()
+                binding.tvProductsprices.text = data.formatted_price.toString()
             }
 
             if (data.image!=null){

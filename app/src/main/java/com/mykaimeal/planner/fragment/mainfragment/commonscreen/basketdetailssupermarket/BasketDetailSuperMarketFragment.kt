@@ -34,6 +34,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.OnItemSelectListener
+import com.mykaimeal.planner.OnItemSelectUnSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.AdapterSuperMarket
 import com.mykaimeal.planner.adapter.CategoryProductAdapter
@@ -43,6 +44,7 @@ import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentBasketDetailSuperMarketBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.model.BasketDetailsSuperMarketModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.model.BasketDetailsSuperMarketModelData
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.model.Product
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.viewmodel.BasketDetailsSuperMarketViewModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Store
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModel
@@ -52,13 +54,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
+class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
+    OnItemSelectUnSelectListener {
 
     private lateinit var binding: FragmentBasketDetailSuperMarketBinding
     private lateinit var itemSectionAdapter: CategoryProductAdapter
     private var bottomSheetDialog: BottomSheetDialog? = null
     private var adapter: AdapterSuperMarket? = null
     private var rcvBottomDialog: RecyclerView? = null
+    private var products:MutableList<Product>?=null
     private lateinit var basketDetailsSuperMarketViewModel: BasketDetailsSuperMarketViewModel
 
     private var fusedLocationClient: FusedLocationProviderClient? = null
@@ -239,6 +243,7 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
         }
 
         if (data.product!= null) {
+            products=data.product
             binding.recyclerItemList.layoutManager = LinearLayoutManager(requireActivity())
             /* itemSectionAdapter = ItemSectionAdapter(data.product,this)
              binding.recyclerItemList.adapter = itemSectionAdapter  */
@@ -356,13 +361,21 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
         }
     }
 
-    override fun itemSelect(id: Int?, status: String?, type: String?) {
-            bottomSheetDialog!!.dismiss()
+    override fun itemSelectUnSelect(id: Int?, status: String?, type: String?, position: Int?) {
+
+        if (type=="Product"){
+            val mainId:String= products!![position!!].id.toString()
+            val productId:String= products!![position].pro_id.toString()
+            val productName:String= products!![position].pro_name.toString()
             val bundle = Bundle().apply {
-                putString("id",id.toString())
-                putString("SwapProId",status)
-                putString("SwapProName",type)
+                putString("id",mainId)
+                putString("SwapProId",productId)
+                putString("SwapProName",productName)
             }
             findNavController().navigate(R.id.basketProductDetailsFragment,bundle)
+        }else{
+            bottomSheetDialog!!.dismiss()
+        }
+
     }
 }
