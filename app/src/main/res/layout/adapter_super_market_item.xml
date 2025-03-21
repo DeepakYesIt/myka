@@ -48,7 +48,7 @@
             android:layout_centerHorizontal="true"
             android:fontFamily="@font/poppins"
             android:singleLine="true"
-            android:text="Tesco"
+            android:text=""
             android:textColor="#0A2533"
             android:textSize="@dimen/_9ssp"
             android:textStyle="bold" />

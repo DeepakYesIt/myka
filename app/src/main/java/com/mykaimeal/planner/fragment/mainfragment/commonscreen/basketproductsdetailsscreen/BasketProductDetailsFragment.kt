@@ -43,8 +43,6 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
     private var proId: String = ""
     private var proName: String = ""
     private var id: String = ""
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -89,6 +87,8 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
+
+
     }
 
 
@@ -145,34 +145,38 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
                 binding.tvProductsprices.text = data.price.toString()
             }
 
-            // ✅ Load image with Glide
-            Glide.with(requireActivity())
-                .load(data.image)
-                .error(R.drawable.no_image)
-                .placeholder(R.drawable.no_image)
-                .listener(object : RequestListener<Drawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        binding.layProgess.root.visibility = View.GONE
-                        return false
-                    }
+            if (data.image!=null){
+                // ✅ Load image with Glide
+                Glide.with(requireActivity())
+                    .load(data.image)
+                    .error(R.drawable.no_image)
+                    .placeholder(R.drawable.no_image)
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            binding.layProgess.root.visibility = View.GONE
+                            return false
+                        }
 
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        binding.layProgess.root.visibility = View.GONE
-                        return false
-                    }
-                })
-                .into(binding.imageSuperMarket)
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            binding.layProgess.root.visibility = View.GONE
+                            return false
+                        }
+                    })
+                    .into(binding.imageSuperMarket)
+            }else{
+                binding.layProgess.root.visibility = View.GONE
+            }
         }
     }
 
@@ -224,8 +228,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
 
         if (data.size != null && data.size > 0) {
             binding.relNoProductsFound.visibility = View.GONE
-            adapterProductsDetailsSelectItem =
-                AdapterProductsDetailsSelectItem(data, requireActivity(), this)
+            adapterProductsDetailsSelectItem = AdapterProductsDetailsSelectItem(data, requireActivity(), this)
             binding.rcyProductItems.adapter = adapterProductsDetailsSelectItem
         } else {
             binding.relNoProductsFound.visibility = View.VISIBLE

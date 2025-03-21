@@ -34,7 +34,6 @@ class AdapterSuperMarket(private var storesData: MutableList<Store>?,
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
 
-//        holder.binding.textName.text=datalist!![position].store_name
         val data = storesData?.get(position)
 
         // ✅ Correctly update the background based on selection

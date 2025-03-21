@@ -43,11 +43,10 @@
 
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/tescoLogoImage"
-                        android:layout_width="@dimen/_85sdp"
-                        android:layout_height="@dimen/_30sdp"
-                        android:layout_margin="@dimen/_3sdp"
-                        android:elevation="@dimen/_10sdp"
-                        android:scaleType="fitXY"
+                        android:layout_width="@dimen/_150sdp"
+                        android:layout_height="@dimen/_80sdp"
+                        android:elevation="@dimen/_2sdp"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/ic_walmart_star_icon"
                         app:shapeAppearanceOverlay="@style/RoundedSquare" />
 

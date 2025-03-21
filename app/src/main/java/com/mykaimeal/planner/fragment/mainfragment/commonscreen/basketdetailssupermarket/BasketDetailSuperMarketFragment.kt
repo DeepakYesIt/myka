@@ -291,15 +291,7 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
     }
 
     private fun bottomSheetDialog() {
-        bottomSheetDialog = BottomSheetDialog(requireActivity(), R.style.BottomSheetDialog)
-        bottomSheetDialog!!.setContentView(R.layout.bottom_sheet_select_super_market_near_me)
-        rcvBottomDialog = bottomSheetDialog!!.findViewById<RecyclerView>(R.id.rcvBottomDialog)
-        val textTitle: TextView? = bottomSheetDialog!!.findViewById<TextView>(R.id.textTitle)
-        bottomSheetDialog!!.show()
-
         getSuperMarketsList()
-
-
         /*  superMarketModel()*/
 
     }
@@ -344,6 +336,10 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
     private fun showUIData(data: MutableList<Store>?) {
         try {
             if (data!=null){
+                bottomSheetDialog = BottomSheetDialog(requireActivity(), R.style.BottomSheetDialog)
+                bottomSheetDialog!!.setContentView(R.layout.bottom_sheet_select_super_market_near_me)
+                rcvBottomDialog = bottomSheetDialog!!.findViewById<RecyclerView>(R.id.rcvBottomDialog)
+                bottomSheetDialog!!.show()
                 adapter = AdapterSuperMarket(data, requireActivity(), this,0)
                 rcvBottomDialog!!.adapter = adapter
             }
@@ -361,13 +357,12 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener, OnItemS
     }
 
     override fun itemSelect(id: Int?, status: String?, type: String?) {
-
+            bottomSheetDialog!!.dismiss()
             val bundle = Bundle().apply {
                 putString("id",id.toString())
-                putString("SwapProId",type)
-                putString("SwapProName",status)
+                putString("SwapProId",status)
+                putString("SwapProName",type)
             }
             findNavController().navigate(R.id.basketProductDetailsFragment,bundle)
-
     }
 }
