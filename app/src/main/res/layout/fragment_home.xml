@@ -63,6 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+
             <TextView
                 android:id="@+id/tvCookingSchedule"
                 android:layout_width="match_parent"
@@ -544,6 +545,7 @@
                 android:layout_height="@dimen/_150sdp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_below="@+id/cardViewCooked">
+<<<<<<< HEAD
 
                 <RelativeLayout
                     android:id="@+id/relMonthlySavingsss"
@@ -665,11 +667,12 @@
                 </RelativeLayout>
 
 
+=======
+>>>>>>> parent of 372adb7 (Dhananjay Singh 20_03_2025 05:30 pm)
                 <ImageView
                     android:id="@+id/imagePlanMeal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     android:src="@drawable/monthly_savings_plan_bg"/>
                 <ImageView
                     android:id="@+id/imageCheckSav"

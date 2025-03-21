@@ -157,7 +157,7 @@ class AddTipScreenFragment : Fragment() {
             showAlert(e.message, false)
         }
     }
-
+ 
     private fun showDataInUI(response: Response) {
 
         Toast.makeText(requireContext(),"Payment successful", Toast.LENGTH_SHORT).show()
