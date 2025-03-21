@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,13 +22,17 @@ class BodyGoalAdapter(private var datalist: List<BodyGoalModelData>, private var
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.tvTitleName.text = datalist[position].name
+        val data=datalist[position]
+
+        data.let {
+            holder.binding.tvTitleName.text = it.name
+        }
 
         // Bind UI based on whether the item is selected or matches the last checked position
         if (datalist[position].selected) {
             holder.binding.imageRightTick.visibility = View.VISIBLE
             holder.binding.relMainLayout.setBackgroundResource(R.drawable.orange_box_bg)
-            onItemClickListener.itemClick(datalist[position].id,"-1","")
+            onItemClickListener.itemClick(data.id,"-1","")
         } else {
             holder.binding.imageRightTick.visibility = View.GONE
             holder.binding.relMainLayout.setBackgroundResource(R.drawable.gray_box_border_bg)
@@ -36,18 +41,17 @@ class BodyGoalAdapter(private var datalist: List<BodyGoalModelData>, private var
         // Handle click event for the item
         holder.binding.relMainLayout.setOnClickListener {
             // Check if the clicked item is already selected
-            if (datalist[position].selected) {
+            if (data.selected) {
                 // Deselect all items
                 datalist.forEach { it.selected = false }
-                onItemClickListener.itemClick(datalist[position].id, position.toString(), "false")
+                onItemClickListener.itemClick(data.id, position.toString(), "false")
                 notifyDataSetChanged()
             } else {
                 // Deselect all items
                 datalist.forEach { it.selected = false }
-                onItemClickListener.itemClick(datalist[position].id, position.toString(), "true")
+                onItemClickListener.itemClick(data.id, position.toString(), "true")
                 // Select the new item
                 datalist[position].selected = true
-                // Notify the adapter about the changes
                 notifyDataSetChanged()
             }
         }

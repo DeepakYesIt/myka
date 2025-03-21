@@ -825,12 +825,12 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             when (dragEvent.action) {
                 DragEvent.ACTION_DRAG_STARTED -> {
                     binding!!.scroll.fullScroll(0)
-                    val draggedPosition = dragEvent.localState as? Int
+                   /* val draggedPosition = dragEvent.localState as? Int
                     if (draggedPosition != null) {
                         Toast.makeText(requireContext(), "Scroll at position: $draggedPosition", Toast.LENGTH_LONG).show()
                     }
 
-                    Toast.makeText(requireContext(), "Scroll vvvvv:- $type", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), "Scroll vvvvv:- $type", Toast.LENGTH_LONG).show()*/
                     true
                 }
 

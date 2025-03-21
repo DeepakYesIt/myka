@@ -460,6 +460,8 @@ class LoginFragment : Fragment() {
                 sessionManagement.setUserName(loginModelData.name)
             }
 
+
+
             val cookingFor = if (loginModelData.cooking_for_type != null) {
                 when (loginModelData.cooking_for_type) {
                     1 -> "Myself"

@@ -6,6 +6,7 @@ data class DataPlayByDate(
     val Breakfast: MutableList<BreakfastModelPlanByDate>?,
     val Dinner: MutableList<BreakfastModelPlanByDate>?,
     val Lunch: MutableList<BreakfastModelPlanByDate>?,
+    @SerializedName("Snacks")
     val Snack: MutableList<BreakfastModelPlanByDate>?,
     @SerializedName("Brunch")
     val Teatime: MutableList<BreakfastModelPlanByDate>?,

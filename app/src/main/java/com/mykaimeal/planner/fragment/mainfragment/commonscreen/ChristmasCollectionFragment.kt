@@ -296,8 +296,6 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
             val logInviteMap = hashMapOf(
                 "referrerId" to currentReferrerId,
                 "campaign" to currentCampaign
-
-                
             )
             ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
         }

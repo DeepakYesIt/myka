@@ -13,6 +13,7 @@ data class CookedTabModelData(
     val Breakfast: MutableList<Breakfast>?,
     val Dinner: MutableList<Breakfast>?,
     val Lunch: MutableList<Breakfast>?,
+    @SerializedName("Snacks")
     val Snacks: MutableList<Breakfast>?,
     @SerializedName("Brunch")
     val Teatime: MutableList<Breakfast>?,
