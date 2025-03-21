@@ -545,7 +545,6 @@
                 android:layout_height="@dimen/_150sdp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_below="@+id/cardViewCooked">
-<<<<<<< HEAD
 
                 <RelativeLayout
                     android:id="@+id/relMonthlySavingsss"
@@ -602,7 +601,6 @@
                         </RelativeLayout>
 
                     </RelativeLayout>
-
 
                 </RelativeLayout>
 
@@ -663,12 +661,8 @@
 
                     </RelativeLayout>
 
-
                 </RelativeLayout>
 
-
-=======
->>>>>>> parent of 372adb7 (Dhananjay Singh 20_03_2025 05:30 pm)
                 <ImageView
                     android:id="@+id/imagePlanMeal"
                     android:layout_width="wrap_content"

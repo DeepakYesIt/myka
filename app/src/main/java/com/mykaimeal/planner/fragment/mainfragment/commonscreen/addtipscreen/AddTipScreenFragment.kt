@@ -20,8 +20,6 @@ import com.mykaimeal.planner.databinding.FragmentAddTipScreenBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addtipscreen.model.OrderProductTrackModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addtipscreen.model.Response
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addtipscreen.viewmodel.AddTipScreenViewModel
-import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.model.CheckoutScreenModel
-import com.mykaimeal.planner.fragment.mainfragment.commonscreen.productpaymentscreen.viewmodel.PaymentCreditDebitViewModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import kotlinx.coroutines.launch
 
@@ -157,7 +155,7 @@ class AddTipScreenFragment : Fragment() {
             showAlert(e.message, false)
         }
     }
- 
+
     private fun showDataInUI(response: Response) {
 
         Toast.makeText(requireContext(),"Payment successful", Toast.LENGTH_SHORT).show()

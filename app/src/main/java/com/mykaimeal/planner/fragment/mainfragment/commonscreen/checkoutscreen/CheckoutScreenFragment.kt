@@ -243,7 +243,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
         }else{
             binding!!.rcyDebitCreditCard.visibility=View.GONE
         }
-
     }
 
     private fun showDataInUI(data: CheckoutScreenModelData?) {
