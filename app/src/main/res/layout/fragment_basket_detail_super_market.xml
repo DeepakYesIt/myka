@@ -88,6 +88,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/rlGoToCheckout"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/_15sdp"
                 android:visibility="visible"
                 android:clipToPadding="false" />
 

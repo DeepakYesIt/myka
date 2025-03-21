@@ -234,8 +234,7 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
                 }
             }
         }
-
-
+        
     }
 
     private fun addMealsApi() {

@@ -288,7 +288,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
             val roundedSubTotal = data.subtotal.let {
                 BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
             }
-            binding!!.textSubTotalPrices.text="$"+roundedSubTotal.toString()
+            binding!!.textSubTotalPrices.text= "$$roundedSubTotal"
         }
 
         if (data.bagfee != null) {

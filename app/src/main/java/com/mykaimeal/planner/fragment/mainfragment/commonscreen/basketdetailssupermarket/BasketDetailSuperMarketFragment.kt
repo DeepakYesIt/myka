@@ -52,6 +52,8 @@ import com.mykaimeal.planner.messageclass.ErrorMessage
 import com.mykaimeal.planner.model.DataModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @AndroidEntryPoint
 class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
@@ -234,7 +236,6 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
             showAlert(e.message, false)
         }
     }
-
 
     private fun showDataInUI(data: BasketDetailsSuperMarketModelData?) {
 

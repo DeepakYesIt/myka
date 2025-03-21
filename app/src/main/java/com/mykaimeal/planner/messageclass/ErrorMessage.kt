@@ -11,7 +11,7 @@ object ErrorMessage {
      const val amountError:String="Invalid amount entered."
      const val mealTypeError:String="Select Meal type."
      const val weekNameError:String="Select Week Name."
-     const val selectCookBookError:String="Please Select Cook Book."
+     const val selectCookBookError:String="Please select a cookbook."
      const val ratingError:String="Message can't be empty."
      const val cookBookSelectError:String="Select Cook Book"
      const val amountEmptyError:String="Amount can't be empty."
