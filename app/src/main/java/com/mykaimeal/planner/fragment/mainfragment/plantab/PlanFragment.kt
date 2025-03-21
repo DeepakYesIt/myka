@@ -539,7 +539,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
             // Snacks
             if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
-                snackesAdapter = setupMealAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snack")
+                snackesAdapter = setupMealAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snacks")
                 binding!!.linearSnacks.visibility = View.VISIBLE
             } else {
                 binding!!.linearSnacks.visibility = View.GONE
@@ -680,14 +680,14 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             // Snacks
             if (recipesDateModel?.Snack != null && recipesDateModel?.Snack?.size!! > 0) {
                 adapterSnacksByDateFast =
-                    setupMealAdapter(data?.Snack, binding!!.rcySnacks, "Snack")
+                    setupMealAdapter(data?.Snack, binding!!.rcySnacks, "Snacks")
                 binding!!.linearSnacks.visibility = View.VISIBLE
                 status = true
             } else {
                 // Snacks
                 if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
                     snackesAdapter =
-                        setupMealTopAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snack")
+                        setupMealTopAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snacks")
                     binding!!.linearSnacks.visibility = View.VISIBLE
                 } else {
                     binding!!.linearSnacks.visibility = View.GONE
@@ -1008,7 +1008,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
         tvSnacks.setOnClickListener {
-            updateSelection("Snack", tvSnacks, allViews)
+            updateSelection("Snacks", tvSnacks, allViews)
         }
 
         tvTeatime.setOnClickListener {
@@ -1042,7 +1042,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "BreakFast" -> recipesModel?.Breakfast to breakfastAdapter
             "Lunch" -> recipesModel?.Lunch to lunchAdapter
             "Dinner" -> recipesModel?.Dinner to dinnerAdapter
-            "Snack" -> recipesModel?.Snack to snackesAdapter
+            "Snacks" -> recipesModel?.Snack to snackesAdapter
             "Brunch" -> recipesModel?.Teatime to teaTimeAdapter
             else -> null to null
         }
@@ -1211,7 +1211,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "BreakFast" -> recipesModel?.Breakfast to breakfastAdapter
             "Lunch" -> recipesModel?.Lunch to lunchAdapter
             "Dinner" -> recipesModel?.Dinner to dinnerAdapter
-            "Snack" -> recipesModel?.Dinner to snackesAdapter
+            "Snacks" -> recipesModel?.Dinner to snackesAdapter
             "Brunch" -> recipesModel?.Dinner to teaTimeAdapter
             else -> null to null
         }
@@ -1420,7 +1420,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "BreakFast" -> recipesDateModel?.Breakfast to adapterPlanBreakByDateFast
             "Lunch" -> recipesDateModel?.Lunch to adapterLunchByDateFast
             "Dinner" -> recipesDateModel?.Dinner to adapterDinnerByDateFast
-            "Snack" -> recipesDateModel?.Dinner to adapterSnacksByDateFast
+            "Snacks" -> recipesDateModel?.Dinner to adapterSnacksByDateFast
             "Brunch" -> recipesDateModel?.Dinner to AdapterteaTimeByDateFast
             else -> null to null
         }
@@ -1560,7 +1560,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "BreakFast" -> recipesModel?.Breakfast to breakfastAdapter
             "Lunch" -> recipesModel?.Lunch to lunchAdapter
             "Dinner" -> recipesModel?.Dinner to dinnerAdapter
-            "Snack" -> recipesModel?.Snack to snackesAdapter
+            "Snacks" -> recipesModel?.Snack to snackesAdapter
             "Brunch" -> recipesModel?.Teatime to teaTimeAdapter
             else -> null to null
         }
@@ -1623,7 +1623,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 )
             }
 
-            "Snack" -> {
+            "Snacks" -> {
                 snackesAdapter = updateMealSection(
                     mealList,
                     binding!!.rcySnacks,

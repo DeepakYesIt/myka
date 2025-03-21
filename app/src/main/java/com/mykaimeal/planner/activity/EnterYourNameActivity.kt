@@ -30,6 +30,7 @@ class EnterYourNameActivity : AppCompatActivity() {
 
         ///main function using all triggered of this screen
         initialize()
+
     }
 
     private fun initialize() {

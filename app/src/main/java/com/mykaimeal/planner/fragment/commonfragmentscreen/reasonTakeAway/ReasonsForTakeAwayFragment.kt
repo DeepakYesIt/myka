@@ -289,7 +289,6 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                             val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
                             if (updateModel.code == 200 && updateModel.success) {
                                 sessionManagement.setLoginSession(true)
-
                                 val intent = Intent(requireActivity(), MainActivity::class.java)
                                 startActivity(intent)
                                 requireActivity().finish()
@@ -433,11 +432,13 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
 
     override fun itemClick(selectItem: Int?, status1: String?, type: String?) {
         reasonSelect=""
+        reasonTakeAway = ""
         if (status1.equals("-1")) {
             status = "2"
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             reasonSelect = selectItem.toString()
+            reasonTakeAway = selectItem.toString()
             return
         }
 
@@ -446,6 +447,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
             binding!!.tvNextBtn.isClickable = true
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             reasonSelect = selectItem.toString()
+            reasonTakeAway = selectItem.toString()
         } else {
             status = ""
             binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)

@@ -16,12 +16,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
-import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.BodyGoalAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentBodyGoalsBinding
 import com.mykaimeal.planner.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModel
 import com.mykaimeal.planner.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModelData
@@ -29,7 +29,6 @@ import com.mykaimeal.planner.fragment.commonfragmentscreen.bodyGoals.viewmodel.B
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
 import com.mykaimeal.planner.messageclass.ErrorMessage
-
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -43,12 +42,16 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
     private var status: String? = null
     private var bodySelect: String? = ""
     private lateinit var bodyGoalViewModel: BodyGoalViewModel
-    private var bodyModelData1: List<BodyGoalModelData>? = null
+    private var bodyModelData1: MutableList<BodyGoalModelData> = mutableListOf()
+    private var bodyGoalsText: String = "What are your body's goals?"
+    private var progressValue: Int = 1
+    private var showBodyGoals: Boolean = true
+    val gson = Gson()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentBodyGoalsBinding.inflate(inflater, container, false)
 
@@ -56,57 +59,57 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
 
         sessionManagement = SessionManagement(requireContext())
 
+        // Get the cookingFor value once to avoid multiple method calls
+        val cookingFor = sessionManagement.getCookingFor()
+        val cookingScreen = sessionManagement.getCookingScreen()
+
         /// checked session value cooking for
-        if (sessionManagement.getCookingFor().equals("Myself")) {
-            binding!!.tvYourBodyGoals.text = "What are your body goals?"
-            binding!!.textBodyGoals.visibility = View.VISIBLE
-            binding!!.textBodyMembersGoals.visibility = View.GONE
-            /*binding!!.textBodyGoals.text= getString(R.string.body_goals)*/
+        if (cookingFor.equals("Myself")) {
+            bodyGoalsText = "What are your body goals?"
+            showBodyGoals=true
             binding!!.progressBar.max = 10
             totalProgressValue = 10
-            updateProgress(1)
-
-        } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-            binding!!.tvYourBodyGoals.text = "You and your partner's goals?"
-            binding!!.textBodyGoals.visibility = View.VISIBLE
-            binding!!.textBodyMembersGoals.visibility = View.GONE
+            progressValue=1
+        } else if (cookingFor.equals("MyPartner")) {
+            bodyGoalsText = "You and your partner's goals?"
+            showBodyGoals=true
             binding!!.progressBar.max = 11
             totalProgressValue = 11
-            updateProgress(2)
+            progressValue=2
         } else {
-            binding!!.tvYourBodyGoals.text = "What are your family's body goals?"
-            binding!!.textBodyGoals.visibility = View.GONE
-            binding!!.textBodyMembersGoals.visibility = View.VISIBLE
+            bodyGoalsText = "What are your family's body goals?"
+            showBodyGoals=false
             binding!!.progressBar.max = 11
             totalProgressValue = 11
-            updateProgress(2)
+            progressValue=2
         }
 
-        if (sessionManagement.getCookingScreen().equals("Profile")) {
+        Log.d("type","*****"+cookingFor)
+
+        binding!!.tvYourBodyGoals.text = bodyGoalsText
+        updateProgress(progressValue)
+
+        if (showBodyGoals){
+            binding!!.textBodyGoals.visibility = View.VISIBLE
+            binding!!.textBodyMembersGoals.visibility = View.GONE
+        }else{
+            binding!!.textBodyGoals.visibility = View.GONE
+            binding!!.textBodyMembersGoals.visibility = View.VISIBLE
+        }
+
+        if (cookingScreen.equals("Profile")) {
             binding!!.llBottomBtn.visibility = View.GONE
             binding!!.rlUpdateBodyGoals.visibility = View.VISIBLE
-
-            if (BaseApplication.isOnline(requireActivity())) {
-                bodyGoalSelectApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
+            loadApi(cookingScreen)
         } else {
             binding!!.llBottomBtn.visibility = View.VISIBLE
             binding!!.rlUpdateBodyGoals.visibility = View.GONE
-
             if (bodyGoalViewModel.getBodyGoalData()!=null){
                 showDataInUi(bodyGoalViewModel.getBodyGoalData()!!)
             }else{
-                ///checking the device of mobile data in online and offline(show network error message)
-                if (BaseApplication.isOnline(requireActivity())) {
-                    bodyGoalApi()
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
+                loadApi(cookingScreen)
             }
         }
-
 
         ///handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -134,6 +137,18 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
         return binding!!.root
     }
 
+    private fun loadApi(type: String?){
+        if (BaseApplication.isOnline(requireActivity())) {
+            if (type.equals("Profile")){
+                bodyGoalSelectApi()
+            }else{
+                bodyGoalApi()
+            }
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
     private fun bodyGoalSelectApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
@@ -142,7 +157,6 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
                 when (it) {
                     is NetworkResult.Success -> {
                         try {
-                            val gson = Gson()
                             val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
                             if (bodyModel.code == 200 && bodyModel.success) {
                                 showDataInUi(bodyModel.data.bodygoal)
@@ -157,11 +171,9 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
                             Log.d("bodyGoal@@","message"+e.message)
                         }
                     }
-
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
-
                     else -> {
                         showAlertFunction(it.message, false)
                     }
@@ -178,7 +190,6 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
                 when (it) {
                     is NetworkResult.Success -> {
                         try {
-                            val gson = Gson()
                             val bodyModel = gson.fromJson(it.data, BodyGoalModel::class.java)
                             if (bodyModel.code == 200 && bodyModel.success) {
                                 showDataInUi(bodyModel.data)
@@ -209,15 +220,15 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
 
     private fun showDataInUi(bodyModelData: MutableList<BodyGoalModelData>) {
         try {
-            if (bodyModelData != null && bodyModelData.size > 0) {
-                bodyModelData1 = bodyModelData
-                bodyGoalAdapter = BodyGoalAdapter(bodyModelData, requireActivity(), this)
+            bodyModelData1.clear()
+            bodyModelData1.addAll(bodyModelData)
+            if (bodyModelData1.size > 0) {
+                bodyGoalAdapter = BodyGoalAdapter(bodyModelData1, requireActivity(), this)
                 binding!!.rcyBodyGoals.adapter = bodyGoalAdapter
             }
         }catch (e:Exception){
             Log.d("bodyGoal","message"+e.message)
         }
-
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {

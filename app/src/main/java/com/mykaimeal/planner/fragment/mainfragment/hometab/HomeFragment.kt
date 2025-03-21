@@ -258,13 +258,13 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 if (breakfast!! != 0) {
                     cookstatus = true
                 }
-                /*if (cookstatus) {
+                if (cookstatus) {
                     binding!!.rlSeeAllBtn.visibility = View.VISIBLE
                     binding!!.imageCookedMeals.visibility = View.GONE
                 } else {
                     binding!!.imageCookedMeals.visibility = View.VISIBLE
                     binding!!.rlSeeAllBtn.visibility = View.GONE
-                }*/
+                }
             }
 
             if (userDataLocal.frezzer != null) {

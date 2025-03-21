@@ -383,7 +383,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
                 // Snacks
                 if (cookedTabModelData.Snacks != null && cookedTabModelData.Snacks.size >0) {
-                    foodListSnacksAdapter = setupMealAdapter(cookedTabModelData.Snacks, binding!!.rcvSnacks, "Snack")
+                    foodListSnacksAdapter = setupMealAdapter(cookedTabModelData.Snacks, binding!!.rcvSnacks, "Snacks")
                     binding!!.relSnacks.visibility = View.VISIBLE
                 } else {
                     binding!!.relSnacks.visibility = View.GONE
@@ -504,8 +504,8 @@ class CookedFragment : Fragment(), OnItemClickListener {
             "BreakFast" -> recipesModel?.Breakfast to foodListBreakFastAdapter
             "Lunch" -> recipesModel?.Lunch to foodListLunchAdapter
             "Dinner" -> recipesModel?.Dinner to foodListDinnerAdapter
-            "Snack" -> recipesModel?.Dinner to foodListSnacksAdapter
-            "TeaTime" -> recipesModel?.Dinner to foodListTeaTimeAdapter
+            "Snacks" -> recipesModel?.Snacks to foodListSnacksAdapter
+            "Brunch" -> recipesModel?.Teatime to foodListTeaTimeAdapter
             else -> null to null
         }
 
@@ -861,7 +861,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
                                     "BreakFast" to binding!!.rlBreakfast,
                                     "Lunch" to binding!!.rlLunch,
                                     "Dinner" to binding!!.relDinner,
-                                    "Snack" to binding!!.relSnacks,
+                                    "Snacks" to binding!!.relSnacks,
                                     "Teatime" to binding!!.relTeaTime
                                 )
 

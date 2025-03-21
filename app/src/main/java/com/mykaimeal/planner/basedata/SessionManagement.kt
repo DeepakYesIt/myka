@@ -337,7 +337,7 @@ class SessionManagement(var context: Context) {
     }
 
     fun getEatingOut(): String? {
-        return pref?.getString(AppConstant.ReasonForTakeAway, "")
+        return pref?.getString(AppConstant.EatingOut, "")
     }
 
     fun setReasonTakeAway(reasonAway: String) {

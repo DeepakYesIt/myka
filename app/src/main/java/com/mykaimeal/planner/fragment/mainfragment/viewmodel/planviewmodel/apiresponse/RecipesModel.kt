@@ -6,6 +6,7 @@ data class RecipesModel(
     val Breakfast: MutableList<BreakfastModel>?,
     val Dinner: MutableList<BreakfastModel>?,
     val Lunch: MutableList<BreakfastModel>?,
+    @SerializedName("Snacks")
     val Snack: MutableList<BreakfastModel>?,
     @SerializedName("Brunch")
     val Teatime: MutableList<BreakfastModel>?
