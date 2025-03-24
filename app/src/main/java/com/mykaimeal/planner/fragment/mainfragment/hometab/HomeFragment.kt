@@ -32,7 +32,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import com.mykaimeal.planner.OnItemClickListener
-import com.mykaimeal.planner.OnItemLongClickListener
+
 import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
@@ -56,8 +56,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnItemSelectListener,
-    OnItemLongClickListener {
+class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnItemSelectListener{
 
     private var binding: FragmentHomeBinding? = null
     private var dataList3: MutableList<DataModel> = mutableListOf()
@@ -72,6 +71,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
     private var latitude = "0.0"
     private var longitude = "0.0"
+    private var cookstatus = false
 
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
         mutableListOf()
@@ -243,7 +243,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 binding!!.imageCheckSav.visibility = View.VISIBLE
             } else {
                 binding!!.imagePlanMeal.visibility = View.VISIBLE
-                binding!!.imageCheckSav.visibility = View.GONE
+;l,          binding!!.imageCheckSav.visibility = View.GONE
             }*/
 
             if (userDataLocal.date != null && !userDataLocal.date.equals("", true)) {
@@ -254,10 +254,11 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             }
 
             fun updateCount(breakfast: Int?) {
-                var cookstatus = false
                 if (breakfast!! != 0) {
                     cookstatus = true
                 }
+                Log.d("status ,", "******$cookstatus")
+
                 if (cookstatus) {
                     binding!!.rlSeeAllBtn.visibility = View.VISIBLE
                     binding!!.imageCookedMeals.visibility = View.GONE
@@ -333,89 +334,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
-    }
-
-
-    private fun checkForZeroValues(): Boolean {
-        var allZero = true // Initialize to true
-
-        if (userDataLocal.frezzer != null) {
-            if (userDataLocal.frezzer.Breakfast != null) {
-                binding!!.tvfreezerbreakfast.text = "" + userDataLocal.frezzer.Breakfast
-                if (userDataLocal.frezzer.Breakfast == 0) return false
-                allZero = false
-            }
-            if (userDataLocal.frezzer.Lunch != null) {
-                binding!!.tvfreezerlunch.text = "" + userDataLocal.frezzer.Lunch
-                if (userDataLocal.frezzer.Lunch == 0) return false
-                allZero = false
-            }
-            if (userDataLocal.frezzer.Dinner != null) {
-                binding!!.tvfreezerdinner.text = "" + userDataLocal.frezzer.Dinner
-                if (userDataLocal.frezzer.Dinner == 0) return false
-                allZero = false
-            }
-            if (userDataLocal.frezzer.Snacks != null) {
-                binding!!.laySnack.visibility = View.VISIBLE
-                binding!!.tvfreezersnack.text = "" + userDataLocal.frezzer.Snacks
-                if (userDataLocal.frezzer.Snacks == 0) return false
-                allZero = false
-            } else {
-                binding!!.tvfreezersnack.visibility = View.GONE
-            }
-            if (userDataLocal.frezzer.Teatime != null) {
-                binding!!.layTeatime.visibility = View.VISIBLE
-                binding!!.tvfreezerteatime.text = "" + userDataLocal.frezzer.Teatime
-                if (userDataLocal.frezzer.Teatime == 0) return false
-                allZero = false
-            } else {
-                binding!!.layTeatime.visibility = View.GONE
-            }
-        }
-
-        if (userDataLocal.fridge != null) {
-            if (userDataLocal.fridge.Breakfast != null) {
-                binding!!.tvfridgebreakfast.text = "" + userDataLocal.fridge.Breakfast
-                if (userDataLocal.fridge.Breakfast == 0) return false
-                allZero = false
-            }
-            if (userDataLocal.fridge.Lunch != null) {
-                binding!!.tvfridgelunch.text = "" + userDataLocal.fridge.Lunch
-                if (userDataLocal.fridge.Lunch == 0) return false
-                allZero = false
-            }
-            if (userDataLocal.fridge.Dinner != null) {
-                binding!!.tvfridgedinner.text = "" + userDataLocal.fridge.Dinner
-                if (userDataLocal.fridge.Dinner == 0) return false
-                allZero = false
-            }
-            if (userDataLocal.fridge.Snacks != null) {
-                binding!!.laySnack.visibility = View.VISIBLE
-                binding!!.tvfridgesnack.text = "" + userDataLocal.fridge.Snacks
-                if (userDataLocal.fridge.Snacks == 0) return false
-                allZero = false
-            } else {
-                binding!!.laySnack.visibility = View.GONE
-            }
-            if (userDataLocal.fridge.Teatime != null) {
-                binding!!.layTeatime.visibility = View.VISIBLE
-                binding!!.tvfridgeteatime.text = "" + userDataLocal.fridge.Teatime
-                if (userDataLocal.fridge.Teatime == 0) return false
-                allZero = false
-            } else {
-                binding!!.layTeatime.visibility = View.GONE
-            }
-        }
-
-        if (allZero) {
-            binding!!.rlSeeAllBtn.visibility = View.VISIBLE
-            binding!!.imageCookedMeals.visibility = View.GONE
-        } else {
-            binding!!.imageCookedMeals.visibility = View.VISIBLE
-            binding!!.rlSeeAllBtn.visibility = View.GONE
-        }
-
-        return true // Return true only if no value is zero
     }
 
 
@@ -896,9 +814,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         }
     }
 
-    override fun itemLongClick(position: Int?, status: String?, type: String?) {
 
-    }
 
     override fun itemSelect(position: Int?, status: String?, type: String?) {
 

@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.mykaimeal.planner.OnItemLongClickListener
 import com.mykaimeal.planner.OnItemSelectUnSelectListener
@@ -92,11 +93,13 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
     private lateinit var startDate: Date
     private lateinit var endDate: Date
     private var dropDate: String? = ""
-    private var id: String? = ""
-    private var type: String? = ""
+    private var id: String? = "null"
+    private var uri: String? = ""
+    private var mealType: String? = ""
     private var dropDay: String? = null
     private var currentDate = Date() // Current date
     private var currentDateSelected: String = ""
+
     private lateinit var spinnerActivityLevel: PowerSpinnerView
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
         mutableListOf()
@@ -110,6 +113,9 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
+
+        binding!!.rlChangeCookSchedule.isClickable=false
+        binding!!.rlChangeCookSchedule.isEnabled=false
 
         sessionManagement = SessionManagement(requireContext())
         commonWorkUtils = CommonWorkUtils(requireContext())
@@ -136,7 +142,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         }
 
         if (BaseApplication.isOnline(requireActivity())) {
-            dataFetchByDate(currentDateSelected)
+            dataFetchByDate(currentDateSelected,"1")
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
@@ -203,7 +209,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
             // Fetch data for the selected date if online
             if (BaseApplication.isOnline(requireActivity())) {
-                dataFetchByDate(currentDateSelected)
+                dataFetchByDate(currentDateSelected,"1")
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
@@ -258,6 +264,10 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                         // Notify the adapter to refresh the changed position
                         calendarAdapter!!.updateList(dateList)
                         calendarAdapter!!.notifyItemChanged(targetPosition)
+
+                        binding!!.rlChangeCookSchedule.isClickable=true
+                        binding!!.rlChangeCookSchedule.isEnabled=true
+                        binding!!.rlChangeCookSchedule.setBackgroundResource(R.drawable.gray_btn_select_background)
 
                         /*calendarAdapter!!.updateList(dateList)*/
 
@@ -346,11 +356,18 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         }
     }
 
-    private fun  dataFetchByDate(date: String) {
+    private fun  dataFetchByDate(date: String,status:String) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             fUllCookingScheduleViewModel.fullCookingSchedule({
                 BaseApplication.dismissMe()
+                if (status.equals("2")){
+                    binding!!.rlChangeCookSchedule.isClickable=false
+                    binding!!.rlChangeCookSchedule.isEnabled=false
+                    binding!!.rlChangeCookSchedule.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                    // Display current week dates
+                    showWeekDates()
+                }
                 handleApiPlanDateResponse(it)
             }, date, "0")
         }
@@ -445,10 +462,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                 if (recipesDateModel?.Teatime != null && recipesDateModel?.Teatime?.size!! > 0) {
                     setupDragScrollForRecyclerView(binding!!.rcySearchTeaTime,"Brunch")
                     binding!!.llTeaTime.visibility = View.VISIBLE
-                    ingredientTeaTimeAdapter = IngredientsTeaTimeAdapter(
-                        recipesDateModel?.Teatime, requireActivity(), this,
-                        this, "Brunch"
-                    )
+                    ingredientTeaTimeAdapter = IngredientsTeaTimeAdapter(recipesDateModel?.Teatime, requireActivity(), this, this, "Brunch")
                     binding!!.rcySearchTeaTime.adapter = ingredientTeaTimeAdapter
                 } else {
                     binding!!.llTeaTime.visibility = View.GONE
@@ -584,19 +598,56 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
     private fun updateMealApi() {
         val jsonObject = JsonObject()
-        jsonObject.addProperty("type", "")
-        jsonObject.addProperty("id", "")
-        jsonObject.addProperty("date",dropDate)
-        jsonObject.addProperty("day", dropDay)
+
+
+        jsonObject.addProperty("type", mealType)
+        if (!id.equals("null")){
+
+            jsonObject.addProperty("id", id)
+            jsonObject.addProperty("date",dropDate)
+            jsonObject.addProperty("day", dropDay)
+        }else{
+            jsonObject.addProperty("uri", uri)
+            val jsonArray = JsonArray()
+            // Create a JsonObject for each ingredient
+            val ingredientObject = JsonObject()
+            ingredientObject.addProperty("date",dropDate)
+            ingredientObject.addProperty("day", dropDay)
+            // Add the ingredient object to the array
+            jsonArray.add(ingredientObject)
+            // Add the ingredients array to the main JSON object
+            jsonObject.add("slot", jsonArray)
+        }
+
+
         Log.d("json object ", "******$jsonObject")
 
+
+
+
+
+
+
+
         BaseApplication.showMe(requireContext())
-        lifecycleScope.launch {
-            fUllCookingScheduleViewModel.updateMealUrl({
-                BaseApplication.dismissMe()
-                handleApiUpdateScheduleResponse(it)
-            }, jsonObject)
+
+        if (!id.equals("null")){
+            lifecycleScope.launch {
+                    fUllCookingScheduleViewModel.updateMealUrl({
+                        BaseApplication.dismissMe()
+                        handleApiUpdateScheduleResponse(it)
+                    }, jsonObject)
+            }
+        }else{
+            lifecycleScope.launch {
+                    fUllCookingScheduleViewModel.recipeAddToPlanRequestApi({
+                        BaseApplication.dismissMe()
+                        handleApiUpdateScheduleResponse(it)
+                    }, jsonObject)
+            }
         }
+
+
     }
 
     private fun handleApiUpdateScheduleResponse(result: NetworkResult<String>) {
@@ -613,7 +664,10 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             val apiModel = Gson().fromJson(data, CreateRecipeSuccessModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                dataFetchByDate(currentDateSelected)
+                mealType=""
+                id="null"
+                uri=""
+                dataFetchByDate(currentDateSelected,"2")
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -1188,8 +1242,16 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         BaseApplication.alertError(requireContext(), message, status)
     }
 
-    override fun itemLongClick(position: Int?, status: String?, type: String?) {
-        onClickEnabled()
+    override fun itemLongClick(position: Int?, status: String?, type: String?,uriItem:String) {
+        id=status.toString()
+        uri=uriItem
+        mealType=type
+        Log.d("uri","****"+id)
+        Log.d("type","****"+uri)
+        Log.d("type","****"+type)
+
+            onClickEnabled()
+
     }
 
     private fun onClickEnabled() {

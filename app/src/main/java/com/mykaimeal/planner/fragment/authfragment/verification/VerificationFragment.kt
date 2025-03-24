@@ -537,10 +537,10 @@ class VerificationFragment : Fragment() {
 
         rlOkayBtn.setOnClickListener {
             if (isCookingComplete==0){
+                sessionManagement.setPreferences(true)
                 val intent = Intent(requireActivity(), EnterYourNameActivity::class.java)
                 startActivity(intent)
                 requireActivity().finish()
-                sessionManagement.setPreferences(true)
             }else{
                 sessionManagement.setLoginSession(true)
                 findNavController().navigate(R.id.turnOnLocationFragment)
