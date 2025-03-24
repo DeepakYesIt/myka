@@ -573,6 +573,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 binding!!.llCalculateBmr.visibility = View.VISIBLE
             }
 
+            
             if (recipesDateModel!!.fat != null || recipesDateModel!!.protein != null || recipesDateModel!!.kcal != null || recipesDateModel!!.carbs != null) {
                 if (recipesDateModel!!.fat?.toInt() != 0 || recipesDateModel!!.protein?.toInt() != 0 ||
                     recipesDateModel!!.kcal?.toInt() != 0 || recipesDateModel!!.carbs?.toInt() != 0
