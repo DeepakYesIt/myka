@@ -13,7 +13,7 @@ data class BasketYourRecipeModelData(
     val Breakfast: MutableList<Dinner?>,
     val Dinner: MutableList<Dinner?>,
     val Lunch: MutableList<Dinner?>,
-    val Snack: MutableList<Dinner?>,
+    val Snacks: MutableList<Dinner?>,
     val Teatime: MutableList<Dinner?>
 )
 

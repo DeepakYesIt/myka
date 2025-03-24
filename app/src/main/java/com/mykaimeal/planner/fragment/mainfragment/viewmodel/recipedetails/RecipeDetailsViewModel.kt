@@ -29,6 +29,12 @@ class RecipeDetailsViewModel @Inject constructor(private val repository: MainRep
     }
 
 
+    suspend fun addMealTypeApiUrl(successCallback: (response: NetworkResult<String>) -> Unit, uri: String?, planType:String?
+    ){
+        repository.addMealTypeApiUrl({ successCallback(it) },uri, planType)
+    }
+
+
     fun setRecipeData(data: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.recipedetails.apiresponse.Data>) {
         localData=data
     }

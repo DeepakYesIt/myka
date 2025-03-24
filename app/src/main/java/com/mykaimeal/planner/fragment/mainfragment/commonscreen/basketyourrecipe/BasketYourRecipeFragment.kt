@@ -140,10 +140,10 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
             binding.tvDinner.visibility=View.GONE
         }
 
-        if (data!!.Snack!=null && data.Snack.size>0){
+        if (data.Snacks!=null && data.Snacks.size>0){
             binding.rcySnacks.visibility=View.VISIBLE
             binding.tvSnacks.visibility=View.VISIBLE
-            yourRecipeAdapter = YourRecipeAdapter(data.Snack,requireActivity(), this,"Snacks")
+            yourRecipeAdapter = YourRecipeAdapter(data.Snacks,requireActivity(), this,"Snacks")
             binding.rcySnacks.adapter = yourRecipeAdapter
         }else{
             binding.rcySnacks.visibility=View.GONE

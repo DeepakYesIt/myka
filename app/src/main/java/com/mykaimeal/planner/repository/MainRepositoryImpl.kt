@@ -2199,4 +2199,23 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
     }
 
 
+    override suspend fun addMealTypeApiUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,uri:String?,planType:String?
+    ) {
+        try {
+            api.addMealTypeApiUrl(uri,planType).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
 }
