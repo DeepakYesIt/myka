@@ -18,6 +18,7 @@ import com.bumptech.glide.request.target.Target
 import com.mykaimeal.planner.OnItemLongClickListener
 import com.mykaimeal.planner.OnItemSelectUnSelectListener
 import com.mykaimeal.planner.R
+import com.mykaimeal.planner.adapter.IngredientsBreakFastAdapter.ViewHolder
 import com.mykaimeal.planner.databinding.AdapterIngredientsItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.Breakfast
 
@@ -102,7 +103,7 @@ class IngredientsDinnerAdapter(
             holder.binding.imageMinus.visibility= View.GONE
             holder.binding.relWatchTimer.visibility= View.VISIBLE
             holder.binding.imgHeartRed.visibility= View.VISIBLE
-            stopZiggle(holder.itemView)
+            stopZiggle(holder)
         }
 
         holder.binding.missingIngredientsImg.setOnClickListener{
@@ -141,7 +142,7 @@ class IngredientsDinnerAdapter(
 
 
             // Notify the onItemLongClickListener of the long click event
-            onItemLongClickListener.itemLongClick(position, checkStatus, type)
+            onItemLongClickListener.itemLongClick(position,item?.id?.toString(), type,item?.recipe?.uri!!)
             true
         }
     }
@@ -156,25 +157,43 @@ class IngredientsDinnerAdapter(
     }
 
     class ViewHolder(var binding: AdapterIngredientsItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        var ziggleAnimation: ObjectAnimator? = null
 
     }
 
-    private fun stopZiggle(view: View) {
-        ziggleAnimation?.cancel()
-        ziggleAnimation = null
-        view.rotation = 0f
+    private fun stopZiggle(holder:ViewHolder) {
+//        ziggleAnimation?.cancel()
+//        ziggleAnimation = null
+//        view.rotation = 0f
+//        isZiggleEnabled = false
+
         isZiggleEnabled = false
+        holder.ziggleAnimation?.cancel()
+        holder.itemView.rotation = 0f
+
     }
 
     private fun startZiggleAnimation(holder: ViewHolder) {
-        val startAngle = -5f // -2 degrees
+        /*val startAngle = -5f // -2 degrees
         val stopAngle = 5f   // 2 degrees
 
         ziggleAnimation = ObjectAnimator.ofFloat(holder.itemView, "rotation", startAngle, stopAngle)
         ziggleAnimation!!.duration = 80
         ziggleAnimation!!.repeatMode = ValueAnimator.REVERSE
         ziggleAnimation!!.repeatCount = ValueAnimator.INFINITE
-        ziggleAnimation!!.start()
+        ziggleAnimation!!.start()*/
+
+        holder.ziggleAnimation?.cancel()
+        holder.itemView.rotation = 0f
+
+        val startAngle = -5f
+        val stopAngle = 5f
+        holder.ziggleAnimation = ObjectAnimator.ofFloat(holder.itemView, "rotation", startAngle, stopAngle).apply {
+            duration = 80
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            start()
+        }
     }
 
     fun updateList(mealList: MutableList<Breakfast>?) {

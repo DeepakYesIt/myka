@@ -112,7 +112,7 @@ class IngredientsTeaTimeAdapter(var datalist:MutableList<Breakfast>?, private va
             holder.binding.imageMinus.visibility= View.GONE
             holder.binding.relWatchTimer.visibility= View.VISIBLE
             holder.binding.imgHeartRed.visibility= View.VISIBLE
-            stopZiggle(holder.itemView)
+            stopZiggle(holder)
         }
 
         holder.binding.missingIngredientsImg.setOnClickListener{
@@ -136,6 +136,7 @@ class IngredientsTeaTimeAdapter(var datalist:MutableList<Breakfast>?, private va
          }
 
         holder.itemView.setOnLongClickListener{
+
             val clipData = ClipData(
                 item?.recipe?.label, // Use the title as the drag data
                 arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
@@ -144,7 +145,7 @@ class IngredientsTeaTimeAdapter(var datalist:MutableList<Breakfast>?, private va
 
             val shadowBuilder = View.DragShadowBuilder(holder.itemView)
             holder.itemView.startDragAndDrop(clipData, shadowBuilder, null, 0)
-            onItemLongClickListener.itemLongClick(position, checkStatus, type)
+            onItemLongClickListener.itemLongClick(position,item?.id?.toString(), type,item?.recipe?.uri!!)
             true
             /*onItemLongClickListener.itemLongClick(position, checkStatus, datalist[position].type)
             true*/
@@ -161,24 +162,41 @@ class IngredientsTeaTimeAdapter(var datalist:MutableList<Breakfast>?, private va
     }
 
     class ViewHolder(var binding: AdapterIngredientsItemBinding) : RecyclerView.ViewHolder(binding.root){
+
+
+        var ziggleAnimation: ObjectAnimator? = null
     }
 
     private fun startZiggleAnimation(holder: ViewHolder) {
-        val startAngle = -5f // -2 degrees
+       /* val startAngle = -5f // -2 degrees
         val stopAngle = 5f   // 2 degrees
 
         ziggleAnimation = ObjectAnimator.ofFloat(holder.itemView, "rotation", startAngle, stopAngle)
         ziggleAnimation!!.duration = 80
         ziggleAnimation!!.repeatMode = ValueAnimator.REVERSE
         ziggleAnimation!!.repeatCount = ValueAnimator.INFINITE
-        ziggleAnimation!!.start()
+        ziggleAnimation!!.start()*/
+        holder.ziggleAnimation?.cancel()
+        holder.itemView.rotation = 0f
+        val startAngle = -5f
+        val stopAngle = 5f
+        holder.ziggleAnimation = ObjectAnimator.ofFloat(holder.itemView, "rotation", startAngle, stopAngle).apply {
+            duration = 80
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            start()
+        }
+
     }
 
-    private fun stopZiggle(view: View) {
-        ziggleAnimation?.cancel()
+    private fun stopZiggle(holder: ViewHolder) {
+        /*ziggleAnimation?.cancel()
         ziggleAnimation = null
         view.rotation = 0f
+        isZiggleEnabled = false*/
         isZiggleEnabled = false
+        holder.ziggleAnimation?.cancel()
+        holder.itemView.rotation = 0f
     }
 
     fun updateList(mealList: MutableList<Breakfast>) {

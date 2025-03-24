@@ -34,4 +34,9 @@ class FullCookingScheduleViewModel @Inject constructor(private val repository: M
         repository.updateMealUrl({ successCallback(it) },jsonObject)
     }
 
+    suspend fun recipeAddToPlanRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, jsonObject: JsonObject
+    ){
+        repository.recipeAddToPlanRequestApi({ successCallback(it) },jsonObject)
+    }
+
 }
