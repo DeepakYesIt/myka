@@ -112,10 +112,6 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
         }
 
         binding!!.tvTitleName.setOnClickListener {
-
-
-
-
             if (BaseApplication.isOnline(requireActivity())) {
                 val mainActivity = requireActivity() as MainActivity
                 mainActivity.mealRoutineSelectApi { data ->
@@ -234,7 +230,6 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
                 }
             }
         }
-
 
     }
 

@@ -26,7 +26,6 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.dropoffoptionscr
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.util.regex.Pattern
 
 @AndroidEntryPoint
 class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
