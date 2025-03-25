@@ -460,7 +460,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
     }
 
 
-    
+
     override fun itemClick(selectItem: Int?, status1: String?, type: String?) {
         reasonSelect=""
         reasonTakeAway = ""
