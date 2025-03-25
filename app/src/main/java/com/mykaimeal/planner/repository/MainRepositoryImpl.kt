@@ -266,6 +266,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         cookingFrequency: String?,
         eatingOut: String?,
         takeAway: String?,
+        takeWayName: String?,
         cookingForType: String?,
         partnerName: String?,
         partnerAge: String?,
@@ -293,6 +294,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                 cookingFrequency,
                 eatingOut,
                 takeAway,
+                takeWayName,
                 cookingForType,
                 partnerName,
                 partnerAge,
@@ -458,6 +460,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         cookingFrequency: String?,
         eatingOut: String?,
         takeAway: String?,
+        takeWayName: String?,
         cookingForType: String?,
         partnerName: String?,
         partnerAge: String?,
@@ -485,6 +488,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                 cookingFrequency,
                 eatingOut,
                 takeAway,
+                takeWayName,
                 cookingForType,
                 partnerName,
                 partnerAge,
@@ -1788,7 +1792,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         spendingAmount: String?,
         duration: String?,
         eatingOut: String?,
-        takeWay: String?
+        takeWay: String?,takeWayName: String?
     ) {
         try {
             api.updatePreferencesApi(
@@ -1811,7 +1815,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                 spendingAmount,
                 duration,
                 eatingOut,
-                takeWay
+                takeWay,takeWayName
             ).apply {
                 if (isSuccessful) {
                     body()?.let {

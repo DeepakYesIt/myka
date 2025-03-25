@@ -443,7 +443,7 @@ class SignUpFragment : Fragment() {
                 bodyGoals,
                 cookingFrequency,
                 eatingOut,
-                reasonTakeAway,
+                reasonTakeAway,"",
                 cookingFor,
                 partnerName,
                 partnerAge,

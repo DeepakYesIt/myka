@@ -22,7 +22,7 @@ interface MainRepository {
     suspend fun signUpModel(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String, password: String)
 
     suspend fun otpVerify(successCallback: (response: NetworkResult<String>) -> Unit,userid: String?, otp: String?,userName:String?,userGender:String?,
-                          bodyGoal:String?,cookingFrequency:String?,eatingOut: String?, takeAway:String?,cookingForType:String?,
+                          bodyGoal:String?,cookingFrequency:String?,eatingOut: String?, takeAway:String?,takeWayName:String?,cookingForType:String?,
                           partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?, familyMemberAge:String?,
                           childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?, dietaryid:List<String>?,
                           favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?)
@@ -39,7 +39,7 @@ interface MainRepository {
     suspend fun userLogin(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String,password: String,deviceType:String,fcmToken:String)
 
     suspend fun socialLogin(successCallback: (response: NetworkResult<String>) -> Unit,  emailOrPhone: String?, socialID: String?,userName:String?,
-                            userGender:String?,bodyGoal:String?,cookingFrequency:String?,eatingOut:String?,takeAway:String?,cookingForType:String?,
+                            userGender:String?,bodyGoal:String?,cookingFrequency:String?,eatingOut:String?,takeAway:String?,takeWayName:String?,cookingForType:String?,
                             partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?, familyMemberAge:String?,
                             childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?, dietaryid:List<String>?,
                             favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?)
@@ -221,7 +221,7 @@ interface MainRepository {
                                      userGender:String?,bodyGoal:String?,partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?,
                              familyMemberAge:String?,childFriendlyMeals:String?,dietaryId: MutableList<String>?,favouriteId: MutableList<String>?,
                              dislikeIngId: MutableList<String>?,allergensId: MutableList<String>?,mealRoutineId: MutableList<String>?,cookingFrequency: String?,
-                             spendingAmount: String?,duration: String?,eatingOut: String?,takeWay: String?)
+                             spendingAmount: String?,duration: String?,eatingOut: String?,takeWay: String?,takeWayName: String?)
 
     suspend fun getFilterList(successCallback: (response: NetworkResult<String>) -> Unit)
 

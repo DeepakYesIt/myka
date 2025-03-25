@@ -22,6 +22,7 @@ class LoginViewModel @Inject constructor(private val repository: MainRepository)
         cookingFrequency: String?,
         eatingOut: String?,
         takeAway: String?,
+        takeWayName: String?,
         cookingForType: String?,
         partnerName: String?,
         partnerAge: String?,
@@ -37,7 +38,7 @@ class LoginViewModel @Inject constructor(private val repository: MainRepository)
         deviceType: String?,
         fcmToken: String?
     ) {
-        repository.socialLogin({ successCallback(it) }, emailOrPhone, socialId, userName, userGender, bodyGoal, cookingFrequency,eatingOut, takeAway,
+        repository.socialLogin({ successCallback(it) }, emailOrPhone, socialId, userName, userGender, bodyGoal, cookingFrequency,eatingOut, takeAway,takeWayName,
             cookingForType, partnerName,partnerAge, partnerGender, familyMemberName, familyMemberAge, childFriendlyMeals, mealRoutineId, spendingAmount,
             duration, dietaryId,favourite, allergies, dislikeIngredients, deviceType, fcmToken
         )

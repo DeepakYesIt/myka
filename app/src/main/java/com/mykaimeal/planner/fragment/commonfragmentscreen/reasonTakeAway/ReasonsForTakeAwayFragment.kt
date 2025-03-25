@@ -313,7 +313,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 }
             },userName,cookingFor,userGender,bodyGoals,partnerName,partnerAge,partnerGender,familyMemName,
                 familyMemAge, familyMemStatus,dietarySelectedId,favouriteSelectedId,dislikeSelectedId,allergenSelectedId,mealRoutineSelectedId,
-                cookingFrequency,spendingAmount,spendingDuration,eatingOut, reasonTakeAway)
+                cookingFrequency,spendingAmount,spendingDuration,eatingOut, reasonSelect,"")
         }
     }
 
