@@ -56,7 +56,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnItemSelectListener{
+class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnItemSelectListener {
 
     private var binding: FragmentHomeBinding? = null
     private var dataList3: MutableList<DataModel> = mutableListOf()
@@ -169,7 +169,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         try {
             val apiModel = Gson().fromJson(data, SuperMarketModel::class.java)
             Log.d("@@@ Recipe Details ", "message :- $data")
-            if (apiModel.code == 200 && apiModel.success==true) {
+            if (apiModel.code == 200 && apiModel.success == true) {
                 showUIData(apiModel.data)
             } else {
                 if (apiModel.code == ErrorMessage.code) {
@@ -185,12 +185,12 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
     private fun showUIData(data: MutableList<Store>?) {
         try {
-            if (data!=null){
-                adapterSuperMarket = SuperMarketListAdapter(data, requireActivity(), this,0)
+            if (data != null) {
+                adapterSuperMarket = SuperMarketListAdapter(data, requireActivity(), this, 0)
                 recySuperMarket!!.adapter = adapterSuperMarket
             }
 
-        }catch (e:Exception){
+        } catch (e: Exception) {
             showAlert(e.message, false)
         }
     }
@@ -223,34 +223,39 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             if (userDataLocal.userData != null && userDataLocal.userData!!.size > 0) {
                 binding!!.relPlanMeal.visibility = View.GONE
                 binding!!.llRecipesCooked.visibility = View.VISIBLE
-                recipeCookedAdapter = RecipeCookedAdapter(userDataLocal.userData, requireActivity(), this)
+                recipeCookedAdapter =
+                    RecipeCookedAdapter(userDataLocal.userData, requireActivity(), this)
                 binding!!.rcyRecipesCooked.adapter = recipeCookedAdapter
             } else {
                 binding!!.relPlanMeal.visibility = View.VISIBLE
                 binding!!.llRecipesCooked.visibility = View.GONE
             }
 
-              if (userDataLocal.graph_value == 0) {
-                  binding!!.imagePlanMeal.visibility = View.VISIBLE
-                  binding!!.imageCheckSav.visibility = View.GONE
-              } else {
-                  binding!!.imagePlanMeal.visibility = View.GONE
-                  binding!!.imageCheckSav.visibility = View.VISIBLE
-              }
+            /*   if (userDataLocal.graph_value == 0) {
+                   binding!!.imagePlanMeal.visibility = View.VISIBLE
+                   binding!!.imageCheckSav.visibility = View.GONE
+               } else {
+                   binding!!.imagePlanMeal.visibility = View.GONE
+                   binding!!.imageCheckSav.visibility = View.VISIBLE
+               }*/
 
-          /*  if (userDataLocal.graph_value == 0) {
-                binding!!.imagePlanMeal.visibility = View.GONE
-                binding!!.imageCheckSav.visibility = View.VISIBLE
+            if (userDataLocal.graph_value == 0) {
+                binding!!.relMonthlySavingsss.visibility = View.GONE
+                binding!!.relCheckSavingsss.visibility = View.VISIBLE
             } else {
-                binding!!.imagePlanMeal.visibility = View.VISIBLE
-;l,          binding!!.imageCheckSav.visibility = View.GONE
-            }*/
+                binding!!.relMonthlySavingsss.visibility = View.VISIBLE
+                binding!!.relCheckSavingsss.visibility = View.GONE
+            }
 
             if (userDataLocal.date != null && !userDataLocal.date.equals("", true)) {
-                val name = BaseApplication.getColoredSpanned("Next meal to be cooked on ", "#3C4541") + BaseApplication.getColoredSpanned(data.date + ".", "#06C169")
+                val name = BaseApplication.getColoredSpanned(
+                    "Next meal to be cooked on ",
+                    "#3C4541"
+                ) + BaseApplication.getColoredSpanned(data.date + ".", "#06C169")
                 binding!!.tvHomeDesc.text = Html.fromHtml(name)
             } else {
-                binding!!.tvHomeDesc.text = "Your cooking schedule is empty! Tap the button below to add a meal and get started."
+                binding!!.tvHomeDesc.text =
+                    "Your cooking schedule is empty! Tap the button below to add a meal and get started."
             }
 
             fun updateCount(breakfast: Int?) {
@@ -442,7 +447,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         binding!!.imageCheckSav.setOnClickListener(this)
 
 
-        if (BaseApplication.isOnline(requireActivity())){
+        if (BaseApplication.isOnline(requireActivity())) {
             // This condition for check location run time permission
             if (ContextCompat.checkSelfPermission(
                     requireActivity(),
@@ -461,7 +466,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                     ), 100
                 )
             }
-        }else{
+        } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
     }
@@ -469,7 +474,8 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     @SuppressLint("MissingPermission")
     private fun getCurrentLocation() {
         // Initialize Location manager
-        val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         // Check condition
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
                 LocationManager.NETWORK_PROVIDER
@@ -813,7 +819,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             dialogRemoveDay.dismiss()
         }
     }
-
 
 
     override fun itemSelect(position: Int?, status: String?, type: String?) {

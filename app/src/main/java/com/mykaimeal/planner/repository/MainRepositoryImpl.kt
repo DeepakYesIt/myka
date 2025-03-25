@@ -2198,6 +2198,24 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
+    override suspend fun recipeSwapUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,id:String?,uri:String?
+    ) {
+        try {
+            api.recipeSwapUrl(id,uri).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
 
     override suspend fun addMealTypeApiUrl(
         successCallback: (response: NetworkResult<String>) -> Unit,uri:String?,planType:String?

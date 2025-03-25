@@ -634,7 +634,7 @@
                             android:fontFamily="@font/poppins"
                             android:layout_marginTop="@dimen/_5sdp"
                             android:layout_below="@+id/tvMonthlySavings"
-                            android:text="Good job Danny, you are on track to save £80 this month"
+                            android:text="Good job Danny, you are on track to save £0 this month"
                             android:textColor="@color/black"
                             android:textSize="@dimen/_11sdp" />
 
@@ -667,6 +667,7 @@
                     android:id="@+id/imagePlanMeal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:src="@drawable/monthly_savings_plan_bg"/>
                 <ImageView
                     android:id="@+id/imageCheckSav"

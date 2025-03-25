@@ -3,7 +3,7 @@
     <string name="my_kitchen_assistant">My Kitchen Assistant</string>
     <string name="publish_key">pk_test_51PdDwn2MfdrjGdokeRO8ulheGv5oP8xXkvE7izmXQbSrmXPO2g6S9x0QoiafnAi3F52AwyC1NHJWOOJqPpcmNbuw00Q2OcA9nr</string>
 
-    <string name="simplify_cooking_meal_planning_and_shopping_all_in_one_place">Simplify cooking, meal planning,\n and shopping all in one place</string>
+    <string name="simplify_cooking_meal_planning_and_shopping_all_in_one_place">Simplify cooking, meal planning and\n grocery shopping all in one place</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <!--
@@ -22,6 +22,7 @@
     <string name="select_gender">Select Gender</string>
 
     <string name="myka_meal_planner"> <font color="#06C169">My-Kai</font><font color="#FE9F45"> Meal Planner</font></string>
+    <string name="myka_kitchen_ai"> <font color="#06C169">My Kitchen</font><font color="#FE9F45"> AI</font></string>
     <string name="sept_meal_planner"> <font color="#3C4541">Next meal to be cooked on </font><font color="#06C169">20 Sept.</font></string>
     <string name="login_to_your_account"><font color="#000000">Login to Your</font><font color="#06C169"> Account</font></string>
     <string name="forgot_password"><font color="#000000">Forgot</font><font color="#06C169"> Password</font></string>
@@ -72,7 +73,7 @@
     <string name="you_want_to_remove_this_meal_from_the_schedule_day">You want to remove this Meal from the\n schedule day?</string>
     <string name="feedback_support"><![CDATA[Feedback & Support]]></string>
     <string name="your_macronutrient_targets"><font color="#000000">Your Macronutrient</font><font color="#06C169"> Targets</font></string>
-    <string name="daily_macro_targets"><font color="#000000">Daily Macro</font><font color="#06C169"> Targets</font></string>
+    <string name="daily_macro_targets"><font color="#000000">Daily macro</font><font color="#06C169"> targets</font></string>
 
 
     <string name="terms_and_conditions">

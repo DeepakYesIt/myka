@@ -393,8 +393,6 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             }else{
                 binding!!.layBottom.visibility = View.GONE
             }
-
-
         }
 
         binding!!.textStepInstructions.setOnClickListener {
@@ -425,7 +423,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                 ingredientsRecipeAdapter?.updateList(viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients!!)
             }
         }
- 
+
         binding!!.layBasket.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
                 if (viewModel.getRecipeData()?.size!!> 0) {

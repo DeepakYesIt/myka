@@ -621,16 +621,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
 
         Log.d("json object ", "******$jsonObject")
-
-
-
-
-
-
-
-
         BaseApplication.showMe(requireContext())
-
         if (!id.equals("null")){
             lifecycleScope.launch {
                     fUllCookingScheduleViewModel.updateMealUrl({
@@ -661,7 +652,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
     @SuppressLint("SetTextI18n")
     private fun handleUpdateScheduleResponse(data: String) {
         try {
-            val apiModel = Gson().fromJson(data, CreateRecipeSuccessModel::class.java)
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 mealType=""
@@ -786,40 +777,25 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
     private fun openDialog() {
         val dialog = Dialog(requireActivity())
-
         // Set custom layout
         dialog.setContentView(R.layout.dialog_calendar)
+
         dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
 
         val calendarView = dialog.findViewById<CalendarView>(R.id.calendar)
-
-        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            // Convert selected date into a Calendar instance
-            val selectedCalendar = Calendar.getInstance()
-            selectedCalendar.set(year, month, dayOfMonth)
-
-            // Calculate start and end of the week
-            val startOfWeek = calendar.clone() as Calendar
-            startOfWeek.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-
-            // Calculate the end of the week (Sunday)
-            val endOfWeek = calendar.clone() as Calendar
-            endOfWeek.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-            endOfWeek.add(Calendar.DAY_OF_WEEK, 6) // Add 6 days to Monday to reach Sunday
-
-            // Format the dates for display
-            val startDate = dateFormat1.format(startOfWeek.time)
-            val endDate = dateFormat1.format(endOfWeek.time)
-
-//            // Update the Week Range Text
-            binding!!.tvCustomDates.text = "$startDate - $endDate"
-            // Calculate the days for the adapter and update it
-            val daysOfWeek = getDaysOfWeekForSelectedDate(selectedCalendar)
-            calendarDayAdapter!!.updateData(daysOfWeek)
-            // Dismiss the dialog after selection
+        calendarView.setOnDateChangeListener { view: CalendarView?, year: Int, month: Int, dayOfMonth: Int ->
+            val calendar = Calendar.getInstance()
+            calendar.set(year, month, dayOfMonth)
+            val date = calendar.time  // This is the Date object
+            // Format the Date object to the desired string format
+            val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.getDefault())
+            val currentDateString = dateFormat.format(date)  // This is the formatted string
+            // To convert the string back to a Date object:
+            currentDate = dateFormat.parse(currentDateString)!!  // This is the Date object
+            // Display current week dates
+            showWeekDates()
             dialog.dismiss()
         }
-
         dialog.show()
     }
 

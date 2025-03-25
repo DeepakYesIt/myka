@@ -99,5 +99,7 @@ object ApiEndPoint {
 
     const val getSelectProductsUrl="select-product"
 
+    const val recipeSwapUrl="swap"
+
 
 }
