@@ -1212,8 +1212,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "BreakFast" -> recipesModel?.Breakfast to breakfastAdapter
             "Lunch" -> recipesModel?.Lunch to lunchAdapter
             "Dinner" -> recipesModel?.Dinner to dinnerAdapter
-            "Snacks" -> recipesModel?.Dinner to snackesAdapter
-            "Brunch" -> recipesModel?.Dinner to teaTimeAdapter
+            "Snacks" -> recipesModel?.Snack to snackesAdapter
+            "Brunch" -> recipesModel?.Teatime to teaTimeAdapter
             else -> null to null
         }
         // Safely get the item and position

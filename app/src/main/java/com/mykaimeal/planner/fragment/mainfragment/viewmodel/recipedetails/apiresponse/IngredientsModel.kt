@@ -7,5 +7,7 @@ data class IngredientsModel(
     val foodCategory: String?,
     val measure: String?,
     val quantity: Double?,
+    val weight:Double?,
+    val foodId:String?,
     var status:Boolean=false
 )

@@ -425,11 +425,10 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                 ingredientsRecipeAdapter?.updateList(viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients!!)
             }
         }
-
+ 
         binding!!.layBasket.setOnClickListener {
-
             if (BaseApplication.isOnline(requireActivity())) {
-                if (viewModel.getRecipeData()?.size!!  > 0) {
+                if (viewModel.getRecipeData()?.size!!> 0) {
                     try {
                         // Create a JsonObject for the main JSON structure
                         val jsonObject = JsonObject()
@@ -437,7 +436,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                         // Create a JsonArray for ingredients
                         val jsonArray = JsonArray()
                         // Iterate through the ingredients and add them to the array if status is true
-                        viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients?.forEach { ingredientsModel ->
+                         viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients?.forEach { ingredientsModel ->
                             if (ingredientsModel.status) {
                                 // Create a JsonObject for each ingredient
                                 val ingredientObject = JsonObject()
@@ -445,11 +444,10 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                                 ingredientObject.addProperty("image", ingredientsModel.image)
                                 ingredientObject.addProperty("food", ingredientsModel.food)
                                 ingredientObject.addProperty("quantity", ingredientsModel.quantity)
-                                ingredientObject.addProperty(
-                                    "foodCategory",
-                                    ingredientsModel.foodCategory
-                                )
+                                ingredientObject.addProperty("foodCategory", ingredientsModel.foodCategory)
                                 ingredientObject.addProperty("measure", ingredientsModel.measure)
+                                ingredientObject.addProperty("food_id", ingredientsModel.foodId)
+                                ingredientObject.addProperty("status", "0")
                                 // Add the ingredient object to the array
                                 jsonArray.add(ingredientObject)
                             }

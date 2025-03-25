@@ -645,7 +645,6 @@ class CookedFragment : Fragment(), OnItemClickListener {
                 if (mealList != null) {
                     adapter?.updateList(mealList, type)
                 }
-
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)

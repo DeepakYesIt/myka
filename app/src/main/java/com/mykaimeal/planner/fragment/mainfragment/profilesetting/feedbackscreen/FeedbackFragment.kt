@@ -22,6 +22,7 @@ import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
+import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentFeedbackBinding
 import com.mykaimeal.planner.fragment.mainfragment.profilesetting.feedbackscreen.model.FeedbackModel
 import com.mykaimeal.planner.fragment.mainfragment.profilesetting.feedbackscreen.viewmodel.FeedbackViewModel
@@ -35,6 +36,7 @@ class FeedbackFragment : Fragment() {
     private var binding: FragmentFeedbackBinding?=null
     private lateinit var feedbackViewModel: FeedbackViewModel
     private lateinit var sessionManagement: SessionManagement
+    private lateinit var commonWorkUtils: CommonWorkUtils
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,6 +51,7 @@ class FeedbackFragment : Fragment() {
         feedbackViewModel = ViewModelProvider(this)[FeedbackViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
+        commonWorkUtils = CommonWorkUtils(requireActivity())
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -71,10 +74,14 @@ class FeedbackFragment : Fragment() {
         binding!!.edtEmail.text=sessionManagement.getEmail().toString()
 
         binding!!.relFeedbackSubmit.setOnClickListener{
-            if (BaseApplication.isOnline(requireActivity())) {
-                saveFeedbackApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            if (binding!!.edtDesc.text.toString().trim().isEmpty()){
+                commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.feedbackDesc, false)
+            }else{
+                if (BaseApplication.isOnline(requireActivity())) {
+                    saveFeedbackApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
 

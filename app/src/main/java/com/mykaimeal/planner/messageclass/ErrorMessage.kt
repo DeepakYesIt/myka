@@ -78,6 +78,7 @@ object ErrorMessage {
      const val validEmail:String="Please Enter Valid Email Address"
      const val validPhoneNumber:String="Please Enter Valid Phone Number"
      const val password:String="Please Enter Password"
+     const val feedbackDesc:String="Please enter your feedback"
      const val confirmPassword:String="Please Enter\n confirm Password"
      const val passwordMatch:String="Password must be a minimum of 6 characters with an at least 1 number, 1 uppercase & special character."
      const val passwordSame:String="Password and confirm password should be same"

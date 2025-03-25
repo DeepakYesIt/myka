@@ -281,6 +281,11 @@ interface ApiInterface {
     suspend fun getCookBookTypeRequestApi(@Field("type") type: String?): Response<JsonObject>
 
 
+    @FormUrlEncoded
+    @POST(ApiEndPoint.addMealTypeUrl)
+    suspend fun addMealTypeApiUrl(@Field("uri") uri: String?,@Field("plan_type") planType:String?): Response<JsonObject>
+
+
     @Multipart
     @POST(ApiEndPoint.createCookBook)
     suspend fun createCookBook(

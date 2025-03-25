@@ -75,7 +75,6 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
-
         })
 
 
@@ -289,7 +288,7 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
                 BaseApplication.alertError(requireContext(), ErrorMessage.cookedMealsError, false)
             }else{
 
-                // Create a JsonObject for the main JSON structure
+           /*     // Create a JsonObject for the main JSON structure
                 val jsonObject = JsonObject()
                 if (uri!= null) {
                     val currentDate = LocalDate.now()
@@ -299,23 +298,18 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
                     jsonObject.addProperty("plan_type", type)
                     jsonObject.addProperty("uri", uri)
                     jsonObject.addProperty("date", formattedDate)
-
                 }
                 Log.d("json object ", "******$jsonObject")
-
+*/
                 BaseApplication.showMe(requireContext())
                 lifecycleScope.launch {
-                    viewModel.recipeAddToPlanRequest({
+                    viewModel.addMealTypeApiUrl({
                         BaseApplication.dismissMe()
                         handleApiAddToPlanResponse(it, dialogCookedMeals)
-                    }, jsonObject)
+                    },uri,type)
                 }
-
             }
-
         }
-
-
     }
 
     private fun handleApiAddToPlanResponse(
