@@ -71,6 +71,7 @@ class VerificationFragment : Fragment() {
     private var spendingDuration: String? = ""
     private var eatingOut: String? = ""
     private var reasonTakeAway: String? = ""
+    private var reasonTakeAwayDesc: String? = ""
     private var token: String = ""
 
     override fun onCreateView(
@@ -206,6 +207,10 @@ class VerificationFragment : Fragment() {
 
             if (sessionManagement.getReasonTakeAway() != "") {
                 reasonTakeAway = sessionManagement.getReasonTakeAway()
+            }
+
+            if (sessionManagement.getReasonTakeAwayDesc() != "") {
+                reasonTakeAwayDesc = sessionManagement.getReasonTakeAwayDesc()
             }
         }
 
@@ -368,7 +373,7 @@ class VerificationFragment : Fragment() {
                 bodyGoals,
                 cookingFrequency,
                 eatingOut,
-                reasonTakeAway,
+                reasonTakeAway,reasonTakeAwayDesc,
                 cookingFor,
                 partnerName,
                 partnerAge,

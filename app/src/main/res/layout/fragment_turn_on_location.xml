@@ -100,6 +100,8 @@
                     android:id="@+id/imgBackTurnLocation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:padding="@dimen/_5sdp"
+                    android:visibility="gone"
                     android:src="@drawable/black_images_back" />
 
                 <ImageView

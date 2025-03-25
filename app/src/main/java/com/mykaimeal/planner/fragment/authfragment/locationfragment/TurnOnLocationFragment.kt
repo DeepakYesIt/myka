@@ -57,7 +57,7 @@ class TurnOnLocationFragment : Fragment() {
             requireActivity(),
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    findNavController().navigateUp()
+                    requireActivity().finish()
                 }
             })
 
@@ -71,7 +71,8 @@ class TurnOnLocationFragment : Fragment() {
 
         /// handle on back pressed
         binding!!.imgBackTurnLocation.setOnClickListener {
-            findNavController().navigateUp()
+//            findNavController().navigateUp()
+            requireActivity().finish()
         }
 
         ///checking the device of mobile data in online and offline(show network error message)

@@ -299,54 +299,6 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
             )
             ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
         }
-
-        /*       val currentCampaign = "user_invite"
-               val currentChannel = "mobile_share"
-               val currentReferrerId = sessionManagement.getId().toString()
-
-               // Generate the invite URL using ShareInviteHelper
-               val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity()).apply {
-                   addParameter("af_user_id", currentReferrerId) // Set the referrer ID
-                   addParameter("CookbooksID", id) // Example value from your link
-                   addParameter("ItemName", name) // Example value from your link
-                   addParameter("ScreenName", "CookBooksType") // Example value from your link
-                   campaign = currentCampaign
-                   channel = currentChannel
-               }
-
-               Log.d("********", "Link params: ${linkGenerator.userParams.toString()}")
-
-               val listener: LinkGenerator.ResponseListener = object : LinkGenerator.ResponseListener {
-                   override fun onResponse(inviteLink: String) {
-                       Log.d(PackageManagerCompat.LOG_TAG, "Generated invite link: $inviteLink")
-                       Log.d("***********", "Generated invite link: $inviteLink")
-
-                       val message = "Hi, I am inviting you to download My-Kai app!\n\nClick on the link below:\n$inviteLink"
-
-                       requireActivity().runOnUiThread {
-                           val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                               type = "text/plain"
-                               putExtra(Intent.EXTRA_TEXT, message)
-                           }
-                           requireActivity().startActivity(Intent.createChooser(shareIntent, "Share invite link via"))
-
-                           // Log invite data
-                           val logInviteMap = hashMapOf(
-                               "referrerId" to currentReferrerId,
-                               "campaign" to currentCampaign
-                           )
-                           ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
-                       }
-                   }
-
-                   override fun onResponseError(error: String) {
-                       Log.d(PackageManagerCompat.LOG_TAG, "onResponseError: $error")
-                   }
-               }
-
-       // Generate the deep link URL
-               linkGenerator.generateLink(requireActivity(), listener)
-       */
     }
 
 

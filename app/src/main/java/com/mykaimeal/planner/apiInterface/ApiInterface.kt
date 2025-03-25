@@ -74,6 +74,7 @@ interface ApiInterface {
         @Field("cooking_frequency") cookingFrequency: String?,
         @Field("eating_out") eatingOut: String?,
         @Field("take_way") takeWay: String?,
+        @Field("take_way_name") takeWayName: String?,
         @Field("cooking_for_type") cookingForType: String?,
         @Field("partner_name") partnerName: String?,
         @Field("partner_age") partnerAge: String?,
@@ -103,6 +104,7 @@ interface ApiInterface {
         @Field("cooking_frequency") cookingFrequency: String?,
         @Field("eating_out") eatingOut: String?,
         @Field("take_way") takeWay: String?,
+        @Field("take_way_name") takeWayName: String?,
         @Field("cooking_for_type") cookingForType: String?,
         @Field("partner_name") partnerName: String?,
         @Field("partner_age") partnerAge: String?,
@@ -428,7 +430,9 @@ interface ApiInterface {
 
     @FormUrlEncoded
     @POST(ApiEndPoint.updateUserPreferences)
+
     suspend fun updateReasonTakeAwayApi(@Field("take_way") takeWay: String?,@Field("take_way_name") take_way_name: String?): Response<JsonObject>
+
 
     @FormUrlEncoded
     @POST(ApiEndPoint.updateUserPreferences)
@@ -513,7 +517,8 @@ interface ApiInterface {
         @Field("spending_amount") spendingAmount: String?,
         @Field("duration") duration: String?,
         @Field("eating_out") eatingOut: String?,
-        @Field("take_way") takeWay: String?
+        @Field("take_way") takeWay: String?,
+        @Field("take_way_name") takeWayName: String?
     ): Response<JsonObject>
 
 

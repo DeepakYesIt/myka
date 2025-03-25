@@ -51,6 +51,7 @@ class AppConstant {
         const val SpendingDuration: String ="SpendingDuration"
         const val EatingOut: String ="EatingOut"
         const val ReasonForTakeAway: String ="ReasonForTakeAway"
+        const val ReasonForTakeAwyDesc: String ="ReasonForTakeAwayDesc"
 
     }
 }

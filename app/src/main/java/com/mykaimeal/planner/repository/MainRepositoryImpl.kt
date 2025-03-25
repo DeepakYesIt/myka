@@ -266,6 +266,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         cookingFrequency: String?,
         eatingOut: String?,
         takeAway: String?,
+        takeWayName: String?,
         cookingForType: String?,
         partnerName: String?,
         partnerAge: String?,
@@ -293,6 +294,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                 cookingFrequency,
                 eatingOut,
                 takeAway,
+                takeWayName,
                 cookingForType,
                 partnerName,
                 partnerAge,
@@ -458,6 +460,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         cookingFrequency: String?,
         eatingOut: String?,
         takeAway: String?,
+        takeWayName: String?,
         cookingForType: String?,
         partnerName: String?,
         partnerAge: String?,
@@ -485,6 +488,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                 cookingFrequency,
                 eatingOut,
                 takeAway,
+                takeWayName,
                 cookingForType,
                 partnerName,
                 partnerAge,
@@ -1422,12 +1426,9 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
-    override suspend fun updateReasonTakeAwayApi(
-        successCallback: (response: NetworkResult<String>) -> Unit,
-        takeway: String?, take_way_name: String?
-    ) {
+    override suspend fun updateReasonTakeAwayApi(successCallback: (response: NetworkResult<String>) -> Unit, takeway: String?, takeWayName: String?) {
         try {
-            api.updateReasonTakeAwayApi(takeway,take_way_name).apply {
+            api.updateReasonTakeAwayApi(takeway,takeWayName).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -1788,7 +1789,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         spendingAmount: String?,
         duration: String?,
         eatingOut: String?,
-        takeWay: String?
+        takeWay: String?,takeWayName: String?
     ) {
         try {
             api.updatePreferencesApi(
@@ -1811,7 +1812,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                 spendingAmount,
                 duration,
                 eatingOut,
-                takeWay
+                takeWay,takeWayName
             ).apply {
                 if (isSuccessful) {
                     body()?.let {

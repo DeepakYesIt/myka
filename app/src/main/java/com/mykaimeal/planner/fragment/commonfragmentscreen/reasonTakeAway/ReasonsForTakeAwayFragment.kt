@@ -248,7 +248,11 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         }
 
         if (sessionManagement.getReasonTakeAway() != "") {
-            reasonTakeAway = sessionManagement.getReasonTakeAway()
+            reasonSelect = sessionManagement.getReasonTakeAway()
+        }
+
+        if (sessionManagement.getReasonTakeAwayDesc() != "") {
+            reasonTakeAway = sessionManagement.getReasonTakeAwayDesc()
         }
 
 
@@ -290,6 +294,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 }else{
                     reasonTakeAwayViewModel.setReasonTakeData(reasonTakeModelData!!.toMutableList())
                     sessionManagement.setReasonTakeAway(reasonSelect.toString())
+                    sessionManagement.setReasonTakeAwayDesc(reasonTakeAway.toString())
                     navigateToAuthActivity("login")
                 }
             }
@@ -342,7 +347,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 }
             },userName,cookingFor,userGender,bodyGoals,partnerName,partnerAge,partnerGender,familyMemName,
                 familyMemAge, familyMemStatus,dietarySelectedId,favouriteSelectedId,dislikeSelectedId,allergenSelectedId,mealRoutineSelectedId,
-                cookingFrequency,spendingAmount,spendingDuration,eatingOut, reasonTakeAway)
+                cookingFrequency,spendingAmount,spendingDuration,eatingOut, reasonSelect,reasonTakeAway)
         }
     }
 
@@ -454,6 +459,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
 
         tvDialogSkipBtn.setOnClickListener {
             sessionManagement.setReasonTakeAway("")
+            sessionManagement.setReasonTakeAwayDesc("")
             dialogStillSkip.dismiss()
             navigateToAuthActivity("login")
         }
@@ -470,6 +476,11 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 reasonTakeAway = reasonTakeModelData?.get(type!!.toInt())!!.descripttion.toString()
                 binding.relMainLayout.visibility=View.VISIBLE
                 binding.edtext.setText(reasonTakeModelData?.get(type!!.toInt())!!.descripttion.toString())
+                if (reasonTakeModelData?.get(type!!.toInt())!!.descripttion!=null){
+                    binding.edtext.setText(reasonTakeModelData?.get(type!!.toInt())!!.descripttion.toString())
+                }else{
+                    binding.edtext.hint="Enter Add Other"
+                }
             }else{
                 reasonSelect = reasonTakeModelData?.get(type!!.toInt())!!.id.toString()
                 reasonTakeAway = ""
@@ -494,6 +505,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 reasonSelect = reasonTakeModelData?.get(status1!!.toInt())!!.id.toString()
                 reasonTakeAway = selectItem.toString()
+                reasonTakeAway = ""
                 binding.relMainLayout.visibility=View.GONE
             }
 
@@ -512,5 +524,5 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         super.onDestroyView()
         _binding = null
     }
-    
+
 }
