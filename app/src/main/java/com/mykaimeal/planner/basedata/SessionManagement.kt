@@ -349,6 +349,15 @@ class SessionManagement(var context: Context) {
         return pref?.getString(AppConstant.ReasonForTakeAway, "")
     }
 
+    fun setReasonTakeAwayDesc(reasonAway: String) {
+        editor!!.putString(AppConstant.ReasonForTakeAwyDesc, reasonAway)
+        editor!!.commit()
+    }
+
+    fun getReasonTakeAwayDesc(): String? {
+        return pref?.getString(AppConstant.ReasonForTakeAwyDesc, "")
+    }
+
 
     fun setEmail(email: String) {
         editor!!.putString(AppConstant.EMAIL, email)

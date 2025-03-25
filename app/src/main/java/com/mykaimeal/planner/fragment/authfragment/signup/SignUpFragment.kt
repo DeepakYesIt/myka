@@ -68,6 +68,7 @@ class SignUpFragment : Fragment() {
     private var spendingDuration: String? = ""
     private var eatingOut: String? = ""
     private var reasonTakeAway: String? = ""
+    private var reasonTakeAwayDesc: String? = ""
     private var token: String = ""
 
     override fun onCreateView(
@@ -181,6 +182,10 @@ class SignUpFragment : Fragment() {
 
         if (sessionManagement.getReasonTakeAway() != "") {
             reasonTakeAway = sessionManagement.getReasonTakeAway()
+        }
+
+        if (sessionManagement.getReasonTakeAwayDesc() != "") {
+            reasonTakeAwayDesc = sessionManagement.getReasonTakeAwayDesc()
         }
 
         logOutGoogle()
@@ -443,7 +448,7 @@ class SignUpFragment : Fragment() {
                 bodyGoals,
                 cookingFrequency,
                 eatingOut,
-                reasonTakeAway,"",
+                reasonTakeAway,reasonTakeAwayDesc,
                 cookingFor,
                 partnerName,
                 partnerAge,

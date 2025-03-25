@@ -181,7 +181,7 @@ interface MainRepository {
 
     suspend fun updateCookingFrequencyApi(successCallback: (response: NetworkResult<String>) -> Unit,cookingFrequency: String?)
 
-    suspend fun updateReasonTakeAwayApi(successCallback: (response: NetworkResult<String>) -> Unit,takeAway: String?)
+    suspend fun updateReasonTakeAwayApi(successCallback: (response: NetworkResult<String>) -> Unit,takeAway: String?,takeWayName: String?)
 
     suspend fun updateEatingOutApi(successCallback: (response: NetworkResult<String>) -> Unit,eatingOut: String?)
 

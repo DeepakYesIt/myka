@@ -32,7 +32,7 @@ class BodyGoalAdapter(private var datalist: List<BodyGoalModelData>, private var
         if (datalist[position].selected) {
             holder.binding.imageRightTick.visibility = View.VISIBLE
             holder.binding.relMainLayout.setBackgroundResource(R.drawable.orange_box_bg)
-            onItemClickListener.itemClick(data.id,"-1","")
+            onItemClickListener.itemClick(data.id,"-1",position.toString())
         } else {
             holder.binding.imageRightTick.visibility = View.GONE
             holder.binding.relMainLayout.setBackgroundResource(R.drawable.gray_box_border_bg)

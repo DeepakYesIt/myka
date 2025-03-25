@@ -1428,10 +1428,11 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
 
     override suspend fun updateReasonTakeAwayApi(
         successCallback: (response: NetworkResult<String>) -> Unit,
-        takeway: String?
+        takeway: String?,
+        takeWayName: String?
     ) {
         try {
-            api.updateReasonTakeAwayApi(takeway).apply {
+            api.updateReasonTakeAwayApi(takeway,takeWayName).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
