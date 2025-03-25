@@ -74,15 +74,59 @@
             android:textColor="@color/light_black"
             android:textSize="@dimen/_15sdp" />
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcyTakeAway"
+        <RelativeLayout
+            android:id="@+id/lay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvEatingOut"
             android:layout_marginTop="@dimen/_10sdp"
-            android:layout_above="@+id/relBottomBtn"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            android:layout_above="@+id/relBottomBtn">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcyTakeAway"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/relMainLayout"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_below="@+id/rcyTakeAway"
+                android:background="@drawable/gray_box_border_bg">
+
+                <EditText
+                    android:id="@+id/edtext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:background="@null"
+                    android:fontFamily="@font/poppins"
+                    android:gravity="center_vertical"
+                    android:layout_toStartOf="@+id/imageRightTick"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_marginEnd="@dimen/_15sdp"
+                    android:paddingVertical="@dimen/_10sdp"
+                    android:singleLine="true"
+                    android:hint="Enter Add Other"
+                    android:textColor="@color/light_black"
+                    android:textColorHint="@color/light_black"
+                    android:textSize="@dimen/_14sdp" />
+
+                <ImageView
+                    android:id="@+id/imageRightTick"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    android:src="@drawable/orange_tick_icon"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+        </RelativeLayout>
+
+
 
         <RelativeLayout
             android:id="@+id/relBottomBtn"

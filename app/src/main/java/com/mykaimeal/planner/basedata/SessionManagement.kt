@@ -336,6 +336,9 @@ class SessionManagement(var context: Context) {
         editor!!.commit()
     }
 
+
+
+
     fun getEatingOut(): String? {
         return pref?.getString(AppConstant.EatingOut, "")
     }

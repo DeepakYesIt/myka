@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.commonfragmentscreen.bodyGoals
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -35,7 +36,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class BodyGoalsFragment : Fragment(), OnItemClickListener {
 
-    private var binding: FragmentBodyGoalsBinding? = null
+    private var _binding: FragmentBodyGoalsBinding? = null
+    private val binding get() = _binding!!
     private var bodyGoalAdapter: BodyGoalAdapter? = null
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue: Int = 0
@@ -52,9 +54,9 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
-        binding = FragmentBodyGoalsBinding.inflate(inflater, container, false)
 
+        // Inflate the layout for this fragment
+        _binding = FragmentBodyGoalsBinding.inflate(inflater, container, false)
         bodyGoalViewModel = ViewModelProvider(this)[BodyGoalViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
@@ -67,43 +69,43 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
         if (cookingFor.equals("Myself")) {
             bodyGoalsText = "What are your body goals?"
             showBodyGoals=true
-            binding!!.progressBar.max = 10
+            binding.progressBar.max = 10
             totalProgressValue = 10
             progressValue=1
         } else if (cookingFor.equals("MyPartner")) {
             bodyGoalsText = "You and your partner's goals?"
             showBodyGoals=true
-            binding!!.progressBar.max = 11
+            binding.progressBar.max = 11
             totalProgressValue = 11
             progressValue=2
         } else {
             bodyGoalsText = "What are your family's body goals?"
             showBodyGoals=false
-            binding!!.progressBar.max = 11
+            binding.progressBar.max = 11
             totalProgressValue = 11
             progressValue=2
         }
 
-        Log.d("type","*****"+cookingFor)
+        Log.d("type", "*****$cookingFor")
 
-        binding!!.tvYourBodyGoals.text = bodyGoalsText
+        binding.tvYourBodyGoals.text = bodyGoalsText
         updateProgress(progressValue)
 
         if (showBodyGoals){
-            binding!!.textBodyGoals.visibility = View.VISIBLE
-            binding!!.textBodyMembersGoals.visibility = View.GONE
+            binding.textBodyGoals.visibility = View.VISIBLE
+            binding.textBodyMembersGoals.visibility = View.GONE
         }else{
-            binding!!.textBodyGoals.visibility = View.GONE
-            binding!!.textBodyMembersGoals.visibility = View.VISIBLE
+            binding.textBodyGoals.visibility = View.GONE
+            binding.textBodyMembersGoals.visibility = View.VISIBLE
         }
 
         if (cookingScreen.equals("Profile")) {
-            binding!!.llBottomBtn.visibility = View.GONE
-            binding!!.rlUpdateBodyGoals.visibility = View.VISIBLE
+            binding.llBottomBtn.visibility = View.GONE
+            binding.rlUpdateBodyGoals.visibility = View.VISIBLE
             loadApi(cookingScreen)
         } else {
-            binding!!.llBottomBtn.visibility = View.VISIBLE
-            binding!!.rlUpdateBodyGoals.visibility = View.GONE
+            binding.llBottomBtn.visibility = View.VISIBLE
+            binding.rlUpdateBodyGoals.visibility = View.GONE
             if (bodyGoalViewModel.getBodyGoalData()!=null){
                 showDataInUi(bodyGoalViewModel.getBodyGoalData()!!)
             }else{
@@ -113,7 +115,7 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
 
         ///handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     if (sessionManagement.getCookingScreen() != "Profile") {
@@ -134,7 +136,7 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
 
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun loadApi(type: String?){
@@ -224,7 +226,7 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
             bodyModelData1.addAll(bodyModelData)
             if (bodyModelData1.size > 0) {
                 bodyGoalAdapter = BodyGoalAdapter(bodyModelData1, requireActivity(), this)
-                binding!!.rcyBodyGoals.adapter = bodyGoalAdapter
+                binding.rcyBodyGoals.adapter = bodyGoalAdapter
             }
         }catch (e:Exception){
             Log.d("bodyGoal","message"+e.message)
@@ -235,14 +237,15 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
         BaseApplication.alertError(requireContext(), message, status)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateProgress(progress: Int) {
-        binding!!.progressBar.progress = progress
-        binding!!.tvProgressText.text = "$progress/$totalProgressValue"
+        binding.progressBar.progress = progress
+        binding.tvProgressText.text = "$progress/$totalProgressValue"
     }
 
     private fun initialize() {
 
-        binding!!.imageBackBodyGoals.setOnClickListener {
+        binding.imageBackBodyGoals.setOnClickListener {
             if (sessionManagement.getCookingScreen() != "Profile") {
                 if (sessionManagement.getCookingFor().equals("Myself")) {
                     requireActivity().finish()
@@ -256,20 +259,19 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
             }
         }
 
-        binding!!.tvSkipBtn.setOnClickListener {
+        binding.tvSkipBtn.setOnClickListener {
             stillSkipDialog()
         }
 
-        binding!!.tvNextBtn.setOnClickListener {
+        binding.tvNextBtn.setOnClickListener {
             if (status == "2") {
-                bodyGoalViewModel.setBodyGoalData(bodyModelData1!!.toMutableList())
+                bodyGoalViewModel.setBodyGoalData(bodyModelData1.toMutableList())
                 sessionManagement.setBodyGoal(bodySelect.toString())
-//                NavAnimations.navigateForward(findNavController(), R.id.dietaryRestrictionsFragment)
                 findNavController().navigate(R.id.dietaryRestrictionsFragment)
             }
         }
 
-        binding!!.rlUpdateBodyGoals.setOnClickListener {
+        binding.rlUpdateBodyGoals.setOnClickListener {
             ///checking the device of mobile data in online and offline(show network error message)
             if (BaseApplication.isOnline(requireActivity())) {
                 updateBodyGoalApi()
@@ -337,27 +339,30 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
     }
 
 
-    override fun itemClick(selectItem: Int?, status1: String?, type: String?) {
-
+    override fun itemClick(position: Int?, status: String?, type: String?) {
         bodySelect = ""
-
-        if (status1.equals("-1")) {
-            status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            bodySelect = selectItem.toString()
+        if (status.equals("-1")) {
+            this.status = "2"
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            bodySelect = position.toString()
             return
         }
 
         if (type.equals("true")) {
-            status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            bodySelect = selectItem.toString()
+            this.status = "2"
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            bodySelect = position.toString()
         } else {
-            status = ""
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            this.status = ""
+            binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

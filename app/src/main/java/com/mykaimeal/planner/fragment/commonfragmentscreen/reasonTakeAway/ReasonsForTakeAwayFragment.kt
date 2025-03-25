@@ -1,30 +1,32 @@
 package com.mykaimeal.planner.fragment.commonfragmentscreen.reasonTakeAway
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
-import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.AuthActivity
-import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.BodyGoalAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentReasonsForTakeAwayBinding
 import com.mykaimeal.planner.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModel
 import com.mykaimeal.planner.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModelData
@@ -38,7 +40,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
 
-    private var binding: FragmentReasonsForTakeAwayBinding? = null
+    private var _binding: FragmentReasonsForTakeAwayBinding? = null
+    private val binding get() = _binding!!
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue: Int = 0
     private var status: String? = ""
@@ -73,32 +76,32 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = FragmentReasonsForTakeAwayBinding.inflate(inflater, container, false)
+        _binding = FragmentReasonsForTakeAwayBinding.inflate(inflater, container, false)
 
         reasonTakeAwayViewModel = ViewModelProvider(this)[ReasonTakeAwayViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
         if (sessionManagement.getCookingFor().equals("Myself")) {
-            binding!!.progressBar11.max = 10
+            binding.progressBar11.max = 10
             totalProgressValue = 10
             updateProgress(10)
         } else {
-            binding!!.progressBar11.max = 11
+            binding.progressBar11.max = 11
             totalProgressValue = 11
             updateProgress(11)
         }
 
         if (sessionManagement.getCookingScreen().equals("Profile")){
-            binding!!.llBottomBtn.visibility=View.GONE
-            binding!!.rlUpdateReasonTakeAway.visibility=View.VISIBLE
+            binding.llBottomBtn.visibility=View.GONE
+            binding.rlUpdateReasonTakeAway.visibility=View.VISIBLE
             if (BaseApplication.isOnline(requireContext())) {
                 reasonTakeAwaySelectApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }else{
-            binding!!.llBottomBtn.visibility=View.VISIBLE
-            binding!!.rlUpdateReasonTakeAway.visibility=View.GONE
+            binding.llBottomBtn.visibility=View.VISIBLE
+            binding.rlUpdateReasonTakeAway.visibility=View.GONE
             ///checking the device of mobile data in online and offline(show network error message)
             if (BaseApplication.isOnline(requireContext())) {
                 reasonTakeAwayApi()
@@ -119,7 +122,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
 
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun reasonTakeAwaySelectApi() {
@@ -156,9 +159,10 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateProgress(progress: Int) {
-        binding!!.progressBar11.progress = progress
-        binding!!.tvProgressText.text = "$progress/$totalProgressValue"
+        binding.progressBar11.progress = progress
+        binding.tvProgressText.text = "$progress/$totalProgressValue"
     }
 
     private fun initialize() {
@@ -248,15 +252,38 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         }
 
 
-        binding!!.imbBackTakeAway.setOnClickListener {
+        binding.imbBackTakeAway.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.tvSkipBtn.setOnClickListener {
+        binding.tvSkipBtn.setOnClickListener {
             stillSkipDialog()
         }
 
-        binding!!.tvNextBtn.setOnClickListener {
+
+        binding.edtext.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Before text changes
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s!!.isNotEmpty()){
+                    reasonTakeAway = s.toString()
+                    binding.tvNextBtn.isClickable = true
+                    binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_select_background)
+                }else{
+                    reasonTakeAway = ""
+                    binding.tvNextBtn.isClickable = false
+                    binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                }
+            }
+
+            override fun afterTextChanged(data: Editable?) {
+
+            }
+        })
+
+        binding.tvNextBtn.setOnClickListener {
             if (status == "2") {
                 if (sessionManagement.getPreferences()){
                     updatePreferencesApi()
@@ -268,7 +295,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
             }
         }
 
-        binding!!.rlUpdateReasonTakeAway.setOnClickListener{
+        binding.rlUpdateReasonTakeAway.setOnClickListener{
             if (BaseApplication.isOnline(requireContext())) {
                 updateReasonTakeAwayApi()
             } else {
@@ -288,10 +315,12 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                             val gson = Gson()
                             val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
                             if (updateModel.code == 200 && updateModel.success) {
+//
                                 sessionManagement.setLoginSession(true)
-                                val intent = Intent(requireActivity(), MainActivity::class.java)
-                                startActivity(intent)
-                                requireActivity().finish()
+                                findNavController().navigate(R.id.turnOnLocationFragment)
+//                                val intent = Intent(requireActivity(), MainActivity::class.java)
+//                                startActivity(intent)
+//                                requireActivity().finish()
 
                             } else {
                                 if (updateModel.code == ErrorMessage.code) {
@@ -355,7 +384,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                         showAlertFunction(it.message, false)
                     }
                 }
-            },reasonSelect.toString())
+            },reasonSelect.toString(),reasonTakeAway)
         }
     }
 
@@ -399,7 +428,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
             if (bodyModelData!=null && bodyModelData.size>0){
                 reasonTakeModelData=bodyModelData
                 bodyGoalAdapter = BodyGoalAdapter(bodyModelData, requireActivity(), this)
-                binding!!.rcyTakeAway.adapter = bodyGoalAdapter
+                binding.rcyTakeAway.adapter = bodyGoalAdapter
             }
         }catch (e:Exception){
             Log.d("ReasonTakeAway","message:--"+e.message)
@@ -434,25 +463,52 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         reasonSelect=""
         reasonTakeAway = ""
         if (status1.equals("-1")) {
+            if (reasonTakeModelData?.get(type!!.toInt())!!.name.toString().equals("Add other",true)){
+                reasonSelect = reasonTakeModelData?.get(type!!.toInt())!!.id.toString()
+                reasonTakeAway = reasonTakeModelData?.get(type!!.toInt())!!.descripttion.toString()
+                binding.relMainLayout.visibility=View.VISIBLE
+                binding.edtext.setText(reasonTakeModelData?.get(type!!.toInt())!!.descripttion.toString())
+            }else{
+                reasonSelect = reasonTakeModelData?.get(type!!.toInt())!!.id.toString()
+                reasonTakeAway = ""
+                binding.relMainLayout.visibility=View.GONE
+            }
             status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            reasonSelect = selectItem.toString()
-            reasonTakeAway = selectItem.toString()
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+
             return
         }
-
         if (type.equals("true")) {
-            status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-            reasonSelect = selectItem.toString()
-            reasonTakeAway = selectItem.toString()
+            if (reasonTakeModelData?.get(status1!!.toInt())!!.name.toString().equals("Add other",true)){
+                status = ""
+                binding.tvNextBtn.isClickable = false
+                binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                binding.relMainLayout.visibility=View.VISIBLE
+                binding.edtext.text.clear()
+            }else{
+                status = "2"
+                binding.tvNextBtn.isClickable = true
+                binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                reasonSelect = reasonTakeModelData?.get(status1!!.toInt())!!.id.toString()
+                reasonTakeAway = selectItem.toString()
+                binding.relMainLayout.visibility=View.GONE
+            }
+
         } else {
+            if (reasonTakeModelData?.get(status1!!.toInt())!!.name.toString().equals("Add other",true)){
+                binding.tvNextBtn.isClickable = false
+                binding.relMainLayout.visibility=View.GONE
+                binding.edtext.text.clear()
+            }
             status = ""
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+    
 }
