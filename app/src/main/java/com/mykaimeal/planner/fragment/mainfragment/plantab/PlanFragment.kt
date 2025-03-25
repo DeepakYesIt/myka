@@ -92,6 +92,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     val dataList = arrayListOf<DataModel>()
     private var currentDate = Date() // Current date
     private var currentDateSelected: String = ""
+    private var swapMealType: String = ""
+    private var swapId: Int = 0
 
     // Define global variables
     private lateinit var startDate: Date
@@ -365,12 +367,12 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             showAlert(e.message, false)
         }
 
-        // Fetch data for the selected date if online
+  /*      // Fetch data for the selected date if online
         if (BaseApplication.isOnline(requireActivity())) {
             dataFatchByDate(currentDateSelected)
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
+        }*/
     }
 
     @SuppressLint("SetTextI18n")
@@ -508,7 +510,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 }
             }
 
-            binding!!.llCalculateBmr.visibility=View.GONE
+            binding!!.llCalculateBmr.visibility = View.GONE
 
             // Breakfast
             if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
@@ -539,7 +541,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
             // Snacks
             if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
-                snackesAdapter = setupMealAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snacks")
+                snackesAdapter =
+                    setupMealAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snacks")
                 binding!!.linearSnacks.visibility = View.VISIBLE
             } else {
                 binding!!.linearSnacks.visibility = View.GONE
@@ -578,15 +581,21 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 if (recipesDateModel!!.fat?.toInt() != 0 || recipesDateModel!!.protein?.toInt() != 0 ||
                     recipesDateModel!!.kcal?.toInt() != 0 || recipesDateModel!!.carbs?.toInt() != 0
                 ) {
-                    if (recipesDateModel!!.show == 1){
+                    if (recipesDateModel!!.show == 1) {
                         binding!!.tvCalories.text = String.format("%.2f", recipesDateModel!!.kcal)
-                        binding!!.tvCalories.text = binding!!.tvCalories.text.toString().take(6) // Allows only the first 5 characters
+                        binding!!.tvCalories.text = binding!!.tvCalories.text.toString()
+                            .take(6) // Allows only the first 5 characters
                         binding!!.tvFats.text = String.format("%.2f", recipesDateModel!!.fat)
-                        binding!!.tvFats.text = binding!!.tvFats.text.toString().take(6) // Allows only the first 5 characters
-                        binding!!.tvCarbohydrates.text = String.format("%.2f", recipesDateModel!!.carbs)
-                        binding!!.tvCarbohydrates.text = binding!!.tvCarbohydrates.text.toString().take(6) // Allows only the first 5 characters
-                        binding!!.tvProteins.text = String.format("%.2f", recipesDateModel!!.protein)
-                        binding!!.tvProteins.text = binding!!.tvProteins.text.toString().take(6) // Allows only the first 5 characters
+                        binding!!.tvFats.text = binding!!.tvFats.text.toString()
+                            .take(6) // Allows only the first 5 characters
+                        binding!!.tvCarbohydrates.text =
+                            String.format("%.2f", recipesDateModel!!.carbs)
+                        binding!!.tvCarbohydrates.text = binding!!.tvCarbohydrates.text.toString()
+                            .take(6) // Allows only the first 5 characters
+                        binding!!.tvProteins.text =
+                            String.format("%.2f", recipesDateModel!!.protein)
+                        binding!!.tvProteins.text = binding!!.tvProteins.text.toString()
+                            .take(6) // Allows only the first 5 characters
                     }
                 }
             }
@@ -697,7 +706,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
             // TeaTime
             if (recipesDateModel?.Teatime != null && recipesDateModel?.Teatime?.size!! > 0) {
-                AdapterteaTimeByDateFast = setupMealAdapter(data?.Teatime, binding!!.rcyTeatime, "Brunch")
+                AdapterteaTimeByDateFast =
+                    setupMealAdapter(data?.Teatime, binding!!.rcyTeatime, "Brunch")
                 binding!!.linearTeatime.visibility = View.VISIBLE
                 status = true
             } else {
@@ -773,33 +783,32 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
         binding!!.imgAddLunch.setOnClickListener {
-            findNavController().navigate(R.id.addMealCookedFragment)
+            findNavController().navigate(R.id.searchFragment)
         }
 
         binding!!.imgAddDinner.setOnClickListener {
-            findNavController().navigate(R.id.addMealCookedFragment)
+            findNavController().navigate(R.id.searchFragment)
         }
 
         binding?.imgAddSnacks?.setOnClickListener {
-            findNavController().navigate(R.id.addMealCookedFragment)
+            findNavController().navigate(R.id.searchFragment)
         }
 
         binding?.imgAddTeaTime1?.setOnClickListener {
-            findNavController().navigate(R.id.addMealCookedFragment)
+            findNavController().navigate(R.id.searchFragment)
         }
-
-
 
 
         binding!!.imgBmr.setOnClickListener {
             if (recipesDateModel != null) {
-                if (recipesDateModel!!.show==1){
+                if (recipesDateModel!!.show == 1) {
                     if (recipesDateModel!!.fat != null || recipesDateModel!!.protein != null || recipesDateModel!!.kcal != null || recipesDateModel!!.carbs != null) {
                         if (recipesDateModel!!.fat?.toInt() != 0 || recipesDateModel!!.protein?.toInt() != 0 ||
                             recipesDateModel!!.kcal?.toInt() != 0 || recipesDateModel!!.carbs?.toInt() != 0
                         ) {
                             binding!!.imgBmr.visibility = View.GONE
-                            binding!!.tvCalories.text = String.format("%.2f", recipesDateModel!!.kcal)
+                            binding!!.tvCalories.text =
+                                String.format("%.2f", recipesDateModel!!.kcal)
                             binding!!.tvFats.text = String.format("%.2f", recipesDateModel!!.fat)
                             binding!!.tvCarbohydrates.text =
                                 String.format("%.2f", recipesDateModel!!.carbs)
@@ -809,7 +818,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                     } else {
                         findNavController().navigate(R.id.healthDataFragment)
                     }
-                }else{
+                } else {
                     findNavController().navigate(R.id.healthDataFragment)
                 }
 
@@ -1177,7 +1186,12 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     override fun itemClick(position: Int?, status: String?, type: String?) {
         when (status) {
             "1" -> {
-                chooseDayDialog(position, type)
+                if (type == swapMealType) {
+                    swapApiImplement(position, type)
+                } else {
+                    chooseDayDialog(position, type)
+                }
+
             }
 
             "2" -> {
@@ -1204,6 +1218,72 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 findNavController().navigate(R.id.recipeDetailsFragment, bundle)
             }
         }
+    }
+
+    private fun swapApiImplement(position: Int?, type: String) {
+        // Map the type to the corresponding list and adapter
+        val (mealList, adapter) = when (type) {
+            "BreakFast" -> recipesModel?.Breakfast to breakfastAdapter
+            "Lunch" -> recipesModel?.Lunch to lunchAdapter
+            "Dinner" -> recipesModel?.Dinner to dinnerAdapter
+            "Snacks" -> recipesModel?.Snack to snackesAdapter
+            "Brunch" -> recipesModel?.Teatime to teaTimeAdapter
+            else -> null to null
+        }
+
+        // Safely get the item and position
+        val item = mealList?.get(position!!)
+        if (item != null) {
+            if (item.recipe?.uri != null) {
+                swapApi(item.recipe.uri)
+            }
+        }
+    }
+
+    private fun swapApi(uri: String) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.recipeSwapUrl({
+                BaseApplication.dismissMe()
+                handleApiSwapResponse(it)
+            }, swapId.toString(), uri)
+        }
+
+    }
+
+
+    private fun handleApiSwapResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessSwapResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    private fun handleSuccessSwapResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ user click  List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+               Toast.makeText(requireContext(),""+apiModel.message,Toast.LENGTH_LONG).show()
+
+                // Fetch data for the selected date if online
+                if (BaseApplication.isOnline(requireActivity())) {
+                    dataFatchByDate(currentDateSelected)
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+
     }
 
     private fun toggleIsLike(type: String, position: Int?, apiType: String) {
@@ -1566,6 +1646,12 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             else -> null to null
         }
 
+        if (position != null) {
+            swapId=position
+        }
+
+        swapMealType=type
+
         fun setupMealTopAdapter(
             mealRecipes: MutableList<BreakfastModel>?,
             recyclerView: RecyclerView,
@@ -1642,8 +1728,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 )
             }
         }
-
-
     }
 
     override fun itemMealTypeSelect(position: Int?, status: String?, type: String?) {

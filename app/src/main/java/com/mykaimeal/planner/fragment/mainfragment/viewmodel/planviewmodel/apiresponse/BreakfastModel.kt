@@ -5,4 +5,8 @@ data class BreakfastModel(
     var is_like: Int?,
     val review_number: Int?=0,
     val review: Double?=0.0,
+    val id:Int?,
+    val user_id:Int?,
+    val type:String?,
+    val status:String?
 )

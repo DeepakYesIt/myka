@@ -88,7 +88,9 @@ class AdapterPlanBreakByDateFast(var datalist: MutableList<BreakfastModelPlanByD
         }
 
         holder.binding.tvSwap.setOnClickListener {
-            onItemClickListener.itemSelectPlayByDate(position,"1",type)
+            if (data != null) {
+                onItemClickListener.itemSelectPlayByDate(data.id,"1",type)
+            }
         }
 
         holder.binding.minus.setOnClickListener{

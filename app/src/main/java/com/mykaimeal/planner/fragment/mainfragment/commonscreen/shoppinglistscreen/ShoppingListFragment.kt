@@ -1,12 +1,19 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen.shoppinglistscreen
 
 import android.annotation.SuppressLint
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -33,6 +40,9 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private lateinit var shoppingListViewModel: ShoppingListViewModel
     private lateinit var adapterShoppingAdapter: IngredientsShoppingAdapter
     private var adapterRecipe: BasketYourRecipeAdapter? = null
+    private var tvCounter:TextView?=null
+    private var quantity:Int=1
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,6 +69,11 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         return binding.root
     }
 
+    private fun updateValue() {
+        tvCounter!!.text = String.format("%02d", quantity)
+
+    }
+
     private fun initialize() {
 
         binding.textSeeAll3.setOnClickListener {
@@ -69,12 +84,60 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             findNavController().navigateUp()
         }
 
-        binding.rlAddPlanButton.setOnClickListener {
-            findNavController().navigate(R.id.addMoreItemsFragment)
+        binding.rlAddMore.setOnClickListener {
+
+            addItemDialog()
+       /*     findNavController().navigate(R.id.addMoreItemsFragment)*/
         }
 
         adapterInitialize()
 
+    }
+
+    private fun addItemDialog() {
+        val dialogRemoveDay: Dialog = context?.let { Dialog(it) }!!
+        dialogRemoveDay.setContentView(R.layout.alert_dialog_add_new_item)
+        dialogRemoveDay.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        dialogRemoveDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val tvDialogCancelBtn = dialogRemoveDay.findViewById<TextView>(R.id.tvDialogCancelBtn)
+        val imageCross = dialogRemoveDay.findViewById<ImageView>(R.id.imageCross)
+        val imageMinus = dialogRemoveDay.findViewById<ImageView>(R.id.imageMinus)
+        val imagePlus = dialogRemoveDay.findViewById<ImageView>(R.id.imagePlus)
+        tvCounter = dialogRemoveDay.findViewById(R.id.tvCounter)
+        val tvDialogAddBtn = dialogRemoveDay.findViewById<TextView>(R.id.tvDialogAddBtn)
+        dialogRemoveDay.show()
+        dialogRemoveDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        tvDialogCancelBtn.setOnClickListener {
+            dialogRemoveDay.dismiss()
+        }
+
+        imageMinus.setOnClickListener{
+            if (quantity > 1) {
+                quantity--
+                updateValue()
+            }else{
+                Toast.makeText(requireActivity(),"Minimum serving atleast value is one", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        imagePlus.setOnClickListener{
+            if (quantity < 99) {
+                quantity++
+                updateValue()
+            }
+        }
+
+        imageCross.setOnClickListener{
+            dialogRemoveDay.dismiss()
+        }
+
+        tvDialogAddBtn.setOnClickListener {
+            dialogRemoveDay.dismiss()
+        }
     }
 
     private fun getShoppingList() {

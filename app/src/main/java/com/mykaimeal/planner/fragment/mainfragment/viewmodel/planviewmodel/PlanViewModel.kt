@@ -21,6 +21,11 @@ class PlanViewModel @Inject constructor(private val repository: MainRepository) 
         repository.planDateRequestApi({ successCallback(it) },date,planType)
     }
 
+    suspend fun recipeSwapUrl(successCallback: (response: NetworkResult<String>) -> Unit,
+                            id: String?,uri:String?){
+        repository.recipeSwapUrl({ successCallback(it) },id,uri)
+    }
+
 
     suspend fun likeUnlikeRequest(successCallback: (response: NetworkResult<String>) -> Unit,
                                     uri: String,likeType: String,type:String){
