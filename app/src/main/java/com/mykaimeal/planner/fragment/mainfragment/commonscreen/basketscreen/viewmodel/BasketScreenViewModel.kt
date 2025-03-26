@@ -27,4 +27,10 @@ class BasketScreenViewModel @Inject constructor(private val repository: MainRepo
         repository.basketYourRecipeIncDescUrl({ successCallback(it) },uri, quantity)
     }
 
+
+    suspend fun basketIngIncDescUrl(successCallback: (response: NetworkResult<String>) -> Unit,
+                              foodId: String?,quantity:String?){
+        repository.basketIngIncDescUrl({ successCallback(it) },foodId, quantity)
+    }
+
 }

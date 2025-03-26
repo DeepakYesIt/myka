@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -16,11 +17,9 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterLayoutYourRecipeItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketyourrecipe.model.Dinner
 
-class YourRecipeAdapter(private var yourRecipesData: MutableList<Dinner?>,
+class YourRecipeAdapter(private var yourRecipesData: MutableList<Dinner>,
                         private var requireActivity: FragmentActivity,
-                        private var onItemSelectListener: OnItemSelectListener,
-    private var type:String
-):
+                        private var onItemSelectListener: OnItemSelectListener, private var type:String):
     RecyclerView.Adapter<YourRecipeAdapter.ViewHolder>() {
 
 
@@ -68,10 +67,28 @@ class YourRecipeAdapter(private var yourRecipesData: MutableList<Dinner?>,
                 holder.binding.layProgess.root.visibility= View.GONE
             }
 
+            if (data.serving!=null){
+                holder.binding.tvServes.text="Serves "+data.serving.toString()
+            }
+        }
+
+        holder.binding.imageMinusItem.setOnClickListener{
+            if (yourRecipesData.get(position).serving.toString().toInt() > 1) {
+                onItemSelectListener.itemSelect(position,"Minus",type)
+            }else{
+                Toast.makeText(requireActivity,"Minimum serving at least value is one", Toast.LENGTH_LONG).show()
+            }
+        }
+
+
+        holder.binding.imagePlusItem.setOnClickListener{
+            if (yourRecipesData.get(position).serving.toString().toInt() < 99) {
+                onItemSelectListener.itemSelect(position,"Plus",type)
+            }
         }
 
         holder.binding.imageCross.setOnClickListener{
-            onItemSelectListener.itemSelect(position,data!!.basket_id.toString(),type)
+            onItemSelectListener.itemSelect(position, data.basket_id.toString(),type)
         }
 
     }
@@ -84,6 +101,11 @@ class YourRecipeAdapter(private var yourRecipesData: MutableList<Dinner?>,
 
     override fun getItemCount(): Int {
         return yourRecipesData.size
+    }
+
+    fun updateList(mealList: MutableList<Dinner>) {
+        yourRecipesData=mealList
+        notifyDataSetChanged()
     }
 
     class ViewHolder(var binding: AdapterLayoutYourRecipeItemBinding) : RecyclerView.ViewHolder(binding.root){

@@ -681,7 +681,11 @@ interface ApiInterface {
 
     @FormUrlEncoded
     @POST(ApiEndPoint.basketYourRecipeIncDescUrl)
-    suspend fun basketYourRecipeIncDescUrl(@Field("uri") id:String?,@Field("quantity") quantity:String?): Response<JsonObject>
+    suspend fun basketYourRecipeIncDescUrl(@Field("uri") uri:String?,@Field("quantity") quantity:String?): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.basketIngIncDescUrl)
+    suspend fun basketIngIncDescUrl(@Field("food_id") foodId:String?,@Field("quantity") quantity:String?): Response<JsonObject>
 
     @FormUrlEncoded
     @POST(ApiEndPoint.addCardMealMeUrl)

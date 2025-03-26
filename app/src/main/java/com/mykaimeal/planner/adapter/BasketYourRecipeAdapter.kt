@@ -97,6 +97,11 @@ class BasketYourRecipeAdapter(private var yourRecipesData: MutableList<Recipes>?
         return yourRecipesData!!.size
     }
 
+    fun updateList(recipe: MutableList<Recipes>?) {
+        yourRecipesData=recipe
+        notifyDataSetChanged()
+    }
+
     class ViewHolder(var binding: AdapterLayoutYourRecipeItemBinding) : RecyclerView.ViewHolder(binding.root){
     }
 

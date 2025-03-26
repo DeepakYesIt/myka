@@ -10,15 +10,16 @@ data class BasketYourRecipeModel(
 )
 
 data class BasketYourRecipeModelData(
-    val Breakfast: MutableList<Dinner?>,
-    val Dinner: MutableList<Dinner?>,
-    val Lunch: MutableList<Dinner?>,
-    val Snacks: MutableList<Dinner?>,
-    val Teatime: MutableList<Dinner?>
+    val Breakfast: MutableList<Dinner>?,
+    val Dinner: MutableList<Dinner>?,
+    val Lunch: MutableList<Dinner>?,
+    val Snacks: MutableList<Dinner>?,
+    val Brunch: MutableList<Dinner>?
 )
 
 data class Dinner(
     val basket_id: Int?,
     val `data`: DataX?,
-    val uri: String?
+    val uri: String?,
+    var serving:String?
 )

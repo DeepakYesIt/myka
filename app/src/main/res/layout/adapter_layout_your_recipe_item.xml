@@ -49,12 +49,12 @@
         <TextView
             android:id="@+id/tvFoodName"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/_32sdp"
             android:layout_below="@+id/relImageFood"
             android:layout_marginTop="@dimen/_4sdp"
             android:layout_marginStart="@dimen/_8sdp"
             android:fontFamily="@font/poppins"
-            android:text="Sandwich"
+            android:text="Sandwich coconut flour zuchini bread"
             android:textColor="#0A2533"
             android:textSize="@dimen/_11ssp"
             android:textStyle="bold" />

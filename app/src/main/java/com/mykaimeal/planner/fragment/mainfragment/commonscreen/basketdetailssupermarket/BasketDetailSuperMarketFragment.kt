@@ -365,15 +365,22 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
     override fun itemSelectUnSelect(id: Int?, status: String?, type: String?, position: Int?) {
 
         if (type=="Product"){
-            val mainId:String= products!![position!!].id.toString()
-            val productId:String= products!![position].pro_id.toString()
-            val productName:String= products!![position].pro_name.toString()
-            val bundle = Bundle().apply {
-                putString("id",mainId)
-                putString("SwapProId",productId)
-                putString("SwapProName",productName)
+            if (status=="plus"){
+
+            }else if (status=="minus"){
+
+            }else{
+                val mainId:String= products!![position!!].id.toString()
+                val productId:String= products!![position].pro_id.toString()
+                val productName:String= products!![position].pro_name.toString()
+                val bundle = Bundle().apply {
+                    putString("id",mainId)
+                    putString("SwapProId",productId)
+                    putString("SwapProName",productName)
+                }
+                findNavController().navigate(R.id.basketProductDetailsFragment,bundle)
             }
-            findNavController().navigate(R.id.basketProductDetailsFragment,bundle)
+
         }else{
             bottomSheetDialog!!.dismiss()
         }

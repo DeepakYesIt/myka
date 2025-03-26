@@ -26,8 +26,10 @@ import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentBasketYourRecipeBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketyourrecipe.model.BasketYourRecipeModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketyourrecipe.model.BasketYourRecipeModelData
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketyourrecipe.model.Dinner
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketyourrecipe.viewmodel.BasketYourRecipeViewModel
 import com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.CookedTabModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -38,6 +40,7 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
     private lateinit var binding: FragmentBasketYourRecipeBinding
     private lateinit var basketYourRecipeViewModel: BasketYourRecipeViewModel
     private var yourRecipeAdapter: YourRecipeAdapter?=null
+    private var basketYourModelData: BasketYourRecipeModelData?=null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,7 +69,6 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
-
 
         binding.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()
@@ -115,7 +117,9 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
 
     private fun showDataInUI(data: BasketYourRecipeModelData?) {
 
-        if (data!!.Breakfast!=null && data.Breakfast.size>0){
+        basketYourModelData=data
+
+        if (data?.Breakfast!=null && data.Breakfast.size>0){
             binding.rcyBreakfast.visibility=View.VISIBLE
             binding.tvBreakFast.visibility=View.VISIBLE
             yourRecipeAdapter = YourRecipeAdapter(data.Breakfast,requireActivity(), this,"Breakfast")
@@ -125,7 +129,7 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
             binding.tvBreakFast.visibility=View.GONE
         }
 
-        if (data!!.Lunch!=null && data.Lunch.size>0){
+        if (data?.Lunch!=null && data.Lunch.size>0){
             binding.rcyLunch.visibility=View.VISIBLE
             binding.tvLunch.visibility=View.VISIBLE
             yourRecipeAdapter = YourRecipeAdapter(data.Lunch,requireActivity(), this,"Lunch")
@@ -135,7 +139,7 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
             binding.tvLunch.visibility=View.GONE
         }
 
-        if (data!!.Dinner!=null && data.Dinner.size>0){
+        if (data?.Dinner!=null && data.Dinner.size>0){
             binding.rcyDinner.visibility=View.VISIBLE
             binding.tvDinner.visibility=View.VISIBLE
             yourRecipeAdapter = YourRecipeAdapter(data.Dinner,requireActivity(), this,"Dinner")
@@ -145,7 +149,7 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
             binding.tvDinner.visibility=View.GONE
         }
 
-        if (data.Snacks!=null && data.Snacks.size>0){
+        if (data?.Snacks!=null && data.Snacks.size>0){
             binding.rcySnacks.visibility=View.VISIBLE
             binding.tvSnacks.visibility=View.VISIBLE
             yourRecipeAdapter = YourRecipeAdapter(data.Snacks,requireActivity(), this,"Snacks")
@@ -155,10 +159,10 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
             binding.tvSnacks.visibility=View.GONE
         }
 
-        if (data!!.Teatime!=null && data.Teatime.size>0){
+        if (data?.Brunch!=null && data.Brunch.size>0){
             binding.rcyTeaTimes.visibility=View.VISIBLE
             binding.tvTeaTime.visibility=View.VISIBLE
-            yourRecipeAdapter = YourRecipeAdapter(data.Teatime,requireActivity(), this,"Teatime")
+            yourRecipeAdapter = YourRecipeAdapter(data.Brunch,requireActivity(), this,"Brunch")
             binding.rcyTeaTimes.adapter = yourRecipeAdapter
         }else{
             binding.rcyTeaTimes.visibility=View.GONE
@@ -220,7 +224,7 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
                                 "Lunch" -> yourRecipeAdapter?.removeItem(position!!)
                                 "Dinner" -> yourRecipeAdapter?.removeItem(position!!)
                                 "Snacks" -> yourRecipeAdapter?.removeItem(position!!)
-                                "Teatime" -> yourRecipeAdapter?.removeItem(position!!)
+                                "Brunch" -> yourRecipeAdapter?.removeItem(position!!)
                             }
                             dialogRemoveDay.dismiss()
                         } else {
@@ -246,7 +250,97 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
 
 
     override fun itemSelect(position: Int?, recipeId: String?, type: String?) {
+        if (recipeId=="Minus"){
+            if (BaseApplication.isOnline(requireActivity())) {
+                removeAddServing(type ?: "", position, "minus")
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }else if (recipeId=="Plus"){
+            if (BaseApplication.isOnline(requireActivity())) {
+                removeAddServing(type ?: "", position, "plus")
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }else{
             removeRecipeBasketDialog(recipeId,position, type.toString())
+        }
+
     }
+
+    private fun removeAddServing(status: String, position: Int?, type: String) {
+
+        val (mealList, adapter) = when (status) {
+            "BreakFast" -> basketYourModelData?.Breakfast to yourRecipeAdapter
+            "Lunch" -> basketYourModelData?.Lunch to yourRecipeAdapter
+            "Dinner" -> basketYourModelData?.Dinner to yourRecipeAdapter
+            "Snacks" -> basketYourModelData?.Snacks to yourRecipeAdapter
+            "Brunch" -> basketYourModelData?.Brunch to yourRecipeAdapter
+            else -> null to null
+        }
+
+        val item = mealList?.get(position!!)
+
+        if (type.equals("plus",true) || type.equals("minus",true)) {
+            var count = item?.serving?.toInt()
+            val uri= item?.uri
+            count = when (type.lowercase()) {
+                "plus" -> count!! + 1
+                "minus" -> count!! - 1
+                else -> count // No change if `apiType` doesn't match
+            }
+            increaseQuantityRecipe(uri,count.toString(),item,position,mealList,adapter)
+        }
+    }
+
+    private fun increaseQuantityRecipe(uri: String?, quantity: String, item: Dinner?, position: Int?,
+                                       mealList: MutableList<Dinner>?, adapter: YourRecipeAdapter?) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            basketYourRecipeViewModel.basketYourRecipeIncDescUrl({
+                BaseApplication.dismissMe()
+                handleApiQuantityResponse(it,item,quantity,position,mealList,adapter)
+            },uri,quantity)
+        }
+    }
+
+    private fun handleApiQuantityResponse(result: NetworkResult<String>, item: Dinner?, quantity: String, position: Int?,
+                                          mealList: MutableList<Dinner>?, adapter: YourRecipeAdapter?
+    ) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessQuantityResponse(result.data.toString(),item,quantity,position,mealList,adapter)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessQuantityResponse(data: String, item: Dinner?, quantity: String,
+        position: Int?, mealList: MutableList<Dinner>?, adapter: YourRecipeAdapter?) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                // Toggle the is_like value
+                item?.serving = quantity.toInt().toString()
+                if (item != null) {
+                    mealList?.set(position!!, item)
+                }
+                // Update the adapter
+                if (mealList != null) {
+                    adapter?.updateList(mealList)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
 
 }

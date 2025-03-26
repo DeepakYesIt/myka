@@ -219,6 +219,7 @@ interface MainRepository {
     suspend fun removeMealApi(successCallback: (response: NetworkResult<String>) -> Unit, cookedId:String?)
     suspend fun removeBasketUrlApi(successCallback: (response: NetworkResult<String>) -> Unit, recipeId:String?)
     suspend fun basketYourRecipeIncDescUrl(successCallback: (response: NetworkResult<String>) -> Unit, uri:String?,quantity:String?)
+    suspend fun basketIngIncDescUrl(successCallback: (response: NetworkResult<String>) -> Unit, foodId:String?,quantity:String?)
     suspend fun getMealByUrl(successCallback: (response: NetworkResult<String>) -> Unit, q:String?)
     suspend fun updatePreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit, userName: String?,cookingForType: String?,
                                      userGender:String?,bodyGoal:String?,partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?,

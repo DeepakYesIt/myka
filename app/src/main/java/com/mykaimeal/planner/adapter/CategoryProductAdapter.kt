@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -42,7 +43,7 @@ class CategoryProductAdapter(
 
         fun bind(product: Product) {
 
-            if (product.name != null || product.sch_id != null) {
+            if (product.name != null) {
                 binding.textProductName.text = product.name
             }
 
@@ -106,15 +107,21 @@ class CategoryProductAdapter(
 
             // Implement quantity controls
             binding.imageDecreaseQuantity.setOnClickListener {
+                if (product.sch_id.toString().toInt() > 1) {
+                    onItemSelectListener.itemSelectUnSelect(position,"Minus","Product",0)
+                }else{
+                    Toast.makeText(requireActivity,"Minimum serving at least value is one", Toast.LENGTH_LONG).show()
+                }
                 // Decrease quantity logic
             }
             binding.imageIncreaseQuantity.setOnClickListener {
                 // Increase quantity logic
+                if (product.sch_id.toString().toInt() < 1000) {
+                    onItemSelectListener.itemSelectUnSelect(position,"Plus","Product",0)
+                }
             }
 
             binding.imageSwap.setOnClickListener {
-
-
                 onItemSelectListener.itemSelectUnSelect(product.id,product.name.toString(),"Product", position)
               /*  onItemSelectListener.itemSelect(
                     product.id,
