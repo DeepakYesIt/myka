@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.authfragment.signup
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
@@ -40,7 +41,8 @@ import java.util.regex.Pattern
 @AndroidEntryPoint
 class SignUpFragment : Fragment() {
 
-    private var binding: FragmentSignUpBinding? = null
+    private var _binding: FragmentSignUpBinding? = null
+    private val binding get() = _binding!!
     private lateinit var commonWorkUtils: CommonWorkUtils
     private var chooseType: String = ""
     private lateinit var signUpViewModel: SignUpViewModel
@@ -76,7 +78,7 @@ class SignUpFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        binding = FragmentSignUpBinding.inflate(inflater, container, false)
+        _binding = FragmentSignUpBinding.inflate(inflater, container, false)
 
         signUpViewModel = ViewModelProvider(this)[SignUpViewModel::class.java]
 
@@ -95,19 +97,72 @@ class SignUpFragment : Fragment() {
         ///main function using all triggered of this screen
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun initialize() {
 
         /// value get for social login
-        if (sessionManagement.getCookingFor() == "Myself") {
-            cookingFor = "1"
-        } else if (sessionManagement.getCookingFor() == "MyPartner") {
-            cookingFor = "2"
-        } else {
-            cookingFor = "3"
+        cookingFor = when (sessionManagement.getCookingFor()) {
+            "Myself" -> "1"
+            "MyPartner" -> "2"
+            else -> "3"
         }
+
+        getValueFromSession()
+
+        logOutGoogle()
+
+        //// handle click event for next login screen
+        binding.tvLogIn.setOnClickListener {
+            findNavController().navigate(R.id.loginFragment)
+        }
+
+        //// handle on back pressed
+        binding.imagesBackSignUp.setOnClickListener {
+            findNavController().navigate(R.id.loginFragment)
+        }
+
+        binding.googleImages.setOnClickListener {
+            if (BaseApplication.isOnline(requireActivity())) {
+                val signInIntent = mGoogleSignInClient!!.signInIntent
+                startActivityForResult(signInIntent, googleLogin)
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+
+        binding.imgEye.setOnClickListener {
+            if (binding.etSignUpPassword.transformationMethod === PasswordTransformationMethod.getInstance()) {
+                binding.etSignUpPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
+                binding.imgEye.setImageDrawable(resources.getDrawable(R.drawable.ic_password_eye))
+                binding.etSignUpPassword.setSelection(binding.etSignUpPassword.text.length)
+            } else {
+                binding.etSignUpPassword.transformationMethod = PasswordTransformationMethod.getInstance()
+                binding.imgEye.setImageDrawable(resources.getDrawable(R.drawable.hide_pass))
+                binding.etSignUpPassword.setSelection(binding.etSignUpPassword.text.length)
+            }
+        }
+
+        //// add validation based  on email or phone & password
+        ///checking the device of mobile data in online and offline(show network error message)
+        //// implement signup api and redirection
+        binding.rlSignUp.setOnClickListener {
+            if (BaseApplication.isOnline(requireActivity())) {
+                if (validate()) {
+                    signUpApi()
+                }
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+
+
+    }
+
+    private fun getValueFromSession() {
+
         if (sessionManagement.getUserName() != "") {
             userName = sessionManagement.getUserName()
         }
@@ -187,53 +242,8 @@ class SignUpFragment : Fragment() {
         if (sessionManagement.getReasonTakeAwayDesc() != "") {
             reasonTakeAwayDesc = sessionManagement.getReasonTakeAwayDesc()
         }
-
-        logOutGoogle()
-
-        //// handle click event for next login screen
-        binding!!.tvLogIn.setOnClickListener {
-            findNavController().navigate(R.id.loginFragment)
-        }
-
-        //// handle on back pressed
-        binding!!.imagesBackSignUp.setOnClickListener {
-            findNavController().navigate(R.id.loginFragment)
-        }
-
-        binding!!.googleImages.setOnClickListener {
-            if (BaseApplication.isOnline(requireActivity())) {
-                val signInIntent = mGoogleSignInClient!!.signInIntent
-                startActivityForResult(signInIntent, googleLogin)
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
-
-        binding!!.imgEye.setOnClickListener {
-            if (binding!!.etSignUpPassword.transformationMethod === PasswordTransformationMethod.getInstance()) {
-                binding!!.etSignUpPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
-                binding!!.imgEye.setImageDrawable(resources.getDrawable(R.drawable.ic_password_eye))
-                binding!!.etSignUpPassword.setSelection(binding!!.etSignUpPassword.text.length)
-            } else {
-                binding!!.etSignUpPassword.transformationMethod = PasswordTransformationMethod.getInstance()
-                binding!!.imgEye.setImageDrawable(resources.getDrawable(R.drawable.hide_pass))
-                binding!!.etSignUpPassword.setSelection(binding!!.etSignUpPassword.text.length)
-            }
-        }
-
-        //// add validation based  on email or phone & password
-        ///checking the device of mobile data in online and offline(show network error message)
-        //// implement signup api and redirection
-        binding!!.rlSignUp.setOnClickListener {
-            if (validate()) {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    signUpApi()
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            }
-        }
     }
+
 
     private fun logOutGoogle() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -247,10 +257,10 @@ class SignUpFragment : Fragment() {
     /// validation part
     private fun validate(): Boolean {
 
-        val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]"
+        val emailPattern =ErrorMessage.emailPatter
         val emaPattern = Pattern.compile(emailPattern)
-        val emailMatcher = emaPattern.matcher(binding!!.etSignUpEmailPhone.text.toString().trim())
-        val password = binding!!.etSignUpPassword.text.toString().trim()
+        val emailMatcher = emaPattern.matcher(binding.etSignUpEmailPhone.text.toString().trim())
+        val password = binding.etSignUpPassword.text.toString().trim()
 
         // Password Validation Conditions
         val hasUpperCase = password.any { it.isUpperCase() }
@@ -259,7 +269,7 @@ class SignUpFragment : Fragment() {
         val isValidLength = password.length >= 6
 
         // Check if email/phone is empty
-        if (binding!!.etSignUpEmailPhone.text.toString().trim().isEmpty()) {
+        if (binding.etSignUpEmailPhone.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.emailPhone, false)
             return false
         }
@@ -275,32 +285,16 @@ class SignUpFragment : Fragment() {
         }
         // Check password conditions individually and show specific errors
         else if (!isValidLength) {
-            commonWorkUtils.alertDialog(
-                requireActivity(),
-                "Password must be at least 6 characters long.",
-                false
-            )
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.charactersPassword, false)
             return false
         } else if (!hasDigit) {
-            commonWorkUtils.alertDialog(
-                requireActivity(),
-                "Password must contain at least one digit.",
-                false
-            )
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.oneDigitPassword, false)
             return false
         } else if (!hasUpperCase) {
-            commonWorkUtils.alertDialog(
-                requireActivity(),
-                "Password must contain at least one uppercase letter.",
-                false
-            )
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.uppercaseLetterPassword, false)
             return false
         } else if (!hasSpecialChar) {
-            commonWorkUtils.alertDialog(
-                requireActivity(),
-                "Password must contain at least one special character.",
-                false
-            )
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.specialLetterPassword, false)
             return false
         }
 
@@ -324,21 +318,15 @@ class SignUpFragment : Fragment() {
                                         val bundle = Bundle()
                                         bundle.putString("screenType", "signup")
                                         bundle.putString("chooseType", chooseType)
-                                        bundle.putString("userId", signUpModel.data.id.toString())
-                                        bundle.putString(
-                                            "value",
-                                            binding!!.etSignUpEmailPhone.text.toString().trim()
-                                        )
+                                        val id=signUpModel.data.id?:0
+                                        bundle.putString("userId",id.toString())
+                                        bundle.putString("value", binding.etSignUpEmailPhone.text.toString().trim())
                                         findNavController().navigate(R.id.verificationFragment, bundle)
                                     }catch (e:Exception){
                                         Log.d("signup","message:---"+e.message)
                                     }
                                 } else {
-                                    if (signUpModel.code == ErrorMessage.code) {
-                                        showAlertFunction(signUpModel.message, true)
-                                    } else {
-                                        showAlertFunction(signUpModel.message, false)
-                                    }
+                                    handleCommon(signUpModel.code,signUpModel.message)
                                 }
                             }catch (e:Exception){
                                 Log.d("signup","message:---"+e.message)
@@ -354,9 +342,17 @@ class SignUpFragment : Fragment() {
                         }
                     }
                 },
-                binding!!.etSignUpEmailPhone.text.toString().trim(),
-                binding!!.etSignUpPassword.text.toString().trim()
+                binding.etSignUpEmailPhone.text.toString().trim(),
+                binding.etSignUpPassword.text.toString().trim()
             )
+        }
+    }
+
+    private fun handleCommon(code: Int, message: String) {
+        if (code == ErrorMessage.code) {
+            showAlertFunction(message, true)
+        } else {
+            showAlertFunction(message, false)
         }
     }
 
@@ -367,13 +363,13 @@ class SignUpFragment : Fragment() {
 
     /// validation based on valid phone number
     private fun validNumber(): Boolean {
-        val email: String = binding!!.etSignUpEmailPhone.text.toString().trim()
+        val email: String = binding.etSignUpEmailPhone.text.toString().trim()
         if (email.length != 10) {
             return false
         }
         var onlyDigits = true
-        for (i in 0 until email.length) {
-            if (!Character.isDigit(email[i])) {
+        for (element in email) {
+            if (!Character.isDigit(element)) {
                 onlyDigits = false
                 break
             }
@@ -382,6 +378,7 @@ class SignUpFragment : Fragment() {
         return onlyDigits
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == googleLogin) {
@@ -404,7 +401,7 @@ class SignUpFragment : Fragment() {
                 socialApi(personId, personEmail)
             } else {
                 logOutGoogle()
-                commonWorkUtils.alertDialog(requireActivity(), "Account not present.", false)
+                commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.googleError, false)
             }
         } catch (e: ApiException) {
             logOutGoogle()
@@ -426,11 +423,7 @@ class SignUpFragment : Fragment() {
                             if (signUpVerificationModel.code == 200 && signUpVerificationModel.success) {
                                 showDataInSession(signUpVerificationModel.data, personEmail)
                             } else {
-                                if (signUpVerificationModel.code == ErrorMessage.code) {
-                                    showAlertFunction(signUpVerificationModel.message, true)
-                                } else {
-                                    showAlertFunction(signUpVerificationModel.message, false)
-                                }
+                                handleCommon(signUpVerificationModel.code,signUpVerificationModel.message)
                             }
                         }
                         is NetworkResult.Error -> {
@@ -463,7 +456,7 @@ class SignUpFragment : Fragment() {
                 favouriteSelectedId,
                 allergenSelectedId,
                 dislikeSelectedId,
-                "Android",
+                ErrorMessage.deviceType,
                 token
             )
         }
@@ -471,54 +464,46 @@ class SignUpFragment : Fragment() {
 
     private fun showDataInSession(signUpVerificationModelData: SignUpVerificationModelData, personEmail: String?) {
         try {
-            sessionManagement.setEmail(personEmail!!)
 
-            if (signUpVerificationModelData.name != null) {
-                sessionManagement.setUserName(signUpVerificationModelData.name)
-            }
+            sessionManagement.setEmail(personEmail ?: "")
+
+            sessionManagement.setUserName(signUpVerificationModelData.name ?: "")
 
             if (signUpVerificationModelData.profile_img != null) {
                 sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
             }
 
-            val cookingFor = if (signUpVerificationModelData.cooking_for_type != null) {
-                when (signUpVerificationModelData.cooking_for_type) {
-                    1 -> "Myself"
-                    2 -> "MyPartner"
-                    3 -> "MyFamily"
-                    else -> {
-                        "Not Select"
-                    }
-                }
-            } else {
-                "Not Select"
+            val cookingFor = when (signUpVerificationModelData.cooking_for_type ?: -1) {
+                1 -> "Myself"
+                2 -> "MyPartner"
+                3 -> "MyFamily"
+                else -> "Not Select"
             }
 
             sessionManagement.setCookingFor(cookingFor)
 
-            if (signUpVerificationModelData.profile_img != null) {
-                sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
+
+            sessionManagement.setImage(signUpVerificationModelData.profile_img?:"")
+
+            sessionManagement.setAuthToken(signUpVerificationModelData.token?:"")
+
+            val id= signUpVerificationModelData.id?:0
+            sessionManagement.setId(id.toString())
+
+            signUpVerificationModelData.is_cooking_complete?.let {
+                if (it == 0) {
+                    sessionManagement.setPreferences(true)
+                    val intent = Intent(requireActivity(), EnterYourNameActivity::class.java)
+                    startActivity(intent)
+                    requireActivity().finish()
+                } else {
+                    sessionManagement.setLoginSession(true)
+                    val intent = Intent(requireActivity(), MainActivity::class.java)
+                    startActivity(intent)
+                    requireActivity().finish()
+                }
             }
 
-            if (signUpVerificationModelData.token != null) {
-                sessionManagement.setAuthToken(signUpVerificationModelData.token.toString())
-            }
-
-            if (signUpVerificationModelData.id != null) {
-                sessionManagement.setId(signUpVerificationModelData.id.toString())
-            }
-
-            if (signUpVerificationModelData.is_cooking_complete==0){
-                val intent = Intent(requireActivity(), EnterYourNameActivity::class.java)
-                startActivity(intent)
-                sessionManagement.setPreferences(true)
-            }else {
-                sessionManagement.setLoginSession(true)
-
-                val intent = Intent(requireActivity(), MainActivity::class.java)
-                startActivity(intent)
-                requireActivity().finish()
-            }
         }catch (e:Exception){
             Log.d("Signup","message:---"+e.message)
         }
@@ -533,6 +518,11 @@ class SignUpFragment : Fragment() {
         lifecycleScope.launch {
             token = BaseApplication.fetchFcmToken()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 

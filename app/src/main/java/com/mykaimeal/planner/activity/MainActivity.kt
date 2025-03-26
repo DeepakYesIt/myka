@@ -130,16 +130,24 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         startDestination()
 
         // Check if 24 hours have passed since the last dialog was shown
-        if (shouldShowDialog()) {
-            dialogDailyInspiration()
-        }
+//        if (shouldShowDialog()) {
+////            dialogDailyInspiration()
+//        }
+
+//        // When screen load then api call
+//        fetchDataOnLoad()
+
 
     }
 
     private fun shouldShowDialog(): Boolean {
         val lastShownTime = sharedPreferences.getLong(lastShownTimeKey, 0)
         val currentTime = System.currentTimeMillis()
-        return (currentTime - lastShownTime) >= oneDayMillis
+        val data=(currentTime - lastShownTime) >= oneDayMillis
+        Log.d("currentTime","*****"+currentTime)
+        Log.d("lastShownTime","*****"+lastShownTime)
+        Log.d("data","*****"+data)
+        return data
     }
 
         private fun handleDeepLink(intent: Intent?) {
@@ -316,7 +324,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 height = WindowManager.LayoutParams.MATCH_PARENT
             }
 
-            layOnBoardingIndicator = findViewById<LinearLayout>(R.id.layonboarding_indicator)
+            layOnBoardingIndicator = findViewById(R.id.layonboarding_indicator)
             val viewPager = findViewById<ViewPager2>(R.id.viewPager)
             val llBreakfast = findViewById<LinearLayout>(R.id.llBreakfast)
             val llLunch = findViewById<LinearLayout>(R.id.llLunch)
@@ -330,11 +338,8 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             val viewLunch = findViewById<View>(R.id.viewLunch)
             val viewDinner = findViewById<View>(R.id.viewDinner)
             
-            // Save the current time as the last shown time
-            sharedPreferences.edit().putLong(lastShownTimeKey, System.currentTimeMillis()).apply()
-            
-            // When screen load then api call
-            fetchDataOnLoad()
+//            // Save the current time as the last shown time
+//            sharedPreferences.edit().putLong(lastShownTimeKey, System.currentTimeMillis()).apply()
 
             llBreakfast.setOnClickListener {
                 viewBreakfast.visibility = View.VISIBLE
@@ -374,10 +379,15 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 dismiss()
             }
 
+
+            if (recipesModel!=null){
+                adapter = ImageViewPagerAdapter(this@MainActivity, recipesModel!!.Dinner)
+            }
+            viewPager.adapter = adapter
+
             // Set up ViewPager with images
             setUpOnBoardingIndicator()
             currentOnBoardingIndicator(0)
-            viewPager.adapter = adapter
 
 
         /*    /// set view pager position and value
@@ -429,10 +439,10 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     }
 
     private fun fetchRecipeDetailsData() {
-        BaseApplication.showMe(this@MainActivity)
+//        BaseApplication.showMe(this@MainActivity)
         lifecycleScope.launch {
             mealRoutineViewModel.planRequest({
-                BaseApplication.dismissMe()
+//                BaseApplication.dismissMe()
                 handleApiResponse(it)
             }, "q")
         }
@@ -469,12 +479,8 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
     private fun showData(data: Data) {
         recipesModel = data.recipes
-
         Log.d("ffdfdfd", "fffdfdf$recipesModel")
-
-        if (recipesModel!=null){
-            adapter = ImageViewPagerAdapter(this@MainActivity, recipesModel!!.Breakfast)
-        }
+        dialogDailyInspiration()
    /*     if (recipesModel != null) {
             fun setupMealAdapter(
                 mealRecipes: MutableList<BreakfastModel>?, recyclerView: RecyclerView, type: String): AdapterPlanBreakFast? {

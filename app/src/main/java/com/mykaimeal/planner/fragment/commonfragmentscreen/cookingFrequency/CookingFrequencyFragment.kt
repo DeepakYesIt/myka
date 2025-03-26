@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.commonfragmentscreen.cookingFrequency
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -35,7 +36,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class CookingFrequencyFragment : Fragment(), OnItemClickListener {
 
-    private var binding: FragmentCookingFrequencyBinding? = null
+    private var _binding: FragmentCookingFrequencyBinding? = null
+    private val binding get() = _binding!!
     private var bodyGoalAdapter: BodyGoalAdapter? = null
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue: Int = 0
@@ -44,36 +46,37 @@ class CookingFrequencyFragment : Fragment(), OnItemClickListener {
     private lateinit var cookingFrequencyViewModel: CookingFrequencyViewModel
     private var cookingFreqModelData: List<BodyGoalModelData>? = null
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = FragmentCookingFrequencyBinding.inflate(inflater, container, false)
+        _binding = FragmentCookingFrequencyBinding.inflate(inflater, container, false)
 
         cookingFrequencyViewModel = ViewModelProvider(this)[CookingFrequencyViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
         if (sessionManagement.getCookingFor().equals("Myself")) {
-            binding!!.tvCookFreqDesc.text = "How often do you cook meals at home?"
-            binding!!.progressBar7.max = 10
+            binding.tvCookFreqDesc.text = "How often do you cook meals at home?"
+            binding.progressBar7.max = 10
             totalProgressValue = 10
             updateProgress(7)
         } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-            binding!!.tvCookFreqDesc.text = "How often do you cook meals at home?"
-            binding!!.progressBar7.max = 11
+            binding.tvCookFreqDesc.text = "How often do you cook meals at home?"
+            binding.progressBar7.max = 11
             totalProgressValue = 11
             updateProgress(8)
         } else {
-            binding!!.tvCookFreqDesc.text = "How often do you cook meals for your family?"
-            binding!!.progressBar7.max = 11
+            binding.tvCookFreqDesc.text = "How often do you cook meals for your family?"
+            binding.progressBar7.max = 11
             totalProgressValue = 11
             updateProgress(8)
         }
 
         if (sessionManagement.getCookingScreen().equals("Profile")) {
-            binding!!.llBottomBtn.visibility = View.GONE
-            binding!!.rlUpdateCookingFrequency.visibility = View.VISIBLE
+            binding.llBottomBtn.visibility = View.GONE
+            binding.rlUpdateCookingFrequency.visibility = View.VISIBLE
 
             if (BaseApplication.isOnline(requireActivity())) {
                 cookingFrequencySelectApi()
@@ -81,8 +84,8 @@ class CookingFrequencyFragment : Fragment(), OnItemClickListener {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         } else {
-            binding!!.llBottomBtn.visibility = View.VISIBLE
-            binding!!.rlUpdateCookingFrequency.visibility = View.GONE
+            binding.llBottomBtn.visibility = View.VISIBLE
+            binding.rlUpdateCookingFrequency.visibility = View.GONE
 
             if (cookingFrequencyViewModel.getCookingFreqData() != null) {
                 showDataInUi(cookingFrequencyViewModel.getCookingFreqData()!!)
@@ -104,28 +107,28 @@ class CookingFrequencyFragment : Fragment(), OnItemClickListener {
                 }
             })
 
-
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateProgress(progress: Int) {
-        binding!!.progressBar7.progress = progress
-        binding!!.tvProgressText.text = "$progress/$totalProgressValue"
+        binding.progressBar7.progress = progress
+        binding.tvProgressText.text = "$progress/$totalProgressValue"
     }
 
     private fun initialize() {
 
-        binding!!.imgBackCookingFreq.setOnClickListener {
+        binding.imgBackCookingFreq.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.tvSkipBtn.setOnClickListener {
+        binding.tvSkipBtn.setOnClickListener {
             stillSkipDialog()
         }
 
-        binding!!.tvNextBtn.setOnClickListener {
+        binding.tvNextBtn.setOnClickListener {
             if (status == "2") {
                 cookingFrequencyViewModel.setCookingFreqData(cookingFreqModelData!!.toMutableList())
                 sessionManagement.setCookingFrequency(cookingSelect.toString())
@@ -141,7 +144,7 @@ class CookingFrequencyFragment : Fragment(), OnItemClickListener {
             }
         }
 
-        binding!!.rlUpdateCookingFrequency.setOnClickListener {
+        binding.rlUpdateCookingFrequency.setOnClickListener {
             ///checking the device of mobile data in online and offline(show network error message)
             if (BaseApplication.isOnline(requireActivity())) {
                 updateCookFrequencyApi()
@@ -291,7 +294,7 @@ class CookingFrequencyFragment : Fragment(), OnItemClickListener {
             if (bodyGoalModelData != null && bodyGoalModelData.size > 0) {
                 cookingFreqModelData = bodyGoalModelData
                 bodyGoalAdapter = BodyGoalAdapter(bodyGoalModelData, requireActivity(), this)
-                binding!!.rcyCookingFreq.adapter = bodyGoalAdapter
+                binding.rcyCookingFreq.adapter = bodyGoalAdapter
             }
         } catch (e: Exception) {
             Log.d("cookingFrequency@@@@", "message" + e.message)
@@ -307,21 +310,27 @@ class CookingFrequencyFragment : Fragment(), OnItemClickListener {
     override fun itemClick(selectItem: Int?, status1: String?, type: String?) {
         if (status1.equals("-1")) {
             status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             cookingSelect = selectItem.toString()
             return
         }
 
         if (type.equals("true")) {
             status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             cookingSelect = selectItem.toString()
         } else {
             status = ""
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

@@ -466,7 +466,6 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
     }
 
     override fun itemClick(selectItem: Int?, status1: String?, type: String?) {
-
         reasonSelect=""
         reasonTakeAway = ""
         if (status1.equals("-1")) {
@@ -502,6 +501,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 binding.tvNextBtn.isClickable = true
                 binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 reasonSelect = reasonTakeModelData?.get(status1!!.toInt())!!.id.toString()
+                reasonTakeAway = selectItem.toString()
                 reasonTakeAway = ""
                 binding.relMainLayout.visibility=View.GONE
             }

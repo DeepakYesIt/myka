@@ -44,7 +44,8 @@ import java.util.Locale
 @AndroidEntryPoint
 class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
 
-    private var binding: FragmentAllergensIngredientsBinding? = null
+    private var _binding: FragmentAllergensIngredientsBinding? = null
+    private val binding get() = _binding!!
     private var allergenIngAdapter: AdapterAllergensIngItem? = null
     private lateinit var sessionManagement: SessionManagement
     private var allergenIngModelData = mutableListOf<AllergensIngredientModelData>()
@@ -62,37 +63,37 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = FragmentAllergensIngredientsBinding.inflate(inflater, container, false)
+        _binding = FragmentAllergensIngredientsBinding.inflate(inflater, container, false)
 
         allergenIngredientViewModel = ViewModelProvider(this)[AllergenIngredientViewModel::class.java]
         sessionManagement = SessionManagement(requireContext())
         allergenIngAdapter = AdapterAllergensIngItem(allergenIngModelData, requireActivity(), this)
-        binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
+        binding.rcyAllergensDesc.adapter = allergenIngAdapter
 
 
         /// checked session value cooking for
         if (sessionManagement.getCookingFor().equals("Myself")) {
-            binding!!.tvAllergensDesc.text = getString(R.string.allergens_ingredients_desc)
-            binding!!.progressBar5.max = 10
+            binding.tvAllergensDesc.text = getString(R.string.allergens_ingredients_desc)
+            binding.progressBar5.max = 10
             totalProgressValue = 10
             updateProgress(5)
         } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-            binding!!.tvAllergensDesc.text =
+            binding.tvAllergensDesc.text =
                 "Pick ingredients you and your partner are allergic to"
-            binding!!.progressBar5.max = 11
+            binding.progressBar5.max = 11
             totalProgressValue = 11
             updateProgress(5)
         } else {
-            binding!!.tvAllergensDesc.text =
+            binding.tvAllergensDesc.text =
                 "Which ingredients are you and your family allergic to?"
-            binding!!.progressBar5.max = 11
+            binding.progressBar5.max = 11
             totalProgressValue = 11
             updateProgress(5)
         }
 
         if (sessionManagement.getCookingScreen().equals("Profile")) {
-            binding!!.llBottomBtn.visibility = View.GONE
-            binding!!.rlUpdateAllergens.visibility = View.VISIBLE
+            binding.llBottomBtn.visibility = View.GONE
+            binding.rlUpdateAllergens.visibility = View.VISIBLE
             if (BaseApplication.isOnline(requireActivity())) {
 //                allergenIngredientSelectApi()
                 searchable("","count")
@@ -100,14 +101,14 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         } else {
-            binding!!.llBottomBtn.visibility = View.VISIBLE
-            binding!!.rlUpdateAllergens.visibility = View.GONE
+            binding.llBottomBtn.visibility = View.VISIBLE
+            binding.rlUpdateAllergens.visibility = View.GONE
 
             if (allergenIngredientViewModel.getAllergensData() != null) {
                 showDataInUi(allergenIngredientViewModel.getAllergensData()!!)
                 if (status=="2"){
-                    binding!!.tvNextBtn.isClickable = true
-                    binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                    binding.tvNextBtn.isClickable = true
+                    binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 }
             } else {
                 ///checking the device of mobile data in online and offline(show network error message)
@@ -135,7 +136,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         ///main function using all triggered of this screen
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun allergenIngredientSelectApi() {
@@ -177,25 +178,25 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
 
     /// update progressbar value and progress
     private fun updateProgress(progress: Int) {
-        binding!!.progressBar5.progress = progress
-        binding!!.tvProgressText.text = "$progress/$totalProgressValue"
+        binding.progressBar5.progress = progress
+        binding.tvProgressText.text = "$progress/$totalProgressValue"
     }
 
     private fun initialize() {
 
         /// handle on back pressed
-        binding!!.imgBackAllergensIng.setOnClickListener {
+        binding.imgBackAllergensIng.setOnClickListener {
             findNavController().navigateUp()
         }
 
         /// handle click event for skip this screen
-        binding!!.tvSkipBtn.setOnClickListener {
+        binding.tvSkipBtn.setOnClickListener {
             stillSkipDialog()
         }
 
        /* // Add a TextWatcher to monitor changes in the username EditText field.
         // The searchable() function is triggered after text changes to search ingredient
-        binding!!.etAllergensIngSearchBar.addTextChangedListener(object :
+        binding.etAllergensIngSearchBar.addTextChangedListener(object :
             TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
@@ -205,9 +206,9 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         })*/
 
         /// handle click event for redirect next part
-        binding!!.tvNextBtn.setOnClickListener {
+        binding.tvNextBtn.setOnClickListener {
             if (status == "2") {
-                allergenIngredientViewModel.setAllergensData(allergenIngModelData,binding!!.etAllergensIngSearchBar.text.toString())
+                allergenIngredientViewModel.setAllergensData(allergenIngModelData,binding.etAllergensIngSearchBar.text.toString())
                 sessionManagement.setAllergenIngredientList(allergensSelectedId)
                 if (sessionManagement.getCookingFor().equals("Myself")) {
                     findNavController().navigate(R.id.mealRoutineFragment)
@@ -219,7 +220,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
             }
         }
 
-        binding!!.rlUpdateAllergens.setOnClickListener {
+        binding.rlUpdateAllergens.setOnClickListener {
             ///checking the device of mobile data in online and offline(show network error message)
             if (BaseApplication.isOnline(requireActivity())) {
                 updateAllergensApi()
@@ -229,8 +230,8 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         }
 
 
-        binding!!.relMoreButton.setOnClickListener { v ->
-            binding!!.relMoreButton.visibility=View.VISIBLE
+        binding.relMoreButton.setOnClickListener { v ->
+            binding.relMoreButton.visibility=View.VISIBLE
 
             itemCount = (itemCount.toInt() + 10).toString()  // Convert to Int, add 10, convert back to String
             ///checking the device of mobile data in online and offline(show network error message)
@@ -323,11 +324,11 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
     }
 
     private fun searchable(editText: String,countStatus:String) {
-        binding!!.layProgess.visibility=View.VISIBLE
+        binding.layProgess.visibility=View.VISIBLE
         val count = if (countStatus.equals("search", true)) "100" else itemCount
         lifecycleScope.launch {
             allergenIngredientViewModel.getAllergensSearchIngredients({
-                binding!!.layProgess.visibility=View.GONE
+                binding.layProgess.visibility=View.GONE
                 when (it) {
                     is NetworkResult.Success -> {
                         val gson = Gson()
@@ -418,13 +419,13 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 allergenIngModelData.addAll(allergensModelData)
                 allergenIngAdapter?.filterList(allergenIngModelData)
                 if (type.equals("search",true)){
-                    binding!!.relMoreButton.visibility=View.GONE
+                    binding.relMoreButton.visibility=View.GONE
                 }else{
-                    binding!!.relMoreButton.visibility=View.VISIBLE
+                    binding.relMoreButton.visibility=View.VISIBLE
                 }
-                binding!!.rcyAllergensDesc.visibility=View.VISIBLE
+                binding.rcyAllergensDesc.visibility=View.VISIBLE
             }else{
-                binding!!.rcyAllergensDesc.visibility=View.GONE
+                binding.rcyAllergensDesc.visibility=View.GONE
             }
         }catch (e:Exception){
             Log.d("allergens","message:--"+e.message)
@@ -450,19 +451,19 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
 
              /*   // Show "Show More" button only if there are more than 3 items
                 if (allergensModelData.size > 3) {
-                    binding!!.relMoreButton.visibility = View.VISIBLE
+                    binding.relMoreButton.visibility = View.VISIBLE
                 }*/
                 allergenIngModelData = allergensModelData.toMutableList()
                 allergenIngModelData = allergensModelData.toMutableList()
                 allergenIngAdapter?.filterList(allergenIngModelData)
                 if (allergenIngredientViewModel.getEditStatus().equals("")){
-                    binding!!.relMoreButton.visibility=View.VISIBLE
+                    binding.relMoreButton.visibility=View.VISIBLE
                 }else{
-                    binding!!.relMoreButton.visibility=View.GONE
+                    binding.relMoreButton.visibility=View.GONE
                 }
 
 //                allergenIngAdapter = AdapterAllergensIngItem(allergensModelData, requireActivity(), this)
-//                binding!!.rcyAllergensDesc.adapter = allergenIngAdapter
+//                binding.rcyAllergensDesc.adapter = allergenIngAdapter
             }
         }catch (e:Exception){
             Log.d("allergens","message:---"+e.message)
@@ -508,30 +509,35 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                     allergensSelectedId = list!!
                 }
                 status = "2"
-                binding!!.tvNextBtn.isClickable = true
-                binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                binding.tvNextBtn.isClickable = true
+                binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 return
             }
 
             if (type.equals("true")) {
                 status = "2"
-                binding!!.tvNextBtn.isClickable = true
-                binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                binding.tvNextBtn.isClickable = true
+                binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 allergensSelectedId = list!!
             } else {
                 status = ""
-                binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             }
     }
 
 
     override fun onResume() {
         super.onResume()
-        binding!!.etAllergensIngSearchBar.addTextChangedListener(textListener)
+        binding.etAllergensIngSearchBar.addTextChangedListener(textListener)
     }
 
     override fun onPause() {
-        binding!!.etAllergensIngSearchBar.removeTextChangedListener(textListener)
+        binding.etAllergensIngSearchBar.removeTextChangedListener(textListener)
         super.onPause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

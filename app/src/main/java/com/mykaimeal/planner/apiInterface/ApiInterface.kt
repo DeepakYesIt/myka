@@ -430,7 +430,9 @@ interface ApiInterface {
 
     @FormUrlEncoded
     @POST(ApiEndPoint.updateUserPreferences)
-    suspend fun updateReasonTakeAwayApi(@Field("take_way") takeWay: String?,@Field("take_way_name") takeWayName: String?): Response<JsonObject>
+
+    suspend fun updateReasonTakeAwayApi(@Field("take_way") takeWay: String?,@Field("take_way_name") take_way_name: String?): Response<JsonObject>
+
 
     @FormUrlEncoded
     @POST(ApiEndPoint.updateUserPreferences)

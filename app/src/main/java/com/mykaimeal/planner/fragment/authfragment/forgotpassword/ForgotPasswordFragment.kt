@@ -26,7 +26,8 @@ import java.util.regex.Pattern
 @AndroidEntryPoint
 class ForgotPasswordFragment : Fragment() {
 
-    private var binding: FragmentForgotPasswordBinding? = null
+    private var _binding: FragmentForgotPasswordBinding? = null
+    private val binding get() = _binding!!
     private lateinit var commonWorkUtils: CommonWorkUtils
     private var chooseType: String? = ""
     private lateinit var forgotPasswordViewModel: ForgotPasswordViewModel
@@ -36,7 +37,7 @@ class ForgotPasswordFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        binding = FragmentForgotPasswordBinding.inflate(inflater, container, false)
+        _binding = FragmentForgotPasswordBinding.inflate(inflater, container, false)
         commonWorkUtils = CommonWorkUtils(requireActivity())
 
         forgotPasswordViewModel = ViewModelProvider(this)[ForgotPasswordViewModel::class.java]
@@ -53,26 +54,26 @@ class ForgotPasswordFragment : Fragment() {
         ///main function using all triggered of this screen
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun initialize() {
 
         /// handle on back pressed
-        binding!!.imagesBackForgot.setOnClickListener {
+        binding.imagesBackForgot.setOnClickListener {
             findNavController().navigateUp()
         }
 
         /// Add validation on the entered email or phone
         ///checking the device of mobile data in online and offline(show network error message)
         /// implement forgot password api
-        binding!!.rlSubmit.setOnClickListener {
-            if (validate()) {
-                if (BaseApplication.isOnline(requireActivity())) {
+        binding.rlSubmit.setOnClickListener {
+            if (BaseApplication.isOnline(requireActivity())) {
+                if (validate()) {
                     forgotPasswordApi()
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
     }
@@ -93,10 +94,7 @@ class ForgotPasswordFragment : Fragment() {
                                     val bundle = Bundle()
                                     bundle.putString("screenType", "forgot")
                                     bundle.putString("chooseType", chooseType)
-                                    bundle.putString(
-                                        "value",
-                                        binding!!.etRegEmailPhone.text.toString().trim()
-                                    )
+                                    bundle.putString("value", binding.etRegEmailPhone.text.toString().trim())
                                     findNavController().navigate(R.id.verificationFragment, bundle)
                                 }catch (e:Exception){
                                     Log.d("Forgot password","message:-- "+e.message)
@@ -120,7 +118,7 @@ class ForgotPasswordFragment : Fragment() {
                         showAlertFunction(it.message, false)
                     }
                 }
-            }, binding!!.etRegEmailPhone.text.toString().trim())
+            }, binding.etRegEmailPhone.text.toString().trim())
         }
     }
 
@@ -133,9 +131,9 @@ class ForgotPasswordFragment : Fragment() {
     private fun validate(): Boolean {
         val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]"
         val emaPattern = Pattern.compile(emailPattern)
-        val emailMatcher = emaPattern.matcher(binding!!.etRegEmailPhone.text.toString().trim())
+        val emailMatcher = emaPattern.matcher(binding.etRegEmailPhone.text.toString().trim())
         chooseType = "email"
-        if (binding!!.etRegEmailPhone.text.toString().trim().isEmpty()) {
+        if (binding.etRegEmailPhone.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.registeredEmailPhone, false)
             return false
         } else if (!emailMatcher.find() && !validNumber()) {
@@ -147,7 +145,7 @@ class ForgotPasswordFragment : Fragment() {
 
     /// validation on valid phone number
     private fun validNumber(): Boolean {
-        val phone: String = binding!!.etRegEmailPhone.text.toString().trim()
+        val phone: String = binding.etRegEmailPhone.text.toString().trim()
         if (phone.length != 10) {
             return false
         }
@@ -160,6 +158,11 @@ class ForgotPasswordFragment : Fragment() {
         }
         chooseType = "phone"
         return onlyDigits
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 

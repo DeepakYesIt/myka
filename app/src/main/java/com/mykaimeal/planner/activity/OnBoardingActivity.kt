@@ -132,4 +132,5 @@ class OnBoardingActivity : AppCompatActivity() {
         datalist.add(OnboardingItem(R.drawable.onboarding_images_3))
 
     }
+
 }
