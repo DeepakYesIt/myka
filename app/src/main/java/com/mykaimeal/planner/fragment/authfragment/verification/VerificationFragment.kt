@@ -40,7 +40,8 @@ import java.util.Locale
 @AndroidEntryPoint
 class VerificationFragment : Fragment() {
 
-    private var binding: FragmentVerificationBinding? = null
+    private var _binding: FragmentVerificationBinding? = null
+    private val binding get() = _binding!!
     private var screenType: String? = null
     private var chooseType: String? = ""
     private var value: String? = ""
@@ -49,7 +50,6 @@ class VerificationFragment : Fragment() {
     private var mTimeLeftInMillis = START_TIME_IN_MILLIS
     private lateinit var verificationViewModel: VerificationViewModel
     private lateinit var sessionManagement: SessionManagement
-
     private var userID: String? = ""
     private var userName: String? = ""
     private var cookingFor: String? = ""
@@ -74,22 +74,15 @@ class VerificationFragment : Fragment() {
     private var reasonTakeAwayDesc: String? = ""
     private var token: String = ""
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
-        binding = FragmentVerificationBinding.inflate(inflater, container, false)
-
+        _binding = FragmentVerificationBinding.inflate(inflater, container, false)
         verificationViewModel = ViewModelProvider(this)[VerificationViewModel::class.java]
-
-        /// argument part for check screen type & check value
-        if (arguments != null) {
-            screenType = requireArguments().getString("screenType", "")
-            chooseType = requireArguments().getString("chooseType", "")
-            value = requireArguments().getString("value", "")
+        arguments?.let {
+            screenType = it.getString("screenType", "") ?: ""
+            chooseType = it.getString("chooseType", "") ?: ""
+            value = it.getString("value", "") ?: ""
         }
-
         /// handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(),
             object : OnBackPressedCallback(true) { override fun handleOnBackPressed() {
@@ -103,126 +96,50 @@ class VerificationFragment : Fragment() {
         ///main function using all triggered of this screen
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
     @SuppressLint("SetTextI18n")
     private fun initialize() {
 
-        /// check value is contains email aur phone
-        if (value!!.contains("@")) {
-            binding!!.tvCodeSent.text = "we have sent the code to $value"
-            binding!!.tvLogInType.text = " email"
+       /* /// check value is contains email aur phone
+        if (value.toString().contains("@")) {
+            binding.tvCodeSent.text = "we have sent the code to $value"
+            binding.tvLogInType.text = " email"
         } else {
-            binding!!.tvLogInType.text = " phone"
-            binding!!.tvCodeSent.text = "**********"
-        }
+            binding.tvLogInType.text = " phone"
+            binding.tvCodeSent.text = "**********"
+        }*/
+
+        val isEmail = value?.contains("@") == true
+
+        binding.tvLogInType.text = if (isEmail) " email" else " phone"
+        binding.tvCodeSent.text = if (isEmail) "we have sent the code to $value" else "**********"
+
 
         /// screen type value for signup screen
-        if (screenType == "signup") {
-            userID = requireArguments().getString("userId", "")
-
-            if (sessionManagement.getCookingFor() == "Myself") {
-                cookingFor = "1"
-            } else if (sessionManagement.getCookingFor() == "MyPartner") {
-                cookingFor = "2"
-            } else {
-                cookingFor = "3"
+        if (screenType.equals("signup",true)) {
+            arguments?.let {
+                userID = it.getString("userId", "")?:""
             }
-
-            if (sessionManagement.getUserName() != "") {
-                userName = sessionManagement.getUserName()
+            /// value get for social login
+            cookingFor = when (sessionManagement.getCookingFor()) {
+                "Myself" -> "1"
+                "MyPartner" -> "2"
+                else -> "3"
             }
-
-            if (sessionManagement.getGender() != "") {
-                userGender = sessionManagement.getGender()
-            }
-
-            if (sessionManagement.getPartnerName() != "") {
-                partnerName = sessionManagement.getPartnerName()
-            }
-
-            if (sessionManagement.getPartnerAge() != "") {
-                partnerAge = sessionManagement.getPartnerAge()
-            }
-
-            if (sessionManagement.getPartnerGender() != "") {
-                partnerGender = sessionManagement.getPartnerGender()
-            }
-
-            if (sessionManagement.getFamilyMemName() != "") {
-                familyMemName = sessionManagement.getFamilyMemName()
-            }
-
-            if (sessionManagement.getFamilyMemAge() != "") {
-                familyMemAge = sessionManagement.getFamilyMemAge()
-            }
-
-            if (sessionManagement.getFamilyStatus() != "") {
-                familyMemStatus = sessionManagement.getFamilyStatus()
-            }
-
-            if (sessionManagement.getBodyGoal() != "") {
-                bodyGoals = sessionManagement.getBodyGoal()
-            }
-
-            if (sessionManagement.getDietaryRestrictionList() != null) {
-                dietarySelectedId = sessionManagement.getDietaryRestrictionList()!!
-            }
-
-            if (sessionManagement.getFavouriteCuisineList() != null) {
-                favouriteSelectedId = sessionManagement.getFavouriteCuisineList()!!
-            }
-
-            if (sessionManagement.getDislikeIngredientList() != null) {
-                dislikeSelectedId = sessionManagement.getDislikeIngredientList()!!
-            }
-
-            if (sessionManagement.getAllergenIngredientList() != null) {
-                allergenSelectedId = sessionManagement.getAllergenIngredientList()!!
-            }
-
-            if (sessionManagement.getMealRoutineList() != null) {
-                mealRoutineSelectedId = sessionManagement.getMealRoutineList()!!
-                if (mealRoutineSelectedId.contains("-1")){
-                    mealRoutineSelectedId.remove("-1")
-                }
-            }
-
-            if (sessionManagement.getCookingFrequency() != "") {
-                cookingFrequency = sessionManagement.getCookingFrequency()
-            }
-
-            if (sessionManagement.getSpendingAmount() != "") {
-                spendingAmount = sessionManagement.getSpendingAmount()
-            }
-
-            if (sessionManagement.getSpendingDuration() != "") {
-                spendingDuration = sessionManagement.getSpendingDuration()
-            }
-
-            if (sessionManagement.getEatingOut() != "") {
-                eatingOut = sessionManagement.getEatingOut()
-            }
-
-            if (sessionManagement.getReasonTakeAway() != "") {
-                reasonTakeAway = sessionManagement.getReasonTakeAway()
-            }
-
-            if (sessionManagement.getReasonTakeAwayDesc() != "") {
-                reasonTakeAwayDesc = sessionManagement.getReasonTakeAwayDesc()
-            }
+            getValueFromSession()
         }
 
         //// handle on back pressed
-        binding!!.imgBackVerification.setOnClickListener {
+        binding.imgBackVerification.setOnClickListener {
             findNavController().navigateUp()
         }
 
         /// handle click event for resend password timer and api
-        binding!!.textResend.setOnClickListener {
+        binding.textResend.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
-                if (screenType == "signup") {
+                if (screenType.equals("signup",true)) {
                     signUpResendOtp()
                 } else {
                     forgotPasswordApi()
@@ -233,11 +150,11 @@ class VerificationFragment : Fragment() {
         }
 
         //// handle click event for verify otp is valid or not
-        binding!!.rlVerificationVerify.setOnClickListener {
+        binding.rlVerificationVerify.setOnClickListener {
             ///checking the device of mobile data in online and offline(show network error message) sign up otp verify api
             if (BaseApplication.isOnline(requireActivity())) {
                 if (validate()) {
-                    if (screenType == "signup") {
+                    if (screenType.equals("signup",true)) {
                         signUpOtpVerify()
                     } else {
                         forgotOtpVerifyApi()
@@ -246,6 +163,93 @@ class VerificationFragment : Fragment() {
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
+        }
+
+    }
+
+    private fun getValueFromSession() {
+
+        if (sessionManagement.getUserName() != "") {
+            userName = sessionManagement.getUserName()
+        }
+
+        if (sessionManagement.getGender() != "") {
+            userGender = sessionManagement.getGender()
+        }
+
+        if (sessionManagement.getPartnerName() != "") {
+            partnerName = sessionManagement.getPartnerName()
+        }
+
+        if (sessionManagement.getPartnerAge() != "") {
+            partnerAge = sessionManagement.getPartnerAge()
+        }
+
+        if (sessionManagement.getPartnerGender() != "") {
+            partnerGender = sessionManagement.getPartnerGender()
+        }
+
+        if (sessionManagement.getFamilyMemName() != "") {
+            familyMemName = sessionManagement.getFamilyMemName()
+        }
+
+        if (sessionManagement.getFamilyMemAge() != "") {
+            familyMemAge = sessionManagement.getFamilyMemAge()
+        }
+
+        if (sessionManagement.getFamilyStatus() != "") {
+            familyMemStatus = sessionManagement.getFamilyStatus()
+        }
+
+        if (sessionManagement.getBodyGoal() != "") {
+            bodyGoals = sessionManagement.getBodyGoal()
+        }
+
+        if (sessionManagement.getDietaryRestrictionList() != null) {
+            dietarySelectedId = sessionManagement.getDietaryRestrictionList()!!
+        }
+
+        if (sessionManagement.getFavouriteCuisineList() != null) {
+            favouriteSelectedId = sessionManagement.getFavouriteCuisineList()!!
+        }
+
+        if (sessionManagement.getDislikeIngredientList() != null) {
+            dislikeSelectedId = sessionManagement.getDislikeIngredientList()!!
+        }
+
+        if (sessionManagement.getAllergenIngredientList() != null) {
+            allergenSelectedId = sessionManagement.getAllergenIngredientList()!!
+        }
+
+        if (sessionManagement.getMealRoutineList() != null) {
+            mealRoutineSelectedId = sessionManagement.getMealRoutineList()!!
+            if (mealRoutineSelectedId.contains("-1")){
+                mealRoutineSelectedId.remove("-1")
+            }
+        }
+
+        if (sessionManagement.getCookingFrequency() != "") {
+            cookingFrequency = sessionManagement.getCookingFrequency()
+        }
+
+        if (sessionManagement.getSpendingAmount() != "") {
+            spendingAmount = sessionManagement.getSpendingAmount()
+        }
+
+        if (sessionManagement.getSpendingDuration() != "") {
+            spendingDuration = sessionManagement.getSpendingDuration()
+        }
+
+        if (sessionManagement.getEatingOut() != "") {
+            eatingOut = sessionManagement.getEatingOut()
+        }
+
+        if (sessionManagement.getReasonTakeAway() != "") {
+            reasonTakeAway = sessionManagement.getReasonTakeAway()
+        }
+
+        if (sessionManagement.getReasonTakeAwayDesc() != "") {
+            reasonTakeAwayDesc = sessionManagement.getReasonTakeAwayDesc()
         }
 
     }
@@ -259,18 +263,13 @@ class VerificationFragment : Fragment() {
                     is NetworkResult.Success -> {
                         try {
                             val gson = Gson()
-                            val resendSignUpModel =
-                                gson.fromJson(it.data, ResendSignUpOtpModel::class.java)
+                            val resendSignUpModel = gson.fromJson(it.data, ResendSignUpOtpModel::class.java)
                             if (resendSignUpModel.code == 200 && resendSignUpModel.success) {
-                                binding!!.relResendVerificationTimer.visibility = View.VISIBLE
-                                binding!!.textResend.isEnabled = false
+                                binding.relResendVerificationTimer.visibility = View.VISIBLE
+                                binding.textResend.isEnabled = false
                                 startTime()
                             } else {
-                                if (resendSignUpModel.code == ErrorMessage.code) {
-                                    showAlertFunction(resendSignUpModel.message, true)
-                                } else {
-                                    showAlertFunction(resendSignUpModel.message, false)
-                                }
+                                handleCommon(resendSignUpModel.code,resendSignUpModel.message)
                             }
                         }catch (e:Exception){
                             Log.d("verification@@","message"+e.message)
@@ -287,8 +286,6 @@ class VerificationFragment : Fragment() {
                 }
             }, value.toString())
         }
-
-
     }
 
     private fun forgotPasswordApi() {
@@ -302,20 +299,15 @@ class VerificationFragment : Fragment() {
                             val gson = Gson()
                             val forgotModel = gson.fromJson(it.data, ForgotPasswordModel::class.java)
                             if (forgotModel.code == 200 && forgotModel.success) {
-                                binding!!.otpView.setOTP("")
-                                binding!!.relResendVerificationTimer.visibility = View.VISIBLE
-                                binding!!.textResend.isEnabled = false
+                                binding.otpView.setOTP("")
+                                binding.relResendVerificationTimer.visibility = View.VISIBLE
+                                binding.textResend.isEnabled = false
                                 startTime()
                             } else {
-                                if (forgotModel.code == ErrorMessage.code) {
-                                    showAlertFunction(forgotModel.message, true)
-                                } else {
-                                    showAlertFunction(forgotModel.message, false)
-                                }
+                                handleCommon(forgotModel.code,forgotModel.message)
                             }
                         }catch (e:Exception){
                             Log.d("verification@@@","message"+e.message)
-
                         }
                     }
 
@@ -331,12 +323,10 @@ class VerificationFragment : Fragment() {
         }
     }
 
-
     private fun signUpOtpVerify() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            verificationViewModel.signUpOtpVerify(
-                {
+            verificationViewModel.signUpOtpVerify({
                     BaseApplication.dismissMe()
                     when (it) {
                         is NetworkResult.Success -> {
@@ -346,11 +336,7 @@ class VerificationFragment : Fragment() {
                                 if (signUpVerificationModel.code == 200 && signUpVerificationModel.success) {
                                     showDataInSession(signUpVerificationModel.data)
                                 } else {
-                                    if (signUpVerificationModel.code == ErrorMessage.code) {
-                                        showAlertFunction(signUpVerificationModel.message, true)
-                                    } else {
-                                        showAlertFunction(signUpVerificationModel.message, false)
-                                    }
+                                    handleCommon(signUpVerificationModel.code,signUpVerificationModel.message)
                                 }
                             }catch (e:Exception){
                                 Log.d("verification@@@","message"+e.message)
@@ -367,7 +353,7 @@ class VerificationFragment : Fragment() {
                     }
                 },
                 userID,
-                binding!!.otpView.otp.toString(),
+                binding.otpView.otp.toString(),
                 userName,
                 userGender,
                 bodyGoals,
@@ -394,44 +380,33 @@ class VerificationFragment : Fragment() {
         }
     }
 
+    private fun handleCommon(code: Int, message: String) {
+        if (code == ErrorMessage.code) {
+            showAlertFunction(message, true)
+        } else {
+            showAlertFunction(message, false)
+        }
+    }
+
     private fun showDataInSession(signUpVerificationModelData: SignUpVerificationModelData) {
         try {
-            if (value!!.contains("@")) {
-                sessionManagement.setEmail(value.toString())
-            } else {
-                sessionManagement.setPhone(value.toString())
+            value?.let {
+                if ("@" in it) sessionManagement.setEmail(it)
+                else sessionManagement.setPhone(it)
             }
-
-            if (signUpVerificationModelData.name != null) {
-                sessionManagement.setUserName(signUpVerificationModelData.name)
+            sessionManagement.setUserName(signUpVerificationModelData.name?:"")
+            val cookingFor = when (signUpVerificationModelData.user_type) {
+                1 -> "Myself"
+                2 -> "MyPartner"
+                3 -> "MyFamily"
+                else -> null
             }
-
-            if (signUpVerificationModelData.user_type == 1) {
-                sessionManagement.setCookingFor("Myself")
-            }
-
-            if (signUpVerificationModelData.user_type == 2) {
-                sessionManagement.setCookingFor("MyPartner")
-            }
-
-            if (signUpVerificationModelData.user_type == 3) {
-                sessionManagement.setCookingFor("MyFamily")
-            }
-
-            if (signUpVerificationModelData.profile_img != null) {
-                sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())
-            }
-
-            if (signUpVerificationModelData.token != null) {
-                sessionManagement.setAuthToken(signUpVerificationModelData.token.toString())
-            }
-
-            if (signUpVerificationModelData.id != null) {
-                sessionManagement.setId(signUpVerificationModelData.id.toString())
-            }
-
+            cookingFor?.let { sessionManagement.setCookingFor(it) }
+            sessionManagement.setImage(signUpVerificationModelData.profile_img?:"")
+            sessionManagement.setAuthToken(signUpVerificationModelData.token?:"")
+            val id= signUpVerificationModelData.id?:0
+            sessionManagement.setId(id.toString())
             successDialog(signUpVerificationModelData.is_cooking_complete)
-
         }catch (e:Exception){
             Log.d("verification","message"+e.message)
         }
@@ -448,8 +423,7 @@ class VerificationFragment : Fragment() {
                         is NetworkResult.Success -> {
                             try {
                                 val gson = Gson()
-                                val forgotOtpModel =
-                                    gson.fromJson(it.data, ForgotVerificationModel::class.java)
+                                val forgotOtpModel = gson.fromJson(it.data, ForgotVerificationModel::class.java)
                                 if (forgotOtpModel.code == 200 && forgotOtpModel.success) {
                                     try {
                                         val bundle = Bundle()
@@ -459,11 +433,7 @@ class VerificationFragment : Fragment() {
                                         Log.d("Verification","message"+e.message)
                                     }
                                 } else {
-                                    if (forgotOtpModel.code == ErrorMessage.code) {
-                                        showAlertFunction(forgotOtpModel.message, true)
-                                    } else {
-                                        showAlertFunction(forgotOtpModel.message, false)
-                                    }
+                                    handleCommon(forgotOtpModel.code,forgotOtpModel.message)
                                 }
                             }catch (e:Exception){
                                 Log.d("Verification@@@","message"+e.message)
@@ -479,7 +449,7 @@ class VerificationFragment : Fragment() {
                             showAlertFunction(it.message, false)
                         }
                     }
-                }, value.toString(), binding!!.otpView.otp.toString()
+                }, value.toString(), binding.otpView.otp.toString()
             )
         }
     }
@@ -494,33 +464,34 @@ class VerificationFragment : Fragment() {
         object : CountDownTimer(mTimeLeftInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 mTimeLeftInMillis = millisUntilFinished
-                binding!!.textResend.setTextColor(Color.parseColor("#828282"))
+                binding.textResend.setTextColor(Color.parseColor("#828282"))
                 updateCountDownText()
             }
 
             override fun onFinish() {
                 mTimeLeftInMillis = 120000
-                binding!!.textResend.setTextColor(Color.parseColor("#06C169"))
-                binding!!.relResendVerificationTimer.visibility = View.GONE
-                binding!!.textResend.isEnabled = true
+                binding.textResend.setTextColor(Color.parseColor("#06C169"))
+                binding.relResendVerificationTimer.visibility = View.GONE
+                binding.textResend.isEnabled = true
             }
         }.start()
     }
 
     /// update count timer
+    @SuppressLint("SetTextI18n")
     private fun updateCountDownText() {
         val minutes = mTimeLeftInMillis.toInt() / 1000 / 60
         val seconds = mTimeLeftInMillis.toInt() / 1000 % 60
         val timeLeftFormatted = String.format(Locale.getDefault(), " %02d:%02d", minutes, seconds)
-        binding!!.tvTimer.text = timeLeftFormatted + " sec"
+        binding.tvTimer.text = timeLeftFormatted + " sec"
     }
 
     /// validation part
     private fun validate(): Boolean {
-        if (binding!!.otpView.otp.toString().trim().isEmpty()) {
+        if (binding.otpView.otp.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.otp, false)
             return false
-        } else if (binding!!.otpView.otp!!.length != 6) {
+        } else if (binding.otpView.otp!!.length != 6) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.correctOtp, false)
             return false
         }
@@ -563,6 +534,11 @@ class VerificationFragment : Fragment() {
         lifecycleScope.launch {
             token = BaseApplication.fetchFcmToken()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

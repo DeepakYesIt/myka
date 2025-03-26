@@ -30,25 +30,22 @@ import java.util.regex.Pattern
 
 @AndroidEntryPoint
 class ResetPasswordFragment : Fragment() {
-    private var binding: FragmentResetPasswordBinding? = null
+    private var _binding: FragmentResetPasswordBinding? = null
+    private val binding get() = _binding!!
     private lateinit var commonWorkUtils: CommonWorkUtils
     private lateinit var resetPasswordViewModel: ResetPasswordViewModel
     private var value: String? = ""
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
-        binding = FragmentResetPasswordBinding.inflate(inflater, container, false)
+        _binding = FragmentResetPasswordBinding.inflate(inflater, container, false)
         commonWorkUtils = CommonWorkUtils(requireActivity())
 
         resetPasswordViewModel = ViewModelProvider(this)[ResetPasswordViewModel::class.java]
 
         ///get arguments value of previous screen
-        if (arguments != null) {
-            value = requireArguments().getString("value", "")
-        }
+        value = arguments?.getString("value", "") ?: ""
+
 
         /// handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -62,26 +59,26 @@ class ResetPasswordFragment : Fragment() {
         ///main function using all triggered of this screen
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun initialize() {
 
         //// handle on back pressed
-        binding!!.imagesBackReset.setOnClickListener {
+        binding.imagesBackReset.setOnClickListener {
             findNavController().navigateUp()
         }
 
         /// add validation based on password & confirm password
         ///checking the device of mobile data in online and offline(show network error message)
         /// reset password api implement and redirection on login screen
-        binding!!.rlResetSubmit.setOnClickListener {
-            if (validate()) {
-                if (BaseApplication.isOnline(requireActivity())) {
+        binding.rlResetSubmit.setOnClickListener {
+            if (BaseApplication.isOnline(requireActivity())) {
+                if (validate()) {
                     resetPasswordApi()
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
     }
@@ -90,8 +87,7 @@ class ResetPasswordFragment : Fragment() {
     private fun resetPasswordApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            resetPasswordViewModel.resetPassword(
-                {
+            resetPasswordViewModel.resetPassword({
                     BaseApplication.dismissMe()
                     when (it) {
                         is NetworkResult.Success -> {
@@ -122,8 +118,8 @@ class ResetPasswordFragment : Fragment() {
                     }
                 },
                 value.toString(),
-                binding!!.etCreatePassword.text.toString().trim(),
-                binding!!.etConfirmPassword.text.toString().trim()
+                binding.etCreatePassword.text.toString().trim(),
+                binding.etConfirmPassword.text.toString().trim()
             )
         }
     }
@@ -155,9 +151,7 @@ class ResetPasswordFragment : Fragment() {
 
     //// validation part
     private fun validate(): Boolean {
-        val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]"
-        val password = binding!!.etCreatePassword.text.toString().trim()
-
+        val password = binding.etCreatePassword.text.toString().trim()
         // Password Validation Conditions
         val hasUpperCase = password.any { it.isUpperCase() }
         val hasDigit = password.any { it.isDigit() }
@@ -171,34 +165,18 @@ class ResetPasswordFragment : Fragment() {
         }
         // Check password conditions individually and show specific errors
         else if (!isValidLength) {
-            commonWorkUtils.alertDialog(
-                requireActivity(),
-                "Password must be at least 6 characters long.",
-                false
-            )
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.charactersPassword, false)
             return false
         } else if (!hasDigit) {
-            commonWorkUtils.alertDialog(
-                requireActivity(),
-                "Password must contain at least one digit.",
-                false
-            )
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.oneDigitPassword, false)
             return false
         } else if (!hasUpperCase) {
-            commonWorkUtils.alertDialog(
-                requireActivity(),
-                "Password must contain at least one uppercase letter.",
-                false
-            )
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.uppercaseLetterPassword, false)
             return false
         } else if (!hasSpecialChar) {
-            commonWorkUtils.alertDialog(
-                requireActivity(),
-                "Password must contain at least one special character.",
-                false
-            )
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.specialLetterPassword, false)
             return false
-        }else if (binding!!.etCreatePassword.text.toString().trim() != binding!!.etConfirmPassword.text.toString().trim()) {
+        }else if (binding.etCreatePassword.text.toString().trim() != binding.etConfirmPassword.text.toString().trim()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.passwordSame, false)
             return false
         }
@@ -206,5 +184,10 @@ class ResetPasswordFragment : Fragment() {
         return true
     }
 
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
 }

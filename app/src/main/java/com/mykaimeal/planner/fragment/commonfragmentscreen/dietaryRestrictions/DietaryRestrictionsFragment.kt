@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.commonfragmentscreen.dietaryRestrictions
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -35,7 +36,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
 
-    private var binding: FragmentDietaryRestrictionsBinding? = null
+    private var _binding: FragmentDietaryRestrictionsBinding? = null
+    private val binding get() = _binding!!
     private var dietaryRestrictionsAdapter: DietaryRestrictionsAdapter? = null
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue:Int=0
@@ -45,36 +47,37 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
     private var dietaryModelsData: MutableList<DietaryRestrictionsModelData>?=null
     private var isExpanded = false
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = FragmentDietaryRestrictionsBinding.inflate(inflater, container, false)
+        _binding = FragmentDietaryRestrictionsBinding.inflate(inflater, container, false)
 
         dietaryRestrictionsViewModel = ViewModelProvider(this)[DietaryRestrictionsViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
         if (sessionManagement.getCookingFor().equals("Myself")){
-            binding!!.tvRestrictions.text="Do you have any dietary restrictions?"
-            binding!!.progressBar2.max=10
+            binding.tvRestrictions.text="Do you have any dietary restrictions?"
+            binding.progressBar2.max=10
             totalProgressValue=10
             updateProgress(2)
         } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-            binding!!.tvRestrictions.text="Do you or your partner have any dietary restrictions?"
-            binding!!.progressBar2.max=11
+            binding.tvRestrictions.text="Do you or your partner have any dietary restrictions?"
+            binding.progressBar2.max=11
             totalProgressValue=11
             updateProgress(3)
         } else {
-            binding!!.tvRestrictions.text="Do you or any of your family members have any  dietary restrictions?"
-            binding!!.progressBar2.max=11
+            binding.tvRestrictions.text="Do you or any of your family members have any  dietary restrictions?"
+            binding.progressBar2.max=11
             totalProgressValue=11
             updateProgress(3)
         }
 
         if (sessionManagement.getCookingScreen().equals("Profile")){
-            binding!!.llBottomBtn.visibility=View.GONE
-            binding!!.rlUpdateDietRest.visibility=View.VISIBLE
+            binding.llBottomBtn.visibility=View.GONE
+            binding.rlUpdateDietRest.visibility=View.VISIBLE
 
             if (BaseApplication.isOnline(requireActivity())) {
                 dietaryRestrictionSelectApi()
@@ -82,8 +85,8 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }else{
-            binding!!.llBottomBtn.visibility=View.VISIBLE
-            binding!!.rlUpdateDietRest.visibility=View.GONE
+            binding.llBottomBtn.visibility=View.VISIBLE
+            binding.rlUpdateDietRest.visibility=View.GONE
 
             if (dietaryRestrictionsViewModel.getDietaryResData()!=null){
                 showDataInUi(dietaryRestrictionsViewModel.getDietaryResData()!!)
@@ -105,7 +108,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
 
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun dietaryRestrictionSelectApi() {
@@ -189,17 +192,16 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                     if(it.selected) selected = true
                 }
                  if(!selected){
-                    dietaryModelData.set(0, DietaryRestrictionsModelData(id = -1, selected = true, "None")
-                    )
+                     dietaryModelData[0] = DietaryRestrictionsModelData(id = -1, selected = true, "None")
                 }
 
                 // Show "Show More" button only if there are more than 3 items
                 if (dietaryModelData.size > 3) {
-                    binding!!.relMoreButton.visibility = View.VISIBLE
+                    binding.relMoreButton.visibility = View.VISIBLE
                 }
                 dietaryModelsData=dietaryModelData
                 dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
-                binding!!.rcyDietaryRestrictions.adapter = dietaryRestrictionsAdapter
+                binding.rcyDietaryRestrictions.adapter = dietaryRestrictionsAdapter
             }
         }catch (e:Exception){
             Log.d("DietaryRestriction","message"+e.message)
@@ -217,10 +219,10 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                 dietaryModelsData=dietaryModelData
                 // Show "Show More" button only if there are more than 3 items
                 if (dietaryModelData.size > 3) {
-                    binding!!.relMoreButton.visibility = View.VISIBLE
+                    binding.relMoreButton.visibility = View.VISIBLE
                 }
                 dietaryRestrictionsAdapter = DietaryRestrictionsAdapter(dietaryModelData, requireActivity(), this)
-                binding!!.rcyDietaryRestrictions.adapter = dietaryRestrictionsAdapter
+                binding.rcyDietaryRestrictions.adapter = dietaryRestrictionsAdapter
             }
         }catch (e:Exception){
             Log.d("Dietary Restrictions","message"+e.message)
@@ -231,22 +233,23 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
         BaseApplication.alertError(requireContext(), message, status)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateProgress(progress: Int) {
-        binding!!.progressBar2.progress = progress
-        binding!!.tvProgressText.text = "$progress/$totalProgressValue"
+        binding.progressBar2.progress = progress
+        binding.tvProgressText.text = "$progress/$totalProgressValue"
     }
 
     private fun initialize() {
 
-        binding!!.imageBackDietaryRestrictions.setOnClickListener{
+        binding.imageBackDietaryRestrictions.setOnClickListener{
             findNavController().navigateUp()
         }
 
-        binding!!.tvSkipBtn.setOnClickListener{
+        binding.tvSkipBtn.setOnClickListener{
             stillSkipDialog()
         }
 
-        binding!!.tvNextBtn.setOnClickListener{
+        binding.tvNextBtn.setOnClickListener{
             if (status=="2"){
                 dietaryRestrictionsViewModel.setDietaryResData(dietaryModelsData!!)
                 sessionManagement.setDietaryRestrictionList(dietarySelectedId)
@@ -260,7 +263,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
             }
         }
 
-        binding!!.rlUpdateDietRest.setOnClickListener{
+        binding.rlUpdateDietRest.setOnClickListener{
             if (BaseApplication.isOnline(requireContext())) {
                 updateDietaryRestApi()
             } else {
@@ -268,10 +271,10 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
             }
         }
 
-        binding!!.relMoreButton.setOnClickListener { v ->
+        binding.relMoreButton.setOnClickListener {
             isExpanded = true
             dietaryRestrictionsAdapter!!.setExpanded(true)
-            binding!!.relMoreButton.visibility = View.GONE // Hide button after expanding
+            binding.relMoreButton.visibility = View.GONE // Hide button after expanding
         }
 
     }
@@ -346,22 +349,25 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                     dietarySelectedId=list!!
                 }
                 status = "2"
-                binding!!.tvNextBtn.isClickable = true
-                binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                binding.tvNextBtn.isClickable = true
+                binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 return
             }
 
             if (type.equals("true")) {
                 status = "2"
-                binding!!.tvNextBtn.isClickable = true
-                binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                binding.tvNextBtn.isClickable = true
+                binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 dietarySelectedId=list!!
             } else {
                 status = ""
-                binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             }
+    }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

@@ -475,7 +475,6 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 reasonSelect = reasonTakeModelData?.get(type!!.toInt())!!.id.toString()
                 reasonTakeAway = reasonTakeModelData?.get(type!!.toInt())!!.descripttion.toString()
                 binding.relMainLayout.visibility=View.VISIBLE
-                binding.edtext.setText(reasonTakeModelData?.get(type!!.toInt())!!.descripttion.toString())
                 if (reasonTakeModelData?.get(type!!.toInt())!!.descripttion!=null){
                     binding.edtext.setText(reasonTakeModelData?.get(type!!.toInt())!!.descripttion.toString())
                 }else{

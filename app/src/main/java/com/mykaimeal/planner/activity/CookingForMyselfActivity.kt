@@ -8,6 +8,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.ActivityCookingMyselfBinding
+import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -35,7 +36,7 @@ class CookingForMyselfActivity : AppCompatActivity() {
     private fun setStartDestination() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.frameLayoutAuth) as? NavHostFragment
         if (navHostFragment == null) {
-            Toast.makeText(this, "Navigation Host Fragment not found", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, ErrorMessage.navigationError, Toast.LENGTH_SHORT).show()
             return
         }
         val navController = navHostFragment.navController
