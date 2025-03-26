@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -65,6 +66,25 @@ class BasketYourRecipeAdapter(private var yourRecipesData: MutableList<Recipes>?
             }else{
                 holder.binding.layProgess.root.visibility= View.GONE
             }
+
+            if (data.serving!=null){
+               holder.binding.tvServes.text="Serves "+data.serving.toString()
+            }
+        }
+
+        holder.binding.imageMinusItem.setOnClickListener{
+            if (yourRecipesData?.get(position)?.serving.toString().toInt() > 1) {
+                onItemSelectListener.itemSelect(position,"Minus","YourRecipe")
+            }else{
+                Toast.makeText(requireActivity,"Minimum serving at least value is one", Toast.LENGTH_LONG).show()
+            }
+        }
+
+
+          holder.binding.imagePlusItem.setOnClickListener{
+              if (yourRecipesData?.get(position)?.serving.toString().toInt() < 99) {
+                  onItemSelectListener.itemSelect(position,"Plus","YourRecipe")
+              }
         }
 
         holder.binding.imageCross.setOnClickListener{

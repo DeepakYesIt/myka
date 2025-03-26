@@ -6,7 +6,6 @@ import android.content.ClipDescription
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.text.Html
 import android.util.Log
 import android.view.DragEvent
 import android.view.LayoutInflater
@@ -26,7 +25,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.mykaimeal.planner.OnItemLongClickListener
@@ -45,18 +43,14 @@ import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentFullCookedScheduleBinding
-import com.mykaimeal.planner.fragment.mainfragment.addrecipetab.createrecipefragment.model.CreateRecipeSuccessModel
 import com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.Breakfast
 import com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.CookedTabModel
 import com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.CookedTabModelData
 import com.mykaimeal.planner.fragment.mainfragment.hometab.fullcookedScheduleFragment.viewmodel.FullCookingScheduleViewModel
-import com.mykaimeal.planner.fragment.mainfragment.plantab.ImagesDeserializer
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
-import com.mykaimeal.planner.fragment.mainfragment.viewmodel.recipedetails.apiresponse.ImagesModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import com.mykaimeal.planner.model.CalendarDataModel
-import com.mykaimeal.planner.model.DataModel
 import com.mykaimeal.planner.model.DateModel
 import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
@@ -65,7 +59,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import java.util.regex.Pattern
 
 @AndroidEntryPoint
 class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
@@ -265,10 +258,6 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                         calendarAdapter!!.updateList(dateList)
                         calendarAdapter!!.notifyItemChanged(targetPosition)
 
-                        binding!!.rlChangeCookSchedule.isClickable=true
-                        binding!!.rlChangeCookSchedule.isEnabled=true
-                        binding!!.rlChangeCookSchedule.setBackgroundResource(R.drawable.gray_btn_select_background)
-
                         /*calendarAdapter!!.updateList(dateList)*/
 
                     } else {
@@ -315,9 +304,10 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                             Log.d("drop date and days", "******" + getDaysBetween(startDate, endDate)[dropPosition].date +
                                     "-" + getDaysBetween(startDate, endDate)[dropPosition].day)
 
-                            Toast.makeText(requireContext(), "date " + getDaysBetween(startDate, endDate)[dropPosition].date + "-" + getDaysBetween(startDate, endDate)[dropPosition].day, Toast.LENGTH_LONG).show()
-
                             Log.d("ACTION_DROP", "Target position: $dropPosition")
+                            binding!!.rlChangeCookSchedule.isClickable=true
+                            binding!!.rlChangeCookSchedule.isEnabled=true
+                            binding!!.rlChangeCookSchedule.setBackgroundResource(R.drawable.gray_btn_select_background)
 
                             // Retrieve the list of dates
                             val dateList = getDaysBetween(startDate, endDate)
@@ -536,11 +526,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         ///relCookChangeSchedule
         binding!!.rlChangeCookSchedule.setOnClickListener {
             if (validate()){
-                if (BaseApplication.isOnline(requireActivity())) {
-                    updateMealApi()
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
+                removeCurrentDayDialog()
             }
 
 //            chooseDayMealTypeDialog()
@@ -582,6 +568,38 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         }
     }
 
+    private fun removeCurrentDayDialog() {
+        val dialogRemoveDay: Dialog = context?.let { Dialog(it) }!!
+        dialogRemoveDay.setContentView(R.layout.alert_dialog_current_day)
+        dialogRemoveDay.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        dialogRemoveDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val tvDialogNoBtn = dialogRemoveDay.findViewById<TextView>(R.id.tvDialogNoBtn)
+        val tvDialogYesBtn = dialogRemoveDay.findViewById<TextView>(R.id.tvDialogYesBtn)
+        dialogRemoveDay.show()
+        dialogRemoveDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        tvDialogNoBtn.setOnClickListener {
+
+            binding!!.rlChangeCookSchedule.isClickable=false
+            binding!!.rlChangeCookSchedule.isEnabled=false
+            binding!!.rlChangeCookSchedule.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            // Display current week dates
+            showWeekDates()
+            dialogRemoveDay.dismiss()
+        }
+
+        tvDialogYesBtn.setOnClickListener {
+            if (BaseApplication.isOnline(requireActivity())) {
+                updateMealApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+    }
+
     /// add validation based on valid email or phone
     private fun validate(): Boolean {
         // Check if email/phone is empty
@@ -589,6 +607,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.changeScheduleItem, false)
             return false
         }else if (dropDate=="") {
+            ///
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.changeScheduleDate, false)
             return false
         }
@@ -599,10 +618,8 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
     private fun updateMealApi() {
         val jsonObject = JsonObject()
 
-
         jsonObject.addProperty("type", mealType)
         if (!id.equals("null")){
-
             jsonObject.addProperty("id", id)
             jsonObject.addProperty("date",dropDate)
             jsonObject.addProperty("day", dropDay)
@@ -674,7 +691,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
     private fun setupRecyclerView() {
         calendarDayAdapter = CalendarDayAdapter(emptyList()) { day ->
             // Handle item clicks if needed
-            Toast.makeText(context, "Clicked on ${day.dayName}, ${day.date}", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(context, "Clicked on ${day.dayName}, ${day.date}", Toast.LENGTH_SHORT).show()
         }
         binding!!.recyclerViewWeekDays.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -868,7 +885,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                     // Get the dropped item position
                     val draggedPosition = dragEvent.localState as? Int
                     if (draggedPosition != null) {
-                        Toast.makeText(requireContext(), "Dropped at position: $draggedPosition", Toast.LENGTH_LONG).show()
+//                        Toast.makeText(requireContext(), "Dropped at position: $draggedPosition", Toast.LENGTH_LONG).show()
                     }
                     true
                 }

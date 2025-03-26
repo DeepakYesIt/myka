@@ -678,6 +678,10 @@ interface ApiInterface {
     suspend fun recipeSwapUrl(@Field("id") id:String?,@Field("uri") uri:String?): Response<JsonObject>
 
     @FormUrlEncoded
+    @POST(ApiEndPoint.basketYourRecipeIncDescUrl)
+    suspend fun basketYourRecipeIncDescUrl(@Field("uri") id:String?,@Field("quantity") quantity:String?): Response<JsonObject>
+
+    @FormUrlEncoded
     @POST(ApiEndPoint.addCardMealMeUrl)
     suspend fun addCardMealMeUrl(
         @Field("card_number") card_number: String?,

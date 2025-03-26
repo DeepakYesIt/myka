@@ -1421,7 +1421,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: Exception) {
+        } catch (e:  Exception) {
             successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
@@ -2208,6 +2208,25 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
     ) {
         try {
             api.recipeSwapUrl(id,uri).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun basketYourRecipeIncDescUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,uri:String?,quantity:String?
+    ) {
+        try {
+            api.basketYourRecipeIncDescUrl(uri,quantity).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

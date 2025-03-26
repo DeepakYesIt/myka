@@ -37,7 +37,9 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.mod
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.GetAddressListModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Recipes
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.viewmodel.BasketScreenViewModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketyourrecipe.model.BasketYourRecipeModel
 import com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.CookedTabModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -355,8 +357,49 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
     }
 
-
     private fun removeBasketRecipeApi(recipeId: String, dialogRemoveDay: Dialog,position:Int?) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            basketScreenViewModel.removeBasketUrlApi({
+                BaseApplication.dismissMe()
+                handleApiRemoveBasketResponse(it,position,dialogRemoveDay)
+            },recipeId)
+        }
+    }
+
+    private fun handleApiRemoveBasketResponse(result: NetworkResult<String>,position:Int?,dialogRemoveDay: Dialog) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessRemoveBasketResponse(result.data.toString(),position,dialogRemoveDay)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessRemoveBasketResponse(data: String,position:Int?,dialogRemoveDay: Dialog) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (recipe!=null){
+                    recipe!!.removeAt(position!!)
+                }
+                dialogRemoveDay.dismiss()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+
+
+    private fun removeBasketRecipeApis(recipeId: String, dialogRemoveDay: Dialog,position:Int?) {
         BaseApplication.showMe(requireActivity())
         lifecycleScope.launch {
             basketScreenViewModel.removeBasketUrlApi({
@@ -394,11 +437,30 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     override fun itemSelect(position: Int?, recipeId: String?, type: String?) {
 
         if (type=="YourRecipe"){
-            removeRecipeBasketDialog(recipeId,position)
+            if (recipeId=="Minus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddServing(type ?: "", position, "Minus")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }else if (recipeId=="Plus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddServing(type ?: "", position, "Plus")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }else{
+                removeRecipeBasketDialog(recipeId,position)
+            }
         }else if (type=="SuperMarket"){
             storeUid=recipeId
         }
         /*findNavController().navigate(R.id.basketDetailSuperMarketFragment)*/
+
+    }
+
+    private fun removeAddServing(status: String, position: Int?, type: String) {
+
 
     }
 

@@ -309,13 +309,13 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
 
         if (data.bio!=null){
             if (!data.bio.equals("null")){
-                binding?.tvBio?.visibility=View.VISIBLE
+                binding?.tvBio?.visibility=View.GONE
                 binding?.tvBio?.setText(data.bio)
             }else{
-                binding?.tvBio?.visibility=View.INVISIBLE
+                binding?.tvBio?.visibility=View.GONE
             }
         }else{
-            binding?.tvBio?.visibility=View.INVISIBLE
+            binding?.tvBio?.visibility=View.GONE
         }
 
         if (data.profile_img!=null){
@@ -525,7 +525,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
 
     private fun enableProfileEditing() {
         binding?.tvBio?.isEnabled = true
-        binding?.tvBio?.visibility = View.VISIBLE
+        binding?.tvBio?.visibility = View.GONE
         binding?.imageEditTargets?.visibility = View.VISIBLE
         binding?.imageProfile?.isClickable = true
         binding?.imageNameEditable?.visibility = View.VISIBLE
@@ -570,7 +570,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
             Log.d("@@@ Health profile", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 binding?.apply {
-                    tvBio.visibility = View.VISIBLE
+                    tvBio.visibility = View.GONE
                     tvBio.isEnabled = false
                     imageNameEditable.visibility = View.GONE
                     imageEditTargets.visibility = View.GONE

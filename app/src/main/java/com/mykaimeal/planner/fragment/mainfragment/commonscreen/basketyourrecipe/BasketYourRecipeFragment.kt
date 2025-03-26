@@ -44,7 +44,7 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-       binding=FragmentBasketYourRecipeBinding.inflate(layoutInflater, container, false)
+       binding= FragmentBasketYourRecipeBinding.inflate(layoutInflater, container, false)
 
         basketYourRecipeViewModel = ViewModelProvider(requireActivity())[BasketYourRecipeViewModel::class.java]
 
@@ -61,7 +61,12 @@ class BasketYourRecipeFragment : Fragment(),OnItemClickListener,OnItemSelectList
 
     private fun initialize() {
 
-        getYourRecipeList()
+        if (BaseApplication.isOnline(requireActivity())) {
+            getYourRecipeList()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+
 
         binding.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()
