@@ -410,13 +410,13 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         if (type=="YourRecipe"){
             if (recipeId=="Minus"){
                 if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddRecipeServing(type ?: "", position, "minus")
+                    removeAddRecipeServing(position, "minus")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }else if (recipeId=="Plus"){
                 if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddRecipeServing(type ?: "", position, "plus")
+                    removeAddRecipeServing(position, "plus")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
@@ -444,7 +444,7 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
     }
 
-    private fun removeAddRecipeServing(status: String, position: Int?, type: String) {
+    private fun removeAddRecipeServing(position: Int?, type: String) {
         val item= position?.let { recipe?.get(it) }
         if (type.equals("plus",true) || type.equals("minus",true)) {
             var count = item?.serving?.toInt()

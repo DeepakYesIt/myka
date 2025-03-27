@@ -282,7 +282,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         allergies: List<String>?,
         dislikeIngredients: List<String>?,
         deviceType: String?,
-        fcmToken: String?
+        fcmToken: String?,
+        referralFrom: String?
     ) {
         try {
             api.otpVerify(
@@ -310,7 +311,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                 allergies,
                 dislikeIngredients,
                 deviceType,
-                fcmToken
+                fcmToken,referralFrom
             ).apply {
                 if (isSuccessful) {
                     body()?.let {
@@ -476,7 +477,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         allergies: List<String>?,
         dislikeIngredients: List<String>?,
         deviceType: String?,
-        fcmToken: String?
+        fcmToken: String?,
+        referralFrom: String?
     ) {
         try {
             api.socialLogin(
@@ -504,7 +506,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                 allergies,
                 dislikeIngredients,
                 deviceType,
-                fcmToken
+                fcmToken,referralFrom
             ).apply {
                 if (isSuccessful) {
                     body()?.let {

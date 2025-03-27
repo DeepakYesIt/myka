@@ -43,7 +43,6 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
     private var foodIds = mutableListOf<String>()
     private var foodName = mutableListOf<String>()
     private var statusType = mutableListOf<String>()
-
     private lateinit var missingIngredientViewModel: MissingIngredientViewModel
 
     override fun onCreateView(
@@ -201,8 +200,6 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
     private fun showDataInUi(data: MutableList<MissingIngredientModelData>?) {
         try {
             if (data!=null && data.size>0){
-                missingIngredientViewModel.setRecipeData(data)
-
                 // Assuming you have a response object of type MissingIngredientModel
                 data.forEach { ingredient ->
                     if (ingredient.is_missing == 0) {
@@ -215,9 +212,11 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
                 Log.d("dffdsss","ffdfdd"+missingIngredientList.size)
                 Log.d("dffd","22222:___"+availableIngredientList.size)
 
+
+                missingIngredientViewModel.setRecipeData(missingIngredientList)
                 if (missingIngredientList!=null && missingIngredientList.size>0){
                     binding!!.rcyIngredientsRecipe.visibility=View.VISIBLE
-                    adapterMissingIngredientsItem = AdapterMissingIngredientsItem(data, requireActivity(),this)
+                    adapterMissingIngredientsItem = AdapterMissingIngredientsItem(missingIngredientList, requireActivity(),this)
                     binding!!.rcyIngredientsRecipe.adapter = adapterMissingIngredientsItem
                 }else{
                     findNavController().navigateUp()

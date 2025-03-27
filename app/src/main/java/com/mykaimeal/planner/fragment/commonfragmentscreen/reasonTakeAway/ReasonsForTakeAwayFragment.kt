@@ -471,26 +471,34 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         if (status1.equals("-1")) {
             if (reasonTakeModelData?.get(type!!.toInt())!!.name.toString().equals("Add other",true)){
                 reasonSelect = reasonTakeModelData?.get(type!!.toInt())!!.id.toString()
-                reasonTakeAway = reasonTakeModelData?.get(type!!.toInt())!!.descripttion.toString()
                 binding.relMainLayout.visibility=View.VISIBLE
                 if (reasonTakeModelData?.get(type!!.toInt())!!.descripttion!=null){
+                    reasonTakeAway = reasonTakeModelData?.get(type!!.toInt())!!.descripttion.toString()
                     binding.edtext.setText(reasonTakeModelData?.get(type!!.toInt())!!.descripttion.toString())
+                    status = "2"
+                    binding.tvNextBtn.isClickable = true
+                    binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 }else{
                     binding.edtext.hint="Enter Add Other"
+                    status = ""
+                    binding.tvNextBtn.isClickable = false
+                    binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
                 }
             }else{
                 reasonSelect = reasonTakeModelData?.get(type!!.toInt())!!.id.toString()
                 reasonTakeAway = ""
                 binding.relMainLayout.visibility=View.GONE
+                status = "2"
+                binding.tvNextBtn.isClickable = true
+                binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             }
-            status = "2"
-            binding.tvNextBtn.isClickable = true
-            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+
 
             return
         }
-        if (type.equals("true")) {
-            if (reasonTakeModelData?.get(status1!!.toInt())!!.name.toString().equals("Add other",true)){
+
+        if (status1.equals("true")) {
+            if (reasonTakeModelData?.get(type!!.toInt())!!.name.toString().equals("Add other",true)){
                 status = ""
                 binding.tvNextBtn.isClickable = false
                 binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
@@ -500,14 +508,14 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 status = "2"
                 binding.tvNextBtn.isClickable = true
                 binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-                reasonSelect = reasonTakeModelData?.get(status1!!.toInt())!!.id.toString()
+                reasonSelect = reasonTakeModelData?.get(type!!.toInt())!!.id.toString()
                 reasonTakeAway = selectItem.toString()
                 reasonTakeAway = ""
                 binding.relMainLayout.visibility=View.GONE
             }
 
         } else {
-            if (reasonTakeModelData?.get(status1!!.toInt())!!.name.toString().equals("Add other",true)){
+            if (reasonTakeModelData?.get(type!!.toInt())!!.name.toString().equals("Add other",true)){
                 binding.tvNextBtn.isClickable = false
                 binding.relMainLayout.visibility=View.GONE
                 binding.edtext.text.clear()

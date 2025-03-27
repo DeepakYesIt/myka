@@ -375,7 +375,7 @@ class VerificationFragment : Fragment() {
                 allergenSelectedId,
                 dislikeSelectedId,
                 "Android",
-                token
+                token,""
             )
         }
     }
@@ -403,6 +403,8 @@ class VerificationFragment : Fragment() {
             }
             cookingFor?.let { sessionManagement.setCookingFor(it) }
             sessionManagement.setImage(signUpVerificationModelData.profile_img?:"")
+            sessionManagement.setReferralCode(signUpVerificationModelData.referral_code ?: "")
+
             sessionManagement.setAuthToken(signUpVerificationModelData.token?:"")
             val id= signUpVerificationModelData.id?:0
             sessionManagement.setId(id.toString())

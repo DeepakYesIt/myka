@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -14,9 +15,9 @@ import com.bumptech.glide.request.target.Target
 import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterBasketIngItemBinding
-import com.mykaimeal.planner.fragment.mainfragment.commonscreen.shoppinglistscreen.model.ShoppingIngredient
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
 
-class IngredientsShoppingAdapter(private var ingredientsData: MutableList<ShoppingIngredient>?,
+class IngredientsShoppingAdapter(private var ingredientsData: MutableList<Ingredient>?,
                                  private var requireActivity: FragmentActivity,
                                  private var onItemSelectListener: OnItemSelectListener
 ):
@@ -32,11 +33,29 @@ class IngredientsShoppingAdapter(private var ingredientsData: MutableList<Shoppi
 
         val data= ingredientsData?.get(position)
 
+
         if (data != null) {
-            holder.binding.tvFoodName.text=data.name
-            if (data.image!=null){
+
+            if (data.sch_id!=null){
+                holder.binding.textCount.text=data.sch_id.toString()
+            }
+
+            if (data.pro_price!=null){
+                if (data.pro_price!="Not available"){
+                    holder.binding.tvFoodPrice.text=data.pro_price.toString()
+                }else{
+                    holder.binding.tvFoodPrice.text="$00"
+
+                }
+            }
+
+            if (data.name!=null){
+                holder.binding.tvFoodName.text=data.name
+            }
+
+            if (data.pro_img!=null){
                 Glide.with(requireActivity)
-                    .load(data.image)
+                    .load(data.pro_img)
                     .error(R.drawable.no_image)
                     .placeholder(R.drawable.no_image)
                     .listener(object : RequestListener<Drawable> {
@@ -65,13 +84,32 @@ class IngredientsShoppingAdapter(private var ingredientsData: MutableList<Shoppi
             }else{
                 holder.binding.layProgess.root.visibility= View.GONE
             }
+        }
 
+        holder.binding.imageMinusIcon.setOnClickListener{
+            if (ingredientsData?.get(position)?.sch_id.toString().toInt() > 1) {
+                onItemSelectListener.itemSelect(position,"Minus","ShoppingIngredients")
+            }else{
+                Toast.makeText(requireActivity,"Minimum serving at least value is one", Toast.LENGTH_LONG).show()
+            }
+        }
+
+
+        holder.binding.imageAddIcon.setOnClickListener{
+            if (ingredientsData?.get(position)?.sch_id.toString().toInt() < 1000) {
+                onItemSelectListener.itemSelect(position,"Plus","ShoppingIngredients")
+            }
         }
 
     }
 
     override fun getItemCount(): Int {
         return ingredientsData!!.size
+    }
+
+    fun updateList(ingredientList: MutableList<Ingredient>) {
+        ingredientsData=ingredientList
+        notifyDataSetChanged()
     }
 
     class ViewHolder(var binding: AdapterBasketIngItemBinding) : RecyclerView.ViewHolder(binding.root){

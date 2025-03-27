@@ -16,7 +16,6 @@ import android.widget.CalendarView
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -76,11 +75,8 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
     private var recipesDateModel: CookedTabModelData? = null
     private lateinit var fUllCookingScheduleViewModel: FullCookingScheduleViewModel
-    private val calendar = Calendar.getInstance()
-    private val dateFormat1 = SimpleDateFormat("dd MMM", Locale.getDefault())
     private lateinit var sessionManagement: SessionManagement
     private lateinit var commonWorkUtils: CommonWorkUtils
-
 
     // Define global variables
     private lateinit var startDate: Date
@@ -107,13 +103,14 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
 
-        binding!!.rlChangeCookSchedule.isClickable=false
-        binding!!.rlChangeCookSchedule.isEnabled=false
+        binding!!.rlChangeCookSchedule.isClickable = false
+        binding!!.rlChangeCookSchedule.isEnabled = false
 
         sessionManagement = SessionManagement(requireContext())
         commonWorkUtils = CommonWorkUtils(requireContext())
         currentDateSelected = BaseApplication.currentDateFormat().toString()
-        fUllCookingScheduleViewModel = ViewModelProvider(requireActivity())[FullCookingScheduleViewModel::class.java]
+        fUllCookingScheduleViewModel =
+            ViewModelProvider(requireActivity())[FullCookingScheduleViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(),
             object : OnBackPressedCallback(true) {
@@ -122,28 +119,30 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                 }
             })
 
-        if (cookbookList!=null){
+        if (cookbookList != null) {
             cookbookList.clear()
         }
 
-        val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
-                "", "", 0, "", "Favorites", 0, "", 0)
+        val data =
+            com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
+                "", "", 0, "", "Favorites", 0, "", 0
+            )
         cookbookList.add(0, data)
 
         if (sessionManagement.getUserName() != null) {
-            binding?.tvName?.text = sessionManagement.getUserName()+"'s week"
+            binding?.tvName?.text = sessionManagement.getUserName() + "'s week"
         }
 
         if (BaseApplication.isOnline(requireActivity())) {
-            dataFetchByDate(currentDateSelected,"1")
+            dataFetchByDate(currentDateSelected, "1")
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
         onClickFalseEnabled()
-   /*     fullCookSchBreakFastModel()
-        fullCookSchLunchModel()
-        fullCookSchDinnerModel()*/
+        /*     fullCookSchBreakFastModel()
+             fullCookSchLunchModel()
+             fullCookSchDinnerModel()*/
         initialize()
 
         // Display current week dates
@@ -182,31 +181,32 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
         // Update UI with formatted date ranges
 //        binding?.tvCustomDates?.text = BaseApplication.formatonlyMonthYear(startDate)
-        binding?.tvCustomDates?.text ="${formatDate(startDate)} - ${formatDate(endDate)}"
+        binding?.tvCustomDates?.text = "${formatDate(startDate)} - ${formatDate(endDate)}"
         binding?.textWeekRange?.text = "${formatDate(startDate)} - ${formatDate(endDate)}"
         tvWeekRange?.text = "${formatDate(startDate)} - ${formatDate(endDate)}"
 
         // Initialize the adapter with the updated date list
-        calendarAdapter = CalendarDayDateAdapter(updatedDaysBetween.toMutableList()) { selectedPosition ->
-            // Update the list to reflect the selected date
-            updatedDaysBetween.forEachIndexed { index, dateModel ->
-                dateModel.status = (index == selectedPosition)
+        calendarAdapter =
+            CalendarDayDateAdapter(updatedDaysBetween.toMutableList()) { selectedPosition ->
+                // Update the list to reflect the selected date
+                updatedDaysBetween.forEachIndexed { index, dateModel ->
+                    dateModel.status = (index == selectedPosition)
+                }
+                Log.d("Date ", "*****$updatedDaysBetween")
+
+                // Notify the adapter to refresh the data
+                calendarAdapter?.updateList(updatedDaysBetween.toMutableList())
+
+                // Update the current date selection
+                currentDateSelected = updatedDaysBetween[selectedPosition].date
+
+                // Fetch data for the selected date if online
+                if (BaseApplication.isOnline(requireActivity())) {
+                    dataFetchByDate(currentDateSelected, "1")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
-            Log.d("Date ", "*****$updatedDaysBetween")
-
-            // Notify the adapter to refresh the data
-            calendarAdapter?.updateList(updatedDaysBetween.toMutableList())
-
-            // Update the current date selection
-            currentDateSelected = updatedDaysBetween[selectedPosition].date
-
-            // Fetch data for the selected date if online
-            if (BaseApplication.isOnline(requireActivity())) {
-                dataFetchByDate(currentDateSelected,"1")
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
 
         // Update the RecyclerView with the adapter
         binding?.recyclerViewWeekDays?.adapter = calendarAdapter
@@ -299,14 +299,20 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                             dropDay = getDaysBetween(startDate, endDate)[dropPosition].day
 
                             Log.d("ACTION_DROP", "*******$dropPosition")
-                            Log.d("date position ", "******" + getDaysBetween(startDate, endDate)[dropPosition].date)
+                            Log.d(
+                                "date position ",
+                                "******" + getDaysBetween(startDate, endDate)[dropPosition].date
+                            )
 
-                            Log.d("drop date and days", "******" + getDaysBetween(startDate, endDate)[dropPosition].date +
-                                    "-" + getDaysBetween(startDate, endDate)[dropPosition].day)
+                            Log.d(
+                                "drop date and days",
+                                "******" + getDaysBetween(startDate, endDate)[dropPosition].date +
+                                        "-" + getDaysBetween(startDate, endDate)[dropPosition].day
+                            )
 
                             Log.d("ACTION_DROP", "Target position: $dropPosition")
-                            binding!!.rlChangeCookSchedule.isClickable=true
-                            binding!!.rlChangeCookSchedule.isEnabled=true
+                            binding!!.rlChangeCookSchedule.isClickable = true
+                            binding!!.rlChangeCookSchedule.isEnabled = true
                             binding!!.rlChangeCookSchedule.setBackgroundResource(R.drawable.gray_btn_select_background)
 
                             // Retrieve the list of dates
@@ -346,14 +352,14 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         }
     }
 
-    private fun  dataFetchByDate(date: String,status:String) {
+    private fun dataFetchByDate(date: String, status: String) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             fUllCookingScheduleViewModel.fullCookingSchedule({
                 BaseApplication.dismissMe()
-                if (status.equals("2")){
-                    binding!!.rlChangeCookSchedule.isClickable=false
-                    binding!!.rlChangeCookSchedule.isEnabled=false
+                if (status.equals("2")) {
+                    binding!!.rlChangeCookSchedule.isClickable = false
+                    binding!!.rlChangeCookSchedule.isEnabled = false
                     binding!!.rlChangeCookSchedule.setBackgroundResource(R.drawable.gray_btn_unselect_background)
                     // Display current week dates
                     showWeekDates()
@@ -400,9 +406,15 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             if (recipesDateModel != null) {
                 // Breakfast
                 if (recipesDateModel?.Breakfast != null && recipesDateModel?.Breakfast?.size!! > 0) {
-                    setupDragScrollForRecyclerView(binding!!.rcySearchBreakFast,"BreakFast")
+                    setupDragScrollForRecyclerView(binding!!.rcySearchBreakFast, "BreakFast")
                     binding!!.llBreakFast.visibility = View.VISIBLE
-                    ingredientBreakFastAdapter = IngredientsBreakFastAdapter(recipesDateModel?.Breakfast, requireActivity(), this, this, "BreakFast")
+                    ingredientBreakFastAdapter = IngredientsBreakFastAdapter(
+                        recipesDateModel?.Breakfast,
+                        requireActivity(),
+                        this,
+                        this,
+                        "BreakFast"
+                    )
                     binding!!.rcySearchBreakFast.adapter = ingredientBreakFastAdapter
                 } else {
                     binding!!.llBreakFast.visibility = View.GONE
@@ -410,9 +422,15 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
                 ///Lunch
                 if (recipesDateModel?.Lunch != null && recipesDateModel?.Lunch?.size!! > 0) {
-                    setupDragScrollForRecyclerView(binding!!.rcySearchLunch,"Lunch")
+                    setupDragScrollForRecyclerView(binding!!.rcySearchLunch, "Lunch")
                     binding!!.llLunch.visibility = View.VISIBLE
-                    ingredientLunchAdapter = IngredientsLunchAdapter(recipesDateModel?.Lunch, requireActivity(), this, this, "Lunch")
+                    ingredientLunchAdapter = IngredientsLunchAdapter(
+                        recipesDateModel?.Lunch,
+                        requireActivity(),
+                        this,
+                        this,
+                        "Lunch"
+                    )
                     binding!!.rcySearchLunch.adapter = ingredientLunchAdapter
                 } else {
                     binding!!.llLunch.visibility = View.GONE
@@ -420,7 +438,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
                 // Dinner
                 if (recipesDateModel?.Dinner != null && recipesDateModel?.Dinner?.size!! > 0) {
-                    setupDragScrollForRecyclerView(binding!!.rcySearchDinner,"Dinner")
+                    setupDragScrollForRecyclerView(binding!!.rcySearchDinner, "Dinner")
                     binding!!.llDinner.visibility = View.VISIBLE
                     ingredientDinnerAdapter = IngredientsDinnerAdapter(
                         recipesDateModel?.Dinner,
@@ -437,7 +455,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
                 // Snacks
                 if (recipesDateModel?.Snacks != null && recipesDateModel?.Snacks?.size!! > 0) {
-                    setupDragScrollForRecyclerView(binding!!.rcySearchSnacks,"Snacks")
+                    setupDragScrollForRecyclerView(binding!!.rcySearchSnacks, "Snacks")
                     binding!!.llSnacks.visibility = View.VISIBLE
                     ingredientSnacksAdapter = IngredientsSnacksAdapter(
                         recipesDateModel?.Snacks, requireActivity(), this,
@@ -450,9 +468,15 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
                 // TeaTime
                 if (recipesDateModel?.Teatime != null && recipesDateModel?.Teatime?.size!! > 0) {
-                    setupDragScrollForRecyclerView(binding!!.rcySearchTeaTime,"Brunch")
+                    setupDragScrollForRecyclerView(binding!!.rcySearchTeaTime, "Brunch")
                     binding!!.llTeaTime.visibility = View.VISIBLE
-                    ingredientTeaTimeAdapter = IngredientsTeaTimeAdapter(recipesDateModel?.Teatime, requireActivity(), this, this, "Brunch")
+                    ingredientTeaTimeAdapter = IngredientsTeaTimeAdapter(
+                        recipesDateModel?.Teatime,
+                        requireActivity(),
+                        this,
+                        this,
+                        "Brunch"
+                    )
                     binding!!.rcySearchTeaTime.adapter = ingredientTeaTimeAdapter
                 } else {
                     binding!!.llTeaTime.visibility = View.GONE
@@ -525,8 +549,10 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
         ///relCookChangeSchedule
         binding!!.rlChangeCookSchedule.setOnClickListener {
-            if (validate()){
-                removeCurrentDayDialog()
+            if (validate()) {
+                if (dropDate==""){
+                    removeCurrentDayDialog()
+                }
             }
 
 //            chooseDayMealTypeDialog()
@@ -583,8 +609,8 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
         tvDialogNoBtn.setOnClickListener {
 
-            binding!!.rlChangeCookSchedule.isClickable=false
-            binding!!.rlChangeCookSchedule.isEnabled=false
+            binding!!.rlChangeCookSchedule.isClickable = false
+            binding!!.rlChangeCookSchedule.isEnabled = false
             binding!!.rlChangeCookSchedule.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             // Display current week dates
             showWeekDates()
@@ -593,7 +619,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
         tvDialogYesBtn.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
-                updateMealApi()
+                updateMealApi(dialogRemoveDay)
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
@@ -603,10 +629,10 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
     /// add validation based on valid email or phone
     private fun validate(): Boolean {
         // Check if email/phone is empty
-        if (id==""){
+        if (id == "") {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.changeScheduleItem, false)
             return false
-        }else if (dropDate=="") {
+        } else if (dropDate == "") {
             ///
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.changeScheduleDate, false)
             return false
@@ -615,20 +641,21 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         return true
     }
 
-    private fun updateMealApi() {
+    private fun updateMealApi(dialogRemoveDay: Dialog) {
+
         val jsonObject = JsonObject()
 
         jsonObject.addProperty("type", mealType)
-        if (!id.equals("null")){
+        if (!id.equals("null")) {
             jsonObject.addProperty("id", id)
-            jsonObject.addProperty("date",dropDate)
+            jsonObject.addProperty("date", dropDate)
             jsonObject.addProperty("day", dropDay)
-        }else{
+        } else {
             jsonObject.addProperty("uri", uri)
             val jsonArray = JsonArray()
             // Create a JsonObject for each ingredient
             val ingredientObject = JsonObject()
-            ingredientObject.addProperty("date",dropDate)
+            ingredientObject.addProperty("date", dropDate)
             ingredientObject.addProperty("day", dropDay)
             // Add the ingredient object to the array
             jsonArray.add(ingredientObject)
@@ -639,43 +666,42 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
         Log.d("json object ", "******$jsonObject")
         BaseApplication.showMe(requireContext())
-        if (!id.equals("null")){
+        if (!id.equals("null")) {
             lifecycleScope.launch {
-                    fUllCookingScheduleViewModel.updateMealUrl({
-                        BaseApplication.dismissMe()
-                        handleApiUpdateScheduleResponse(it)
-                    }, jsonObject)
+                fUllCookingScheduleViewModel.updateMealUrl({
+                    BaseApplication.dismissMe()
+                    handleApiUpdateScheduleResponse(it,dialogRemoveDay)
+                }, jsonObject)
             }
-        }else{
+        } else {
             lifecycleScope.launch {
-                    fUllCookingScheduleViewModel.recipeAddToPlanRequestApi({
-                        BaseApplication.dismissMe()
-                        handleApiUpdateScheduleResponse(it)
-                    }, jsonObject)
+                fUllCookingScheduleViewModel.recipeAddToPlanRequestApi({
+                    BaseApplication.dismissMe()
+                    handleApiUpdateScheduleResponse(it,dialogRemoveDay)
+                }, jsonObject)
             }
         }
-
-
     }
 
-    private fun handleApiUpdateScheduleResponse(result: NetworkResult<String>) {
+    private fun handleApiUpdateScheduleResponse(result: NetworkResult<String>, dialogRemoveDay: Dialog) {
         when (result) {
-            is NetworkResult.Success -> handleUpdateScheduleResponse(result.data.toString())
+            is NetworkResult.Success -> handleUpdateScheduleResponse(result.data.toString(),dialogRemoveDay)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleUpdateScheduleResponse(data: String) {
+    private fun handleUpdateScheduleResponse(data: String,dialogRemoveDay: Dialog) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                mealType=""
-                id="null"
-                uri=""
-                dataFetchByDate(currentDateSelected,"2")
+                dialogRemoveDay.dismiss()
+                mealType = ""
+                id = "null"
+                uri = ""
+                dataFetchByDate(currentDateSelected, "2")
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -752,7 +778,8 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                 DragEvent.ACTION_DROP -> {
                     // Retrieve the dragged data
                     val clipData = dragEvent.clipData
-                    val draggedItem = clipData.getItemAt(0).text.toString() // Assuming text represents the dragged item
+                    val draggedItem =
+                        clipData.getItemAt(0).text.toString() // Assuming text represents the dragged item
 
                     // Find the target position in RecyclerView
                     val recyclerView = view as RecyclerView // Cast the view to RecyclerView
@@ -838,11 +865,11 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         return days
     }
 
-  /*  private fun setupDragScrollForRecyclerView(recyclerView: RecyclerView,type:String) {
-        recyclerView.setOnDragListener {_, dragEvent ->
-            when (dragEvent.action) {
-                DragEvent.ACTION_DRAG_STARTED -> {
-*//*
+    /*  private fun setupDragScrollForRecyclerView(recyclerView: RecyclerView,type:String) {
+          recyclerView.setOnDragListener {_, dragEvent ->
+              when (dragEvent.action) {
+                  DragEvent.ACTION_DRAG_STARTED -> {
+  *//*
                     Toast.makeText(requireContext(),"Scroll Viewss:- "+type,Toast.LENGTH_LONG).show()
 *//*
                     binding!!.scroll.fullScroll(0)
@@ -872,12 +899,12 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             when (dragEvent.action) {
                 DragEvent.ACTION_DRAG_STARTED -> {
                     binding!!.scroll.fullScroll(0)
-                   /* val draggedPosition = dragEvent.localState as? Int
-                    if (draggedPosition != null) {
-                        Toast.makeText(requireContext(), "Scroll at position: $draggedPosition", Toast.LENGTH_LONG).show()
-                    }
+                    /* val draggedPosition = dragEvent.localState as? Int
+                     if (draggedPosition != null) {
+                         Toast.makeText(requireContext(), "Scroll at position: $draggedPosition", Toast.LENGTH_LONG).show()
+                     }
 
-                    Toast.makeText(requireContext(), "Scroll vvvvv:- $type", Toast.LENGTH_LONG).show()*/
+                     Toast.makeText(requireContext(), "Scroll vvvvv:- $type", Toast.LENGTH_LONG).show()*/
                     true
                 }
 
@@ -904,7 +931,6 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             }
         }
     }
-
 
 
     override fun itemSelectUnSelect(id: Int?, status: String?, type: String?, position: Int?) {
@@ -934,10 +960,10 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             if (item != null) {
                 if (item.recipe?.uri != null) {
                     val bundle = Bundle().apply {
-                        putString("uri",item.recipe.uri)
-                        putString("schId",item.id.toString())
+                        putString("uri", item.recipe.uri)
+                        putString("schId", item.id.toString())
                     }
-                    findNavController().navigate(R.id.missingIngredientsFragment,bundle)
+                    findNavController().navigate(R.id.missingIngredientsFragment, bundle)
                 }
             }
         } else {
@@ -955,8 +981,8 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             if (item != null) {
                 if (item.recipe?.uri != null) {
                     val bundle = Bundle().apply {
-                        putString("uri",item.recipe.uri)
-                        putString("mealType",item.recipe.mealType.toString())
+                        putString("uri", item.recipe.uri)
+                        putString("mealType", item.recipe.mealType.toString())
                     }
                     findNavController().navigate(R.id.recipeDetailsFragment, bundle)
                 }
@@ -966,7 +992,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         }
     }
 
-    private fun toggleIsLike(type: String, position: Int?)  {
+    private fun toggleIsLike(type: String, position: Int?) {
         // Map the type to the corresponding list and adapter
         val (mealList) = when (type) {
             "BreakFast" -> recipesDateModel!!.Breakfast to ingredientBreakFastAdapter
@@ -1011,7 +1037,13 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
     }
 
     private fun handleLikeAndUnlikeApiResponse(
-        result: NetworkResult<String>, item: Breakfast, type: String, mealList: MutableList<Breakfast>, position: Int?, dialogAddRecipe: Dialog?) {
+        result: NetworkResult<String>,
+        item: Breakfast,
+        type: String,
+        mealList: MutableList<Breakfast>,
+        position: Int?,
+        dialogAddRecipe: Dialog?
+    ) {
         when (result) {
             is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(
                 result.data.toString(),
@@ -1106,7 +1138,11 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
         rlDoneBtn.setOnClickListener {
             if (spinnerActivityLevel.text.toString().equals("", true)) {
-                BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
+                BaseApplication.alertError(
+                    requireContext(),
+                    ErrorMessage.selectCookBookError,
+                    false
+                )
             } else {
                 val cookBookType = cookbookList[spinnerActivityLevel.selectedIndex].id
                 recipeLikeAndUnlikeData(
@@ -1165,25 +1201,25 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
     }
 
     private fun removeDayDialog(id: Int?, position: Int?, type: String?) {
-        val dialogRemoveDay: Dialog = context?.let { Dialog(it) }!!
-        dialogRemoveDay.setContentView(R.layout.alert_dialog_remove_day)
-        dialogRemoveDay.window!!.setLayout(
+        val dialogScheduleDay: Dialog = context?.let { Dialog(it) }!!
+        dialogScheduleDay.setContentView(R.layout.alert_dialog_remove_day)
+        dialogScheduleDay.window!!.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT
         )
-        dialogRemoveDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val tvDialogNoBtn = dialogRemoveDay.findViewById<TextView>(R.id.tvDialogNoBtn)
-        val tvDialogYesBtn = dialogRemoveDay.findViewById<TextView>(R.id.tvDialogYesBtn)
-        dialogRemoveDay.show()
-        dialogRemoveDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        dialogScheduleDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val tvDialogNoBtn = dialogScheduleDay.findViewById<TextView>(R.id.tvDialogNoBtn)
+        val tvDialogYesBtn = dialogScheduleDay.findViewById<TextView>(R.id.tvDialogYesBtn)
+        dialogScheduleDay.show()
+        dialogScheduleDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
         tvDialogNoBtn.setOnClickListener {
-            dialogRemoveDay.dismiss()
+            dialogScheduleDay.dismiss()
         }
 
         tvDialogYesBtn.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
-                removeCookBookApi(id.toString(), dialogRemoveDay, position, type)
+                removeCookBookApi(id.toString(), dialogScheduleDay, position, type)
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
@@ -1191,8 +1227,10 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         }
     }
 
-    private fun removeCookBookApi(cookedId: String, dialogRemoveDay: Dialog,
-        position: Int?, status: String?) {
+    private fun removeCookBookApi(
+        cookedId: String, dialogScheduleDay: Dialog,
+        position: Int?, status: String?
+    ) {
         BaseApplication.showMe(requireActivity())
         lifecycleScope.launch {
             fUllCookingScheduleViewModel.removeMealApi({
@@ -1209,7 +1247,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                                 "Snacks" -> ingredientSnacksAdapter?.removeItem(position!!)
                                 "Brunch" -> ingredientTeaTimeAdapter?.removeItem(position!!)
                             }
-                            dialogRemoveDay.dismiss()
+                            dialogScheduleDay.dismiss()
                         } else {
                             if (cookedModel.code == ErrorMessage.code) {
                                 showAlertFunction(cookedModel.message, true)
@@ -1235,15 +1273,15 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         BaseApplication.alertError(requireContext(), message, status)
     }
 
-    override fun itemLongClick(position: Int?, status: String?, type: String?,uriItem:String) {
-        id=status.toString()
-        uri=uriItem
-        mealType=type
-        Log.d("uri","****"+id)
-        Log.d("type","****"+uri)
-        Log.d("type","****"+type)
+    override fun itemLongClick(position: Int?, status: String?, type: String?, uriItem: String) {
+        id = status.toString()
+        uri = uriItem
+        mealType = type
+        Log.d("uri", "****" + id)
+        Log.d("type", "****" + uri)
+        Log.d("type", "****" + type)
 
-            onClickEnabled()
+        onClickEnabled()
 
     }
 

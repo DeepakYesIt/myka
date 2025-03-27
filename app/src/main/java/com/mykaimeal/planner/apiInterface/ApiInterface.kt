@@ -91,6 +91,7 @@ interface ApiInterface {
         @Field("dislike_ingredients_id[]") dislikeIngredientsId: List<String>?,
         @Field("device_type") deviceType: String?,
         @Field("fcm_token") fcmToken: String?,
+        @Field("referral_from") referralFrom: String?
     ): Response<JsonObject>
 
     @FormUrlEncoded
@@ -121,6 +122,7 @@ interface ApiInterface {
         @Field("dislike_ingredients_id[]") dislikeIngredientsId: List<String>?,
         @Field("device_type") deviceType: String?,
         @Field("fcm_token") fcmToken: String?,
+        @Field("referral_from") referralFrom: String?
     ): Response<JsonObject>
 
     @FormUrlEncoded
@@ -586,7 +588,6 @@ interface ApiInterface {
     ): Response<JsonObject>
 
 
-    @FormUrlEncoded
     @POST(ApiEndPoint.updateMealUrl)
     suspend fun updateMealUrl(@Body jsonObject: JsonObject): Response<JsonObject>
 

@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -168,22 +169,17 @@ class IngredientsSnacksAdapter(var datalist:MutableList<Breakfast>?, private var
     }
 
     private fun startZiggleAnimation(holder: ViewHolder) {
-      /*  val startAngle = -5f // -2 degrees
-        val stopAngle = 5f   // 2 degrees
-
-        ziggleAnimation = ObjectAnimator.ofFloat(holder.itemView, "rotation", startAngle, stopAngle)
-        ziggleAnimation!!.duration = 80
-        ziggleAnimation!!.repeatMode = ValueAnimator.REVERSE
-        ziggleAnimation!!.repeatCount = ValueAnimator.INFINITE
-        ziggleAnimation!!.start()*/
         holder.ziggleAnimation?.cancel()
         holder.itemView.rotation = 0f
+
         val startAngle = -5f
         val stopAngle = 5f
+
         holder.ziggleAnimation = ObjectAnimator.ofFloat(holder.itemView, "rotation", startAngle, stopAngle).apply {
-            duration = 80
+            duration = 200 // Increase duration to slow down the movement
             repeatMode = ValueAnimator.REVERSE
             repeatCount = ValueAnimator.INFINITE
+            interpolator = LinearInterpolator() // Ensures smooth transition
             start()
         }
     }

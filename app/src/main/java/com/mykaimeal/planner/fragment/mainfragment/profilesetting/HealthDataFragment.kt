@@ -42,6 +42,9 @@ class HealthDataFragment : Fragment() {
         _binding = FragmentHealthDataBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[SettingViewModel::class.java]
 
+        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
+        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
+
         setupUi()
 
         setupBackNavigation()

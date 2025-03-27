@@ -639,7 +639,7 @@
                             android:textSize="@dimen/_11sdp" />
 
                         <RelativeLayout
-                            android:id="@+id/rlVerificationVerify"
+                            android:id="@+id/rlLayCheckSavings"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/tvMonthlySavingsDesc"

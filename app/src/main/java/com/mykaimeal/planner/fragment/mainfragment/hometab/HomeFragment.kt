@@ -445,6 +445,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 //        binding!!.imageRecipeSeeAll.setOnClickListener(this)
 //        binding!!.relMonthlySavings.setOnClickListener(this)
         binding!!.imageCheckSav.setOnClickListener(this)
+        binding!!.rlLayCheckSavings.setOnClickListener(this)
 
 
         if (BaseApplication.isOnline(requireActivity())) {
@@ -537,6 +538,10 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             }
 
             R.id.imageCheckSav -> {
+                findNavController().navigate(R.id.statisticsGraphFragment)
+            }
+
+            R.id.rlLayCheckSavings -> {
                 findNavController().navigate(R.id.statisticsGraphFragment)
             }
 

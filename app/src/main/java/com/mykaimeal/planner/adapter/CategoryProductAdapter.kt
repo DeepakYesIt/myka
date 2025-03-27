@@ -21,7 +21,7 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssup
 
 class CategoryProductAdapter(
     private var requireActivity: FragmentActivity,
-    private val products: MutableList<Product>?,
+    private var products: MutableList<Product>,
     private var onItemSelectListener: OnItemSelectUnSelectListener
 ) : RecyclerView.Adapter<CategoryProductAdapter.ProductViewHolder>() {
 
@@ -33,10 +33,15 @@ class CategoryProductAdapter(
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
-        holder.bind(products!![position])
+        holder.bind(products[position])
     }
 
-    override fun getItemCount(): Int = products!!.size
+    override fun getItemCount(): Int = products.size
+    fun updateList(productss: MutableList<Product>) {
+        products=productss
+        notifyDataSetChanged()
+
+    }
 
     inner class ProductViewHolder(private val binding: ItemSectionHeaderBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -108,7 +113,7 @@ class CategoryProductAdapter(
             // Implement quantity controls
             binding.imageDecreaseQuantity.setOnClickListener {
                 if (product.sch_id.toString().toInt() > 1) {
-                    onItemSelectListener.itemSelectUnSelect(position,"Minus","Product",0)
+                    onItemSelectListener.itemSelectUnSelect(position,"Minus","Product",position)
                 }else{
                     Toast.makeText(requireActivity,"Minimum serving at least value is one", Toast.LENGTH_LONG).show()
                 }
@@ -117,7 +122,7 @@ class CategoryProductAdapter(
             binding.imageIncreaseQuantity.setOnClickListener {
                 // Increase quantity logic
                 if (product.sch_id.toString().toInt() < 1000) {
-                    onItemSelectListener.itemSelectUnSelect(position,"Plus","Product",0)
+                    onItemSelectListener.itemSelectUnSelect(position,"Plus","Product", position)
                 }
             }
 

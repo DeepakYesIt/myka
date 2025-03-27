@@ -410,6 +410,8 @@ class LoginFragment : Fragment() {
 
             sessionManagement.setUserName(loginModelData.name ?: "")
 
+            sessionManagement.setReferralCode(loginModelData.referral_code ?: "")
+
             val cookingFor = when (loginModelData.cooking_for_type ?: -1) {
                 1 -> "Myself"
                 2 -> "MyPartner"
@@ -596,7 +598,7 @@ class LoginFragment : Fragment() {
                 allergenSelectedId,
                 dislikeSelectedId,
                 ErrorMessage.deviceType,
-                token
+                token,""
             )
         }
     }

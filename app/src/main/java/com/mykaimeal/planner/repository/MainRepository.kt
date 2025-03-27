@@ -25,7 +25,8 @@ interface MainRepository {
                           bodyGoal:String?,cookingFrequency:String?,eatingOut: String?, takeAway:String?,takeWayName:String?,cookingForType:String?,
                           partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?, familyMemberAge:String?,
                           childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?, dietaryid:List<String>?,
-                          favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?)
+                          favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?,
+                          referralFrom:String?)
 
     suspend fun forgotPassword(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String)
     suspend fun resendSignUpModel(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String)
@@ -42,7 +43,7 @@ interface MainRepository {
                             userGender:String?,bodyGoal:String?,cookingFrequency:String?,eatingOut:String?,takeAway:String?,takeWayName:String?,cookingForType:String?,
                             partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?, familyMemberAge:String?,
                             childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?, dietaryid:List<String>?,
-                            favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?)
+                            favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?,referralFrom:String?)
     suspend fun updateLocation(successCallback: (response: NetworkResult<String>) -> Unit,locationStatus: String)
 
     suspend fun updateNotification(successCallback: (response: NetworkResult<String>) -> Unit,notificationStatus: String)

@@ -130,16 +130,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         cookbookList.clear()
 
         val data =
-            com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
-                "",
-                "",
-                0,
-                "",
-                "Favorites",
-                0,
-                "",
-                0
-            )
+            com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("", "", 0, "", "Favorites", 0, "", 0)
         cookbookList.add(0, data)
 
         if (sessionManagement.getImage() != null) {
@@ -557,6 +548,13 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 binding!!.linearTeatime.visibility = View.GONE
             }
         }
+
+        // Fetch data for the selected date if online
+        if (BaseApplication.isOnline(requireActivity())) {
+            dataFatchByDate(currentDateSelected)
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
     }
 
     private fun showDataAccordingDate(data: DataPlayByDate?) {
@@ -779,23 +777,38 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
         binding!!.imgAddBreakFast.setOnClickListener {
-            findNavController().navigate(R.id.addMealCookedFragment)
+            val bundle = Bundle().apply {
+                putString("ClickedUrl","")
+            }
+            findNavController().navigate(R.id.searchFragment,bundle)
         }
 
         binding!!.imgAddLunch.setOnClickListener {
-            findNavController().navigate(R.id.searchFragment)
+            val bundle = Bundle().apply {
+                putString("ClickedUrl","")
+            }
+            findNavController().navigate(R.id.searchFragment,bundle)
         }
 
         binding!!.imgAddDinner.setOnClickListener {
-            findNavController().navigate(R.id.searchFragment)
+            val bundle = Bundle().apply {
+                putString("ClickedUrl","")
+            }
+            findNavController().navigate(R.id.searchFragment,bundle)
         }
 
         binding?.imgAddSnacks?.setOnClickListener {
-            findNavController().navigate(R.id.searchFragment)
+            val bundle = Bundle().apply {
+                putString("ClickedUrl","")
+            }
+            findNavController().navigate(R.id.searchFragment,bundle)
         }
 
         binding?.imgAddTeaTime1?.setOnClickListener {
-            findNavController().navigate(R.id.searchFragment)
+            val bundle = Bundle().apply {
+                putString("ClickedUrl","")
+            }
+            findNavController().navigate(R.id.searchFragment,bundle)
         }
 
 
@@ -1156,6 +1169,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                                     updateModel.message,
                                     Toast.LENGTH_LONG
                                 ).show()
+
                                 // When screen load then api call
                                 fetchDataOnLoad()
                             } else {

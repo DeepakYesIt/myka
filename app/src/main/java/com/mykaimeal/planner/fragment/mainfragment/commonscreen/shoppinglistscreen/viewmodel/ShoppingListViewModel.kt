@@ -14,4 +14,20 @@ class ShoppingListViewModel @Inject constructor(private val repository: MainRepo
         repository.getShoppingList{ successCallback(it) }
     }
 
+    suspend fun removeBasketUrlApi(successCallback: (response: NetworkResult<String>) -> Unit,
+                                   cookedId: String?){
+        repository.removeBasketUrlApi({ successCallback(it) },cookedId)
+    }
+
+    suspend fun basketYourRecipeIncDescUrl(successCallback: (response: NetworkResult<String>) -> Unit,
+                                           uri: String?,quantity:String?){
+        repository.basketYourRecipeIncDescUrl({ successCallback(it) },uri, quantity)
+    }
+
+
+    suspend fun basketIngIncDescUrl(successCallback: (response: NetworkResult<String>) -> Unit,
+                                    foodId: String?,quantity:String?){
+        repository.basketIngIncDescUrl({ successCallback(it) },foodId, quantity)
+    }
+
 }

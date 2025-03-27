@@ -35,6 +35,7 @@ class AppConstant {
         const val Image :String ="Image"
 
         const val PartnerName: String ="PartnerName"
+        const val ReferralCode: String ="RefferalCode"
         const val PartnerAge: String ="PartnerAge"
         const val PartnerGender: String ="PartnerGender"
         const val FamilyMemName: String ="FamilyMemName"
