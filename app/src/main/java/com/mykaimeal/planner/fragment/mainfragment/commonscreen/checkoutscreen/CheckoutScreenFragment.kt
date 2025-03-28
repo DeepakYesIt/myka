@@ -393,10 +393,15 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
         Log.d("Location latitude", "********$latitude")
         Log.d("Location longitude", "********$longitude")
         mMap = gmap
+
         val lat = latitude?.toDoubleOrNull() ?: 0.0  // Convert String to Double, default to 0.0 if null
         val lng = longitude?.toDoubleOrNull() ?: 0.0
         val newYork = LatLng(lat, lng)
         val customMarker = bitmapDescriptorFromVector(R.drawable.map_marker_icon,45,60) // Change with your drawable
+
+/*        val newYork = LatLng(40.7128, -74.0060)
+        val customMarker = bitmapDescriptorFromVector(R.drawable.current_location_marker,50,50) // Change with your drawable*/
+//        val customMarker = bitmapDescriptorFromVector(R.drawable.marker_icon,50,50) // Change with your drawable
         mMap?.addMarker(
             MarkerOptions()
                 .position(newYork)

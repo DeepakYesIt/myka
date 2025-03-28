@@ -41,32 +41,25 @@
             <RelativeLayout
                 android:id="@+id/relIngSearchBar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_40sdp"
                 android:layout_below="@+id/tvAddressDesc"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:background="@drawable/gray_edittext_bg">
 
-                <ImageView
-                    android:id="@+id/imgIngSearch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="@dimen/_8sdp"
-                    android:src="@drawable/yellow_search_icon" />
-
-                <EditText
-                    android:id="@+id/etIngDislikesSearchBar"
+                <AutoCompleteTextView
+                    android:id="@+id/tv_address"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginHorizontal="@dimen/_10sdp"
-                    android:layout_toEndOf="@+id/imgIngSearch"
+                    android:layout_height="match_parent"
+                    android:drawableStart="@drawable/yellow_search_icon"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:drawablePadding="@dimen/_10sdp"
+                    android:paddingStart="@dimen/_10sdp"
                     android:background="@null"
-                    android:hint="Search for an address"
-                    android:paddingVertical="@dimen/_8sdp"
+                    android:textColor="#58585A"
+                    android:gravity="center|start"
                     android:singleLine="true"
-                    android:textSize="@dimen/_12sdp" />
-
+                    android:hint="Enter Address"
+                    android:textSize="@dimen/_13sdp" />
             </RelativeLayout>
 
             <LinearLayout
@@ -193,18 +186,18 @@
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_100sdp"
+                android:layout_height="@dimen/_150sdp"
                 android:layout_marginTop="@dimen/_15sdp"
                 app:cardCornerRadius="@dimen/_10sdp"
                 android:background="@color/grey3"
                 android:layout_marginHorizontal="@dimen/_5sdp"
                 android:layout_below="@+id/relUseCurrentLocation">
 
-                <FrameLayout
-                    android:id="@+id/mapid"
-                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                <com.google.android.gms.maps.MapView
+                    android:id="@+id/mapView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true" />
 
             </androidx.cardview.widget.CardView>
 

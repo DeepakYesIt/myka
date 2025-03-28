@@ -54,13 +54,11 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
 
     private var binding: FragmentSearchedRecipeBreakfastBinding?=null
     private var dataList3: MutableList<DataModel> = mutableListOf()
-    private var planBreakFastAdapter: AdapterPlanBreakFast? = null
     private val calendar = Calendar.getInstance()
     private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
     private var chooseDayAdapter: ChooseDayAdapter? = null
     private var rcyChooseDaySch: RecyclerView? = null
     private var tvWeekRange: TextView? = null
-    private var clickable:String?=""
     private lateinit var startDate: Date
     private lateinit var endDate: Date
     private lateinit var spinnerActivityLevel: PowerSpinnerView
@@ -68,16 +66,12 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
     private var recipes: MutableList<Recipe>?= mutableListOf()
     private var currentDate = Date() // Current date
     private var adapterSearchedRecipeItem:AdapterSearchedRecipeItem?=null
-/*    AdapterSearchedRecipeItem*/
     private var recipeType: String? = null
     private lateinit var searchedRecipeViewModel: SearchedRecipeViewModel
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
 
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         binding=FragmentSearchedRecipeBreakfastBinding.inflate(layoutInflater, container, false)
 

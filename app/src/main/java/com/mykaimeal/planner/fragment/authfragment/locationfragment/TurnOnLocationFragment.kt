@@ -1,7 +1,10 @@
 package com.mykaimeal.planner.fragment.authfragment.locationfragment
 
-import android.annotation.SuppressLint
-import android.content.Context.LOCATION_SERVICE
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
@@ -12,17 +15,24 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.common.api.PendingResult
+import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResult
+import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.gson.Gson
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.basedata.BaseApplication
@@ -36,21 +46,29 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class TurnOnLocationFragment : Fragment() {
-    private var binding: FragmentTurnOnLocationBinding? = null
+    private var _binding: FragmentTurnOnLocationBinding? = null
+    private val binding get() = _binding!!
     private lateinit var locationViewModel: LocationViewModel
-    private var status: String = ""
-    private var fusedLocationClient: FusedLocationProviderClient? = null
-    private val LOCATION_PERMISSION_REQUEST_CODE = 1001
-
+    private lateinit var mFusedLocationClient: FusedLocationProviderClient
+    private var locationManager: LocationManager? = null
+    private var latitude: String = "0"
+    private var longitude: String = "0"
+    private var tAG: String = "Location"
+    
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+
         // Inflate the layout for this fragment
-        binding = FragmentTurnOnLocationBinding.inflate(inflater, container, false)
+        _binding = FragmentTurnOnLocationBinding.inflate(inflater, container, false)
 
         locationViewModel = ViewModelProvider(this)[LocationViewModel::class.java]
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+
+        // This is use for LocationServices declaration
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        locationManager = requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
 
         /// handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -64,133 +82,163 @@ class TurnOnLocationFragment : Fragment() {
         ///main function using all triggered of this screen
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun initialize() {
 
         /// handle on back pressed
-        binding!!.imgBackTurnLocation.setOnClickListener {
-//            findNavController().navigateUp()
+        binding.imgBackTurnLocation.setOnClickListener {
             requireActivity().finish()
         }
 
-        ///checking the device of mobile data in online and offline(show network error message)
-        /// turn on location permission and implement api
-        binding!!.rlShareLocation.setOnClickListener {
-            status = "1"
-
-//            findNavController().navigate(R.id.enterYourAddressFragment)
-            findNavController().navigate(R.id.turnOnNotificationsFragment)
-
-//            requestLocationPermission()
-
-        /*    if (BaseApplication.isOnline(requireActivity())){
+        binding.rlShareLocation.setOnClickListener {
+            if (BaseApplication.isOnline(requireContext())){
                 // This condition for check location run time permission
-                if (ContextCompat.checkSelfPermission(
-                        requireActivity(),
-                        android.Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-                        requireActivity(),
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
+                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     getCurrentLocation()
                 } else {
-                    requestPermissions(
-                        arrayOf(
-                            android.Manifest.permission.ACCESS_FINE_LOCATION,
-                            android.Manifest.permission.ACCESS_COARSE_LOCATION
-                        ), 100
-                    )
-                }    
+                    requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 100)
+                }
             }else{
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }*/
-        }
-    }
-
-    private fun requestLocationPermission() {
-        if (ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // Permission is already granted, proceed with location access
-            getCurrentLocation()
-        } else {
-            // Show permission request dialog
-            ActivityCompat.requestPermissions(
-                requireActivity(), arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_PERMISSION_REQUEST_CODE
-            )
-        }
-    }
-
-    // Handle Permission Result
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getCurrentLocation()
-            } else {
-                Toast.makeText(requireActivity(), "Location permission denied", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
 
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 100) {
+            if (requestCode == 100 && grantResults.isNotEmpty() && (grantResults[0] + grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                displayLocationSettingsRequest(requireContext())
+            } else {
+                findNavController().navigate(R.id.enterYourAddressFragment)
+            }
+        }
 
-    @SuppressLint("MissingPermission")
+    }
+
+    private fun displayLocationSettingsRequest(context: Context) {
+        val googleApiClient = GoogleApiClient.Builder(context)
+            .addApi(LocationServices.API).build()
+        googleApiClient.connect()
+        val locationRequest: LocationRequest = LocationRequest.create()
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        locationRequest.interval = 10000
+        locationRequest.fastestInterval = 1000
+        locationRequest.numUpdates = 1
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        builder.setAlwaysShow(true)
+        val result: PendingResult<LocationSettingsResult> =
+            LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build())
+        result.setResultCallback { result ->
+            val status: Status = result.status
+            when (status.statusCode) {
+                LocationSettingsStatusCodes.SUCCESS -> {
+                    Log.i(tAG, "All location settings are satisfied.")
+                    getCurrentLocation()
+                }
+                LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
+                    Log.i(tAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ")
+                    try {
+                        // Show the dialog by calling startResolutionForResult(), and check the result
+                        // in onActivityResult().
+                        status.resolution?.let {
+                            startIntentSenderForResult(it.intentSender, 100, null, 0, 0, 0, null)
+                        }
+
+                    } catch (e: IntentSender.SendIntentException) {
+                        Log.i(tAG, "PendingIntent unable to execute request.")
+                    }
+                }
+                LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> Log.i(tAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.")
+
+            }
+        }
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 100) {
+            if (Activity.RESULT_OK == resultCode) {
+                getCurrentLocation()
+            } else {
+                Toast.makeText(requireContext(), "Please turn on location", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
     private fun getCurrentLocation() {
         // Initialize Location manager
-        val locationManager = requireActivity().getSystemService(LOCATION_SERVICE) as LocationManager
+        val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         // Check condition
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             // When location service is enabled
             // Get last location
-            fusedLocationClient!!.lastLocation.addOnCompleteListener { task ->
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return
+            }
+            mFusedLocationClient.lastLocation.addOnCompleteListener { task ->
                 // Initialize location
+                val location = task.result
                 // Check condition
-                if (task.isSuccessful && task.result != null) {
-                    val location = task.result
-                    // When location result is not
-                    // null set latitude
-                    status = "1"
-//                    locationApi()
+                if (location != null) {
+                    latitude = location.latitude.toString()
+                    longitude = location.longitude.toString()
+
+                    locationApi()
 
                 } else {
-                    // When location result is null
-                    // initialize location request
-                    val locationRequest = LocationRequest()
-                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                        .setInterval(10000)
-                        .setFastestInterval(1000)
-                    // Initialize location call back
+//                    // When location result is null
+//                    // initialize location request
+                    val locationRequest =
+                        LocationRequest().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                            .setInterval(10000)
+                            .setFastestInterval(1000)
+                            .setNumUpdates(1)
+
                     val locationCallback: LocationCallback = object : LocationCallback() {
                         override fun onLocationResult(locationResult: LocationResult) {
+                            // Initialize
                             // location
                             val location1 = locationResult.lastLocation
-                            /*latitude = location1!!.latitude.toString()
-                            longitude = location1.longitude.toString()*/
-
-                            status = "1"
-//                            locationApi()
-
+                            latitude = location1!!.latitude.toString()
+                            longitude = location1.longitude.toString()
+                            locationApi()
                         }
                     }
-                    fusedLocationClient!!.requestLocationUpdates(
+//                    // Request location updates
+                    mFusedLocationClient.requestLocationUpdates(
                         locationRequest,
                         locationCallback,
-                        Looper.myLooper()
+                        Looper.myLooper()!!
                     )
+
                 }
             }
         } else {
             requestPermissions(
                 arrayOf(
-                    android.Manifest.permission.ACCESS_FINE_LOCATION,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
                 ), 100
             )
         }
@@ -200,8 +248,7 @@ class TurnOnLocationFragment : Fragment() {
     private fun locationApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            locationViewModel.updateLocation(
-                {
+            locationViewModel.updateLocation({
                     BaseApplication.dismissMe()
                     when (it) {
                         is NetworkResult.Success -> {
@@ -230,7 +277,7 @@ class TurnOnLocationFragment : Fragment() {
                             showAlertFunction(it.message, false)
                         }
                     }
-                }, status
+                }, "1"
             )
         }
     }
@@ -238,6 +285,12 @@ class TurnOnLocationFragment : Fragment() {
     /// show error message
     private fun showAlertFunction(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }
