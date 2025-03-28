@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.findNavController
 import com.mykaimeal.planner.R
+import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.databinding.FragmentPaymentCreditDebitBinding
 import com.mykaimeal.planner.databinding.FragmentTrackOrderScreenBinding
 
@@ -26,6 +27,9 @@ class TrackOrderScreenFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentTrackOrderScreenBinding.inflate(layoutInflater, container, false)
+
+        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
+        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
 
         if (arguments!=null){
             trackStatus = arguments?.getString("tracking", "").toString()

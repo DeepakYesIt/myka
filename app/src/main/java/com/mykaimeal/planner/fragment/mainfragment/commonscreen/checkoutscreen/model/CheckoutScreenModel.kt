@@ -8,18 +8,53 @@ data class CheckoutScreenModel(
 )
 
 data class CheckoutScreenModelData(
-    val address: MutableList<Addres>?,
-    val bagfee: Double?,
-    val card: String?,
     val Store: String?,
-    val store_image: String?,
-    val delivery: Double?,
-    val note: Note?,
-    val phone: Any?,
-    val service: Double?,
-    val subtotal: Double?,
-    val total: Double?,
+    val address: MutableList<Addres>?,
+    val card: Card?,
+    val country_code: String?,
+    val delivery: Int?,
+    val ingredient: List<IngredientList>?,
     val ingredient_count: Int?,
+    val net_total: Double?,
+    val note: Note?,
+    val phone: Any,
+    val processing: Double?,
+    val recipes: Int?,
+    val store_image: String?,
+    val tax: Double?,
+    val total: Double?
+)
+
+
+data class IngredientList(
+    val created_at: String?,
+    val deleted_at: Any,
+    val food_id: String?,
+    val id: Int,
+    val market_id: Any,
+    val name: String?,
+    val price: Int?,
+    val pro_id: String?,
+    val pro_img: String?,
+    val pro_name: String?,
+    val pro_price: String?,
+    val product_id: String?,
+    val quantity: Any,
+    val sch_id: Int,
+    val status: Int?,
+    val updated_at: String?,
+    val user_id: Int?
+)
+
+
+data class Card(
+    val card_num: Int?,
+    val created_at: String,
+    val deleted_at: Any,
+    val id: Int,
+    val payment_id: String,
+    val updated_at: String,
+    val user_id: Int
 )
 
 data class Addres(

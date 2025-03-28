@@ -36,7 +36,7 @@ class AddNumberVerifyFragment : Fragment() {
     private var binding: FragmentAddNumberVerifyBinding? = null
     private lateinit var addNumberVerifyViewModel: AddNumberVerifyViewModel
     var lastNumber: String =""
-    private var countryCode:String=""
+    private var countryCode:String="+44"
     private lateinit var commonWorkUtils: CommonWorkUtils
 
     override fun onCreateView(
@@ -48,8 +48,7 @@ class AddNumberVerifyFragment : Fragment() {
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
 
-        addNumberVerifyViewModel =
-            ViewModelProvider(requireActivity())[AddNumberVerifyViewModel::class.java]
+        addNumberVerifyViewModel = ViewModelProvider(requireActivity())[AddNumberVerifyViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
@@ -103,7 +102,7 @@ class AddNumberVerifyFragment : Fragment() {
         })
 
         binding!!.countryCodePicker.setOnCountryChangeListener {
-            countryCode = binding!!.countryCodePicker.selectedCountryCode
+            countryCode = "+" + binding!!.countryCodePicker.selectedCountryCode
             Log.d("CountryCode", "Selected Country Code: $countryCode")
         }
 
@@ -187,7 +186,7 @@ class AddNumberVerifyFragment : Fragment() {
             addNumberVerifyViewModel.addPhoneUrl({
                 BaseApplication.dismissMe()
                 handleApiVerifyResponse(it)
-            }, binding!!.etRegPhone.text.toString().trim(),binding!!.otpView.otp.toString())
+            }, binding!!.etRegPhone.text.toString().trim(),binding!!.otpView.otp.toString(),countryCode)
         }
     }
 

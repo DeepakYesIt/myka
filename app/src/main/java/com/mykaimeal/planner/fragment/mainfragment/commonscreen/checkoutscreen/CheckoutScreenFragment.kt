@@ -62,6 +62,10 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     private lateinit var adapterPaymentCreditDebitItem: AdapterCardPreferredItem
     private lateinit var sessionManagement: SessionManagement
 
+    private var latitude: String? = ""
+    private var longitude: String? = ""
+    private var totalPrices: String? = ""
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,13 +79,17 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
 
         sessionManagement = SessionManagement(requireContext())
 
+        if (sessionManagement.getLatitude()!=""){
+            latitude=sessionManagement.getLatitude().toString()
+        }else{
+            latitude="40.7128"
+        }
 
-        // Load saved instance state
-//        var mapViewBundle: Bundle? = null
-//        if (savedInstanceState != null) {
-//            mapViewBundle= savedInstanceState.getBundle("MapViewBundleKey")
-////            mapViewBundle = savedInstanceState.getBundle("AIzaSyA-e6IRZ8axxpwrm1GEjlFOTzwb5KVQHgc")
-//        }
+        if (sessionManagement.getLongitude()!=""){
+            longitude=sessionManagement.getLongitude().toString()
+        }else{
+            longitude="-74.0060"
+        }
 
         mapView = binding!!.mapView
         mapView.onCreate(savedInstanceState)
@@ -118,6 +126,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
 
 
         binding!!.layEdit.setOnClickListener {
+
             findNavController().navigate(R.id.addressMapFullScreenFragment)
         }
 
@@ -127,7 +136,10 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
         }
 
         binding!!.textPayBtn.setOnClickListener {
-            findNavController().navigate(R.id.addTipScreenFragment)
+            val bundle = Bundle().apply {
+                putString("totalPrices",totalPrices)
+            }
+            findNavController().navigate(R.id.addTipScreenFragment,bundle)
         }
 
         binding!!.relSetMeetAtDoor.setOnClickListener {
@@ -264,8 +276,8 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     @SuppressLint("SetTextI18n")
     private fun showDataInUI(data: CheckoutScreenModelData?) {
 
-        if (data!!.phone != null) {
-            binding!!.tvAddNumber.text = data.phone.toString()
+        if (data!!.phone != null || data.country_code!=null) {
+            binding!!.tvAddNumber.text = data.country_code+data.phone.toString()
             binding!!.tvAddNumber.setTextColor(Color.parseColor("#000000"))
         }
 
@@ -284,22 +296,22 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
             }
         }
 
-        if (data.subtotal!=null){
-            val roundedSubTotal = data.subtotal.let {
+        if (data.net_total!=null){
+            val roundedSubTotal = data.net_total.let {
                 BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
             }
             binding!!.textSubTotalPrices.text= "$$roundedSubTotal"
         }
 
-        if (data.bagfee != null) {
-            val roundedBagFees = data.bagfee.let {
+        if (data.tax != null) {
+            val roundedBagFees = data.tax.let {
                 BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
             }
-            binding!!.textSubTotalPrices.text="$$roundedBagFees"
+            binding!!.textBagFees.text="$$roundedBagFees"
         }
 
-        if (data.service!=null){
-            val roundedServices = data.service.let {
+        if (data.processing!=null){
+            val roundedServices = data.processing.let {
                 BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
             }
             binding!!.textServicesPrice.text= "$$roundedServices"
@@ -316,6 +328,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
             val roundedTotal = data.total.let {
                 BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
             }
+            totalPrices=roundedTotal.toString()
             binding!!.textTotalAmounts.text = "$$roundedTotal"
         }
 
@@ -376,9 +389,14 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     }
 
     override fun onMapReady(gmap: GoogleMap) {
+
+        Log.d("Location latitude", "********$latitude")
+        Log.d("Location longitude", "********$longitude")
         mMap = gmap
-        val newYork = LatLng(40.7128, -74.0060)
-        val customMarker = bitmapDescriptorFromVector(R.drawable.marker_icon,50,50) // Change with your drawable
+        val lat = latitude?.toDoubleOrNull() ?: 0.0  // Convert String to Double, default to 0.0 if null
+        val lng = longitude?.toDoubleOrNull() ?: 0.0
+        val newYork = LatLng(lat, lng)
+        val customMarker = bitmapDescriptorFromVector(R.drawable.map_marker_icon,45,60) // Change with your drawable
         mMap?.addMarker(
             MarkerOptions()
                 .position(newYork)

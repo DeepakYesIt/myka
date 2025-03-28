@@ -90,6 +90,24 @@ class SessionManagement(var context: Context) {
         return prefFirstTime!!.getBoolean(AppConstant.SessionFirstTime, true)
     }
 
+    fun setLatitude(status: String) {
+        editor!!.putString(AppConstant.Latitude, status)
+        editor!!.commit()
+    }
+
+    fun getLatitude(): String? {
+        return pref?.getString(AppConstant.Latitude, "")
+    }
+
+    fun setLongitude(status: String) {
+        editor!!.putString(AppConstant.Longitude, status)
+        editor!!.commit()
+    }
+
+    fun getLongitude(): String? {
+        return pref!!.getString(AppConstant.Longitude, "")
+    }
+
 
     fun setLoginSession(session: Boolean?) {
         editor!!.putBoolean(AppConstant.loginSession, session!!)
@@ -345,8 +363,6 @@ class SessionManagement(var context: Context) {
         editor!!.putString(AppConstant.EatingOut, eatingOut)
         editor!!.commit()
     }
-
-
 
 
     fun getEatingOut(): String? {

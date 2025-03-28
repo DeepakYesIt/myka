@@ -65,10 +65,8 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
                 }
             })
 
-//        getProductsUrl
 
         initialize()
-//        productDetailsModel()
 
         return binding.root
     }
@@ -78,9 +76,9 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
             findNavController().navigateUp()
         }
 
-        binding.tvDetails.setOnClickListener{
+        /*binding.tvDetails.setOnClickListener{
             findNavController().navigate(R.id.basketIngredientsDetailsFragment)
-        }
+        }*/
 
         if (BaseApplication.isOnline(requireContext())) {
             getProductsDetailsApi()
@@ -235,13 +233,13 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
 
     override fun itemSelect(position: Int?, productId: String?, type: String?) {
 
-        if (type=="products"){
+     /*   if (type=="products"){
             if (BaseApplication.isOnline(requireContext())) {
                 getProductsSwapApi(productId)
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        }
+        }*/
 
     }
 

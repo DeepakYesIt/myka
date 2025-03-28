@@ -465,7 +465,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_medium"
-                        android:text="Bag fee"
+                        android:text="Tax"
                         android:textColor="#4A4A4A" />
 
                     <TextView
@@ -526,7 +526,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_medium"
-                        android:text="Services"
+                        android:text="Processing"
                         android:textColor="#4A4A4A" />
 
                     <TextView

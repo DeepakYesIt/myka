@@ -90,7 +90,11 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
                 }
             })
 
-        getBasketDetailsApi()
+        if (BaseApplication.isOnline(requireActivity())){
+            getBasketDetailsApi()
+        }else{
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
 
         initialize()
 
@@ -407,7 +411,7 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
     }
 
     private fun increaseIngRecipe(foodId: String?, quantity: String, item: Product?, position: Int?) {
-        BaseApplication.showMe(requireContext())
+//        BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             basketDetailsSuperMarketViewModel.basketIngIncDescUrl({
                 BaseApplication.dismissMe()

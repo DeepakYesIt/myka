@@ -94,7 +94,7 @@
                         android:textColor="@color/black"
                         android:layout_marginHorizontal="@dimen/_15sdp"
                         android:text="Not now"
-                        android:textSize="@dimen/_10sdp"/>
+                        android:textSize="@dimen/_9sdp"/>
 
                 </LinearLayout>
 
@@ -157,12 +157,12 @@
                         android:id="@+id/tvDollarNine"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingVertical="@dimen/_5sdp"
-                        android:paddingHorizontal="@dimen/_3sdp"
+                        android:paddingVertical="@dimen/_4sdp"
+                        android:paddingHorizontal="@dimen/_2sdp"
                         android:textColor="@color/light_green"
                         android:layout_marginHorizontal="@dimen/_15sdp"
                         android:text="$9"
-                        android:textSize="@dimen/_10sdp"/>
+                        android:textSize="@dimen/_11sdp"/>
 
                 </LinearLayout>
 
@@ -178,7 +178,7 @@
                     android:layout_weight="1">
 
                     <TextView
-                        android:id="@+id/tvTwentyPerc"
+                        android:id="@+id/tvTwelvePerc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="@dimen/_2sdp"
@@ -199,6 +199,7 @@
                         android:textSize="@dimen/_10sdp"/>
 
                 </LinearLayout>
+
 
                 <LinearLayout
                     android:id="@+id/llFifteenDollar"
@@ -272,15 +273,15 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginBottom="@dimen/_50sdp"
                 android:layout_marginHorizontal="@dimen/_20sdp"
-                android:background="@drawable/green_btn_background">
+                android:background="@drawable/gray_btn_unselect_background">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
+                    android:fontFamily="@font/poppins"
                     android:paddingVertical="@dimen/_10sdp"
                     android:text="Proceed and Pay"
-                    android:fontFamily="@font/poppins"
                     android:textColor="@color/white"
                     android:textSize="@dimen/_11sdp" />
 

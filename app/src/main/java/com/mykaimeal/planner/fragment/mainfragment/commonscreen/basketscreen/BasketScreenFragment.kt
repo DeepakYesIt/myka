@@ -69,8 +69,7 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
         (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
 
-        basketScreenViewModel =
-            ViewModelProvider(requireActivity())[BasketScreenViewModel::class.java]
+        basketScreenViewModel = ViewModelProvider(requireActivity())[BasketScreenViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
@@ -85,7 +84,11 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         */
 //        addressDialog()
 
-        getBasketList()
+        if (BaseApplication.isOnline(requireActivity())){
+            getBasketList()
+        }else{
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
         initialize()
 
         return binding!!.root
@@ -225,27 +228,6 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                     BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
                 }
                 binding!!.textNetTotalProduct.text=roundedNetTotal.toString()
-            }
-
-            if (data.billing.tax!=null){
-                val roundedTax = data.billing.tax.let {
-                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
-                }
-                binding!!.textTaxPrice.text= "$$roundedTax"
-            }
-
-            if (data.billing.delivery!=null){
-                val roundedDelivery = data.billing.delivery.let {
-                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
-                }
-                binding!!.textDeliveyPrice.text= "$$roundedDelivery"
-            }
-
-            if (data.billing.processing!=null){
-                val roundedProcessing = data.billing.processing.let {
-                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
-                }
-                binding!!.textProcessingAmount.text= "$roundedProcessing%"
             }
 
             if (data.billing.total!=null){
@@ -428,13 +410,13 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }else {
             if (recipeId=="Minus"){
                 if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing(type ?: "", position, "minus")
+                    removeAddIngServing(position, "minus")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }else if (recipeId=="Plus"){
                 if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing(type ?: "", position, "plus")
+                    removeAddIngServing( position, "plus")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
@@ -459,7 +441,7 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     }
 
 
-    private fun removeAddIngServing(status: String, position: Int?, type: String) {
+    private fun removeAddIngServing(position: Int?, type: String) {
         val item= position?.let { ingredientList?.get(it) }
         if (type.equals("plus",true) || type.equals("minus",true)) {
             var count = item?.sch_id
@@ -474,7 +456,7 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     }
 
     private fun increaseIngRecipe(foodId: String?, quantity: String, item: Ingredient?, position: Int?) {
-        BaseApplication.showMe(requireContext())
+//        BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             basketScreenViewModel.basketIngIncDescUrl({
                 BaseApplication.dismissMe()
@@ -506,6 +488,8 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 if (ingredientList != null) {
                     adapterIngredients.updateList(ingredientList!!)
                 }
+
+                getBasketList()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
