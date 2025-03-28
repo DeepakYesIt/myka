@@ -83,7 +83,7 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
             Log.d("TESTING_MAP", "Map is moving...")
 
             // Change marker image while dragging
-            binding!!.markerImage.setImageResource(R.drawable.marker_icon)
+            binding!!.markerImage.setImageResource(R.drawable.current_location_marker)
         }
 
         mMap.setOnCameraIdleListener {
@@ -107,6 +107,8 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
             binding!!.tvAddress.text = getAddressFromLatLng(lat, lng)
             address=getAddressFromLatLng(lat,lng)
         }
+
+
     }
 
     private fun getAddressFromLatLng(latitude: Double, longitude: Double): String? {

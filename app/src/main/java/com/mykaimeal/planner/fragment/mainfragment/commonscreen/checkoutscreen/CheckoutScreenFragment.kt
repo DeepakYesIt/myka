@@ -378,7 +378,8 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     override fun onMapReady(gmap: GoogleMap) {
         mMap = gmap
         val newYork = LatLng(40.7128, -74.0060)
-        val customMarker = bitmapDescriptorFromVector(R.drawable.marker_icon,50,50) // Change with your drawable
+        val customMarker = bitmapDescriptorFromVector(R.drawable.current_location_marker,50,50) // Change with your drawable
+//        val customMarker = bitmapDescriptorFromVector(R.drawable.marker_icon,50,50) // Change with your drawable
         mMap?.addMarker(
             MarkerOptions()
                 .position(newYork)

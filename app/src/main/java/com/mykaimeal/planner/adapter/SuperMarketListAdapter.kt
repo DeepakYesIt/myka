@@ -21,7 +21,7 @@ class SuperMarketListAdapter(
     private var storesData: MutableList<Store>?,
     private var requireActivity: FragmentActivity,
     private var onItemSelectListener: OnItemSelectListener,
-    private var pos: Int
+    pos: Int
 ) : RecyclerView.Adapter<SuperMarketListAdapter.ViewHolder>() {
 
     private var selectedPosition = pos // Default no selection

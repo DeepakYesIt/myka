@@ -10,6 +10,12 @@
     <string name="api_key">AIzaSyC9NuN_f-wESHh3kihTvpbvdrmKlTQurxw</string>
 -->
 
+
+    <string name="error_processing_places_api">Error processing Places API URL</string>
+    <string name="error_connecting_to_places_api">Error connecting to Places API</string>
+    <string name="error_cannot_process_json_results">Cannot process JSON results</string>
+    <string name="error_lib_not_initialized">Please initialize the api before using it</string>
+
     <string name="api_key">AIzaSyC9NuN_f-wESHh3kihTvpbvdrmKlTQurxw</string>
     <string name="tvDescriptions1">Get meal plans tailored to your\n preferences and goals</string>
     <string name="tvDescriptions2">Track spending and meal choices to\n reach your goals</string>
