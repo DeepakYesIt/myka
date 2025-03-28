@@ -457,7 +457,7 @@ class SignUpFragment : Fragment() {
                 allergenSelectedId,
                 dislikeSelectedId,
                 ErrorMessage.deviceType,
-                token
+                token,""
             )
         }
     }
@@ -468,6 +468,8 @@ class SignUpFragment : Fragment() {
             sessionManagement.setEmail(personEmail ?: "")
 
             sessionManagement.setUserName(signUpVerificationModelData.name ?: "")
+
+            sessionManagement.setReferralCode(signUpVerificationModelData.referral_code ?: "")
 
             if (signUpVerificationModelData.profile_img != null) {
                 sessionManagement.setImage(signUpVerificationModelData.profile_img.toString())

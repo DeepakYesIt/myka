@@ -44,12 +44,12 @@ class BodyGoalAdapter(private var datalist: List<BodyGoalModelData>, private var
             if (data.selected) {
                 // Deselect all items
                 datalist.forEach { it.selected = false }
-                onItemClickListener.itemClick(data.id, position.toString(), "false")
+                onItemClickListener.itemClick(data.id,"false" , position.toString())
                 notifyDataSetChanged()
             } else {
                 // Deselect all items
                 datalist.forEach { it.selected = false }
-                onItemClickListener.itemClick(data.id, position.toString(), "true")
+                onItemClickListener.itemClick(data.id, "true",position.toString())
                 // Select the new item
                 datalist[position].selected = true
                 notifyDataSetChanged()

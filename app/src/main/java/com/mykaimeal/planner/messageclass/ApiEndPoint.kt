@@ -101,5 +101,8 @@ object ApiEndPoint {
 
     const val recipeSwapUrl="swap"
 
+    const val basketYourRecipeIncDescUrl="add-to-basket"
+    const val basketIngIncDescUrl="change-cart"
+
 
 }

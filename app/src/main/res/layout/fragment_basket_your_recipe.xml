@@ -133,7 +133,7 @@
                 android:layout_marginStart="@dimen/_15sdp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:fontFamily="@font/poppins"
-                android:text="Tea time"
+                android:text="Brunch"
                 android:textColor="#0A2533"
                 android:textSize="@dimen/_12ssp"
                 android:textStyle="bold" />

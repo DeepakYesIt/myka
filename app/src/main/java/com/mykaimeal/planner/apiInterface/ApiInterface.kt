@@ -91,6 +91,7 @@ interface ApiInterface {
         @Field("dislike_ingredients_id[]") dislikeIngredientsId: List<String>?,
         @Field("device_type") deviceType: String?,
         @Field("fcm_token") fcmToken: String?,
+        @Field("referral_from") referralFrom: String?
     ): Response<JsonObject>
 
     @FormUrlEncoded
@@ -121,6 +122,7 @@ interface ApiInterface {
         @Field("dislike_ingredients_id[]") dislikeIngredientsId: List<String>?,
         @Field("device_type") deviceType: String?,
         @Field("fcm_token") fcmToken: String?,
+        @Field("referral_from") referralFrom: String?
     ): Response<JsonObject>
 
     @FormUrlEncoded
@@ -586,7 +588,6 @@ interface ApiInterface {
     ): Response<JsonObject>
 
 
-    @FormUrlEncoded
     @POST(ApiEndPoint.updateMealUrl)
     suspend fun updateMealUrl(@Body jsonObject: JsonObject): Response<JsonObject>
 
@@ -678,6 +679,14 @@ interface ApiInterface {
     @FormUrlEncoded
     @POST(ApiEndPoint.recipeSwapUrl)
     suspend fun recipeSwapUrl(@Field("id") id:String?,@Field("uri") uri:String?): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.basketYourRecipeIncDescUrl)
+    suspend fun basketYourRecipeIncDescUrl(@Field("uri") uri:String?,@Field("quantity") quantity:String?): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.basketIngIncDescUrl)
+    suspend fun basketIngIncDescUrl(@Field("food_id") foodId:String?,@Field("quantity") quantity:String?): Response<JsonObject>
 
     @FormUrlEncoded
     @POST(ApiEndPoint.addCardMealMeUrl)

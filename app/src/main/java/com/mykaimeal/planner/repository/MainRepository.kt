@@ -25,7 +25,8 @@ interface MainRepository {
                           bodyGoal:String?,cookingFrequency:String?,eatingOut: String?, takeAway:String?,takeWayName:String?,cookingForType:String?,
                           partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?, familyMemberAge:String?,
                           childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?, dietaryid:List<String>?,
-                          favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?)
+                          favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?,
+                          referralFrom:String?)
 
     suspend fun forgotPassword(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String)
     suspend fun resendSignUpModel(successCallback: (response: NetworkResult<String>) -> Unit,emailOrPhone: String)
@@ -42,7 +43,7 @@ interface MainRepository {
                             userGender:String?,bodyGoal:String?,cookingFrequency:String?,eatingOut:String?,takeAway:String?,takeWayName:String?,cookingForType:String?,
                             partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?, familyMemberAge:String?,
                             childFriendlyMeals:String?,mealRoutineId:List<String>?,spendingAmount:String?,duration:String?, dietaryid:List<String>?,
-                            favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?)
+                            favourite:List<String>?, allergies:List<String>?,dislikeIngredients:List<String>?,deviceType:String?,fcmToken:String?,referralFrom:String?)
     suspend fun updateLocation(successCallback: (response: NetworkResult<String>) -> Unit,locationStatus: String)
 
     suspend fun updateNotification(successCallback: (response: NetworkResult<String>) -> Unit,notificationStatus: String)
@@ -218,6 +219,8 @@ interface MainRepository {
 
     suspend fun removeMealApi(successCallback: (response: NetworkResult<String>) -> Unit, cookedId:String?)
     suspend fun removeBasketUrlApi(successCallback: (response: NetworkResult<String>) -> Unit, recipeId:String?)
+    suspend fun basketYourRecipeIncDescUrl(successCallback: (response: NetworkResult<String>) -> Unit, uri:String?,quantity:String?)
+    suspend fun basketIngIncDescUrl(successCallback: (response: NetworkResult<String>) -> Unit, foodId:String?,quantity:String?)
     suspend fun getMealByUrl(successCallback: (response: NetworkResult<String>) -> Unit, q:String?)
     suspend fun updatePreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit, userName: String?,cookingForType: String?,
                                      userGender:String?,bodyGoal:String?,partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?,

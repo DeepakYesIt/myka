@@ -33,7 +33,8 @@ class VerificationViewModel @Inject constructor(private val repository: MainRepo
         dietaryid: List<String>?,favourite:List<String>?, allergies:List<String>?,
         dislikeIngredients: List<String>?,
         deviceType: String?,
-        fcmToken: String?
+        fcmToken: String?,
+        referralFrom: String?
     ) {
         repository.otpVerify(
             { successCallback(it) },
@@ -59,7 +60,8 @@ class VerificationViewModel @Inject constructor(private val repository: MainRepo
             allergies,
             dislikeIngredients,
             deviceType,
-            fcmToken
+            fcmToken,
+            referralFrom
         )
     }
 
@@ -75,5 +77,6 @@ class VerificationViewModel @Inject constructor(private val repository: MainRepo
     suspend fun resendSignUpModel(successCallback: (response: NetworkResult<String>) -> Unit, emailOrPhone: String){
         repository.resendSignUpModel({ successCallback(it) }, emailOrPhone)
     }
+
 
 }

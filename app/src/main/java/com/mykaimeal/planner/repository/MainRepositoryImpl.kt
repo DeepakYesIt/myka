@@ -282,7 +282,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         allergies: List<String>?,
         dislikeIngredients: List<String>?,
         deviceType: String?,
-        fcmToken: String?
+        fcmToken: String?,
+        referralFrom: String?
     ) {
         try {
             api.otpVerify(
@@ -310,7 +311,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                 allergies,
                 dislikeIngredients,
                 deviceType,
-                fcmToken
+                fcmToken,referralFrom
             ).apply {
                 if (isSuccessful) {
                     body()?.let {
@@ -476,7 +477,8 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         allergies: List<String>?,
         dislikeIngredients: List<String>?,
         deviceType: String?,
-        fcmToken: String?
+        fcmToken: String?,
+        referralFrom: String?
     ) {
         try {
             api.socialLogin(
@@ -504,7 +506,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                 allergies,
                 dislikeIngredients,
                 deviceType,
-                fcmToken
+                fcmToken,referralFrom
             ).apply {
                 if (isSuccessful) {
                     body()?.let {
@@ -1421,7 +1423,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
                     successCallback(NetworkResult.Error(errorBody().toString()))
                 }
             }
-        } catch (e: Exception) {
+        } catch (e:  Exception) {
             successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
@@ -2204,6 +2206,44 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
     ) {
         try {
             api.recipeSwapUrl(id,uri).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun basketYourRecipeIncDescUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,uri:String?,quantity:String?
+    ) {
+        try {
+            api.basketYourRecipeIncDescUrl(uri,quantity).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun basketIngIncDescUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,foodID:String?,quantity:String?
+    ) {
+        try {
+            api.basketIngIncDescUrl(foodID,quantity).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

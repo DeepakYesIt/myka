@@ -178,6 +178,16 @@ class SessionManagement(var context: Context) {
         return pref?.getString(AppConstant.PartnerName, "")
     }
 
+
+    fun setReferralCode(referralCode: String) {
+        editor!!.putString(AppConstant.ReferralCode, referralCode)
+        editor!!.commit()
+    }
+
+    fun getReferralCode(): String? {
+        return pref?.getString(AppConstant.ReferralCode, "")
+    }
+
     fun setPartnerAge(partnerAge: String) {
         editor!!.putString(AppConstant.PartnerAge, partnerAge)
         editor!!.commit()

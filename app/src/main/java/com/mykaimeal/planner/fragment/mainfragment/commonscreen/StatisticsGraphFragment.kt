@@ -174,10 +174,12 @@ class StatisticsGraphFragment : Fragment() {
         val currentCampaign = "user_invite"
         val currentChannel = "mobile_share"
         val currentReferrerId = sessionManagement.getId().toString()
+        val userReferralCode = sessionManagement.getReferralCode().toString()
 
         // Ensure the generated URL has the right structure
         val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity())
         linkGenerator.addParameter("deep_link_sub2", currentReferrerId)
+        linkGenerator.addParameter("deep_link_sub3", userReferralCode)
         linkGenerator.campaign = currentCampaign
         linkGenerator.channel = currentChannel
 

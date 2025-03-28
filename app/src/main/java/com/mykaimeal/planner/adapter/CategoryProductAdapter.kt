@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -20,7 +21,7 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssup
 
 class CategoryProductAdapter(
     private var requireActivity: FragmentActivity,
-    private val products: MutableList<Product>?,
+    private var products: MutableList<Product>,
     private var onItemSelectListener: OnItemSelectUnSelectListener
 ) : RecyclerView.Adapter<CategoryProductAdapter.ProductViewHolder>() {
 
@@ -32,17 +33,22 @@ class CategoryProductAdapter(
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
-        holder.bind(products!![position])
+        holder.bind(products[position])
     }
 
-    override fun getItemCount(): Int = products!!.size
+    override fun getItemCount(): Int = products.size
+    fun updateList(productss: MutableList<Product>) {
+        products=productss
+        notifyDataSetChanged()
+
+    }
 
     inner class ProductViewHolder(private val binding: ItemSectionHeaderBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: Product) {
 
-            if (product.name != null || product.sch_id != null) {
+            if (product.name != null) {
                 binding.textProductName.text = product.name
             }
 
@@ -106,15 +112,21 @@ class CategoryProductAdapter(
 
             // Implement quantity controls
             binding.imageDecreaseQuantity.setOnClickListener {
+                if (product.sch_id.toString().toInt() > 1) {
+                    onItemSelectListener.itemSelectUnSelect(position,"Minus","Product",position)
+                }else{
+                    Toast.makeText(requireActivity,"Minimum serving at least value is one", Toast.LENGTH_LONG).show()
+                }
                 // Decrease quantity logic
             }
             binding.imageIncreaseQuantity.setOnClickListener {
                 // Increase quantity logic
+                if (product.sch_id.toString().toInt() < 1000) {
+                    onItemSelectListener.itemSelectUnSelect(position,"Plus","Product", position)
+                }
             }
 
             binding.imageSwap.setOnClickListener {
-
-
                 onItemSelectListener.itemSelectUnSelect(product.id,product.name.toString(),"Product", position)
               /*  onItemSelectListener.itemSelect(
                     product.id,

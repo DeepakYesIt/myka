@@ -46,8 +46,10 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssup
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.model.BasketDetailsSuperMarketModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.model.Product
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.viewmodel.BasketDetailsSuperMarketViewModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Store
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import com.mykaimeal.planner.model.DataModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,7 +68,6 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
     private var rcvBottomDialog: RecyclerView? = null
     private var products:MutableList<Product>?=null
     private lateinit var basketDetailsSuperMarketViewModel: BasketDetailsSuperMarketViewModel
-
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private var latitude = "0.0"
     private var longitude = "0.0"
@@ -78,9 +79,7 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
         // Inflate the layout for this fragment
         binding = FragmentBasketDetailSuperMarketBinding.inflate(layoutInflater, container, false)
 
-        basketDetailsSuperMarketViewModel =
-            ViewModelProvider(requireActivity())[BasketDetailsSuperMarketViewModel::class.java]
-
+        basketDetailsSuperMarketViewModel = ViewModelProvider(requireActivity())[BasketDetailsSuperMarketViewModel::class.java]
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -365,18 +364,92 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
     override fun itemSelectUnSelect(id: Int?, status: String?, type: String?, position: Int?) {
 
         if (type=="Product"){
-            val mainId:String= products!![position!!].id.toString()
-            val productId:String= products!![position].pro_id.toString()
-            val productName:String= products!![position].pro_name.toString()
-            val bundle = Bundle().apply {
-                putString("id",mainId)
-                putString("SwapProId",productId)
-                putString("SwapProName",productName)
+            if (status=="Plus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddIngServing(position, "plus")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }else if (status=="Minus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddIngServing(position, "minus")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            } else{
+                val mainId:String= products!![position!!].id.toString()
+                val productId:String= products!![position].pro_id.toString()
+                val productName:String= products!![position].pro_name.toString()
+                val bundle = Bundle().apply {
+                    putString("id",mainId)
+                    putString("SwapProId",productId)
+                    putString("SwapProName",productName)
+                }
+                findNavController().navigate(R.id.basketProductDetailsFragment,bundle)
             }
-            findNavController().navigate(R.id.basketProductDetailsFragment,bundle)
         }else{
             bottomSheetDialog!!.dismiss()
         }
-
     }
+
+    private fun removeAddIngServing(position: Int?, type: String) {
+        val item= position?.let { products?.get(it) }
+        if (type.equals("plus",true) || type.equals("minus",true)) {
+            var count = item?.sch_id
+            val foodId= item?.food_id
+            count = when (type.lowercase()) {
+                "plus" -> count!! + 1
+                "minus" -> count!! - 1
+                else -> count // No change if `apiType` doesn't match
+            }
+            increaseIngRecipe(foodId,count.toString(),item,position)
+        }
+    }
+
+    private fun increaseIngRecipe(foodId: String?, quantity: String, item: Product?, position: Int?) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            basketDetailsSuperMarketViewModel.basketIngIncDescUrl({
+                BaseApplication.dismissMe()
+                handleApiIngResponse(it,item,quantity,position)
+            },foodId,quantity)
+        }
+    }
+
+    private fun handleApiIngResponse(result: NetworkResult<String>, item: Product?, quantity: String, position: Int?) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessIngResponse(result.data.toString(),item,quantity,position)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessIngResponse(data: String, item: Product?, quantity: String, position: Int?) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                // Toggle the is_like value
+                item?.sch_id = quantity.toInt()
+                if (item!= null) {
+                    products?.set(position!!, item)
+                }
+                // Update the adapter
+                if (products != null) {
+                    itemSectionAdapter.updateList(products!!)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+
 }

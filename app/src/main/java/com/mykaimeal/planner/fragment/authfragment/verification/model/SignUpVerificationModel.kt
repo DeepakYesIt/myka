@@ -40,7 +40,7 @@ data class SignUpVerificationModelData(
     val phone_number: Any,
     val profile_img: String?,
     val protien: Any,
-    val referral_code: Any,
+    val referral_code: String,
     val referrals: Any,
     val social_id: Any,
     val social_type: Any,

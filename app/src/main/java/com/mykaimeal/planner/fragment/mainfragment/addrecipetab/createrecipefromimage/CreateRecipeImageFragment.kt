@@ -169,8 +169,11 @@ class CreateRecipeImageFragment : Fragment() {
         // Pass your API key (this is just for demonstration, don't hardcode your API key)
         val apiKey = "AIzaSyB1WtrB2oHQmyIX1ZpaXzbI9kOA2FlkCXk"*/
 
+        /////old api key
+//        val apiKey = "AIzaSyDBGkONqxKXls4kQ9DlyZmfjvuUKbDUHUw"
+
         /////new api key
-        val apiKey = "AIzaSyDBGkONqxKXls4kQ9DlyZmfjvuUKbDUHUw"
+        val apiKey = "AIzaSyCjOLbQCG6foFlN05JOFKBpjNqV8DE9vi8"
 
         val call = visionApiService.annotateImage(apiKey, visionRequest)
         call.enqueue(object : retrofit2.Callback<VisionResponse> {

@@ -28,6 +28,7 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/no_image"
                 app:shapeAppearanceOverlay="@style/CornerCut" />
+
             <include
                 android:id="@+id/lay_progess"
                 layout="@layout/progess_loader"
@@ -50,7 +51,9 @@
                 android:layout_alignParentEnd="true"
                 android:layout_margin="@dimen/_6sdp"
                 android:src="@drawable/heart_red_icon" />
+
         </RelativeLayout>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -58,12 +61,11 @@
             <TextView
                 android:id="@+id/tvBreakfast"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_30sdp"
                 android:fontFamily="@font/montserrat_semibold"
                 android:text=""
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_marginEnd="@dimen/_5sdp"
-                android:singleLine="true"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true"
                 android:textSize="@dimen/_10sdp" />

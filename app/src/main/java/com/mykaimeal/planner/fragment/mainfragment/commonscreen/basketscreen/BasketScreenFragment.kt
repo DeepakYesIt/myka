@@ -35,9 +35,10 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.mod
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.BasketScreenModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.GetAddressListModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.GetAddressListModelData
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Recipes
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.viewmodel.BasketScreenViewModel
-import com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.CookedTabModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -55,6 +56,7 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private lateinit var basketScreenViewModel: BasketScreenViewModel
     private var rcySavedAddress: RecyclerView? = null
     private var recipe: MutableList<Recipes>?=null
+    private var ingredientList: MutableList<Ingredient>?=null
     private var storeUid:String?=""
 
     override fun onCreateView(
@@ -272,6 +274,7 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         if (data.ingredient != null && data.ingredient.size > 0) {
+            ingredientList=data.ingredient
             binding!!.rlIngredients.visibility=View.VISIBLE
             adapterIngredients = IngredientsAdapter(data.ingredient, requireActivity(), this)
             binding!!.rcvIngredients.adapter = adapterIngredients
@@ -355,52 +358,211 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
     }
 
-
     private fun removeBasketRecipeApi(recipeId: String, dialogRemoveDay: Dialog,position:Int?) {
-        BaseApplication.showMe(requireActivity())
+        BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             basketScreenViewModel.removeBasketUrlApi({
                 BaseApplication.dismissMe()
-                when (it) {
-                    is NetworkResult.Success -> {
-                        val gson = Gson()
-                        val cookedModel = gson.fromJson(it.data, CookedTabModel::class.java)
-                        if (cookedModel.code == 200 && cookedModel.success) {
-                            if (recipe!=null){
-                                recipe!!.removeAt(position!!)
-                            }
-                            dialogRemoveDay.dismiss()
-                        } else {
-                            if (cookedModel.code == ErrorMessage.code) {
-                                showAlert(cookedModel.message, true)
-                            } else {
-                                showAlert(cookedModel.message, false)
-                            }
-                        }
-                    }
-
-                    is NetworkResult.Error -> {
-                        showAlert(it.message, false)
-                    }
-
-                    else -> {
-                        showAlert(it.message, false)
-                    }
-                }
-            }, recipeId)
+                handleApiRemoveBasketResponse(it,position,dialogRemoveDay)
+            },recipeId)
         }
     }
+
+    private fun handleApiRemoveBasketResponse(result: NetworkResult<String>,position:Int?,dialogRemoveDay: Dialog) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessRemoveBasketResponse(result.data.toString(),position,dialogRemoveDay)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessRemoveBasketResponse(data: String,position:Int?,dialogRemoveDay: Dialog) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                dialogRemoveDay.dismiss()
+                if (recipe!=null){
+                    recipe!!.removeAt(position!!)
+                }
+
+                // Update the adapter
+                if (recipe != null) {
+                    adapterRecipe?.updateList(recipe)
+                }
+
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
 
     override fun itemSelect(position: Int?, recipeId: String?, type: String?) {
 
         if (type=="YourRecipe"){
-            removeRecipeBasketDialog(recipeId,position)
+            if (recipeId=="Minus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddRecipeServing(position, "minus")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }else if (recipeId=="Plus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddRecipeServing(position, "plus")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }else{
+                removeRecipeBasketDialog(recipeId,position)
+            }
         }else if (type=="SuperMarket"){
             storeUid=recipeId
+        }else {
+            if (recipeId=="Minus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddIngServing(type ?: "", position, "minus")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }else if (recipeId=="Plus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddIngServing(type ?: "", position, "plus")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
         }
         /*findNavController().navigate(R.id.basketDetailSuperMarketFragment)*/
 
     }
+
+    private fun removeAddRecipeServing(position: Int?, type: String) {
+        val item= position?.let { recipe?.get(it) }
+        if (type.equals("plus",true) || type.equals("minus",true)) {
+            var count = item?.serving?.toInt()
+            val uri= item?.uri
+            count = when (type.lowercase()) {
+                "plus" -> count!! + 1
+                "minus" -> count!! - 1
+                else -> count // No change if `apiType` doesn't match
+            }
+            increaseQuantityRecipe(uri,count.toString(),item,position)
+        }
+    }
+
+
+    private fun removeAddIngServing(status: String, position: Int?, type: String) {
+        val item= position?.let { ingredientList?.get(it) }
+        if (type.equals("plus",true) || type.equals("minus",true)) {
+            var count = item?.sch_id
+            val foodId= item?.food_id
+            count = when (type.lowercase()) {
+                "plus" -> count!! + 1
+                "minus" -> count!! - 1
+                else -> count // No change if `apiType` doesn't match
+            }
+            increaseIngRecipe(foodId,count.toString(),item,position)
+        }
+    }
+
+    private fun increaseIngRecipe(foodId: String?, quantity: String, item: Ingredient?, position: Int?) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            basketScreenViewModel.basketIngIncDescUrl({
+                BaseApplication.dismissMe()
+                handleApiIngResponse(it,item,quantity,position)
+            },foodId,quantity)
+        }
+    }
+
+    private fun handleApiIngResponse(result: NetworkResult<String>, item: Ingredient?, quantity: String, position: Int?) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessIngResponse(result.data.toString(),item,quantity,position)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessIngResponse(data: String, item: Ingredient?, quantity: String, position: Int?) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                // Toggle the is_like value
+                item?.sch_id = quantity.toInt()
+                if (item!= null) {
+                    ingredientList?.set(position!!, item)
+                }
+                // Update the adapter
+                if (ingredientList != null) {
+                    adapterIngredients.updateList(ingredientList!!)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun increaseQuantityRecipe(uri: String?, quantity: String, item: Recipes?, position: Int?) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            basketScreenViewModel.basketYourRecipeIncDescUrl({
+                BaseApplication.dismissMe()
+                handleApiQuantityResponse(it,item,quantity,position)
+            },uri,quantity)
+        }
+    }
+
+    private fun handleApiQuantityResponse(result: NetworkResult<String>, item: Recipes?, quantity: String, position: Int?) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessQuantityResponse(result.data.toString(),item,quantity,position)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessQuantityResponse(data: String, item: Recipes?, quantity: String, position: Int?) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                // Toggle the is_like value
+                item?.serving = quantity.toInt().toString()
+                if (item != null) {
+                    recipe?.set(position!!, item)
+                }
+                // Update the adapter
+                if (recipe != null) {
+                    adapterRecipe?.updateList(recipe)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
 
     override fun itemClicked(position: Int?, list: MutableList<String>?, status: String?, type: String?) {
 

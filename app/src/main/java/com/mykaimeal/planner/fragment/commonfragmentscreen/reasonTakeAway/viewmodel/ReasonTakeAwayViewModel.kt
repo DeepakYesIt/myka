@@ -46,7 +46,4 @@ class ReasonTakeAwayViewModel @Inject constructor(private val repository: MainRe
             cookingFrequency, spendingAmount, duration, eatingOut, takeWay,takeWayName)
     }
 
-
-
-
 }

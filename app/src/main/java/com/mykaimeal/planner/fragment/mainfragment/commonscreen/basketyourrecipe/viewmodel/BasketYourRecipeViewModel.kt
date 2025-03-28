@@ -14,8 +14,14 @@ class BasketYourRecipeViewModel @Inject constructor(private val repository: Main
     }
 
     suspend fun removeBasketUrlApi(successCallback: (response: NetworkResult<String>) -> Unit,
-                                   cookedId: String){
+                                   cookedId: String?){
         repository.removeBasketUrlApi({ successCallback(it) },cookedId)
+    }
+
+
+    suspend fun basketYourRecipeIncDescUrl(successCallback: (response: NetworkResult<String>) -> Unit,
+                                           uri: String?,quantity:String?){
+        repository.basketYourRecipeIncDescUrl({ successCallback(it) },uri, quantity)
     }
 
 }

@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.mainfragment.profilesetting.subscriptionplan
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,10 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
@@ -24,9 +29,11 @@ import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
+import com.mykaimeal.planner.adapter.OnboardingAdapter
 import com.mykaimeal.planner.basedata.AppConstant
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.databinding.FragmentSubscriptionPlanOverViewBinding
+import com.mykaimeal.planner.model.OnboardingItem
 import com.mykaimeal.planner.model.SubscriptionModel
 import java.util.Arrays
 import java.util.concurrent.Executors
@@ -40,6 +47,9 @@ class SubscriptionPlanOverViewFragment : Fragment() {
     private var premiumAnnual = ""
     private var premiumWeekly = ""
     private val rootPlanList: MutableList<SubscriptionModel> = mutableListOf()
+
+    var datalist : ArrayList<OnboardingItem> = arrayListOf()
+    private var adapters:OnboardingAdapter?=null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,9 +67,57 @@ class SubscriptionPlanOverViewFragment : Fragment() {
             }
         })
 
+        adapters = OnboardingAdapter(datalist)
+        binding!!.viewpager.adapter = adapters
+        binding!!.viewpager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+
         initialize()
 
+        /// set indicator for onboarding
+        setUpOnBoardingIndicator()
+        /// set current indicator position
+        currentOnBoardingIndicator(0)
+
         return binding!!.root
+    }
+
+    private fun setUpOnBoardingIndicator() {
+        val indicator = arrayOfNulls<ImageView>(5)
+        val layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        layoutParams.setMargins(0, 0, 0, 0)
+        for (i in 0 until indicator.size) {
+            val img = ImageView(requireContext())
+            img.setImageDrawable(this.let {
+                ContextCompat.getDrawable(requireContext(), R.drawable.indicator_inactive)
+            })
+            img.layoutParams = layoutParams
+            binding!!.layOnboardingIndicator.addView(img)
+        }
+    }
+
+    private fun currentOnBoardingIndicator(index: Int) {
+        val childCount: Int = binding!!.layOnboardingIndicator.childCount
+        for (i in 0 until childCount) {
+            val imageView = binding!!.layOnboardingIndicator.getChildAt(i) as ImageView
+            if (i == index) {
+                imageView.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireActivity(),
+                        R.drawable.subs_indicator_active
+                    )
+                )
+            } else {
+                imageView.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireActivity(),
+                        R.drawable.subs_indicator_inactive
+                    )
+                )
+            }
+        }
     }
 
     private fun initialize() {
@@ -67,6 +125,20 @@ class SubscriptionPlanOverViewFragment : Fragment() {
         binding!!.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()
         }
+
+        // List of onboarding items
+        datalist.add(OnboardingItem(R.drawable.subscription_onboarding_1))
+
+        datalist.add(OnboardingItem(R.drawable.subscription_onboarding_2))
+
+        datalist.add(OnboardingItem(R.drawable.subscription_onboarding_3))
+
+        datalist.add(OnboardingItem(R.drawable.subscription_onboarding_4))
+
+        datalist.add(OnboardingItem(R.drawable.subscription_onboarding_5))
+
+        viewPagerFunctionImpl()
+
         startBillingApi()
 
         binding!!.textSeeAllButton.setOnClickListener {
@@ -88,6 +160,48 @@ class SubscriptionPlanOverViewFragment : Fragment() {
             })
             binding!!.llSubPlans.startAnimation(slideUp)
         }
+    }
+
+    private fun viewPagerFunctionImpl() {
+
+        /// set view pager position and value
+        binding!!.viewpager.registerOnPageChangeCallback(object :
+            ViewPager2.OnPageChangeCallback() {
+            @SuppressLint("SetTextI18n")
+
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                if (position == 0) {
+                    binding!!.tvHeadingTitle.text = "Save Time, Save Money Eat Better"
+                    binding!!.tvDescriptions.text = "Kai plans your meals, Compares store prices, And creates your cart so you don’t have to."
+                    binding!!.tvDescriptions2.text = ""
+                    binding!!.tvDescriptions2.visibility=View.INVISIBLE
+                } else if (position == 1) {
+                    binding!!.tvHeadingTitle.text = "Endless Meals to Explore"
+                    binding!!.tvDescriptions.text = "Kai gives you access to over 80,000 recipes"
+                    binding!!.tvDescriptions2.text = ""
+                    binding!!.tvDescriptions2.visibility=View.INVISIBLE
+                } else if (position==2) {
+                    binding!!.tvDescriptions2.visibility=View.VISIBLE
+                    binding!!.tvHeadingTitle.text = "Eat Smart, Every Day"
+                    binding!!.tvDescriptions.text = "Kai helps you plan your week with recipes tailored to your preferences"
+                    binding!!.tvDescriptions2.text = "Stay on top of your nutrition with Kai’s daily nutrition tracker"
+
+                }else if (position==3){
+                    binding!!.tvDescriptions2.visibility=View.VISIBLE
+                    binding!!.tvHeadingTitle.text = "Maximum Savings, Zero Hassle"
+                    binding!!.tvDescriptions.text = "One tap, and all your weekly ingredients are in your cart"
+                    binding!!.tvDescriptions2.text = "Compare grocery prices at nearby stores & have them delivered  right to your door"
+                }else{
+                    binding!!.tvDescriptions2.visibility=View.VISIBLE
+                    binding!!.tvHeadingTitle.text = "Show Me the Money!"
+                    binding!!.tvDescriptions.text = "Users save an average of \$64 a week that’s an amazing \$256* a month!"
+                    binding!!.tvDescriptions2.text = "With Kai, smart choices aren't just smart. They’re money in the bank"
+                }
+
+                currentOnBoardingIndicator(position)
+            }
+        })
     }
 
     private fun startBillingApi() {

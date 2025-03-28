@@ -28,11 +28,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
+class DropOffOptionsScreenFragment : Fragment(), View.OnClickListener {
 
     private var binding: FragmentDropOffOptionsScreenBinding? = null
     private lateinit var dropOffOptionsScreenViewModel: DropOffOptionsScreenViewModel
-    private var status:String?=null
+    private var clickedstatus: String? = "Meet at my door"
     private lateinit var commonWorkUtils: CommonWorkUtils
 
     override fun onCreateView(
@@ -42,7 +42,8 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
         // Inflate the layout for this fragment
         binding = FragmentDropOffOptionsScreenBinding.inflate(layoutInflater, container, false)
 
-        dropOffOptionsScreenViewModel = ViewModelProvider(requireActivity())[DropOffOptionsScreenViewModel::class.java]
+        dropOffOptionsScreenViewModel =
+            ViewModelProvider(requireActivity())[DropOffOptionsScreenViewModel::class.java]
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
 
@@ -95,11 +96,11 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success == true) {
 
-                if (apiModel.description!=null){
+                if (apiModel.description != null) {
                     binding!!.edtInstructions.setText(apiModel.description.toString())
                 }
 
-                if (apiModel.data != null && apiModel.data.size>0) {
+                if (apiModel.data != null && apiModel.data.size > 0) {
                     showDataNotesUI(apiModel.data)
                 }
             } else {
@@ -116,13 +117,13 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
 
     private fun showDataNotesUI(data: MutableList<GetDropOffOptionsModelData>?) {
 
-        if (data!![0].name!=null){
-            binding!!.tvMeetAtDoor.text=data[0].name
+        if (data!![0].name != null) {
+            binding!!.tvMeetAtDoor.text = data[0].name
         }
 
-        if (data!![0].status!=null){
-            if (data[0].status==1){
-                status="Meet at my door"
+        if (data!![0].status != null) {
+            if (data[0].status == 1) {
+                clickedstatus = "Meet at my door"
                 binding!!.tvMeetAtDoor.setTextColor(Color.parseColor("#000000"))
                 binding!!.tvMeetAtDoor.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.BOLD)
                 binding!!.imgMeetDoor.setImageResource(R.drawable.radio_green_icon)
@@ -132,13 +133,13 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
             }
         }
 
-        if (data!![1].name!=null){
-            binding!!.tvMeetOutside.text=data[1].name
+        if (data!![1].name != null) {
+            binding!!.tvMeetOutside.text = data[1].name
         }
 
-        if (data!![1].status!=null){
-            if (data[1].status==1){
-                status="Meet outside"
+        if (data!![1].status != null) {
+            if (data[1].status == 1) {
+                clickedstatus = "Meet outside"
                 binding!!.tvMeetOutside.setTextColor(Color.parseColor("#000000"))
                 binding!!.tvMeetOutside.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.BOLD)
                 binding!!.imgMeetOutside.setImageResource(R.drawable.radio_green_icon)
@@ -148,15 +149,18 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
             }
         }
 
-        if (data!![2].name!=null){
-            binding!!.tvMeetReception.text=data[2].name
+        if (data!![2].name != null) {
+            binding!!.tvMeetReception.text = data[2].name
         }
 
-        if (data!![2].status!=null){
-            if (data[2].status==1){
-                status="Meet at reception"
+        if (data!![2].status != null) {
+            if (data[2].status == 1) {
+                clickedstatus = "Meet at reception"
                 binding!!.tvMeetReception.setTextColor(Color.parseColor("#000000"))
-                binding!!.tvMeetReception.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.BOLD)
+                binding!!.tvMeetReception.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.BOLD
+                )
                 binding!!.imgMeetReception.setImageResource(R.drawable.radio_green_icon)
 
                 binding!!.relMeetHandMe.setBackgroundResource(R.drawable.outline_green_border_white_bg)
@@ -164,13 +168,13 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
             }
         }
 
-        if (data!![3].name!=null){
-            binding!!.tvLeaveAtDoor.text=data[3].name
+        if (data!![3].name != null) {
+            binding!!.tvLeaveAtDoor.text = data[3].name
         }
 
-        if (data!![3].status!=null){
-            if (data[3].status==1){
-                status="Leave at my door"
+        if (data!![3].status != null) {
+            if (data[3].status == 1) {
+                clickedstatus = "Leave at my door"
                 binding!!.tvLeaveAtDoor.setTextColor(Color.parseColor("#000000"))
                 binding!!.tvLeaveAtDoor.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.BOLD)
                 binding!!.imgLeaveAtDoor.setImageResource(R.drawable.radio_green_icon)
@@ -180,15 +184,18 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
             }
         }
 
-        if (data!![4].name!=null){
-            binding!!.tvLeaveReception.text=data[4].name
+        if (data!![4].name != null) {
+            binding!!.tvLeaveReception.text = data[4].name
         }
 
-        if (data!![4].status!=null){
-            if (data[4].status==1){
-                status="Leave at reception"
+        if (data!![4].status != null) {
+            if (data[4].status == 1) {
+                clickedstatus = "Leave at reception"
                 binding!!.tvLeaveReception.setTextColor(Color.parseColor("#000000"))
-                binding!!.tvLeaveReception.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.BOLD)
+                binding!!.tvLeaveReception.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.BOLD
+                )
                 binding!!.imgLeaveReception.setImageResource(R.drawable.radio_green_icon)
 
                 binding!!.relMeetHandMe.setBackgroundResource(R.drawable.rectangular_shape_green_bg)
@@ -212,24 +219,28 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
     }
 
     override fun onClick(item: View?) {
-        when(item!!.id){
+        when (item!!.id) {
 
-            R.id.relBack->{
+            R.id.relBack -> {
                 findNavController().navigateUp()
             }
 
-            R.id.rlUpdate->{
+            R.id.rlUpdate -> {
                 if (validate()) {
                     if (BaseApplication.isOnline(requireActivity())) {
                         addNotesUrl()
                     } else {
-                        BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                        BaseApplication.alertError(
+                            requireContext(),
+                            ErrorMessage.networkError,
+                            false
+                        )
                     }
                 }
             }
 
-            R.id.relMeetDoor->{
-                status="Meet at my door"
+            R.id.relMeetDoor -> {
+                clickedstatus = "Meet at my door"
                 binding!!.relMeetHandMe.setBackgroundResource(R.drawable.outline_green_border_white_bg)
                 binding!!.relLeaveDoorOpt.setBackgroundResource(R.drawable.rectangular_shape_green_bg)
                 binding!!.tvMeetAtDoor.setTextColor(Color.parseColor("#000000"))
@@ -237,24 +248,36 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
                 binding!!.imgMeetDoor.setImageResource(R.drawable.radio_green_icon)
 
                 binding!!.tvMeetOutside.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvMeetOutside.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvMeetOutside.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgMeetOutside.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvMeetReception.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvMeetReception.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvMeetReception.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgMeetReception.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvLeaveAtDoor.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvLeaveAtDoor.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvLeaveAtDoor.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgLeaveAtDoor.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvLeaveReception.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvLeaveReception.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvLeaveReception.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgLeaveReception.setImageResource(R.drawable.radio_uncheck_gray_icon)
             }
 
-            R.id.relMeetOutSide-> {
-                status="Meet outside"
+            R.id.relMeetOutSide -> {
+                clickedstatus = "Meet outside"
                 binding!!.relMeetHandMe.setBackgroundResource(R.drawable.outline_green_border_white_bg)
                 binding!!.relLeaveDoorOpt.setBackgroundResource(R.drawable.rectangular_shape_green_bg)
 
@@ -267,20 +290,29 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
                 binding!!.imgMeetOutside.setImageResource(R.drawable.radio_green_icon)
 
                 binding!!.tvMeetReception.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvMeetReception.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvMeetReception.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgMeetReception.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvLeaveAtDoor.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvLeaveAtDoor.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvLeaveAtDoor.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgLeaveAtDoor.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvLeaveReception.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvLeaveReception.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvLeaveReception.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgLeaveReception.setImageResource(R.drawable.radio_uncheck_gray_icon)
             }
 
-            R.id.relMeetReception-> {
-                status="Meet at reception"
+            R.id.relMeetReception -> {
+                clickedstatus = "Meet at reception"
                 binding!!.relMeetHandMe.setBackgroundResource(R.drawable.outline_green_border_white_bg)
                 binding!!.relLeaveDoorOpt.setBackgroundResource(R.drawable.rectangular_shape_green_bg)
 
@@ -289,24 +321,36 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
                 binding!!.imgMeetDoor.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvMeetOutside.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvMeetOutside.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvMeetOutside.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgMeetOutside.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvMeetReception.setTextColor(Color.parseColor("#000000"))
-                binding!!.tvMeetReception.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.BOLD)
+                binding!!.tvMeetReception.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.BOLD
+                )
                 binding!!.imgMeetReception.setImageResource(R.drawable.radio_green_icon)
 
                 binding!!.tvLeaveAtDoor.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvLeaveAtDoor.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvLeaveAtDoor.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgLeaveAtDoor.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvLeaveReception.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvLeaveReception.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvLeaveReception.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgLeaveReception.setImageResource(R.drawable.radio_uncheck_gray_icon)
             }
 
-            R.id.relLeaveDoor->{
-                status="Leave at my door"
+            R.id.relLeaveDoor -> {
+                clickedstatus = "Leave at my door"
                 binding!!.relMeetHandMe.setBackgroundResource(R.drawable.rectangular_shape_green_bg)
                 binding!!.relLeaveDoorOpt.setBackgroundResource(R.drawable.outline_green_border_white_bg)
 
@@ -315,11 +359,17 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
                 binding!!.imgMeetDoor.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvMeetOutside.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvMeetOutside.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvMeetOutside.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgMeetOutside.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvMeetReception.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvMeetReception.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvMeetReception.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgMeetReception.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvLeaveAtDoor.setTextColor(Color.parseColor("#000000"))
@@ -327,12 +377,15 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
                 binding!!.imgLeaveAtDoor.setImageResource(R.drawable.radio_green_icon)
 
                 binding!!.tvLeaveReception.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvLeaveReception.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvLeaveReception.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgLeaveReception.setImageResource(R.drawable.radio_uncheck_gray_icon)
             }
 
-            R.id.relLeaveReception-> {
-                status="Leave at reception"
+            R.id.relLeaveReception -> {
+                clickedstatus = "Leave at reception"
 
                 binding!!.relMeetHandMe.setBackgroundResource(R.drawable.rectangular_shape_green_bg)
                 binding!!.relLeaveDoorOpt.setBackgroundResource(R.drawable.outline_green_border_white_bg)
@@ -342,19 +395,31 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
                 binding!!.imgMeetDoor.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvMeetOutside.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvMeetOutside.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvMeetOutside.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgMeetOutside.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvMeetReception.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvMeetReception.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvMeetReception.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgMeetReception.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvLeaveAtDoor.setTextColor(Color.parseColor("#848484"))
-                binding!!.tvLeaveAtDoor.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.NORMAL)
+                binding!!.tvLeaveAtDoor.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.NORMAL
+                )
                 binding!!.imgLeaveAtDoor.setImageResource(R.drawable.radio_uncheck_gray_icon)
 
                 binding!!.tvLeaveReception.setTextColor(Color.parseColor("#000000"))
-                binding!!.tvLeaveReception.setTypeface(binding!!.tvMeetAtDoor.typeface, Typeface.BOLD)
+                binding!!.tvLeaveReception.setTypeface(
+                    binding!!.tvMeetAtDoor.typeface,
+                    Typeface.BOLD
+                )
                 binding!!.imgLeaveReception.setImageResource(R.drawable.radio_green_icon)
             }
 
@@ -366,9 +431,7 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
     private fun validate(): Boolean {
         // Check if email/phone is empty
 
-        if (status==null){
-            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.selectLists, false)
-        }else if (binding!!.edtInstructions.text.toString().trim().isEmpty()) {
+        if (binding!!.edtInstructions.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.deliveryInstructions, false)
             return false
         }
@@ -382,7 +445,7 @@ class DropOffOptionsScreenFragment : Fragment(),View.OnClickListener {
             dropOffOptionsScreenViewModel.addNotesUrl({
                 BaseApplication.dismissMe()
                 handleApiAddNotesResponse(it)
-            },status,binding!!.edtInstructions.text.toString().trim())
+            }, clickedstatus, binding!!.edtInstructions.text.toString().trim())
         }
     }
 

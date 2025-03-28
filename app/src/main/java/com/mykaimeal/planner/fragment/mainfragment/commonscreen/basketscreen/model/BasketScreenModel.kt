@@ -31,7 +31,7 @@ data class Ingredient(
     val pro_price: String?,
     val product_id: String?,
     val quantity: Any,
-    val sch_id: Int?,
+    var sch_id: Int?,
     val status: Int?,
     val updated_at: String?,
     val user_id: Int?
@@ -81,7 +81,7 @@ data class Recipes(
     val `data`: DataX?,
     val deleted_at: Any?,
     val id: Int?,
-    val serving: String?,
+    var serving: String?,
     val type: String?,
     val updated_at: String?,
     val uri: String?,

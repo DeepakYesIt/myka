@@ -396,9 +396,29 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         binding.rlSeeAllBtn.setOnClickListener(this)
         binding.textSeeAll.setOnClickListener(this)
 
+
         binding.imageCookedMeals.setOnClickListener(this)
         binding.imgFreeTrial.setOnClickListener(this)
         binding.imgBasketIcon.setOnClickListener(this)
+
+        binding.rlSeeAllBtn.setOnClickListener(this)
+        binding!!.textSeeAll.setOnClickListener(this)
+
+        binding.imageCookedMeals.setOnClickListener(this)
+        binding.imgFreeTrial.setOnClickListener(this)
+        binding.imgBasketIcon.setOnClickListener(this)
+        binding.tvName.setOnClickListener(this)
+
+        binding.imageProfile.setOnClickListener(this)
+
+        binding.rlPlanAMealBtn.setOnClickListener(this)
+        binding.imgHearRedIcons.setOnClickListener(this)
+        binding.imagePlanMeal.setOnClickListener(this)
+//        binding!!.imageRecipeSeeAll.setOnClickListener(this)
+//        binding!!.relMonthlySavings.setOnClickListener(this)
+        binding.imageCheckSav.setOnClickListener(this)
+        binding.rlLayCheckSavings.setOnClickListener(this)
+
 
 
         binding.imageProfile.setOnClickListener(this)
@@ -492,6 +512,10 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             }
 
             R.id.imageCheckSav -> {
+                findNavController().navigate(R.id.statisticsGraphFragment)
+            }
+
+            R.id.rlLayCheckSavings -> {
                 findNavController().navigate(R.id.statisticsGraphFragment)
             }
 

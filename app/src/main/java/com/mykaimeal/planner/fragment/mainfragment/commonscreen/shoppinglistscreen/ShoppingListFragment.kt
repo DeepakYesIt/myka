@@ -27,9 +27,12 @@ import com.mykaimeal.planner.adapter.IngredientsShoppingAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentShoppingListBinding
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Recipes
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.shoppinglistscreen.model.ShoppingListModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.shoppinglistscreen.model.ShoppingListModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.shoppinglistscreen.viewmodel.ShoppingListViewModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -42,7 +45,8 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private var adapterRecipe: BasketYourRecipeAdapter? = null
     private var tvCounter:TextView?=null
     private var quantity:Int=1
-
+    private var recipe: MutableList<Recipes>?=null
+    private var ingredientList: MutableList<Ingredient>?=null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,7 +68,11 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
         initialize()
 
-        getShoppingList()
+        if (BaseApplication.isOnline(requireContext())){
+            getShoppingList()
+        }else{
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
 
         return binding.root
     }
@@ -89,9 +97,6 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             addItemDialog()
        /*     findNavController().navigate(R.id.addMoreItemsFragment)*/
         }
-
-        adapterInitialize()
-
     }
 
     private fun addItemDialog() {
@@ -186,6 +191,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private fun showDataShoppingUI(data: ShoppingListModelData) {
 
         if (data.recipe != null && data.recipe.size > 0) {
+            recipe=data.recipe
             adapterRecipe = BasketYourRecipeAdapter(data.recipe, requireActivity(), this)
             binding.rcvYourRecipes.adapter = adapterRecipe
         }
@@ -198,17 +204,230 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
     }
 
-
-    private fun adapterInitialize() {
-
-    }
-
     override fun itemClick(position: Int?, status: String?, type: String?) {
 
     }
 
     override fun itemSelect(position: Int?, status: String?, type: String?) {
+        if (type=="YourRecipe"){
+            if (status=="Minus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddRecipeServing(position, "minus")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }else if (status=="Plus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddRecipeServing(position, "plus")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }else{
+                removeRecipeBasketDialog(status,position)
+            }
+        }else if (type=="ShoppingIngredients"){
+            if (status=="Minus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddIngServing(position, "minus")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }else if (status=="Plus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddIngServing(position, "plus")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
+        }
+    }
 
+    private fun removeAddIngServing(position: Int?, type: String) {
+        val item= position?.let { ingredientList?.get(it) }
+        if (type.equals("plus",true) || type.equals("minus",true)) {
+            var count = item?.sch_id
+            val foodId= item?.food_id
+            count = when (type.lowercase()) {
+                "plus" -> count!! + 1
+                "minus" -> count!! - 1
+                else -> count // No change if `apiType` doesn't match
+            }
+            increaseIngRecipe(foodId,count.toString(),item,position)
+        }
+    }
+
+    private fun increaseIngRecipe(foodId: String?, quantity: String, item: Ingredient?, position: Int?) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            shoppingListViewModel.basketIngIncDescUrl({
+                BaseApplication.dismissMe()
+                handleApiIngResponse(it,item,quantity,position)
+            },foodId,quantity)
+        }
+    }
+
+    private fun handleApiIngResponse(result: NetworkResult<String>, item: Ingredient?, quantity: String, position: Int?) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessIngResponse(result.data.toString(),item,quantity,position)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessIngResponse(data: String, item: Ingredient?, quantity: String, position: Int?) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                // Toggle the is_like value
+                item?.sch_id = quantity.toInt()
+                if (item!= null) {
+                    ingredientList?.set(position!!, item)
+                }
+                // Update the adapter
+                if (ingredientList != null) {
+                    adapterShoppingAdapter.updateList(ingredientList!!)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun removeAddRecipeServing(position: Int?, type: String) {
+        val item= position?.let { recipe?.get(it) }
+        if (type.equals("plus",true) || type.equals("minus",true)) {
+            var count = item?.serving?.toInt()
+            val uri= item?.uri
+            count = when (type.lowercase()) {
+                "plus" -> count!! + 1
+                "minus" -> count!! - 1
+                else -> count // No change if `apiType` doesn't match
+            }
+            increaseQuantityRecipe(uri,count.toString(),item,position)
+        }
+    }
+
+    private fun increaseQuantityRecipe(uri: String?, quantity: String, item: Recipes?, position: Int?) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            shoppingListViewModel.basketYourRecipeIncDescUrl({
+                BaseApplication.dismissMe()
+                handleApiQuantityResponse(it,item,quantity,position)
+            },uri,quantity)
+        }
+    }
+
+    private fun handleApiQuantityResponse(result: NetworkResult<String>, item: Recipes?, quantity: String, position: Int?) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessQuantityResponse(result.data.toString(),item,quantity,position)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessQuantityResponse(data: String, item: Recipes?, quantity: String, position: Int?) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                // Toggle the is_like value
+                item?.serving = quantity.toInt().toString()
+                if (item != null) {
+                    recipe?.set(position!!, item)
+                }
+                // Update the adapter
+                if (recipe != null) {
+                    adapterRecipe?.updateList(recipe)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun removeRecipeBasketDialog(recipeId: String?,position:Int?) {
+        val dialogAddItem: Dialog = context?.let { Dialog(it) }!!
+        dialogAddItem.setContentView(R.layout.alert_dialog_remove_recipe_basket)
+        dialogAddItem.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialogAddItem.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+
+        val tvDialogCancelBtn = dialogAddItem.findViewById<TextView>(R.id.tvDialogCancelBtn)
+        val tvDialogRemoveBtn = dialogAddItem.findViewById<TextView>(R.id.tvDialogRemoveBtn)
+        dialogAddItem.show()
+        dialogAddItem.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        tvDialogCancelBtn.setOnClickListener {
+            dialogAddItem.dismiss()
+        }
+
+        tvDialogRemoveBtn.setOnClickListener {
+            if (BaseApplication.isOnline(requireActivity())) {
+                removeBasketRecipeApi(recipeId.toString(), dialogAddItem,position)
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+    }
+
+    private fun removeBasketRecipeApi(recipeId: String, dialogRemoveDay: Dialog,position:Int?) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            shoppingListViewModel.removeBasketUrlApi({
+                BaseApplication.dismissMe()
+                handleApiRemoveBasketResponse(it,position,dialogRemoveDay)
+            },recipeId)
+        }
+    }
+
+    private fun handleApiRemoveBasketResponse(result: NetworkResult<String>,position:Int?,dialogRemoveDay: Dialog) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessRemoveBasketResponse(result.data.toString(),position,dialogRemoveDay)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessRemoveBasketResponse(data: String,position:Int?,dialogRemoveDay: Dialog) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                dialogRemoveDay.dismiss()
+                if (recipe!=null){
+                    recipe!!.removeAt(position!!)
+                }
+
+                // Update the adapter
+                if (recipe != null) {
+                    adapterRecipe?.updateList(recipe)
+                }
+
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
     }
 
 }
