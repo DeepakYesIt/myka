@@ -242,7 +242,7 @@ interface MainRepository {
                               zipcode:String?,primary:String?,id:String?,type:String?)
 
     suspend fun sendOtpUrl(successCallback: (response: NetworkResult<String>) -> Unit,phone: String?)
-    suspend fun addPhoneUrl(successCallback: (response: NetworkResult<String>) -> Unit,phone: String?,otp:String?)
+    suspend fun addPhoneUrl(successCallback: (response: NetworkResult<String>) -> Unit,phone: String?,otp:String?,countryCode:String?)
     suspend fun getShoppingList(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getNotesUrl(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun addNotesUrl(successCallback: (response: NetworkResult<String>) -> Unit,pickup:String?,description:String?)

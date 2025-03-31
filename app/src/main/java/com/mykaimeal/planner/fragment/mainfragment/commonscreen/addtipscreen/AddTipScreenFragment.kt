@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.mykaimeal.planner.R
+import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentAddTipScreenBinding
@@ -27,6 +28,8 @@ class AddTipScreenFragment : Fragment() {
 
     private var binding: FragmentAddTipScreenBinding? = null
     private lateinit var addTipScreenViewModel: AddTipScreenViewModel
+    private var totalPrices = ""
+    private var status = ""
 
 
     override fun onCreateView(
@@ -36,8 +39,16 @@ class AddTipScreenFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentAddTipScreenBinding.inflate(layoutInflater, container, false)
 
+        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
+        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
+
         addTipScreenViewModel =
             ViewModelProvider(requireActivity())[AddTipScreenViewModel::class.java]
+
+
+        if (arguments != null) {
+            totalPrices = arguments?.getString("totalPrices", "").toString()
+        }
 
         setupBackNavigation()
 
@@ -47,20 +58,28 @@ class AddTipScreenFragment : Fragment() {
     }
 
     private fun setupBackNavigation() {
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(
+            requireActivity(),
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initialize() {
 
-        binding!!.relBack.setOnClickListener{
+        binding!!.tvDescriptions.text =
+            "100% of your tip goes to your courier. Tips are based on your order total of $$totalPrices before any discounts or promotions."
+
+        binding!!.relBack.setOnClickListener {
             findNavController().navigateUp()
         }
 
         binding!!.linearNotNow.setOnClickListener {
+            status="1"
+            searchable()
             binding!!.linearNotNow.setBackgroundResource(R.drawable.outline_green_border_bg)
             binding!!.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
             binding!!.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
@@ -69,6 +88,8 @@ class AddTipScreenFragment : Fragment() {
         }
 
         binding!!.llSevenDollar.setOnClickListener {
+            status="1"
+            searchable()
             binding!!.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
             binding!!.llSevenDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
             binding!!.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
@@ -77,6 +98,8 @@ class AddTipScreenFragment : Fragment() {
         }
 
         binding!!.llNineDollar.setOnClickListener {
+            status="1"
+            searchable()
             binding!!.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
             binding!!.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
             binding!!.llNineDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
@@ -86,6 +109,8 @@ class AddTipScreenFragment : Fragment() {
         }
 
         binding!!.llTwelveDollar.setOnClickListener {
+            status="1"
+            searchable()
             binding!!.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
             binding!!.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
             binding!!.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
@@ -94,28 +119,42 @@ class AddTipScreenFragment : Fragment() {
         }
 
         binding!!.llFifteenDollar.setOnClickListener {
+            status="1"
+            searchable()
             binding!!.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
             binding!!.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
             binding!!.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
             binding!!.llTwelveDollar.setBackgroundResource(R.drawable.edittext_bg)
             binding!!.llFifteenDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
-
         }
 
-        binding!!.rlProceedAndPay.setOnClickListener{
-            if (BaseApplication.isOnline(requireContext())){
-                paymentCreditDebitApi()
-            }else{
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        binding!!.rlProceedAndPay.setOnClickListener {
+            if (status!=""){
+                if (BaseApplication.isOnline(requireContext())) {
+                    paymentCreditDebitApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
 //            findNavController().navigate(R.id.paymentCreditDebitFragment)
         }
     }
 
+    private fun searchable() {
+        if (status != "") {
+            status = "1"
+            binding!!.rlProceedAndPay.setBackgroundResource(R.drawable.green_fill_corner_bg)
+        } else {
+            status = ""
+            binding!!.rlProceedAndPay.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+        }
+
+    }
+
     private fun paymentCreditDebitApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            addTipScreenViewModel.getOrderProductUrl{
+            addTipScreenViewModel.getOrderProductUrl {
                 BaseApplication.dismissMe()
                 handleApiOrderResponse(it)
             }
@@ -140,7 +179,7 @@ class AddTipScreenFragment : Fragment() {
         try {
             val apiModel = Gson().fromJson(data, OrderProductTrackModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
-            if (apiModel.code!=null){
+            if (apiModel.code != null) {
                 if (apiModel.code == 200 && apiModel.success == true) {
                     if (apiModel.response != null) {
                         showDataInUI(apiModel.response)
@@ -152,8 +191,8 @@ class AddTipScreenFragment : Fragment() {
                         showAlert(apiModel.message, false)
                     }
                 }
-            }else{
-                if (apiModel.response?.error!=null){
+            } else {
+                if (apiModel.response?.error != null) {
                     showAlert(apiModel.response.error, false)
                 }
             }
@@ -164,13 +203,13 @@ class AddTipScreenFragment : Fragment() {
 
     private fun showDataInUI(response: Response) {
 
-        Toast.makeText(requireContext(),"Payment successful", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Payment successful", Toast.LENGTH_SHORT).show()
 
-        if (response.tracking_link!=null){
+        if (response.tracking_link != null) {
             val bundle = Bundle().apply {
-                putString("tracking",response.tracking_link)
+                putString("tracking", response.tracking_link)
             }
-            findNavController().navigate(R.id.trackOrderScreenFragment,bundle)
+            findNavController().navigate(R.id.trackOrderScreenFragment, bundle)
         }
 
     }

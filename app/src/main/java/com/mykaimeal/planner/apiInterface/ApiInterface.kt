@@ -627,7 +627,8 @@ interface ApiInterface {
     @POST(ApiEndPoint.addPhoneUrl)
     suspend fun addPhoneUrl(
         @Field("phone") phone: String?,
-        @Field("otp") otp: String?
+        @Field("otp") otp: String?,
+        @Field("country_code") countryCode: String?
     ): Response<JsonObject>
 
 

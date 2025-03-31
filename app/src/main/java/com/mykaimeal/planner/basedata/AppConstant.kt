@@ -23,6 +23,8 @@ class AppConstant {
         val Id: String?="ID"
         val NAME: String? ="NAME"
         val Address: String? ="UserAddress"
+        val Latitude: String ="latitude"
+        val Longitude: String ="longitude"
 
         val userId: String? ="UserId"
         val CookBookName: String? ="CookBookName"

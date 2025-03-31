@@ -65,10 +65,8 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
                 }
             })
 
-//        getProductsUrl
 
         initialize()
-//        productDetailsModel()
 
         return binding.root
     }
@@ -78,9 +76,9 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
             findNavController().navigateUp()
         }
 
-        binding.tvDetails.setOnClickListener{
+        /*binding.tvDetails.setOnClickListener{
             findNavController().navigate(R.id.basketIngredientsDetailsFragment)
-        }
+        }*/
 
         if (BaseApplication.isOnline(requireContext())) {
             getProductsDetailsApi()

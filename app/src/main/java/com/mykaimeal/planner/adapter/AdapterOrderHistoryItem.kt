@@ -1,6 +1,7 @@
 package com.mykaimeal.planner.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -25,14 +26,24 @@ class AdapterOrderHistoryItem(private var datalist: List<DataModel>,
 
         val data= datalist[position]
 
-        holder.binding.tvDate.text=data.title
-        holder.binding.tvPrice.text=data.price
-        holder.binding.tvItems.text=data.quantity
+        if (data.isOpen){
+            holder.binding.tvTrackOrder.visibility=View.VISIBLE
+            holder.binding.tvViewOrder.visibility=View.GONE
+        }else{
+            holder.binding.tvTrackOrder.visibility=View.GONE
+            holder.binding.tvViewOrder.visibility=View.VISIBLE
+        }
+
+        holder.binding.tvDate.text=data.title+"• "+data.price+"• "+data.quantity
         holder.binding.tvDelivery.text=data.distance
         holder.binding.imageData.setImageResource(data.image)
 
         holder.binding.tvViewOrder.setOnClickListener{
-            onItemClickedListener.itemClicked(position,null,"","")
+            onItemClickedListener.itemClicked(position,null,"","View")
+        }
+
+        holder.binding.tvTrackOrder.setOnClickListener{
+            onItemClickedListener.itemClicked(position,null,"","Track")
         }
 
     }

@@ -375,7 +375,7 @@ class VerificationFragment : Fragment() {
                 allergenSelectedId,
                 dislikeSelectedId,
                 "Android",
-                token,""
+                token,sessionManagement.getReferralCode()
             )
         }
     }

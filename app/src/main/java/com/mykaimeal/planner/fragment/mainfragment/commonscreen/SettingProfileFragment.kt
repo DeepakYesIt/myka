@@ -608,9 +608,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
-
         dialog.show()
-
     }
 
     private fun showRemoveAccountDialog() {

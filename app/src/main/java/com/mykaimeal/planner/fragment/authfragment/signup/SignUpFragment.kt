@@ -457,7 +457,7 @@ class SignUpFragment : Fragment() {
                 allergenSelectedId,
                 dislikeSelectedId,
                 ErrorMessage.deviceType,
-                token,""
+                token,sessionManagement.getReferralCode()
             )
         }
     }

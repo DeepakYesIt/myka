@@ -396,7 +396,7 @@
         tools:layout="@layout/fragment_drop_off_options_screen" />
     <fragment
         android:id="@+id/addressMapFullScreenFragment"
-        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.AddressMapFullScreenFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.addressmapfullscreen.AddressMapFullScreenFragment"
         android:label="fragment_address_map_full_screen"
         tools:layout="@layout/fragment_address_map_full_screen" />
     <fragment
