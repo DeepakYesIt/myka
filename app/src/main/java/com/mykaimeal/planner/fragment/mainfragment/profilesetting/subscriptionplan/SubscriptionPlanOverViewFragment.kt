@@ -29,6 +29,7 @@ import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
+import com.mykaimeal.planner.adapter.AdapterOnBoardingSubscriptionItem
 import com.mykaimeal.planner.adapter.OnboardingAdapter
 import com.mykaimeal.planner.basedata.AppConstant
 import com.mykaimeal.planner.basedata.BaseApplication
@@ -49,7 +50,7 @@ class SubscriptionPlanOverViewFragment : Fragment() {
     private val rootPlanList: MutableList<SubscriptionModel> = mutableListOf()
 
     var datalist : ArrayList<OnboardingItem> = arrayListOf()
-    private var adapters:OnboardingAdapter?=null
+    private var adapters: AdapterOnBoardingSubscriptionItem?=null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,7 +68,7 @@ class SubscriptionPlanOverViewFragment : Fragment() {
             }
         })
 
-        adapters = OnboardingAdapter(datalist)
+        adapters = AdapterOnBoardingSubscriptionItem(datalist)
         binding!!.viewpager.adapter = adapters
         binding!!.viewpager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
 
@@ -127,7 +128,7 @@ class SubscriptionPlanOverViewFragment : Fragment() {
         }
 
         // List of onboarding items
-        datalist.add(OnboardingItem(R.drawable.subscription_onboarding_1))
+         datalist.add(OnboardingItem(R.drawable.banner_images_subscription))
 
         datalist.add(OnboardingItem(R.drawable.subscription_onboarding_2))
 

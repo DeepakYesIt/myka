@@ -237,13 +237,8 @@
         android:label="fragment_wallet"
         tools:layout="@layout/fragment_wallet" />
     <fragment
-        android:id="@+id/homeSubscriptionFragment"
-        android:name="com.mykaimeal.planner.fragment.mainfragment.hometab.HomeSubscriptionFragment"
-        android:label="fragment_home_subscription"
-        tools:layout="@layout/fragment_home_subscription" />
-    <fragment
         android:id="@+id/homeSubscriptionAllPlanFragment"
-        android:name="com.mykaimeal.planner.fragment.mainfragment.hometab.HomeSubscriptionAllPlanFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.profilesetting.subscriptionplan.SubscriptionAllPlanFragment"
         android:label="fragment_home_subscription_all_plan"
         tools:layout="@layout/fragment_home_subscription_all_plan" />
     <fragment
