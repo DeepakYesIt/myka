@@ -103,6 +103,7 @@ interface MainRepository {
  suspend fun recipeAddBasketRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)
 
  suspend fun recipeAddToPlanRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)
+ suspend fun addToBasketAllUrl(successCallback: (response: NetworkResult<String>) -> Unit,date: String?)
  suspend fun addMealTypeApiUrl(successCallback: (response: NetworkResult<String>) -> Unit,uri: String?,planType: String?)
  suspend fun createRecipeRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)
  suspend fun updateMealUrl(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)

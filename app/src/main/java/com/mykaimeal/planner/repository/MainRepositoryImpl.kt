@@ -2144,6 +2144,25 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
     }
 
 
+    override suspend fun addToBasketAllUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,date: String?
+    ) {
+        try {
+            api.addToBasketAllUrl(date).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
 
     override suspend fun getProductsUrl(
         successCallback: (response: NetworkResult<String>) -> Unit,query:String?

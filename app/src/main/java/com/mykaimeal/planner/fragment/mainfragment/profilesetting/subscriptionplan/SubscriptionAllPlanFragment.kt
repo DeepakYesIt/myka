@@ -32,8 +32,8 @@ class SubscriptionAllPlanFragment : Fragment() {
         // Inflate the layout for this fragment
         binding=FragmentHomeSubscriptionAllPlanBinding.inflate(layoutInflater, container, false)
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
+        (activity as MainActivity?)!!.binding.llIndicator.visibility=View.GONE
+        (activity as MainActivity?)!!.binding.llBottomNavigation.visibility=View.GONE
 
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(), object : OnBackPressedCallback(true) {

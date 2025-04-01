@@ -698,6 +698,12 @@ interface ApiInterface {
         @Field("cvv") cvv: String?
     ): Response<JsonObject>
 
+    @FormUrlEncoded
+    @POST(ApiEndPoint.addToBasketAllUrl)
+    suspend fun addToBasketAllUrl(
+        @Field("date") date: String?
+    ): Response<JsonObject>
+
     @GET(ApiEndPoint.addAddressUrl)
     suspend fun addAddressUrl(
         @Query("latitude") latitude: String?,
