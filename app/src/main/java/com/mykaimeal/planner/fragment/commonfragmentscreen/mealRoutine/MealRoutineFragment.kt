@@ -1,27 +1,32 @@
 package com.mykaimeal.planner.fragment.commonfragmentscreen.mealRoutine
 
+
+
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
-import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.OnItemClickedListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.MealRoutineAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
+import com.mykaimeal.planner.basedata.BaseApplication.alertError
+import com.mykaimeal.planner.basedata.BaseApplication.isOnline
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentMealRoutineBinding
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
@@ -32,10 +37,11 @@ import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+
 @AndroidEntryPoint
 class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListener {
 
-    private var binding: FragmentMealRoutineBinding? = null
+    private lateinit var binding: FragmentMealRoutineBinding
     private lateinit var sessionManagement: SessionManagement
     private var mealRoutineAdapter: MealRoutineAdapter? = null
     private var totalProgressValue: Int = 0
@@ -44,72 +50,77 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
     private lateinit var mealRoutineViewModel: MealRoutineViewModel
     private var mealRoutineModelData: MutableList<MealRoutineModelData>? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         binding = FragmentMealRoutineBinding.inflate(inflater, container, false)
-
         mealRoutineViewModel = ViewModelProvider(this)[MealRoutineViewModel::class.java]
-
         sessionManagement = SessionManagement(requireContext())
-        if (sessionManagement.getCookingFor().equals("Myself")) {
-            binding!!.textAllergensIng.visibility = View.VISIBLE
-            binding!!.textAllergensIngPartner.visibility = View.GONE
-            binding!!.textAllergensIngFamily.visibility = View.GONE
-            binding!!.tvMealRoutineDesc.text = getString(R.string.meal_routine_desc)
-            binding!!.progressBar6.max = 10
-            totalProgressValue = 10
-            updateProgress(6)
-        } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-            binding!!.textAllergensIng.visibility = View.GONE
-            binding!!.textAllergensIngPartner.visibility = View.VISIBLE
-            binding!!.textAllergensIngFamily.visibility = View.GONE
-            binding!!.tvMealRoutineDesc.text =
-                "Which days do you guys normally meal prep or cook on?\n"
-            binding!!.progressBar6.max = 11
-            totalProgressValue = 11
-            updateProgress(7)
-        } else {
-            binding!!.textAllergensIng.visibility = View.GONE
-            binding!!.textAllergensIngPartner.visibility = View.GONE
-            binding!!.textAllergensIngFamily.visibility = View.VISIBLE
-            binding!!.tvMealRoutineDesc.text = "What meals do you typically cook for your family?"
-            binding!!.progressBar6.max = 11
-            totalProgressValue = 11
-            updateProgress(7)
+
+
+        val cookingFor = sessionManagement.getCookingFor()
+        val progressValue: Int
+        val maxProgress: Int
+        val mealRoutineDesc: String
+        binding.textAllergensIng.visibility = View.GONE
+        binding.textAllergensIngPartner.visibility = View.GONE
+        binding.textAllergensIngFamily.visibility = View.GONE
+
+        when (cookingFor) {
+            "Myself" -> {
+                binding.textAllergensIng.visibility = View.VISIBLE
+                mealRoutineDesc = getString(R.string.meal_routine_desc)
+                maxProgress = 10
+                progressValue = 6
+            }
+            "MyPartner" -> {
+                binding.textAllergensIngPartner.visibility = View.VISIBLE
+                mealRoutineDesc = "Which days do you guys normally meal prep or cook on?\n"
+                maxProgress = 11
+                progressValue = 7
+            }
+            else -> {
+                binding.textAllergensIngFamily.visibility = View.VISIBLE
+                mealRoutineDesc = "What meals do you typically cook for your family?"
+                maxProgress = 11
+                progressValue = 7
+            }
         }
 
-        if (sessionManagement.getCookingScreen().equals("Profile")) {
-            binding!!.llBottomBtn.visibility = View.GONE
-            binding!!.rlUpdateMealRoutine.visibility = View.VISIBLE
-            if (BaseApplication.isOnline(requireContext())) {
+        binding.tvMealRoutineDesc.text = mealRoutineDesc
+        binding.progressBar6.max = maxProgress
+        totalProgressValue = maxProgress
+        updateProgress(progressValue)
+
+        val isProfileScreen = sessionManagement.getCookingScreen() == "Profile"
+        val isOnline = isOnline(requireContext())
+
+        binding.llBottomBtn.visibility = if (isProfileScreen) View.GONE else View.VISIBLE
+        binding.rlUpdateMealRoutine.visibility = if (isProfileScreen) View.VISIBLE else View.GONE
+
+        if (isOnline) {
+            if (isProfileScreen) {
                 mealRoutineSelectApi()
             } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                mealRoutineViewModel.getMealRoutineData()?.let {
+                    showDataInUi(it)
+                    if (status.equals("2")) {
+                        binding.tvNextBtn.isClickable = true
+                        binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                    }
+                }?: mealRoutineApi()
             }
-        } else {
-            binding!!.llBottomBtn.visibility = View.VISIBLE
-            binding!!.rlUpdateMealRoutine.visibility = View.GONE
-
-            if (mealRoutineViewModel.getMealRoutineData() != null) {
-                showDataInUi(mealRoutineViewModel.getMealRoutineData()!!)
-                if (status=="2"){
-                    binding!!.tvNextBtn.isClickable = true
-                    binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-                }
-            } else {
-                ///checking the device of mobile data in online and offline(show network error message)
-                if (BaseApplication.isOnline(requireContext())) {
-                    mealRoutineApi()
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            }
+        }else {
+            alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
+        backButton()
 
+        initialize()
+
+        return binding.root
+    }
+
+    private  fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
             object : OnBackPressedCallback(true) {
@@ -117,23 +128,20 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
                     findNavController().navigateUp()
                 }
             })
-
-        initialize()
-
-        return binding!!.root
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateProgress(progress: Int) {
-        binding!!.progressBar6.progress = progress
-        binding!!.tvProgressText.text = "$progress/$totalProgressValue"
+        binding.progressBar6.progress = progress
+        binding.tvProgressText.text = "$progress/$totalProgressValue"
     }
 
     private fun initialize() {
 
-        binding!!.tvSkipBtn.setOnClickListener(this)
-        binding!!.imgBackMealRoutine.setOnClickListener(this)
-        binding!!.tvNextBtn.setOnClickListener(this)
-        binding!!.rlUpdateMealRoutine.setOnClickListener(this)
+        binding.tvSkipBtn.setOnClickListener(this)
+        binding.imgBackMealRoutine.setOnClickListener(this)
+        binding.tvNextBtn.setOnClickListener(this)
+        binding.rlUpdateMealRoutine.setOnClickListener(this)
 
     }
 
@@ -235,7 +243,7 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
                 }
                 mealRoutineModelData = mealRoutineModelsData
                 mealRoutineAdapter = MealRoutineAdapter(mealRoutineModelsData, requireActivity(), this)
-                binding!!.rcyMealRoutine.adapter = mealRoutineAdapter
+                binding.rcyMealRoutine.adapter = mealRoutineAdapter
             }
         }catch (e:Exception){
             Log.d("MealRoutine","message:---"+e.message)
@@ -243,7 +251,7 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {
-        BaseApplication.alertError(requireContext(), message, status)
+        alertError(requireContext(), message, status)
     }
 
     override fun onClick(item: View?) {
@@ -266,10 +274,10 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
             }
 
             R.id.rlUpdateMealRoutine -> {
-                if (BaseApplication.isOnline(requireContext())) {
+                if (isOnline(requireContext())) {
                     updateMealRoutineApi()
                 } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                    alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }
         }
@@ -319,20 +327,20 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
                 mealRoutineSelectedId = list!!
             }
             status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
 
             return
         }
 
         if (type.equals("true")) {
             status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             mealRoutineSelectedId = list!!
         } else {
             status = ""
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
 

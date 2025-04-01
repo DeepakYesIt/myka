@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.commonfragmentscreen.favouriteCuisines
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -35,7 +36,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
 
-    private var binding: FragmentFavouriteCuisinesBinding? = null
+    private lateinit var binding: FragmentFavouriteCuisinesBinding
     private var adapterFavouriteCuisinesItem: AdapterFavouriteCuisinesItem? = null
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue: Int = 0
@@ -45,56 +46,60 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
     private var favouriteCuiModelData: MutableList<FavouriteCuisinesModelData>? = null
     private var isExpanded = false
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+
         // Inflate the layout for this fragment
         binding = FragmentFavouriteCuisinesBinding.inflate(inflater, container, false)
         favouriteCuisineViewModel = ViewModelProvider(this)[FavouriteCuisineViewModel::class.java]
-
         sessionManagement = SessionManagement(requireContext())
-        if (sessionManagement.getCookingFor().equals("Myself")) {
-            binding!!.tvCuisinesEnjoy.text = "What cuisines do you enjoy most?"
-            binding!!.progressBar3.max = 10
-            totalProgressValue = 10
-            updateProgress(3)
-        } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-            binding!!.tvCuisinesEnjoy.text = "What cuisines do you and your partner enjoy most?"
-            binding!!.progressBar3.max = 11
-            totalProgressValue = 11
-            updateProgress(6)
+
+        val cookingFor = sessionManagement.getCookingFor()
+        val progressValue: Int
+        val maxProgress: Int
+        val restrictionText: String
+
+        if (cookingFor.equals("Myself")) {
+            restrictionText = "What cuisines do you enjoy most?"
+            maxProgress = 10
+            progressValue=3
+        } else if (cookingFor.equals("MyPartner")) {
+            restrictionText = "What cuisines do you and your partner enjoy most?"
+            maxProgress = 11
+            progressValue=6
         } else {
-            binding!!.tvCuisinesEnjoy.text = "What cuisines do you and your family enjoy most?"
-            binding!!.progressBar3.max = 11
-            totalProgressValue = 11
-            updateProgress(6)
+            restrictionText = "What cuisines do you and your family enjoy most?"
+            maxProgress = 11
+            progressValue=6
         }
 
-        if (sessionManagement.getCookingScreen().equals("Profile")) {
-            binding!!.llBottomBtn.visibility = View.GONE
-            binding!!.rlUpdateFavCuisine.visibility = View.VISIBLE
-            if (BaseApplication.isOnline(requireContext())) {
+        binding.tvCuisinesEnjoy.text = restrictionText
+        binding.progressBar3.max = maxProgress
+        totalProgressValue = maxProgress
+        updateProgress(progressValue)
+
+        val isProfileScreen = sessionManagement.getCookingScreen().equals("Profile",true)
+        binding.llBottomBtn.visibility = if (isProfileScreen) View.GONE else View.VISIBLE
+        binding.rlUpdateFavCuisine.visibility = if (isProfileScreen) View.VISIBLE else View.GONE
+
+        if (BaseApplication.isOnline(requireContext())) {
+            if (isProfileScreen) {
                 favouriteCuisineSelectApi()
             } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                favouriteCuisineViewModel.getFavouriteCuiData()?.let {
+                    showDataInUi(it)
+                } ?: favouriteCuisineApi()
             }
         } else {
-            binding!!.llBottomBtn.visibility = View.VISIBLE
-            binding!!.rlUpdateFavCuisine.visibility = View.GONE
-
-            if (favouriteCuisineViewModel.getFavouriteCuiData() != null) {
-                showDataInUi(favouriteCuisineViewModel.getFavouriteCuiData()!!)
-            } else {
-                ///checking the device of mobile data in online and offline(show network error message)
-                if (BaseApplication.isOnline(requireContext())) {
-                    favouriteCuisineApi()
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            }
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
+        backButton()
+
+        initialize()
+        return binding.root
+    }
+
+    private fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
             object : OnBackPressedCallback(true) {
@@ -102,27 +107,25 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
                     findNavController().navigateUp()
                 }
             })
-
-        initialize()
-        return binding!!.root
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateProgress(progress: Int) {
-        binding!!.progressBar3.progress = progress
-        binding!!.tvProgressText.text = "$progress/$totalProgressValue"
+        binding.progressBar3.progress = progress
+        binding.tvProgressText.text = "$progress/$totalProgressValue"
     }
 
     private fun initialize() {
 
-        binding!!.imbBackFavouriteCuisines.setOnClickListener {
+        binding.imbBackFavouriteCuisines.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.tvSkipBtn.setOnClickListener {
+        binding.tvSkipBtn.setOnClickListener {
             stillSkipDialog()
         }
 
-        binding!!.tvNextBtn.setOnClickListener {
+        binding.tvNextBtn.setOnClickListener {
             if (status == "2") {
                 favouriteCuisineViewModel.setFavouriteCuiData(favouriteCuiModelData!!)
                 sessionManagement.setFavouriteCuisineList(favouriteSelectId)
@@ -136,7 +139,7 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
             }
         }
 
-        binding!!.rlUpdateFavCuisine.setOnClickListener {
+        binding.rlUpdateFavCuisine.setOnClickListener {
             if (BaseApplication.isOnline(requireContext())) {
                 updateFavCuisineApi()
             } else {
@@ -144,10 +147,10 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
             }
         }
 
-        binding!!.relMoreButton.setOnClickListener { v ->
+        binding.relMoreButton.setOnClickListener { v ->
             isExpanded = true
             adapterFavouriteCuisinesItem!!.setExpanded(true)
-            binding!!.relMoreButton.visibility = View.GONE // Hide button after expanding
+            binding.relMoreButton.visibility = View.GONE // Hide button after expanding
         }
     }
 
@@ -293,28 +296,22 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
             if (favouriteModelData != null && favouriteModelData.isNotEmpty()) {
                 if (favouriteCuisineViewModel.getFavouriteCuiData() == null) {
 
-                    favouriteModelData.add(
-                        0, FavouriteCuisinesModelData(id = -1, selected = false, "None")
-                    ) // ID set to -1 as an indicator
+                    favouriteModelData.add(0, FavouriteCuisinesModelData(id = -1, selected = false, "None")) // ID set to -1 as an indicator
                 }
                 var selected = false
                 favouriteModelData.forEach {
                     if (it.selected) selected = true
                 }
                 if (!selected) {
-                    favouriteModelData.set(
-                        0, FavouriteCuisinesModelData(id = -1, selected = true, "None")
-                    )
+                    favouriteModelData[0] = FavouriteCuisinesModelData(id = -1, selected = true, "None")
                 }
-
                 // Show "Show More" button only if there are more than 3 items
-                if (favouriteModelData.size > 3) {
-                    binding!!.relMoreButton.visibility = View.VISIBLE
+                if (favouriteModelData.size > 5) {
+                    binding.relMoreButton.visibility = View.VISIBLE
                 }
                 favouriteCuiModelData = favouriteModelData
-                adapterFavouriteCuisinesItem =
-                    AdapterFavouriteCuisinesItem(favouriteModelData, requireActivity(), this)
-                binding!!.rcyFavCuisines.adapter = adapterFavouriteCuisinesItem
+                adapterFavouriteCuisinesItem = AdapterFavouriteCuisinesItem(favouriteModelData, requireActivity(), this)
+                binding.rcyFavCuisines.adapter = adapterFavouriteCuisinesItem
             }
         } catch (e: Exception) {
             Log.d("FavouriteCuisines", "message" + e.message)
@@ -326,19 +323,15 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
         try {
             if (favouriteModelData != null && favouriteModelData.isNotEmpty()) {
                 if (favouriteCuisineViewModel.getFavouriteCuiData() == null) {
-
-                    favouriteModelData.add(0, FavouriteCuisinesModelData(id = -1, selected = false, "None")
-                    ) // ID set to -1 as an indicator
+                    favouriteModelData.add(0, FavouriteCuisinesModelData(id = -1, selected = false, "None")) // ID set to -1 as an indicator
                 }
-
                 favouriteCuiModelData = favouriteModelData
                 // Show "Show More" button only if there are more than 3 items
-                if (favouriteModelData.size > 3) {
-                    binding!!.relMoreButton.visibility = View.VISIBLE
+                if (favouriteModelData.size > 5) {
+                    binding.relMoreButton.visibility = View.VISIBLE
                 }
-                adapterFavouriteCuisinesItem =
-                    AdapterFavouriteCuisinesItem(favouriteModelData, requireActivity(), this)
-                binding!!.rcyFavCuisines.adapter = adapterFavouriteCuisinesItem
+                adapterFavouriteCuisinesItem = AdapterFavouriteCuisinesItem(favouriteModelData, requireActivity(), this)
+                binding.rcyFavCuisines.adapter = adapterFavouriteCuisinesItem
             }
         } catch (e: Exception) {
             Log.d("FavouriteCuisines", "message" + e.message)
@@ -365,20 +358,20 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
                 favouriteSelectId = list!!
             }
             status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             favouriteSelectId = list!!
             return
         }
 
         if (type.equals("true")) {
             status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             favouriteSelectId = list!!
         } else {
             status = ""
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
 

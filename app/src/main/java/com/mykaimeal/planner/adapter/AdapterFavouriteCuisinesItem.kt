@@ -98,7 +98,9 @@ class AdapterFavouriteCuisinesItem(private var favouriteCuisineModelData: List<F
 
     override fun getItemCount(): Int {
         isNoneSelected = true
-        return if (isExpanded) favouriteCuisineModelData.size else Math.min(3, favouriteCuisineModelData.size)
+        return if (isExpanded) favouriteCuisineModelData.size else 5.coerceAtMost(
+            favouriteCuisineModelData.size
+        )
     }
 
     class ViewHolder(var binding: AdapterBodyGoalsBinding) : RecyclerView.ViewHolder(binding.root){
