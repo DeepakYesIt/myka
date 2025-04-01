@@ -7,21 +7,23 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.mykaimeal.planner.R
-import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.basedata.BaseApplication
+import com.mykaimeal.planner.basedata.BaseApplication.alertError
+import com.mykaimeal.planner.basedata.BaseApplication.isOnline
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentFamilyMembersBinding
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.FamilyDetail
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
@@ -31,9 +33,10 @@ import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+
 @AndroidEntryPoint
 class FamilyMembersFragment : Fragment() {
-    private var binding: FragmentFamilyMembersBinding? = null
+    private lateinit var binding: FragmentFamilyMembersBinding
     private var isChecked: Boolean? = null
     private var status: String? = ""
     private var childFriendlyStatus: String? = ""
@@ -46,24 +49,34 @@ class FamilyMembersFragment : Fragment() {
 
         familyMemberInfoViewModel = ViewModelProvider(this)[FamilyMemberInfoViewModel::class.java]
 
-        if (sessionManagement.getCookingScreen().equals("Profile")){
-            binding!!.llBottomBtn.visibility=View.GONE
-            binding!!.rlUpdateFamMem.visibility=View.VISIBLE
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireContext())) {
+
+        val isProfileScreen = sessionManagement.getCookingScreen().equals("Profile",true)
+        val isOnline = isOnline(requireContext())
+
+        binding.llBottomBtn.visibility = if (isProfileScreen) View.GONE else View.VISIBLE
+        binding.rlUpdateFamMem.visibility = if (isProfileScreen) View.VISIBLE else View.GONE
+
+        if (isProfileScreen) {
+            if (isOnline) {
                 familyMemApi()
             } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        }else{
-            binding!!.llBottomBtn.visibility=View.VISIBLE
-            binding!!.rlUpdateFamMem.visibility=View.GONE
-
-            if (familyMemberInfoViewModel.getFamilyData()!=null){
-                showDataInUi(familyMemberInfoViewModel.getFamilyData()!!)
+        } else {
+            familyMemberInfoViewModel.getFamilyData()?.let {
+                showDataInUi(it)
             }
         }
 
+
+        backButton()
+
+        initialize()
+
+        return binding.root
+    }
+    
+    private fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
             object : OnBackPressedCallback(true) {
@@ -76,10 +89,6 @@ class FamilyMembersFragment : Fragment() {
 
                 }
             })
-
-        initialize()
-
-        return binding!!.root
     }
 
     private fun familyMemApi() {
@@ -93,8 +102,10 @@ class FamilyMembersFragment : Fragment() {
                             val gson = Gson()
                             val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
                             if (bodyModel.code == 200 && bodyModel.success) {
-                                showDataInUi(bodyModel.data.familyDetail)
+                                bodyModel.data.familyDetail?.let { it1 -> showDataInUi(it1) }
                             } else {
+                                binding.tvNextBtn.isClickable=false
+                                binding.rlUpdateFamMem.isClickable=false
                                 if (bodyModel.code == ErrorMessage.code) {
                                     showAlertFunction(bodyModel.message, true)
                                 }else{
@@ -102,13 +113,19 @@ class FamilyMembersFragment : Fragment() {
                                 }
                             }
                         }catch (e:Exception){
+                            binding.tvNextBtn.isClickable=false
+                            binding.rlUpdateFamMem.isClickable=false
                             Log.d("FamilyMembers@@","message"+e.message)
                         }
                     }
                     is NetworkResult.Error -> {
+                        binding.tvNextBtn.isClickable=false
+                        binding.rlUpdateFamMem.isClickable=false
                         showAlertFunction(it.message, false)
                     }
                     else -> {
+                        binding.tvNextBtn.isClickable=false
+                        binding.rlUpdateFamMem.isClickable=false
                         showAlertFunction(it.message, false)
                     }
                 }
@@ -118,27 +135,33 @@ class FamilyMembersFragment : Fragment() {
 
     private fun showDataInUi(familyModelData: FamilyDetail) {
         try {
-            if (familyModelData!=null){
-
-                if (familyModelData.name!=null){
-                    binding!!.etMembersName.setText(familyModelData.name.toString())
+                familyModelData.name?.let {
+                    binding.etMembersName.setText(it)
                 }
 
-                if (familyModelData.age!=null){
-                    binding!!.etMemberAge.setText(familyModelData.age.toString())
+                familyModelData.age?.let {
+                    binding.etMemberAge.setText(it)
                 }
 
-                if (familyModelData.status!=null){
-                    if (familyModelData.status=="1"){
+                familyModelData.child_friendly_meals?.let {
+                    if (it.equals("1",true)){
+                        isChecked=false
                         childFriendlyStatus = "1"
-                        binding!!.checkBoxImages.setImageResource(R.drawable.tick_ckeckbox_images)
+                        binding.checkBoxImages.setImageResource(R.drawable.tick_ckeckbox_images)
                     }else{
+                        isChecked=true
                         childFriendlyStatus = "0"
-                        binding!!.checkBoxImages.setImageResource(R.drawable.uncheck_box_images)
+                        binding.checkBoxImages.setImageResource(R.drawable.uncheck_box_images)
                     }
+                }?: run {
+                    isChecked=true
+                    // Handle the case where familyModelData.status is null
+                    childFriendlyStatus = "0"
+                    binding.checkBoxImages.setImageResource(R.drawable.uncheck_box_images)
                 }
 
-            }
+            searchable()
+
         }catch (e:Exception){
             Log.d("FamilyMembers","message"+e.message)
         }
@@ -146,85 +169,69 @@ class FamilyMembersFragment : Fragment() {
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {
-        BaseApplication.alertError(requireContext(), message, status)
+        alertError(requireContext(), message, status)
     }
 
     private fun initialize() {
-
-        binding!!.etMembersName.addTextChangedListener(object :
-            TextWatcher {
+        val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(editable: Editable) {
                 searchable()
             }
-        })
-
-        binding!!.etMemberAge.addTextChangedListener(object :
-            TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(editable: Editable) {
-                searchable()
-            }
-        })
-
-        binding!!.imgBackFamilyMember.setOnClickListener {
+        }
+        binding.etMembersName.addTextChangedListener(textWatcher)
+        binding.etMemberAge.addTextChangedListener(textWatcher)
+        binding.imgBackFamilyMember.setOnClickListener {
             if (sessionManagement.getCookingScreen()=="Profile"){
                 findNavController().navigateUp()
             }else{
-                /*val intent = Intent(requireActivity(), CookingForScreenActivity::class.java)
-                startActivity(intent)*/
                 requireActivity().finish()
             }
         }
-
-        binding!!.checkBoxImages.setOnClickListener {
+        binding.relRememberForgot.setOnClickListener {
             if (isChecked == true) {
                 childFriendlyStatus = "1"
-                binding!!.checkBoxImages.setImageResource(R.drawable.tick_ckeckbox_images)
+                binding.checkBoxImages.setImageResource(R.drawable.tick_ckeckbox_images)
                 isChecked = false
             } else {
                 childFriendlyStatus = "0"
-                binding!!.checkBoxImages.setImageResource(R.drawable.uncheck_box_images)
+                binding.checkBoxImages.setImageResource(R.drawable.uncheck_box_images)
                 isChecked = true
             }
             searchable()
         }
-
-        binding!!.tvSkipBtn.setOnClickListener {
+        binding.tvSkipBtn.setOnClickListener {
             stillSkipDialog()
         }
-
-        binding!!.tvNextBtn.setOnClickListener {
+        binding.tvNextBtn.setOnClickListener {
             if (status == "2") {
                 val familyLocalData = FamilyDetail(
                     name = "",
                     age = "",
-                    status = "",
+                    child_friendly_meals = "",
                     id = 0,  // Default or appropriate ID
                     created_at = "",
                     updated_at = "",
                     deleted_at = null,  // This can remain null if it's optional
                     user_id = 0  // Default or appropriate user ID
                 )
-                familyLocalData.name=binding!!.etMembersName.text.toString().trim()
-                familyLocalData.age=binding!!.etMemberAge.text.toString().trim()
-                familyLocalData.status=childFriendlyStatus.toString()
+                familyLocalData.name=binding.etMembersName.text.toString().trim()
+                familyLocalData.age=binding.etMemberAge.text.toString().trim()
+                familyLocalData.child_friendly_meals=childFriendlyStatus.toString()
                 familyMemberInfoViewModel.setFamilyData(familyLocalData)
 
-                sessionManagement.setFamilyMemName(binding!!.etMembersName.text.toString().trim())
-                sessionManagement.setFamilyMemAge(binding!!.etMemberAge.text.toString().trim())
+                sessionManagement.setFamilyMemName(binding.etMembersName.text.toString().trim())
+                sessionManagement.setFamilyMemAge(binding.etMemberAge.text.toString().trim())
                 sessionManagement.setFamilyStatus(childFriendlyStatus.toString())
                 findNavController().navigate(R.id.bodyGoalsFragment)
             }
         }
-
-        binding!!.rlUpdateFamMem.setOnClickListener{
-            if (BaseApplication.isOnline(requireContext())) {
+        binding.rlUpdateFamMem.setOnClickListener{
+            if (isOnline(requireContext())) {
                 updateFamilyMemInfoApi()
             } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
     }
@@ -259,31 +266,33 @@ class FamilyMembersFragment : Fragment() {
                         showAlertFunction(it.message, false)
                     }
                 }
-            }, binding!!.etMembersName.text.toString().trim(),binding!!.etMemberAge.text.toString().trim(),childFriendlyStatus)
+            }, binding.etMembersName.text.toString().trim(),binding.etMemberAge.text.toString().trim(),childFriendlyStatus)
         }
     }
 
     private fun searchable() {
-        if (binding!!.etMembersName.text.isNotEmpty()) {
-            if (binding!!.etMemberAge.text.isNotEmpty()) {
+        if (binding.etMembersName.text.isNotEmpty()) {
+            if (binding.etMemberAge.text.isNotEmpty()) {
                 if (childFriendlyStatus == "1") {
                     status = "2"
-                    binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                    binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                    binding.tvNextBtn.isClickable=true
                 } else {
                     status = "1"
-                    binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                    binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                    binding.tvNextBtn.isClickable=false
                 }
             } else {
                 status = "1"
-                binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                binding.tvNextBtn.isClickable=false
             }
         } else {
             status = "1"
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.tvNextBtn.isClickable=false
         }
-
     }
-
     private fun stillSkipDialog() {
         val dialogStillSkip: Dialog = context?.let { Dialog(it) }!!
         dialogStillSkip.setContentView(R.layout.alert_dialog_still_skip)

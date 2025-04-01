@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragment.mainfragment.commonscreen.CookBookFragment">
-
     <RelativeLayout
         android:id="@+id/rlToolbar"
         android:layout_width="match_parent"
@@ -29,7 +28,6 @@
             android:textSize="@dimen/_13sdp" />
 
     </RelativeLayout>
-
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -43,7 +41,7 @@
                 android:layout_marginTop="@dimen/_20sdp"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:background="@drawable/search_recipients_bg"
-                android:visibility="gone"
+                android:visibility="visible"
                 android:orientation="vertical">
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -59,11 +57,10 @@
             <RelativeLayout
                 android:id="@+id/relRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginHorizontal="@dimen/_5sdp"
                 android:layout_below="@+id/llCookBookItems">
-
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rcyCookBookDetails"
                     android:layout_width="match_parent"
@@ -73,21 +70,18 @@
                     android:nestedScrollingEnabled="false"
                     android:orientation="vertical"
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"/>
-
+                <TextView
+                    android:id="@+id/tvnoData"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/montserrat_semibold"
+                    android:text="@string/no_recipes_yet"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    android:layout_centerInParent="true"
+                    android:singleLine="true"
+                    android:textSize="@dimen/_15sdp" />
             </RelativeLayout>
-
-            <TextView
-                android:id="@+id/tvnoData"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fontFamily="@font/montserrat_semibold"
-                android:text="@string/no_recipes_yet"
-                android:gravity="center"
-                android:visibility="gone"
-                android:layout_centerInParent="true"
-                android:singleLine="true"
-                android:textSize="@dimen/_15sdp" />
-
         </RelativeLayout>
     <RelativeLayout
         android:id="@+id/rlAddRecipes"

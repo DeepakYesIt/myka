@@ -61,7 +61,7 @@ import java.util.Locale
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), OnClickListener {
 
-    var binding: ActivityMainBinding? = null
+    lateinit var  binding: ActivityMainBinding
     private lateinit var commonWorkUtils: CommonWorkUtils
     private lateinit var mealRoutineViewModel: MealRoutineViewModel
     private var recipesModel: RecipesModel? = null
@@ -83,42 +83,44 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this))
-        setContentView(binding!!.root)
+        setContentView(binding.root)
         mealRoutineViewModel = ViewModelProvider(this@MainActivity)[MealRoutineViewModel::class.java]
         commonWorkUtils = CommonWorkUtils(this)
 
         // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+
         handleDeepLink(intent)
 
-        binding!!.llHomeIndicator.visibility = View.VISIBLE
-        binding!!.llSearchIndicator.visibility = View.INVISIBLE
-        binding!!.llAddRecipeIndicator.visibility = View.INVISIBLE
-        binding!!.llPlanIndicator.visibility = View.INVISIBLE
-        binding!!.llCookedIndicator.visibility = View.INVISIBLE
+        binding.llHomeIndicator.visibility = View.VISIBLE
+        binding.llSearchIndicator.visibility = View.INVISIBLE
+        binding.llAddRecipeIndicator.visibility = View.INVISIBLE
+        binding.llPlanIndicator.visibility = View.INVISIBLE
+        binding.llCookedIndicator.visibility = View.INVISIBLE
+
         getFcmToken()
-        binding!!.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
-        binding!!.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-        binding!!.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-        binding!!.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-        binding!!.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-        binding!!.tvHome.setTextColor(ContextCompat.getColor(this, R.color.light_green))
-        binding!!.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
-        binding!!.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
-        binding!!.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
-        binding!!.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
 
-        binding!!.llHome.setOnClickListener(this)
-        binding!!.llSearch.setOnClickListener(this)
-        binding!!.llAddRecipe.setOnClickListener(this)
-        binding!!.llPlan.setOnClickListener(this)
-        binding!!.llCooked.setOnClickListener(this)
-        binding!!.relAddRecipeWeb.setOnClickListener(this)
-        binding!!.relCreateNewRecipe.setOnClickListener(this)
-        binding!!.relRecipeImage.setOnClickListener(this)
+        binding.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
+        binding.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+        binding.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+        binding.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+        binding.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+        binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.light_green))
+        binding.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
+        binding.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
+        binding.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
+        binding.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
 
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
-            != PackageManager.PERMISSION_GRANTED) {
+        binding.llHome.setOnClickListener(this)
+        binding.llSearch.setOnClickListener(this)
+        binding.llAddRecipe.setOnClickListener(this)
+        binding.llPlan.setOnClickListener(this)
+        binding.llCooked.setOnClickListener(this)
+        binding.relAddRecipeWeb.setOnClickListener(this)
+        binding.relCreateNewRecipe.setOnClickListener(this)
+        binding.relRecipeImage.setOnClickListener(this)
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
@@ -174,7 +176,6 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.frameContainerMain) as NavHostFragment
         val navController = navHostFragment.navController
         val navGraph = navController.navInflater.inflate(R.navigation.main_graph)
-
         navGraph.setStartDestination(R.id.homeFragment)
         navController.graph = navGraph
     }
@@ -183,104 +184,104 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     fun changeBottom(status: String) {
         if (status.equals("home", true)) {
 
-            binding!!.cardViewAddRecipe.visibility = View.GONE
-            binding!!.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
-            binding!!.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.tvHome.setTextColor(ContextCompat.getColor(this, R.color.light_green))
-            binding!!.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.cardViewAddRecipe.visibility = View.GONE
+            binding.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
+            binding.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.light_green))
+            binding.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
 
-            binding!!.llHomeIndicator.visibility = View.VISIBLE
-            binding!!.llSearchIndicator.visibility = View.INVISIBLE
-            binding!!.llAddRecipeIndicator.visibility = View.INVISIBLE
-            binding!!.llPlanIndicator.visibility = View.INVISIBLE
-            binding!!.llCookedIndicator.visibility = View.INVISIBLE
+            binding.llHomeIndicator.visibility = View.VISIBLE
+            binding.llSearchIndicator.visibility = View.INVISIBLE
+            binding.llAddRecipeIndicator.visibility = View.INVISIBLE
+            binding.llPlanIndicator.visibility = View.INVISIBLE
+            binding.llCookedIndicator.visibility = View.INVISIBLE
         }
         if (status.equals("search", true)) {
-            binding!!.cardViewAddRecipe.visibility = View.GONE
-            binding!!.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
-            binding!!.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.light_green))
-            binding!!.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.cardViewAddRecipe.visibility = View.GONE
+            binding.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
+            binding.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.light_green))
+            binding.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
 
-            binding!!.llHomeIndicator.visibility = View.INVISIBLE
-            binding!!.llSearchIndicator.visibility = View.VISIBLE
-            binding!!.llAddRecipeIndicator.visibility = View.INVISIBLE
-            binding!!.llPlanIndicator.visibility = View.INVISIBLE
-            binding!!.llCookedIndicator.visibility = View.INVISIBLE
+            binding.llHomeIndicator.visibility = View.INVISIBLE
+            binding.llSearchIndicator.visibility = View.VISIBLE
+            binding.llAddRecipeIndicator.visibility = View.INVISIBLE
+            binding.llPlanIndicator.visibility = View.INVISIBLE
+            binding.llCookedIndicator.visibility = View.INVISIBLE
         }
         if (status.equals("addRecipe", true)) {
-            binding!!.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
-            binding!!.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.light_green))
-            binding!!.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
+            binding.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.light_green))
+            binding.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
 
-            binding!!.llHomeIndicator.visibility = View.INVISIBLE
-            binding!!.llSearchIndicator.visibility = View.INVISIBLE
-            binding!!.llAddRecipeIndicator.visibility = View.VISIBLE
-            binding!!.llPlanIndicator.visibility = View.INVISIBLE
-            binding!!.llCookedIndicator.visibility = View.INVISIBLE
+            binding.llHomeIndicator.visibility = View.INVISIBLE
+            binding.llSearchIndicator.visibility = View.INVISIBLE
+            binding.llAddRecipeIndicator.visibility = View.VISIBLE
+            binding.llPlanIndicator.visibility = View.INVISIBLE
+            binding.llCookedIndicator.visibility = View.INVISIBLE
         }
         if (status.equals("plan", true)) {
-            binding!!.cardViewAddRecipe.visibility = View.GONE
-            binding!!.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
-            binding!!.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.light_green))
-            binding!!.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.cardViewAddRecipe.visibility = View.GONE
+            binding.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
+            binding.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.light_green))
+            binding.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
 
-            binding!!.llHomeIndicator.visibility = View.INVISIBLE
-            binding!!.llSearchIndicator.visibility = View.INVISIBLE
-            binding!!.llAddRecipeIndicator.visibility = View.INVISIBLE
-            binding!!.llPlanIndicator.visibility = View.VISIBLE
-            binding!!.llCookedIndicator.visibility = View.INVISIBLE
+            binding.llHomeIndicator.visibility = View.INVISIBLE
+            binding.llSearchIndicator.visibility = View.INVISIBLE
+            binding.llAddRecipeIndicator.visibility = View.INVISIBLE
+            binding.llPlanIndicator.visibility = View.VISIBLE
+            binding.llCookedIndicator.visibility = View.INVISIBLE
         }
         if (status.equals("cooked", true)) {
-            binding!!.cardViewAddRecipe.visibility = View.GONE
-            binding!!.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding!!.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
-            binding!!.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding!!.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.light_green))
+            binding.cardViewAddRecipe.visibility = View.GONE
+            binding.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
+            binding.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
+            binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
+            binding.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.light_green))
 
-            binding!!.llHomeIndicator.visibility = View.INVISIBLE
-            binding!!.llSearchIndicator.visibility = View.INVISIBLE
-            binding!!.llAddRecipeIndicator.visibility = View.INVISIBLE
-            binding!!.llPlanIndicator.visibility = View.INVISIBLE
-            binding!!.llCookedIndicator.visibility = View.VISIBLE
+            binding.llHomeIndicator.visibility = View.INVISIBLE
+            binding.llSearchIndicator.visibility = View.INVISIBLE
+            binding.llAddRecipeIndicator.visibility = View.INVISIBLE
+            binding.llPlanIndicator.visibility = View.INVISIBLE
+            binding.llCookedIndicator.visibility = View.VISIBLE
         }
     }
 
     /// add recipe screen
     private fun addRecipeFromWeb() {
-        val dialogWeb: Dialog = this.let { Dialog(it) }
+        val dialogWeb = Dialog(this)
         dialogWeb.setContentView(R.layout.alert_dialog_add_recipe_form_web)
         dialogWeb.window!!.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -303,7 +304,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             }/* else if (isValidUrl(etPasteURl.text.toString().trim())){
                 commonWorkUtils.alertDialog(this, ErrorMessage.validUrl, false)
             }*/ else {
-                binding!!.cardViewAddRecipe.visibility = View.GONE
+                binding.cardViewAddRecipe.visibility = View.VISIBLE
                 val bundle = Bundle().apply {
                     putString("url",etPasteURl.text.toString().trim())
                 }
@@ -397,21 +398,21 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
                 *//*    if (position == 0) {
-                        binding!!.rlNextBtn.visibility= View.VISIBLE
-                        binding!!.relLetsGetStarted.visibility= View.GONE
-                        binding!!.tvHeading1.text="Plan a Meal"
-                        binding!!.tvTextDescriptions.text=getString(R.string.tvDescriptions1)
+                        binding.rlNextBtn.visibility= View.VISIBLE
+                        binding.relLetsGetStarted.visibility= View.GONE
+                        binding.tvHeading1.text="Plan a Meal"
+                        binding.tvTextDescriptions.text=getString(R.string.tvDescriptions1)
 
                     }else if (position==1){
-                        binding!!.rlNextBtn.visibility= View.VISIBLE
-                        binding!!.relLetsGetStarted.visibility= View.GONE
-                        binding!!.tvHeading1.text="Track Food Expenses"
-                        binding!!.tvTextDescriptions.text=getString(R.string.tvDescriptions2)
+                        binding.rlNextBtn.visibility= View.VISIBLE
+                        binding.relLetsGetStarted.visibility= View.GONE
+                        binding.tvHeading1.text="Track Food Expenses"
+                        binding.tvTextDescriptions.text=getString(R.string.tvDescriptions2)
                     }else{
-                        binding!!.rlNextBtn.visibility= View.GONE
-                        binding!!.relLetsGetStarted.visibility= View.VISIBLE
-                        binding!!.tvHeading1.text="Smart Meal Shopping"
-                        binding!!.tvTextDescriptions.text=getString(R.string.tvDescription3)
+                        binding.rlNextBtn.visibility= View.GONE
+                        binding.relLetsGetStarted.visibility= View.VISIBLE
+                        binding.tvHeading1.text="Smart Meal Shopping"
+                        binding.tvTextDescriptions.text=getString(R.string.tvDescription3)
                     }*//*
 
                     currentOnBoardingIndicator(position)
@@ -496,10 +497,10 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
             // Breakfast
             if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
-                breakfastAdapter = setupMealAdapter(recipesModel?.Breakfast, binding!!.rcyBreakFast, "BreakFast")
-                binding!!.linearBreakfast.visibility = View.VISIBLE
+                breakfastAdapter = setupMealAdapter(recipesModel?.Breakfast, binding.rcyBreakFast, "BreakFast")
+                binding.linearBreakfast.visibility = View.VISIBLE
             } else {
-                binding!!.linearBreakfast.visibility = View.GONE
+                binding.linearBreakfast.visibility = View.GONE
             }
 
         }*/
@@ -835,12 +836,12 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.llHome -> {
-                binding!!.cardViewAddRecipe.visibility = View.GONE
+                binding.cardViewAddRecipe.visibility = View.GONE
                 findNavController(R.id.frameContainerMain).navigate(R.id.homeFragment)
             }
 
             R.id.llSearch -> {
-                binding!!.cardViewAddRecipe.visibility = View.GONE
+                binding.cardViewAddRecipe.visibility = View.GONE
                 val bundle = Bundle().apply {
                     putString("ClickedUrl","")
                 }
@@ -848,18 +849,17 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             }
 
             R.id.llAddRecipe -> {
-                changeBottom("addRecipe")
-                binding!!.cardViewAddRecipe.visibility = View.VISIBLE
-//                findNavController(R.id.frameContainerMain).navigate(R.id.addRecipeFragment)
+//                binding.cardViewAddRecipe.visibility = View.VISIBLE
+                findNavController(R.id.frameContainerMain).navigate(R.id.searchFragmentDummy)
             }
 
             R.id.llPlan -> {
-                binding!!.cardViewAddRecipe.visibility = View.GONE
+                binding.cardViewAddRecipe.visibility = View.GONE
                 findNavController(R.id.frameContainerMain).navigate(R.id.planFragment)
             }
 
             R.id.llCooked -> {
-                binding!!.cardViewAddRecipe.visibility = View.GONE
+                binding.cardViewAddRecipe.visibility = View.GONE
                 findNavController(R.id.frameContainerMain).navigate(R.id.cookedFragment)
             }
 
@@ -868,7 +868,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             }
 
             R.id.relCreateNewRecipe -> {
-                binding!!.cardViewAddRecipe.visibility = View.GONE
+                binding.cardViewAddRecipe.visibility = View.GONE
                 val bundle = Bundle().apply {
                     putString("name","")
                 }
@@ -877,7 +877,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
             R.id.relRecipeImage->{
                 findNavController(R.id.frameContainerMain).navigate(R.id.createRecipeImageFragment)
-                binding!!.cardViewAddRecipe.visibility = View.GONE
+                binding.cardViewAddRecipe.visibility = View.GONE
             }
         }
     }

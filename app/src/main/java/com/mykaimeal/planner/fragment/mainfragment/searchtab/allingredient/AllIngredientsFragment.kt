@@ -15,23 +15,30 @@ import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.AdapterAllIngredientsItem
 import com.mykaimeal.planner.databinding.FragmentAllIngredientsBinding
 import com.mykaimeal.planner.model.DataModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
 
+
+@AndroidEntryPoint
 class AllIngredientsFragment : Fragment(),View.OnClickListener {
 
-    private var binding: FragmentAllIngredientsBinding?=null
+    private var _binding: FragmentAllIngredientsBinding?=null
+    private val binding get() = _binding!!
     private var adapterAllIngItem: AdapterAllIngredientsItem? = null
     private val dataList = ArrayList<DataModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        binding= FragmentAllIngredientsBinding.inflate(layoutInflater, container, false)
+        _binding= FragmentAllIngredientsBinding.inflate(layoutInflater, container, false)
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
+        (activity as? MainActivity)?.binding?.let {
+            it.llIndicator.visibility = View.VISIBLE
+            it.llBottomNavigation.visibility = View.VISIBLE
+        }
+
 
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -43,18 +50,18 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener {
 
         allIngredientsModel()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun initialize() {
 
-        binding!!.llFruits.setOnClickListener(this)
-        binding!!.llVegetables.setOnClickListener(this)
-        binding!!.llDairyEgg.setOnClickListener(this)
-        binding!!.llBakery.setOnClickListener(this)
-        binding!!.imageBackIcon.setOnClickListener(this)
+        binding.llFruits.setOnClickListener(this)
+        binding.llVegetables.setOnClickListener(this)
+        binding.llDairyEgg.setOnClickListener(this)
+        binding.llBakery.setOnClickListener(this)
+        binding.imageBackIcon.setOnClickListener(this)
 
-        binding!!.etIngRecipes.addTextChangedListener(object :
+        binding.etIngRecipes.addTextChangedListener(object :
             TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
@@ -73,9 +80,9 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener {
         }
         if (filteredList.size > 0) {
             adapterAllIngItem!!.filterList(filteredList)
-            binding!!.rcyAllIngredients.visibility = View.VISIBLE
+            binding.rcyAllIngredients.visibility = View.VISIBLE
         } else {
-            binding!!.rcyAllIngredients.visibility = View.GONE
+            binding.rcyAllIngredients.visibility = View.GONE
         }
     }
 
@@ -140,7 +147,7 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener {
         dataList.add(data8)
 
         adapterAllIngItem = AdapterAllIngredientsItem(dataList, requireActivity())
-        binding!!.rcyAllIngredients.adapter = adapterAllIngItem
+        binding.rcyAllIngredients.adapter = adapterAllIngItem
     }
 
     override fun onClick(item: View?) {
@@ -151,58 +158,64 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener {
             }
 
             R.id.llFruits->{
-                    binding!!.textFruits.setBackgroundResource(R.drawable.select_bg)
-                    binding!!.textVegetables.setBackgroundResource(R.drawable.unselect_bg)
-                    binding!!.textDairyEgg.setBackgroundResource(R.drawable.unselect_bg)
-                    binding!!.textBakery.setBackgroundResource(R.drawable.unselect_bg)
+                    binding.textFruits.setBackgroundResource(R.drawable.select_bg)
+                    binding.textVegetables.setBackgroundResource(R.drawable.unselect_bg)
+                    binding.textDairyEgg.setBackgroundResource(R.drawable.unselect_bg)
+                    binding.textBakery.setBackgroundResource(R.drawable.unselect_bg)
 
-                    binding!!.textFruits.setTextColor(Color.parseColor("#FFFFFF"))
-                    binding!!.textVegetables.setTextColor(Color.parseColor("#3C4541"))
-                    binding!!.textDairyEgg.setTextColor(Color.parseColor("#3C4541"))
-                    binding!!.textBakery.setTextColor(Color.parseColor("#3C4541"))
+                    binding.textFruits.setTextColor(Color.parseColor("#FFFFFF"))
+                    binding.textVegetables.setTextColor(Color.parseColor("#3C4541"))
+                    binding.textDairyEgg.setTextColor(Color.parseColor("#3C4541"))
+                    binding.textBakery.setTextColor(Color.parseColor("#3C4541"))
 
             }
 
             R.id.llVegetables->{
-                binding!!.textFruits.setBackgroundResource(R.drawable.unselect_bg)
-                binding!!.textVegetables.setBackgroundResource(R.drawable.select_bg)
-                binding!!.textDairyEgg.setBackgroundResource(R.drawable.unselect_bg)
-                binding!!.textBakery.setBackgroundResource(R.drawable.unselect_bg)
+                binding.textFruits.setBackgroundResource(R.drawable.unselect_bg)
+                binding.textVegetables.setBackgroundResource(R.drawable.select_bg)
+                binding.textDairyEgg.setBackgroundResource(R.drawable.unselect_bg)
+                binding.textBakery.setBackgroundResource(R.drawable.unselect_bg)
 
-                binding!!.textFruits.setTextColor(Color.parseColor("#3C4541"))
-                binding!!.textVegetables.setTextColor(Color.parseColor("#FFFFFF"))
-                binding!!.textDairyEgg.setTextColor(Color.parseColor("#3C4541"))
-                binding!!.textBakery.setTextColor(Color.parseColor("#3C4541"))
+                binding.textFruits.setTextColor(Color.parseColor("#3C4541"))
+                binding.textVegetables.setTextColor(Color.parseColor("#FFFFFF"))
+                binding.textDairyEgg.setTextColor(Color.parseColor("#3C4541"))
+                binding.textBakery.setTextColor(Color.parseColor("#3C4541"))
 
             }
 
             R.id.llDairyEgg->{
-                binding!!.textFruits.setBackgroundResource(R.drawable.unselect_bg)
-                binding!!.textVegetables.setBackgroundResource(R.drawable.unselect_bg)
-                binding!!.textDairyEgg.setBackgroundResource(R.drawable.select_bg)
-                binding!!.textBakery.setBackgroundResource(R.drawable.unselect_bg)
+                binding.textFruits.setBackgroundResource(R.drawable.unselect_bg)
+                binding.textVegetables.setBackgroundResource(R.drawable.unselect_bg)
+                binding.textDairyEgg.setBackgroundResource(R.drawable.select_bg)
+                binding.textBakery.setBackgroundResource(R.drawable.unselect_bg)
 
-                binding!!.textFruits.setTextColor(Color.parseColor("#3C4541"))
-                binding!!.textVegetables.setTextColor(Color.parseColor("#3C4541"))
-                binding!!.textDairyEgg.setTextColor(Color.parseColor("#FFFFFF"))
-                binding!!.textBakery.setTextColor(Color.parseColor("#3C4541"))
+                binding.textFruits.setTextColor(Color.parseColor("#3C4541"))
+                binding.textVegetables.setTextColor(Color.parseColor("#3C4541"))
+                binding.textDairyEgg.setTextColor(Color.parseColor("#FFFFFF"))
+                binding.textBakery.setTextColor(Color.parseColor("#3C4541"))
             }
 
             R.id.llBakery->{
-                binding!!.textFruits.setBackgroundResource(R.drawable.unselect_bg)
-                binding!!.textVegetables.setBackgroundResource(R.drawable.unselect_bg)
-                binding!!.textDairyEgg.setBackgroundResource(R.drawable.unselect_bg)
-                binding!!.textBakery.setBackgroundResource(R.drawable.select_bg)
+                binding.textFruits.setBackgroundResource(R.drawable.unselect_bg)
+                binding.textVegetables.setBackgroundResource(R.drawable.unselect_bg)
+                binding.textDairyEgg.setBackgroundResource(R.drawable.unselect_bg)
+                binding.textBakery.setBackgroundResource(R.drawable.select_bg)
 
-                binding!!.textFruits.setTextColor(Color.parseColor("#3C4541"))
-                binding!!.textVegetables.setTextColor(Color.parseColor("#3C4541"))
-                binding!!.textDairyEgg.setTextColor(Color.parseColor("#3C4541"))
-                binding!!.textBakery.setTextColor(Color.parseColor("#FFFFFF"))
+                binding.textFruits.setTextColor(Color.parseColor("#3C4541"))
+                binding.textVegetables.setTextColor(Color.parseColor("#3C4541"))
+                binding.textDairyEgg.setTextColor(Color.parseColor("#3C4541"))
+                binding.textBakery.setTextColor(Color.parseColor("#FFFFFF"))
 
             }
 
         }
     }
 
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+    
 
 }

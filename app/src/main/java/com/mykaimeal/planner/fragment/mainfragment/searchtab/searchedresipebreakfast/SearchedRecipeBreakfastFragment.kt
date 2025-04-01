@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +15,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -26,7 +26,6 @@ import com.google.gson.JsonObject
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
-import com.mykaimeal.planner.adapter.AdapterPlanBreakFast
 import com.mykaimeal.planner.adapter.AdapterSearchedRecipeItem
 import com.mykaimeal.planner.adapter.ChooseDayAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
@@ -52,18 +51,14 @@ import java.util.Locale
 @AndroidEntryPoint
 class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
 
-    private var binding: FragmentSearchedRecipeBreakfastBinding?=null
-    private var dataList3: MutableList<DataModel> = mutableListOf()
-    private val calendar = Calendar.getInstance()
-    private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
-    private var chooseDayAdapter: ChooseDayAdapter? = null
-    private var rcyChooseDaySch: RecyclerView? = null
+    private var _binding: FragmentSearchedRecipeBreakfastBinding?=null
+    private val binding get() = _binding!!
     private var tvWeekRange: TextView? = null
     private lateinit var startDate: Date
     private lateinit var endDate: Date
     private lateinit var spinnerActivityLevel: PowerSpinnerView
     private val dataList = arrayListOf<DataModel>()
-    private var recipes: MutableList<Recipe>?= mutableListOf()
+    private var recipes: MutableList<Recipe> = mutableListOf()
     private var currentDate = Date() // Current date
     private var adapterSearchedRecipeItem:AdapterSearchedRecipeItem?=null
     private var recipeType: String? = null
@@ -71,40 +66,44 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        binding=FragmentSearchedRecipeBreakfastBinding.inflate(layoutInflater, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
+        // Inflate the layout for this fragment
+        _binding=FragmentSearchedRecipeBreakfastBinding.inflate(layoutInflater, container, false)
+
+        (activity as? MainActivity)?.binding?.let {
+            it.llIndicator.visibility = View.VISIBLE
+            it.llBottomNavigation.visibility = View.VISIBLE
+        }
 
         searchedRecipeViewModel = ViewModelProvider(this)[SearchedRecipeViewModel::class.java]
 
-        if (arguments!=null){
-            recipeType = requireArguments().getString("recipeName", "")
-        }
+
+        recipeType = arguments?.getString("recipeName", "") ?: ""
 
         cookbookList.clear()
 
         val data= com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favourites",0,"",0)
         cookbookList.add(0,data)
 
-        binding!!.tvSearchedTitle.text=recipeType.toString()
+        binding.tvSearchedTitle.text=recipeType.toString()
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
-
-        planDinnerModel()
+        backHandle()
 
         initialize()
 
         // This Api call when the screen in loaded
         launchApi()
 
-        return binding!!.root
+        return binding.root
+    }
+
+    private fun backHandle(){
+        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                findNavController().navigateUp()
+            }
+        })
     }
 
     private fun launchApi() {
@@ -115,8 +114,14 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
                     BaseApplication.dismissMe()
                     when (it) {
                         is NetworkResult.Success -> handleSearchSuccessResponse(it.data.toString())
-                        is NetworkResult.Error -> showAlert(it.message, false)
-                        else -> showAlert(it.message, false)
+                        is NetworkResult.Error -> {
+                            showNoData()
+                            showAlert(it.message, false)
+                        }
+                        else ->{
+                            showNoData()
+                            showAlert(it.message, false)
+                        }
                     }
                 },recipeType)
             }
@@ -135,84 +140,69 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
             val apiModel = Gson().fromJson(data, SearchModel::class.java)
             Log.d("@@@ Recipe Details ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                showDataInUi(apiModel.data)
+                apiModel.data?.let { showDataInUi(it) }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                showNoData()
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
+            showNoData()
             showAlert(e.message, false)
+        }
+    }
+
+    private fun handleError(code: Int, message: String) {
+        if (code == ErrorMessage.code) {
+            showAlert(message, true)
+        } else {
+            showAlert(message, false)
         }
     }
 
     private fun showDataInUi(searchModelData: SearchModelData) {
         try {
-            if (searchModelData!=null){
-                if (searchModelData.recipes!=null && searchModelData.recipes.size>0){
-                    recipes=searchModelData.recipes
-                    binding!!.rcySearchedItem.visibility=View.VISIBLE
-                    adapterSearchedRecipeItem = AdapterSearchedRecipeItem(searchModelData.recipes, requireActivity(),this)
-                    binding!!.rcySearchedItem.adapter = adapterSearchedRecipeItem
-                }else{
-                    binding!!.rcySearchedItem.visibility=View.GONE
-                }
+            recipes.clear()
+            searchModelData.recipes?.let {
+                recipes.addAll(it)
+            }
+            if (recipes.size>0){
+                binding.rcySearchedItem.visibility=View.VISIBLE
+                binding.tvnoData.visibility=View.GONE
+                adapterSearchedRecipeItem = AdapterSearchedRecipeItem(recipes, requireActivity(),this)
+                binding.rcySearchedItem.adapter = adapterSearchedRecipeItem
+            }else{
+                showNoData()
             }
         }catch (e:Exception){
+            showNoData()
             Log.d("@@@@SearchFragment","message:--"+e.message)
         }
     }
 
+
+    private fun showNoData(){
+        binding.rcySearchedItem.visibility=View.GONE
+        binding.tvnoData.visibility=View.VISIBLE
+    }
+
     private fun initialize() {
 
-        binding!!.relBackSearched.setOnClickListener{
+        binding.relBackSearched.setOnClickListener{
             findNavController().navigateUp()
         }
 
-        binding!!.imgHeartRed.setOnClickListener {
+        binding.imgHeartRed.setOnClickListener {
             findNavController().navigate(R.id.cookBookFragment)
         }
 
-        binding!!.imgBasketIcon.setOnClickListener {
+        binding.imgBasketIcon.setOnClickListener {
             findNavController().navigate(R.id.basketScreenFragment)
         }
+
+
     }
 
-    private fun planDinnerModel() {
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
 
-        data1.title = "Bread"
-        data1.isOpen = false
-        data1.rating="4.1(121)"
-        data1.price="3.4"
-        data1.type = "BreakFastPlan"
-        data1.image = R.drawable.bread_dinner_image
-
-        data2.title = "Juice"
-        data2.isOpen = false
-        data2.rating="4.4(128)"
-        data2.price="3.5"
-        data2.type = "BreakFastPlan"
-        data2.image = R.drawable.fresh_juice_glass_image
-
-        data3.title = "Bar-B-Q"
-        data3.isOpen = false
-        data3.rating="4.3(125)"
-        data3.price="3.2"
-        data3.type = "BreakFastPlan"
-        data3.image = R.drawable.bar_b_q_breakfast_image
-
-        dataList3.add(data1)
-        dataList3.add(data2)
-        dataList3.add(data3)
-
-//        planBreakFastAdapter = AdapterPlanBreakFast(dataList3, requireActivity(),this)
-//        binding!!.rcySearchedItem.adapter = planBreakFastAdapter
-    }
 
     private fun chooseDayDialog(position: Int?) {
         val dialogChooseDay: Dialog = context?.let { Dialog(it) }!!
@@ -278,37 +268,6 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
             println("\nAfter clicking 'Next':")
             showWeekDates()
         }
-
-
-        /*     val dialogChooseDay: Dialog = context?.let { Dialog(it) }!!
-             dialogChooseDay.setContentView(R.layout.alert_dialog_choose_day)
-             dialogChooseDay.window!!.setLayout(
-                 WindowManager.LayoutParams.MATCH_PARENT,
-                 WindowManager.LayoutParams.WRAP_CONTENT
-             )
-             dialogChooseDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-             rcyChooseDaySch = dialogChooseDay.findViewById(R.id.rcyChooseDaySch)
-             tvWeekRange = dialogChooseDay.findViewById(R.id.tvWeekRange)
-             val rlDoneBtn = dialogChooseDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
-             val btnPrevious = dialogChooseDay.findViewById<ImageView>(R.id.btnPrevious)
-             val btnNext = dialogChooseDay.findViewById<ImageView>(R.id.btnNext)
-             dialogChooseDay.show()
-             updateWeekRange()
-             dialogChooseDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-             cookingScheduleModel()
-
-             rlDoneBtn.setOnClickListener {
-                 chooseDayMealTypeDialog()
-                 dialogChooseDay.dismiss()
-             }
-
-             btnPrevious.setOnClickListener {
-                 changeWeek(-1)
-             }
-
-             btnNext.setOnClickListener {
-                 changeWeek(1)
-             }*/
     }
 
     private fun formatDate(date: Date): String {
@@ -330,10 +289,10 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
         val daysBetween = getDaysBetween(startDate, endDate)
 
         // Print the dates
-        println("Days between ${startDate} and ${endDate}:")
+        println("Days between $startDate and ${endDate}:")
         daysBetween.forEach { println(it) }
-        /*binding!!.tvDate.text = BaseApplication.formatonlyMonthYear(startDate)
-        binding!!.textWeekRange.text = ""+formatDate(startDate)+"-"+formatDate(endDate)*/
+        /*binding.tvDate.text = BaseApplication.formatonlyMonthYear(startDate)
+        binding.textWeekRange.text = ""+formatDate(startDate)+"-"+formatDate(endDate)*/
 
         tvWeekRange?.text = ""+formatDate(startDate)+"-"+formatDate(endDate)
 
@@ -354,7 +313,7 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
             }
         }
         // Update the RecyclerView
-        binding!!.recyclerViewWeekDays.adapter =  calendarAdapter*/
+        binding.recyclerViewWeekDays.adapter =  calendarAdapter*/
 
     }
 
@@ -372,74 +331,6 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
         return Pair(startOfWeek, endOfWeek)
     }
 
-
-    private fun changeWeek(weeks: Int) {
-        calendar.add(Calendar.WEEK_OF_YEAR, weeks)
-        updateWeekRange()
-    }
-
-    private fun cookingScheduleModel() {
-        val dataList = ArrayList<DataModel>()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-        val data6 = DataModel()
-        val data7 = DataModel()
-
-        data1.title = "Monday"
-        data1.isOpen = false
-        data1.type = "CookingSchedule"
-
-        data2.title = "Tuesday"
-        data2.isOpen = false
-        data2.type = "CookingSchedule"
-
-        data3.title = "Wednesday"
-        data3.isOpen = false
-        data3.type = "CookingSchedule"
-
-        data4.title = "Thursday"
-        data4.isOpen = false
-        data4.type = "CookingSchedule"
-
-        data5.title = "Friday"
-        data5.isOpen = false
-        data5.type = "CookingSchedule"
-
-        data6.title = "Saturday"
-        data6.isOpen = false
-        data6.type = "CookingSchedule"
-
-        data7.title = "Sunday"
-        data7.isOpen = false
-        data7.type = "CookingSchedule"
-
-        dataList.add(data1)
-        dataList.add(data2)
-        dataList.add(data3)
-        dataList.add(data4)
-        dataList.add(data5)
-        dataList.add(data6)
-        dataList.add(data7)
-
-        chooseDayAdapter = ChooseDayAdapter(dataList, requireActivity())
-        rcyChooseDaySch!!.adapter = chooseDayAdapter
-    }
-
-    private fun updateWeekRange() {
-        val startOfWeek = calendar.apply {
-            set(Calendar.DAY_OF_WEEK, firstDayOfWeek)
-        }.time
-
-        val endOfWeek = calendar.apply {
-            add(Calendar.DAY_OF_WEEK, 6)
-        }.time
-
-        tvWeekRange!!.text = "${dateFormat.format(startOfWeek)} - ${dateFormat.format(endOfWeek)}"
-        calendar.add(Calendar.DAY_OF_WEEK, -6) // Reset endOfWeek calculation
-    }
 
     private fun chooseDayMealTypeDialog(position: Int?) {
         val dialogChooseMealDay: Dialog = context?.let { Dialog(it) }!!
@@ -484,11 +375,11 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
         }
 
         tvSnacks.setOnClickListener {
-            updateSelection("Snack", tvSnacks, allViews)
+            updateSelection("Snacks", tvSnacks, allViews)
         }
 
         tvTeatime.setOnClickListener {
-            updateSelection("Teatime", tvTeatime, allViews)
+            updateSelection("Brunch", tvTeatime, allViews)
         }
 
 
@@ -541,7 +432,7 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
         val jsonObject = JsonObject()
 
         // Safely get the item and position
-        val item = recipes?.get(position!!)
+        val item = recipes[position!!]
         if (item != null) {
             if (item.recipe?.uri!=null){
                 jsonObject.addProperty("type", selectType)
@@ -605,11 +496,7 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
                 dialogChooseMealDay.dismiss()
                 Toast.makeText(requireContext(),apiModel.message, Toast.LENGTH_LONG).show()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -643,18 +530,12 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
                 findNavController().navigate(R.id.recipeDetailsFragment, bundle)
             }
         }
-
-    /*    if (status=="1"){
-            chooseDayDialog()
-        }else{
-            findNavController().navigate(R.id.basketScreenFragment)
-        }*/
-
     }
+
     private fun toggleIsLike(position: Int?, apiType: String) {
         // Map the type to the corresponding list and adapter
         // Safely get the item and position
-        val item = recipes?.get(position!!)
+        val item = recipes[position!!]
         if (item != null) {
             if (item.recipe?.uri!=null){
                 if (apiType.equals("basket",true)){
@@ -682,7 +563,6 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
         val rlDoneBtn = dialogAddRecipe.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         spinnerActivityLevel = dialogAddRecipe.findViewById(R.id.spinnerActivityLevel)
         val relCreateNewCookBook = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
-        val relFavourites = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relFavourites)
         val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
 
         spinnerActivityLevel.setItems(cookbookList.map { it.name })
@@ -809,11 +689,7 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
                 adapterSearchedRecipeItem?.updateList(mealList)
 
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -850,15 +726,16 @@ class SearchedRecipeBreakfastFragment : Fragment(),OnItemClickListener {
             if (apiModel.code == 200 && apiModel.success) {
                 Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

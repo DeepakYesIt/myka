@@ -12,12 +12,12 @@ data class PartnerDetail(
 )
 
 data class FamilyDetail(
-    var age: String,
+    var age: String?,
     val created_at: String,
     val deleted_at: Any?,
-    var status: String,
-    val id: Int,
-    var name: String,
+    var child_friendly_meals: String?,
+    val id: Int?,
+    var name: String?,
     val updated_at: String,
     val user_id: Int
 )

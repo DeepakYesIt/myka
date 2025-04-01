@@ -48,67 +48,68 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
     private var isExpanded = false
 
     @SuppressLint("SetTextI18n")
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         _binding = FragmentDietaryRestrictionsBinding.inflate(inflater, container, false)
-
         dietaryRestrictionsViewModel = ViewModelProvider(this)[DietaryRestrictionsViewModel::class.java]
-
         sessionManagement = SessionManagement(requireContext())
-        if (sessionManagement.getCookingFor().equals("Myself")){
-            binding.tvRestrictions.text="Do you have any dietary restrictions?"
-            binding.progressBar2.max=10
-            totalProgressValue=10
-            updateProgress(2)
-        } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-            binding.tvRestrictions.text="Do you or your partner have any dietary restrictions?"
-            binding.progressBar2.max=11
-            totalProgressValue=11
-            updateProgress(3)
-        } else {
-            binding.tvRestrictions.text="Do you or any of your family members have any  dietary restrictions?"
-            binding.progressBar2.max=11
-            totalProgressValue=11
-            updateProgress(3)
+
+        val cookingFor = sessionManagement.getCookingFor()
+        val progressValue: Int
+        val maxProgress: Int
+        val restrictionText: String
+        when (cookingFor) {
+            "Myself" -> {
+                restrictionText = "Do you have any dietary restrictions?"
+                maxProgress = 10
+                progressValue = 2
+            }
+            "MyPartner" -> {
+                restrictionText = "Do you or your partner have any dietary restrictions?"
+                maxProgress = 11
+                progressValue = 3
+            }
+            else -> {
+                restrictionText = "Do you or any of your family members have any dietary restrictions?"
+                maxProgress = 11
+                progressValue = 3
+            }
         }
 
-        if (sessionManagement.getCookingScreen().equals("Profile")){
-            binding.llBottomBtn.visibility=View.GONE
-            binding.rlUpdateDietRest.visibility=View.VISIBLE
+        binding.tvRestrictions.text = restrictionText
+        binding.progressBar2.max = maxProgress
+        totalProgressValue = maxProgress
+        updateProgress(progressValue)
 
-            if (BaseApplication.isOnline(requireActivity())) {
+        val isProfileScreen = sessionManagement.getCookingScreen().equals("Profile",true)
+        binding.llBottomBtn.visibility = if (isProfileScreen) View.GONE else View.VISIBLE
+        binding.rlUpdateDietRest.visibility = if (isProfileScreen) View.VISIBLE else View.GONE
+
+        if (BaseApplication.isOnline(requireContext())) {
+            if (isProfileScreen) {
                 dietaryRestrictionSelectApi()
             } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                dietaryRestrictionsViewModel.getDietaryResData()?.let {
+                    showDataInUi(it)
+                } ?: dietaryRestrictionApi()
             }
-        }else{
-            binding.llBottomBtn.visibility=View.VISIBLE
-            binding.rlUpdateDietRest.visibility=View.GONE
-
-            if (dietaryRestrictionsViewModel.getDietaryResData()!=null){
-                showDataInUi(dietaryRestrictionsViewModel.getDietaryResData()!!)
-            }else{
-                ///checking the device of mobile data in online and offline(show network error message)
-                if (BaseApplication.isOnline(requireContext())) {
-                    dietaryRestrictionApi()
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            }
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
+        backButton()
+
+        initialize()
+
+        return binding.root
+    }
+
+    private fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
         })
-
-        initialize()
-
-        return binding.root
     }
 
     private fun dietaryRestrictionSelectApi() {
@@ -196,7 +197,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
                 }
 
                 // Show "Show More" button only if there are more than 3 items
-                if (dietaryModelData.size > 3) {
+                if (dietaryModelData.size > 5) {
                     binding.relMoreButton.visibility = View.VISIBLE
                 }
                 dietaryModelsData=dietaryModelData
@@ -235,7 +236,7 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
 
     @SuppressLint("SetTextI18n")
     private fun updateProgress(progress: Int) {
-        binding.progressBar2.progress = progress
+        binding.progressBar2.progress=progress
         binding.tvProgressText.text = "$progress/$totalProgressValue"
     }
 
@@ -332,8 +333,6 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
             sessionManagement.setDietaryRestrictionList(null)
             if (sessionManagement.getCookingFor().equals("Myself")){
                 findNavController().navigate(R.id.favouriteCuisinesFragment)
-            } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-                findNavController().navigate(R.id.ingredientDislikesFragment)
             } else {
                 findNavController().navigate(R.id.ingredientDislikesFragment)
             }

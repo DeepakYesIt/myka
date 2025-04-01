@@ -26,35 +26,36 @@ import kotlinx.coroutines.launch
 
 class AddTipScreenFragment : Fragment() {
 
-    private var binding: FragmentAddTipScreenBinding? = null
+    private var _binding: FragmentAddTipScreenBinding? = null
+    private val binding get() = _binding!!
     private lateinit var addTipScreenViewModel: AddTipScreenViewModel
     private var totalPrices = ""
     private var status = ""
 
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        binding = FragmentAddTipScreenBinding.inflate(layoutInflater, container, false)
-
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
-
-        addTipScreenViewModel =
-            ViewModelProvider(requireActivity())[AddTipScreenViewModel::class.java]
-
-
-        if (arguments != null) {
-            totalPrices = arguments?.getString("totalPrices", "").toString()
+        _binding = FragmentAddTipScreenBinding.inflate(layoutInflater, container, false)
+        
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.GONE
+            llBottomNavigation.visibility = View.GONE
         }
+        
+        addTipScreenViewModel = ViewModelProvider(requireActivity())[AddTipScreenViewModel::class.java]
+
+        totalPrices = arguments?.getString("totalPrices") ?: ""
+
 
         setupBackNavigation()
 
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun setupBackNavigation() {
@@ -70,83 +71,113 @@ class AddTipScreenFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun initialize() {
 
-        binding!!.tvDescriptions.text =
-            "100% of your tip goes to your courier. Tips are based on your order total of $$totalPrices before any discounts or promotions."
+        binding.tvDescriptions.text = "100% of your tip goes to your courier. Tips are based on your order total of $$totalPrices before any discounts or promotions."
 
-        binding!!.relBack.setOnClickListener {
+        binding.relBack.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.linearNotNow.setOnClickListener {
-            status="1"
-            searchable()
-            binding!!.linearNotNow.setBackgroundResource(R.drawable.outline_green_border_bg)
-            binding!!.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llTwelveDollar.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llFifteenDollar.setBackgroundResource(R.drawable.edittext_bg)
-        }
+//        binding.linearNotNow.setOnClickListener {
+//            status="1"
+//            searchable()
+//            binding.linearNotNow.setBackgroundResource(R.drawable.outline_green_border_bg)
+//            binding.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llTwelveDollar.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llFifteenDollar.setBackgroundResource(R.drawable.edittext_bg)
+//        }
+//
+//        binding.llSevenDollar.setOnClickListener {
+//            status="1"
+//            searchable()
+//            binding.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llSevenDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
+//            binding.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llTwelveDollar.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llFifteenDollar.setBackgroundResource(R.drawable.edittext_bg)
+//        }
+//
+//        binding.llNineDollar.setOnClickListener {
+//            status="1"
+//            searchable()
+//            binding.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llNineDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
+//            binding.llTwelveDollar.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llFifteenDollar.setBackgroundResource(R.drawable.edittext_bg)
+//
+//        }
+//
+//        binding.llTwelveDollar.setOnClickListener {
+//            status="1"
+//            searchable()
+//            binding.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llTwelveDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
+//            binding.llFifteenDollar.setBackgroundResource(R.drawable.edittext_bg)
+//        }
+//
+//        binding.llFifteenDollar.setOnClickListener {
+//            status="1"
+//            searchable()
+//            binding.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llTwelveDollar.setBackgroundResource(R.drawable.edittext_bg)
+//            binding.llFifteenDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
+//        }
 
-        binding!!.llSevenDollar.setOnClickListener {
-            status="1"
-            searchable()
-            binding!!.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llSevenDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
-            binding!!.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llTwelveDollar.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llFifteenDollar.setBackgroundResource(R.drawable.edittext_bg)
-        }
+//        binding.rlProceedAndPay.setOnClickListener {
+//            if (status!=""){
+//                if (BaseApplication.isOnline(requireContext())) {
+//                    paymentCreditDebitApi()
+//                } else {
+//                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+//                }
+//            }
+////            findNavController().navigate(R.id.paymentCreditDebitFragment)
+//        }
 
-        binding!!.llNineDollar.setOnClickListener {
-            status="1"
-            searchable()
-            binding!!.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llNineDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
-            binding!!.llTwelveDollar.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llFifteenDollar.setBackgroundResource(R.drawable.edittext_bg)
 
-        }
 
-        binding!!.llTwelveDollar.setOnClickListener {
-            status="1"
-            searchable()
-            binding!!.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llTwelveDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
-            binding!!.llFifteenDollar.setBackgroundResource(R.drawable.edittext_bg)
-        }
+        binding.linearNotNow.setOnClickListener { updateSelection(binding.linearNotNow) }
+        binding.llSevenDollar.setOnClickListener { updateSelection(binding.llSevenDollar) }
+        binding.llNineDollar.setOnClickListener { updateSelection(binding.llNineDollar) }
+        binding.llTwelveDollar.setOnClickListener { updateSelection(binding.llTwelveDollar) }
+        binding.llFifteenDollar.setOnClickListener { updateSelection(binding.llFifteenDollar) }
 
-        binding!!.llFifteenDollar.setOnClickListener {
-            status="1"
-            searchable()
-            binding!!.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llTwelveDollar.setBackgroundResource(R.drawable.edittext_bg)
-            binding!!.llFifteenDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
-        }
-
-        binding!!.rlProceedAndPay.setOnClickListener {
-            if (status!=""){
+        binding.rlProceedAndPay.setOnClickListener {
+            if (status.isNotEmpty()) {
                 if (BaseApplication.isOnline(requireContext())) {
                     paymentCreditDebitApi()
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }
-//            findNavController().navigate(R.id.paymentCreditDebitFragment)
         }
+
+
     }
+
+
+
+    private fun updateSelection(selectedView: View) {
+        status = "1"
+        searchable()
+        val allViews = listOf(binding.linearNotNow, binding.llSevenDollar, binding.llNineDollar, binding.llTwelveDollar, binding.llFifteenDollar)
+        allViews.forEach { it.setBackgroundResource(R.drawable.edittext_bg) }
+        selectedView.setBackgroundResource(R.drawable.outline_green_border_bg)
+    }
+
 
     private fun searchable() {
         if (status != "") {
             status = "1"
-            binding!!.rlProceedAndPay.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlProceedAndPay.setBackgroundResource(R.drawable.green_fill_corner_bg)
         } else {
             status = ""
-            binding!!.rlProceedAndPay.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.rlProceedAndPay.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
 
     }
@@ -212,6 +243,12 @@ class AddTipScreenFragment : Fragment() {
             findNavController().navigate(R.id.trackOrderScreenFragment, bundle)
         }
 
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

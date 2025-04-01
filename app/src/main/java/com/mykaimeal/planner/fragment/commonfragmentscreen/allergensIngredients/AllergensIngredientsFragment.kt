@@ -57,11 +57,11 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
     private lateinit var textListener: TextWatcher
     private var textChangedJob: Job? = null
 
-    @SuppressLint("SuspiciousIndentation")
+    @SuppressLint("SuspiciousIndentation", "SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentAllergensIngredientsBinding.inflate(inflater, container, false)
 
@@ -78,14 +78,12 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
             totalProgressValue = 10
             updateProgress(5)
         } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-            binding.tvAllergensDesc.text =
-                "Pick ingredients you and your partner are allergic to"
+            binding.tvAllergensDesc.text = "Pick ingredients you and your partner are allergic to"
             binding.progressBar5.max = 11
             totalProgressValue = 11
             updateProgress(5)
         } else {
-            binding.tvAllergensDesc.text =
-                "Which ingredients are you and your family allergic to?"
+            binding.tvAllergensDesc.text = "Which ingredients are you and your family allergic to?"
             binding.progressBar5.max = 11
             totalProgressValue = 11
             updateProgress(5)
@@ -95,7 +93,6 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
             binding.llBottomBtn.visibility = View.GONE
             binding.rlUpdateAllergens.visibility = View.VISIBLE
             if (BaseApplication.isOnline(requireActivity())) {
-//                allergenIngredientSelectApi()
                 searchable("","count")
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
@@ -111,8 +108,6 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                     binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 }
             } else {
-                ///checking the device of mobile data in online and offline(show network error message)
-                ///checking the device of mobile data in online and offline(show network error message)
                 /// allergies api implement
                 if (BaseApplication.isOnline(requireContext())) {
 //                    allergenIngredientApi()
@@ -194,16 +189,6 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
             stillSkipDialog()
         }
 
-       /* // Add a TextWatcher to monitor changes in the username EditText field.
-        // The searchable() function is triggered after text changes to search ingredient
-        binding.etAllergensIngSearchBar.addTextChangedListener(object :
-            TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(editable: Editable) {
-                searchable(editable.toString())
-            }
-        })*/
 
         /// handle click event for redirect next part
         binding.tvNextBtn.setOnClickListener {
@@ -229,14 +214,12 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
             }
         }
 
-
         binding.relMoreButton.setOnClickListener { v ->
             binding.relMoreButton.visibility=View.VISIBLE
 
             itemCount = (itemCount.toInt() + 10).toString()  // Convert to Int, add 10, convert back to String
             ///checking the device of mobile data in online and offline(show network error message)
             if (BaseApplication.isOnline(requireContext())) {
-//                allergenIngredientApi()
                 searchable("","count")
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
