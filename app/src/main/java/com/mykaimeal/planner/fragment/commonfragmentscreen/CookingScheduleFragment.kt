@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.commonfragmentscreen
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -21,7 +22,7 @@ import com.mykaimeal.planner.model.DataModel
 
 class CookingScheduleFragment : Fragment(),OnItemClickListener {
 
-    private var binding: FragmentCookingScheduleBinding? = null
+    private lateinit var binding: FragmentCookingScheduleBinding
     private val dataList = ArrayList<DataModel>()
     private var dietaryRestrictionsAdapter: AdapterCookingSchedule? = null
     private lateinit var sessionManagement: SessionManagement
@@ -32,30 +33,30 @@ class CookingScheduleFragment : Fragment(),OnItemClickListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentCookingScheduleBinding.inflate(inflater, container, false)
 
         sessionManagement = SessionManagement(requireContext())
         if (sessionManagement.getCookingFor().equals("Myself")){
-            binding!!.textCookingSch.visibility=View.VISIBLE
-            binding!!.textCookingFamilySch.visibility=View.GONE
-            binding!!.tvCookingSchDesc.text="Select the days you usually cook or prep meals"
-            binding!!.progressBar8.max=10
+            binding.textCookingSch.visibility=View.VISIBLE
+            binding.textCookingFamilySch.visibility=View.GONE
+            binding.tvCookingSchDesc.text="Select the days you usually cook or prep meals"
+            binding.progressBar8.max=10
             totalProgressValue=10
             updateProgress(8)
         } else if (sessionManagement.getCookingFor().equals("MyPartner")){
-            binding!!.textCookingSch.visibility=View.VISIBLE
-            binding!!.textCookingFamilySch.visibility=View.GONE
-            binding!!.tvCookingSchDesc.text="Select the days you usually cook or prep meals"
-            binding!!.progressBar8.max=11
+            binding.textCookingSch.visibility=View.VISIBLE
+            binding.textCookingFamilySch.visibility=View.GONE
+            binding.tvCookingSchDesc.text="Select the days you usually cook or prep meals"
+            binding.progressBar8.max=11
             totalProgressValue=11
             updateProgress(7)
         } else {
-            binding!!.textCookingSch.visibility=View.GONE
-            binding!!.textCookingFamilySch.visibility=View.VISIBLE
-            binding!!.tvCookingSchDesc.text="Which days do you normally meal prep or cook for your family?"
-            binding!!.progressBar8.max=11
+            binding.textCookingSch.visibility=View.GONE
+            binding.textCookingFamilySch.visibility=View.VISIBLE
+            binding.tvCookingSchDesc.text="Which days do you normally meal prep or cook for your family?"
+            binding.progressBar8.max=11
             totalProgressValue=11
             updateProgress(7)
         }
@@ -69,25 +70,26 @@ class CookingScheduleFragment : Fragment(),OnItemClickListener {
 //        cookingScheduleModel()
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateProgress(progress: Int) {
-        binding!!.progressBar8.progress = progress
-        binding!!.tvProgressText.text = "$progress/$totalProgressValue"
+        binding.progressBar8.progress = progress
+        binding.tvProgressText.text = "$progress/$totalProgressValue"
     }
 
     private fun initialize() {
 
-        binding!!.imgBackCookingSch.setOnClickListener{
+        binding.imgBackCookingSch.setOnClickListener{
             findNavController().navigateUp()
         }
 
-        binding!!.tvSkipBtn.setOnClickListener{
+        binding.tvSkipBtn.setOnClickListener{
             stillSkipDialog()
         }
 
-        binding!!.tvNextBtn.setOnClickListener{
+        binding.tvNextBtn.setOnClickListener{
             if (status=="2"){
                 if (sessionManagement.getCookingFor().equals("Myself")){
                     findNavController().navigate(R.id.spendingOnGroceriesFragment)
@@ -171,17 +173,17 @@ class CookingScheduleFragment : Fragment(),OnItemClickListener {
 //        dataList.add(data7)
 //
 //        dietaryRestrictionsAdapter = AdapterCookingSchedule(dataList, requireActivity(),this)
-//        binding!!.rcyCookingSch.adapter = dietaryRestrictionsAdapter
+//        binding.rcyCookingSch.adapter = dietaryRestrictionsAdapter
 //    }
 
     override fun itemClick(position: Int?, status1: String?, type: String?) {
         if (status1 == "1") {
             status=""
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         } else {
             status="2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
 
         }
     }
