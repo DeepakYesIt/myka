@@ -21,6 +21,7 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
     private var binding: FragmentOrderHistoryBinding? = null
     private var dataList3: MutableList<DataModel> = mutableListOf()
     private var adapterOrderHistoryItem: AdapterOrderHistoryItem? = null
+    private var id:String=""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,8 +30,10 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
         // Inflate the layout for this fragment
         binding = FragmentOrderHistoryBinding.inflate(inflater, container, false)
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
+        (activity as MainActivity?)!!.binding.llIndicator.visibility = View.VISIBLE
+        (activity as MainActivity?)!!.binding.llBottomNavigation.visibility = View.VISIBLE
+
+        id=arguments?.getString("id","").toString()
 
         setupBackNavigation()
 
@@ -42,11 +45,20 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
     }
 
     private fun setupBackNavigation() {
+
+        if (id=="yes"){
+            binding!!.relNoOrders.visibility = View.GONE
+            binding!!.rcyOrderHistory.visibility = View.VISIBLE
+        }else{
+            binding!!.relNoOrders.visibility = View.VISIBLE
+            binding!!.rcyOrderHistory.visibility = View.GONE
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    findNavController().navigateUp()
+                    findNavController().navigate(R.id.settingProfileFragment)
                 }
             })
     }
@@ -54,7 +66,7 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
     private fun initialize() {
 
         binding!!.imgBackOrderHistory.setOnClickListener {
-            findNavController().navigateUp()
+            findNavController().navigate(R.id.settingProfileFragment)
         }
 
         binding!!.rlStartOrder.setOnClickListener {

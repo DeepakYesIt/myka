@@ -397,7 +397,15 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
             R.id.imageNameEditable -> disableProfileEditing()
             R.id.imageEditTargets -> moveToNextScreen()
             R.id.relMyWallet -> navigateToFragment(R.id.walletFragment)
-            R.id.relOrderHistory -> navigateToFragment(R.id.orderHistoryFragment)
+            R.id.relOrderHistory -> {
+                val bundle = Bundle().apply {
+                    putString("id","no")
+                }
+                findNavController().navigate(R.id.orderHistoryFragment,bundle)
+/*
+                navigateToFragment(R.id.orderHistoryFragment)
+*/
+            }
             R.id.relHealthData -> navigateToFragment(R.id.healthDataFragment)
             R.id.relFeedbackSupport -> navigateToFragment(R.id.feedbackFragment)
             R.id.imageProfile -> navigateToFragment(R.id.editProfileFragment)

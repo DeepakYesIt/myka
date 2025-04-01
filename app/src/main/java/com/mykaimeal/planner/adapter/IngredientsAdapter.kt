@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -12,6 +14,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.chauthai.swipereveallayout.SwipeRevealLayout
 import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterBasketIngItemBinding
@@ -19,8 +22,7 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.mod
 
 class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
                          private var requireActivity: FragmentActivity,
-                         private var onItemSelectListener: OnItemSelectListener
-):
+                         private var onItemSelectListener: OnItemSelectListener):
     RecyclerView.Adapter<IngredientsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -102,6 +104,21 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
             }
         }
 
+        holder.binding.swipeLayout.setSwipeListener(object : SwipeRevealLayout.SwipeListener {
+            override fun onClosed(view: SwipeRevealLayout) {
+
+
+            }
+
+            override fun onOpened(view: SwipeRevealLayout) {
+                // Change to desired background color
+            }
+
+            override fun onSlide(view: SwipeRevealLayout, slideOffset: Float) {
+                // Optional: Gradually change color based on slide offset
+            }
+        })
+
 
     }
 
@@ -115,6 +132,10 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
     }
 
     class ViewHolder(var binding: AdapterBasketIngItemBinding) : RecyclerView.ViewHolder(binding.root){
+
+
+
+
     }
 
 }

@@ -32,14 +32,14 @@ class AdapterProductsDetailsSelectItem(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        val data= datalist[position]
+        val data = datalist[position]
 
-        if (data.name!=null){
-            holder.binding.textProductName.text=data.name.toString()
+        if (data.name != null) {
+            holder.binding.textProductName.text = data.name.toString()
         }
 
-        if (data.formatted_price!=null){
-            holder.binding.textPrice.text=data.formatted_price.toString()
+        if (data.formatted_price != null) {
+            holder.binding.textPrice.text = data.formatted_price.toString()
         }
 
         data.let {
@@ -81,8 +81,17 @@ class AdapterProductsDetailsSelectItem(
         holder.binding.productImage.setImageResource(datalist[position].image)*/
 
 
-        holder.binding.llProductsClick.setOnClickListener{
-            onItemSelectListener.itemSelect(position,data.product_id,"products")
+        holder.binding.productImage.setOnClickListener {
+            onItemSelectListener.itemSelect(position, data.product_id, "products")
+        }
+
+        holder.binding.textProductName.setOnClickListener {
+            onItemSelectListener.itemSelect(position, data.product_id, "products")
+        }
+
+
+        holder.binding.productDetails.setOnClickListener {
+            onItemSelectListener.itemSelect(position, data.product_id, "swap")
         }
 
     }

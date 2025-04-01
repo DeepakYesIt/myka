@@ -18,6 +18,8 @@ import com.mykaimeal.planner.OnItemSelectUnSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterSuperMarketItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Store
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 class AdapterSuperMarket(private var storesData: MutableList<Store>?,
                          private var requireActivity: FragmentActivity,
@@ -45,7 +47,27 @@ class AdapterSuperMarket(private var storesData: MutableList<Store>?,
         }
 
         data?.let {
+
+            if (it.all_items==1){
+                if (it.missing!=null){
+                    holder.binding.tvSuperMarketItems.setTextColor(android.graphics.Color.parseColor("#FF3232"))
+                    holder.binding.tvSuperMarketItems.text=it.missing.toString()+"ITEMS MISSING"
+                }
+            }else{
+                holder.binding.tvSuperMarketItems.setTextColor(android.graphics.Color.parseColor("#06C169"))
+                holder.binding.tvSuperMarketItems.text="ALL ITEMS"
+            }
+
+            if (it.total!=null){
+                val roundedNetTotal = it.total.let {
+                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+                }
+                holder.binding.tvSuperMarketRupees.text= "$$roundedNetTotal"
+            }
+
+/*
             holder.binding.tvSuperMarketItems.text = it.store_name ?: ""
+*/
 
             // ✅ Load image with Glide
             Glide.with(requireActivity)

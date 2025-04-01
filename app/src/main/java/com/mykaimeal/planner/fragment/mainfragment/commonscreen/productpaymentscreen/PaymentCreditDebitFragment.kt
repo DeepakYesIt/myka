@@ -43,8 +43,6 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
     private var year: Int = 0
     private lateinit var paymentCreditDebitViewModel:PaymentCreditDebitViewModel
 
-//    getOrderProductUrl
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -91,10 +89,11 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
         }
 
         binding.imgCheckUncheck.setOnClickListener{
-            if (checkUnchecked == true){
-                binding.imgCheckUncheck.setImageResource(R.drawable.uncheck_box_images)
-            }else{
+            checkUnchecked = !checkUnchecked!!
+            if (checkUnchecked as Boolean) {
                 binding.imgCheckUncheck.setImageResource(R.drawable.tick_ckeckbox_images)
+            } else {
+                binding.imgCheckUncheck.setImageResource(R.drawable.uncheck_box_images)
             }
         }
 
@@ -110,6 +109,7 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
 
         binding.textAddCardNumber.setOnClickListener{
             binding.cvDebitCard3.visibility=View.VISIBLE
+            binding.textAddCardNumber.visibility=View.GONE
         }
     }
 
@@ -161,12 +161,13 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
 
         if (data!=null && data.size>0){
             binding.cvDebitCard3.visibility=View.GONE
+            binding.textAddCardNumber.visibility=View.GONE
             adapterPaymentCreditDebitItem = AdapterPaymentCreditDebitItem(requireContext(), data,  this)
             binding.rcvCardNumber.adapter = adapterPaymentCreditDebitItem
         }else{
             binding.cvDebitCard3.visibility=View.VISIBLE
+            binding.textAddCardNumber.visibility=View.GONE
         }
-
     }
 
     private fun cardSaveApi() {

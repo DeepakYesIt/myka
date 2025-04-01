@@ -277,7 +277,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     private fun showDataInUI(data: CheckoutScreenModelData?) {
 
         if (data!!.phone != null || data.country_code!=null) {
-            binding!!.tvAddNumber.text = data.country_code+data.phone.toString()
+            binding!!.tvAddNumber.text = "("+data.country_code+")"+data.phone.toString()
             binding!!.tvAddNumber.setTextColor(Color.parseColor("#000000"))
         }
 

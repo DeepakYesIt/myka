@@ -3,6 +3,7 @@ package com.mykaimeal.planner.fragment.mainfragment.commonscreen.addnumberfragme
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.telecom.Call
 import android.text.Editable
 import android.text.TextWatcher
@@ -29,15 +30,19 @@ import dagger.hilt.android.AndroidEntryPoint
 import `in`.aabhasjindal.otptextview.OTPListener
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import java.util.Locale
 import javax.security.auth.callback.Callback
 
 @AndroidEntryPoint
 class AddNumberVerifyFragment : Fragment() {
     private var binding: FragmentAddNumberVerifyBinding? = null
     private lateinit var addNumberVerifyViewModel: AddNumberVerifyViewModel
-    var lastNumber: String =""
-    private var countryCode:String="+44"
+    var lastNumber: String = ""
+    private var countryCode: String = "+1"
     private lateinit var commonWorkUtils: CommonWorkUtils
+    private val START_TIME_IN_MILLIS: Long = 120000
+    private var mTimeLeftInMillis = START_TIME_IN_MILLIS
+    private var status: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,7 +53,8 @@ class AddNumberVerifyFragment : Fragment() {
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
 
-        addNumberVerifyViewModel = ViewModelProvider(requireActivity())[AddNumberVerifyViewModel::class.java]
+        addNumberVerifyViewModel =
+            ViewModelProvider(requireActivity())[AddNumberVerifyViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
@@ -65,11 +71,11 @@ class AddNumberVerifyFragment : Fragment() {
 
     private fun initialize() {
 
-        binding!!.relBacks.setOnClickListener{
+        binding!!.relBacks.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.countryCodePicker.setDefaultCountryUsingNameCode("GB")
+        binding!!.countryCodePicker.setDefaultCountryUsingNameCode("US")
         binding!!.countryCodePicker.resetToDefaultCountry()
 
         binding?.etRegPhone?.addTextChangedListener(object : TextWatcher {
@@ -77,11 +83,11 @@ class AddNumberVerifyFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {
                 val input = s.toString()
                 // Enable button only if the phone number is valid (10 digits)
-                if (input==lastNumber){
+                if (input == lastNumber) {
                     binding?.tvVerify?.isClickable = false
                     binding?.tvVerify?.isEnabled = false
                     binding?.tvVerify?.setTextColor(Color.parseColor("#D7D7D7")) // Gray color for inactive state
-                }else{
+                } else {
                     if (input.length >= 10) {
                         binding?.tvVerify?.isClickable = true
                         binding?.tvVerify?.isEnabled = true
@@ -108,6 +114,7 @@ class AddNumberVerifyFragment : Fragment() {
 
         // Click Listener
         binding?.tvVerify?.setOnClickListener {
+            status = "verify"
             if (validate()) {
                 if (BaseApplication.isOnline(requireActivity())) {
                     getOtpUrl()
@@ -117,7 +124,16 @@ class AddNumberVerifyFragment : Fragment() {
             }
         }
 
-        binding!!.rlVerificationVerify.setOnClickListener{
+        binding?.textResend?.setOnClickListener {
+            status = "resend"
+            if (BaseApplication.isOnline(requireActivity())) {
+                getOtpUrl()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+
+        binding!!.rlVerificationVerify.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
                 addNumberUrl()
             } else {
@@ -133,7 +149,7 @@ class AddNumberVerifyFragment : Fragment() {
             override fun onOTPComplete(otp: String) {
                 // Called when OTP is fully entered
                 binding!!.rlVerificationVerify.setBackgroundResource(R.drawable.green_btn_background)
-                binding!!.rlVerificationVerify.isClickable=true
+                binding!!.rlVerificationVerify.isClickable = true
             }
         }
     }
@@ -176,17 +192,22 @@ class AddNumberVerifyFragment : Fragment() {
             addNumberVerifyViewModel.sendOtpUrl({
                 BaseApplication.dismissMe()
                 handleApiOtpSendResponse(it)
-            }, countryCode+binding!!.etRegPhone.text.toString().trim())
+            }, countryCode + binding!!.etRegPhone.text.toString().trim())
         }
     }
 
     private fun addNumberUrl() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            addNumberVerifyViewModel.addPhoneUrl({
-                BaseApplication.dismissMe()
-                handleApiVerifyResponse(it)
-            }, binding!!.etRegPhone.text.toString().trim(),binding!!.otpView.otp.toString(),countryCode)
+            addNumberVerifyViewModel.addPhoneUrl(
+                {
+                    BaseApplication.dismissMe()
+                    handleApiVerifyResponse(it)
+                },
+                binding!!.etRegPhone.text.toString().trim(),
+                binding!!.otpView.otp.toString(),
+                countryCode
+            )
         }
     }
 
@@ -197,7 +218,9 @@ class AddNumberVerifyFragment : Fragment() {
                 binding?.tvVerify?.isClickable = true
                 binding?.tvVerify?.isEnabled = true
                 binding?.tvVerify?.setTextColor(Color.parseColor("#06C169")) // Green color for active state
-                showAlert(result.message, false)}
+                showAlert(result.message, false)
+            }
+
             else -> showAlert(result.message, false)
         }
     }
@@ -220,11 +243,18 @@ class AddNumberVerifyFragment : Fragment() {
             val apiModel = Gson().fromJson(data, OtpSendModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                lastNumber=binding?.etRegPhone?.text.toString().trim()
+                lastNumber = binding?.etRegPhone?.text.toString().trim()
                 binding?.tvVerify?.isClickable = false
                 binding?.tvVerify?.isEnabled = false
                 binding!!.tvVerify.setTextColor(R.color.grey5)
                 binding!!.relPhoneValidation.visibility = View.VISIBLE
+
+                if (status == "resend") {
+                    binding?.otpView?.setOTP("")
+                    binding?.relResendVerificationTimer?.visibility = View.VISIBLE
+                    binding?.textResend?.isEnabled = false
+                    startTime()
+                }
             } else {
                 binding?.tvVerify?.isClickable = true
                 binding?.tvVerify?.isEnabled = true
@@ -240,6 +270,33 @@ class AddNumberVerifyFragment : Fragment() {
         }
     }
 
+    /// start timer for counting 2 minutes
+    private fun startTime() {
+        object : CountDownTimer(mTimeLeftInMillis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                mTimeLeftInMillis = millisUntilFinished
+                binding?.textResend?.setTextColor(Color.parseColor("#828282"))
+                updateCountDownText()
+            }
+
+            override fun onFinish() {
+                mTimeLeftInMillis = 120000
+                binding?.textResend?.setTextColor(Color.parseColor("#06C169"))
+                binding?.relResendVerificationTimer?.visibility = View.INVISIBLE
+                binding?.textResend?.isEnabled = true
+            }
+        }.start()
+    }
+
+
+    /// update count timer
+    @SuppressLint("SetTextI18n")
+    private fun updateCountDownText() {
+        val minutes = mTimeLeftInMillis.toInt() / 1000 / 60
+        val seconds = mTimeLeftInMillis.toInt() / 1000 % 60
+        val timeLeftFormatted = String.format(Locale.getDefault(), " %02d:%02d", minutes, seconds)
+        binding?.tvTimer?.text = "$timeLeftFormatted sec"
+    }
 
 
     @SuppressLint("SetTextI18n", "ResourceAsColor")
@@ -248,12 +305,15 @@ class AddNumberVerifyFragment : Fragment() {
             val apiModel = Gson().fromJson(data, OtpSendModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                Toast.makeText(requireContext(),""+apiModel.message,Toast.LENGTH_LONG).show()
+                binding!!.tvVerificationError.visibility = View.GONE
+                Toast.makeText(requireContext(), "" + apiModel.message, Toast.LENGTH_LONG).show()
+                findNavController().navigateUp()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
+                    binding!!.tvVerificationError.visibility = View.VISIBLE
                 } else {
-                    showAlert(apiModel.message, false)
+                    binding!!.tvVerificationError.visibility = View.VISIBLE
+//                    showAlert(apiModel.message, false)
                 }
             }
         } catch (e: Exception) {

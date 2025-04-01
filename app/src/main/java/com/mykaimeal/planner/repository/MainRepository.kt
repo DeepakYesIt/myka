@@ -250,6 +250,7 @@ interface MainRepository {
     suspend fun getOrderProductUrl(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getStoreProductUrl(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit)
+    suspend fun getAllIngredientsUrl(successCallback: (response: NetworkResult<String>) -> Unit,category:String?,search:String?,number:String?)
     suspend fun addCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit,cardNumber:String?,expMonth:String?,expYear:String?,cvv:String?)
 
     suspend fun getProductsUrl(successCallback: (response: NetworkResult<String>) -> Unit,query:String?)

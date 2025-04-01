@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -26,6 +27,7 @@ import com.mykaimeal.planner.adapter.BasketYourRecipeAdapter
 import com.mykaimeal.planner.adapter.IngredientsShoppingAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentShoppingListBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Recipes
@@ -36,6 +38,7 @@ import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.api
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 @AndroidEntryPoint
 class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
@@ -47,6 +50,10 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private var quantity: Int = 1
     private var recipe: MutableList<Recipes>? = null
     private var ingredientList: MutableList<Ingredient>? = null
+    private var foodIds = mutableListOf<String>()
+    private var foodName = mutableListOf<String>()
+    private var statusType = mutableListOf<String>()
+    private lateinit var commonWorkUtils: CommonWorkUtils
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,6 +62,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         // Inflate the layout for this fragment
         binding = FragmentShoppingListBinding.inflate(layoutInflater, container, false)
 
+        commonWorkUtils = CommonWorkUtils(requireActivity())
         shoppingListViewModel =
             ViewModelProvider(requireActivity())[ShoppingListViewModel::class.java]
 
@@ -93,7 +101,6 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         binding.rlAddMore.setOnClickListener {
-
             addItemDialog()
             /*     findNavController().navigate(R.id.addMoreItemsFragment)*/
         }
@@ -112,6 +119,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         val imageMinus = dialogRemoveDay.findViewById<ImageView>(R.id.imageMinus)
         val imagePlus = dialogRemoveDay.findViewById<ImageView>(R.id.imagePlus)
         tvCounter = dialogRemoveDay.findViewById(R.id.tvCounter)
+        val tvLabel = dialogRemoveDay.findViewById<EditText>(R.id.tvLabel)
         val tvDialogAddBtn = dialogRemoveDay.findViewById<TextView>(R.id.tvDialogAddBtn)
         dialogRemoveDay.show()
         dialogRemoveDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
@@ -145,8 +153,66 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         tvDialogAddBtn.setOnClickListener {
-            dialogRemoveDay.dismiss()
+            if (foodName!=null){
+                foodName.clear()
+            }
+            statusType = mutableListOf("0")
+
+            val eightDigitNumber = Random.nextInt(10000000, 99999999)  // Generates 8-digit number
+            foodIds.add(eightDigitNumber.toString())
+            val inputText = tvLabel.text.toString().trim() // Get text and trim spaces
+            if (inputText.isNotEmpty()) { // Check if input is not empty
+                foodName.add(inputText) // Add to list
+                tvLabel.text.clear() // Clear input field after adding
+                if (BaseApplication.isOnline(requireActivity())) {
+                    addToCartUrlApi(dialogRemoveDay)
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            } else {
+                commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.enterIngName, false)
+            }
         }
+    }
+
+    private fun addToCartUrlApi(dismiss: Dialog) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            shoppingListViewModel.addToCartUrlApi({
+                BaseApplication.dismissMe()
+                handleCartApiResponse(it,dismiss)
+            }, foodIds, tvCounter!!.text.toString().trim(), foodName, statusType)
+        }
+    }
+
+    private fun handleCartApiResponse(result: NetworkResult<String>, dismiss: Dialog) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessCartResponse(result.data.toString(),dismiss)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessCartResponse(data: String, dismiss: Dialog) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ Recipe Details ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                dismiss.dismiss()
+                Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+
+        getShoppingList()
     }
 
     private fun getShoppingList() {
@@ -204,8 +270,9 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         if (data.ingredient != null && data.ingredient.size > 0) {
-            ingredientList=data.ingredient
-            adapterShoppingAdapter = IngredientsShoppingAdapter(data.ingredient, requireActivity(), this)
+            ingredientList = data.ingredient
+            adapterShoppingAdapter =
+                IngredientsShoppingAdapter(data.ingredient, requireActivity(), this)
             binding.rcvIngredients.adapter = adapterShoppingAdapter
 
         }

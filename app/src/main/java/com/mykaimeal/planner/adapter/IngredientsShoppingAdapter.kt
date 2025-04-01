@@ -94,7 +94,6 @@ class IngredientsShoppingAdapter(private var ingredientsData: MutableList<Ingred
             }
         }
 
-
         holder.binding.imageAddIcon.setOnClickListener{
             if (ingredientsData?.get(position)?.sch_id.toString().toInt() < 1000) {
                 onItemSelectListener.itemSelect(position,"Plus","ShoppingIngredients")

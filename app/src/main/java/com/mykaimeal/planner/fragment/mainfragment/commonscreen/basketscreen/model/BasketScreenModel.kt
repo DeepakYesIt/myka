@@ -43,7 +43,10 @@ data class Store(
     val operational_hours: OperationalHours?,
     val store_name: String?,
     val store_uuid: String?,
-    val image:String?
+    val image:String?,
+    val all_items:Int?,
+    val missing:String?,
+    val total:Double?
 )
 
 data class Address(

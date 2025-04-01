@@ -205,7 +205,6 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
         }
     }
 
-
     private fun handleApiBasketDetailsResponse(result: NetworkResult<String>) {
         when (result) {
             is NetworkResult.Success -> handleSuccessBasketResponse(result.data.toString())
@@ -360,9 +359,9 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
 
-        if (status == "2") {
+      /*  if (status == "2") {
             findNavController().navigate(R.id.tescoCartItemFragmentFragment)
-        }
+        }*/
     }
 
     override fun itemSelectUnSelect(id: Int?, status: String?, type: String?, position: Int?) {
@@ -443,6 +442,8 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
                 if (products != null) {
                     itemSectionAdapter.updateList(products!!)
                 }
+
+                getBasketDetailsApi()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)

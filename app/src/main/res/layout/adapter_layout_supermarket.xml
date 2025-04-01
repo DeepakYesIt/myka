@@ -26,7 +26,7 @@
                 android:layout_width="@dimen/_100sdp"
                 android:layout_height="@dimen/_85sdp"
                 android:layout_margin="@dimen/_3sdp"
-                android:elevation="@dimen/_10sdp"
+                android:elevation="@dimen/_3sdp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_welmart_super_market"
                 app:shapeAppearanceOverlay="@style/RoundedSquare" />

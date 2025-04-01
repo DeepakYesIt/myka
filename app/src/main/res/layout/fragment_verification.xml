@@ -126,6 +126,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/resend"
+                        android:textColor="#828282"
                         android:layout_toEndOf="@+id/textDidNotCode"
                         android:textSize="@dimen/_13sdp"
                         android:fontFamily="@font/poppins_bold"/>

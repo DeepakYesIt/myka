@@ -230,8 +230,8 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 binding!!.textNetTotalProduct.text=roundedNetTotal.toString()
             }
 
-            if (data.billing.total!=null){
-                val roundedTotal = data.billing.total.let {
+            if (data.billing.net_total!=null){
+                val roundedTotal = data.billing.net_total.let {
                     BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
                 }
                 binding!!.textTotalAmount.text= "$$roundedTotal*"

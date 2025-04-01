@@ -17,7 +17,6 @@ class AdapterCardPreferredItem(var context: Context, private var datalist: Mutab
 
     private var selectedPosition = pos // Default no selection
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding: AdapterCardPrefferedItemBinding =
