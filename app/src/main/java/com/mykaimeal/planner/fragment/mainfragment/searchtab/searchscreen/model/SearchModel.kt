@@ -2,7 +2,7 @@ package com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.model
 
 data class SearchModel(
     val code: Int,
-    val `data`: SearchModelData,
+    val `data`: SearchModelData?,
     val message: String,
     val success: Boolean
 )

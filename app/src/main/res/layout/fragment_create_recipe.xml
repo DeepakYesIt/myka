@@ -163,7 +163,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/_5sdp"
                             android:layout_marginEnd="@dimen/_5sdp"
-                            android:text="02"
+                            android:text="01"
                             android:textColor="#000000"
                             android:textSize="@dimen/_13sdp"
                             android:textStyle="bold" />
@@ -350,8 +350,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:weightSum="2">
-
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1">
@@ -364,12 +363,13 @@
                         android:drawableStart="@drawable/radio_check_icon"
                         android:drawablePadding="@dimen/_10sdp"
                         android:padding="@dimen/_5sdp"
+                        android:layout_centerInParent="true"
+                        android:layout_alignParentStart="true"
                         android:text="Private"
                         android:textColor="#3C4541"
                         android:textSize="@dimen/_13sdp" />
-                </LinearLayout>
-
-                <LinearLayout
+                </RelativeLayout>
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1">
@@ -382,11 +382,12 @@
                         android:drawableStart="@drawable/radio_uncheck_gray_icon"
                         android:drawablePadding="@dimen/_10sdp"
                         android:padding="@dimen/_5sdp"
+                        android:layout_centerInParent="true"
+                        android:layout_alignParentStart="true"
                         android:text="Public"
                         android:textColor="#3C4541"
                         android:textSize="@dimen/_13sdp" />
-                </LinearLayout>
-
+                </RelativeLayout>
             </LinearLayout>
 
             <RelativeLayout

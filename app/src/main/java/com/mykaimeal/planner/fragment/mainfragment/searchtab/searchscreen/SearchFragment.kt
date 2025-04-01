@@ -65,7 +65,6 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
     private var searchRecipeAdapter: SearchRecipeAdapter? = null
-    private var adapterUrlIngredients: AdapterUrlIngredientItem? = null
     private var searchMealAdapter: SearchMealAdapter? = null
     private var searchMealCatAdapter: SearchMealCatAdapter? = null
     private var status:String?="RecipeSearch"
@@ -73,17 +72,9 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
     private lateinit var sessionManagement: SessionManagement
     private lateinit var searchRecipeViewModel:SearchRecipeViewModel
     private var clickedUrl: String = ""
-    private var uri: String = ""
-    private var bottomSheetDialog: BottomSheetDialog? = null
-    private var rcyIngredients: RecyclerView? = null
-    private var tvTitleName: TextView? = null
-    private var tvTitleDesc: TextView? = null
-    private var layMainProgress: View? = null
     private var ingredient: MutableList<Ingredient>?= mutableListOf()
     private var mealType: MutableList<MealType>?= mutableListOf()
     private var category: MutableList<Category>?= mutableListOf()
-    private var imgRecipeLike: ImageView? = null
-    private lateinit var spinnerActivityLevel: PowerSpinnerView
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
 
 
@@ -95,10 +86,16 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
         (activity as MainActivity?)?.changeBottom("search")
-        (activity as MainActivity?)?.binding?.llIndicator?.visibility  =View.VISIBLE
-        (activity as MainActivity?)?.binding?.llBottomNavigation?.visibility =View.VISIBLE
+
+        (activity as? MainActivity)?.binding?.let {
+            it.llIndicator.visibility = View.VISIBLE
+            it.llBottomNavigation.visibility = View.VISIBLE
+        }
+
+        binding.cardViewAddRecipe.visibility=View.GONE
 
         clickedUrl = arguments?.getString("ClickedUrl", "").toString()
+
         searchRecipeViewModel = ViewModelProvider(this)[SearchRecipeViewModel::class.java]
 
         cookbookList.clear()
@@ -114,11 +111,7 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
             }
         })
 
-        if (clickedUrl!=""){
-            searchBottomDialog()
-        }else{
-            searchRecipeDialog()
-        }
+        searchRecipeDialog()
 
         initialize()
 
@@ -126,216 +119,6 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
         lunchApi()
 
         return binding.root
-    }
-
-    private fun searchBottomDialog() {
-        bottomSheetDialog = BottomSheetDialog(requireActivity(), R.style.BottomSheetDialog)
-        bottomSheetDialog!!.setContentView(R.layout.bottom_import_recipe_url)
-        rcyIngredients = bottomSheetDialog!!.findViewById(R.id.rcyIngredients)
-        tvTitleName = bottomSheetDialog!!.findViewById(R.id.tvTitleName)
-        tvTitleDesc = bottomSheetDialog!!.findViewById(R.id.tvTitleDesc)
-        layMainProgress = bottomSheetDialog!!.findViewById(R.id.layMainProgress)
-        imgRecipeLike = bottomSheetDialog!!.findViewById(R.id.imgRecipeLike)
-        bottomSheetDialog!!.show()
-
-        imgRecipeLike!!.setOnClickListener{
-            addFavTypeDialog()
-        }
-
-        searchMealUrlApi()
-
-    }
-
-    private fun addFavTypeDialog() {
-        val dialogAddRecipe: Dialog = context?.let { Dialog(it) }!!
-        dialogAddRecipe.setContentView(R.layout.alert_dialog_add_recipe)
-        dialogAddRecipe.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
-        dialogAddRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val rlDoneBtn = dialogAddRecipe.findViewById<RelativeLayout>(R.id.rlDoneBtn)
-        spinnerActivityLevel = dialogAddRecipe.findViewById(R.id.spinnerActivityLevel)
-        val relCreateNewCookBook = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
-        val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
-
-        val newLikeStatus = 0
-        spinnerActivityLevel.setItems(cookbookList.map { it.name })
-
-        dialogAddRecipe.show()
-        dialogAddRecipe.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-
-        getCookBookList()
-
-        relCreateNewCookBook.setOnClickListener{
-            relCreateNewCookBook.setBackgroundResource(R.drawable.light_green_rectangular_bg)
-            imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
-            dialogAddRecipe.dismiss()
-            val bundle=Bundle()
-            bundle.putString("value","New")
-            bundle.putString("uri",uri)
-            findNavController().navigate(R.id.createCookBookFragment,bundle)
-        }
-
-
-        rlDoneBtn.setOnClickListener{
-            if (spinnerActivityLevel.text.toString().equals(ErrorMessage.cookBookSelectError,true)){
-                BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
-            }else {
-                val cookBookType = cookbookList[spinnerActivityLevel.selectedIndex].id
-                recipeLikeAndUnlikeData(newLikeStatus.toString(),cookBookType.toString(), dialogAddRecipe)
-            }
-        }
-    }
-
-    private fun getCookBookList(){
-        BaseApplication.showMe(requireContext())
-        lifecycleScope.launch {
-            searchRecipeViewModel.getCookBookRequest {
-                BaseApplication.dismissMe()
-                handleApiCookBookResponse(it)
-            }
-        }
-    }
-
-    private fun handleApiCookBookResponse(result: NetworkResult<String>) {
-        when (result) {
-            is NetworkResult.Success -> handleSuccessCookBookResponse(result.data.toString())
-            is NetworkResult.Error -> showAlert(result.message, false)
-            else -> showAlert(result.message, false)
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun handleSuccessCookBookResponse(data: String) {
-        try {
-            val apiModel = Gson().fromJson(data, CookBookListResponse::class.java)
-            Log.d("@@@ addMea List ", "message :- $data")
-            if (apiModel.code == 200 && apiModel.success) {
-                if (apiModel.data!=null && apiModel.data.size>0){
-                    cookbookList.retainAll { it == cookbookList[0] }
-                    cookbookList.addAll(apiModel.data)
-                    // OR directly modify the original list
-                    spinnerActivityLevel.setItems(cookbookList.map { it.name })
-                }
-            } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
-            }
-        } catch (e: Exception) {
-            showAlert(e.message, false)
-        }
-    }
-
-    private fun recipeLikeAndUnlikeData(
-        likeType:String,
-        cookBookType: String,
-        dialogAddRecipe: Dialog?
-    ) {
-        BaseApplication.showMe(requireContext())
-        lifecycleScope.launch {
-            searchRecipeViewModel.likeUnlikeRequest({
-                BaseApplication.dismissMe()
-                handleLikeAndUnlikeApiResponse(it,dialogAddRecipe)
-            }, uri,likeType,cookBookType)
-        }
-    }
-
-    private fun handleLikeAndUnlikeApiResponse(
-        result: NetworkResult<String>,
-        dialogAddRecipe: Dialog?
-    ) {
-        when (result) {
-            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(result.data.toString(),dialogAddRecipe)
-            is NetworkResult.Error -> showAlert(result.message, false)
-            else -> showAlert(result.message, false)
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun handleLikeAndUnlikeSuccessResponse(
-        data: String,
-        dialogAddRecipe: Dialog?
-    ) {
-        try {
-            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
-            Log.d("@@@ Plan List ", "message :- $data")
-            if (apiModel.code == 200 && apiModel.success) {
-                dialogAddRecipe?.dismiss()
-            } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
-            }
-        } catch (e: Exception) {
-            showAlert(e.message, false)
-        }
-    }
-
-
-    private fun searchMealUrlApi() {
-        if (BaseApplication.isOnline(requireActivity())) {
-            layMainProgress!!.visibility=View.VISIBLE
-            lifecycleScope.launch {
-                searchRecipeViewModel.getMealByUrl({
-                    layMainProgress!!.visibility=View.GONE
-                    when (it) {
-                        is NetworkResult.Success -> handleSuccessMealResponse(it.data.toString())
-                        is NetworkResult.Error -> showAlert(it.message, false)
-                        else -> showAlert(it.message, false)
-                    }
-                },clickedUrl)
-            }
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun handleSuccessMealResponse(data: String) {
-        try {
-            val apiModel = Gson().fromJson(data, SearchMealUrlModel::class.java)
-            Log.d("@@@ Recipe Details ", "message :- $data")
-            if (apiModel.code == 200 && apiModel.success==true) {
-                showURlData(apiModel.data)
-            } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
-            }
-        } catch (e: Exception) {
-            showAlert(e.message, false)
-        }
-    }
-
-    private fun showURlData(data: SearchMealUrlModelData?) {
-        try {
-            if (data!!.label!=null){
-                tvTitleName!!.text=data.label.toString()
-            }
-
-            if (data.uri!=null){
-                uri=data.uri.toString()
-            }
-
-            if (data.source!=null){
-                tvTitleDesc!!.text="By "+data.source.toString()
-            }
-
-            if (data.ingredients!=null && data.ingredients.size>0){
-                adapterUrlIngredients = AdapterUrlIngredientItem(data.ingredients, requireActivity())
-                rcyIngredients!!.adapter = adapterUrlIngredients
-                rcyIngredients!!.visibility=View.VISIBLE
-            }else{
-                rcyIngredients!!.visibility=View.GONE
-            }
-        }catch (e:Exception){
-            showAlert(e.message, false)
-        }
     }
 
     private fun lunchApi() {
@@ -374,8 +157,6 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
             showAlert(e.message, false)
         }
     }
-
-
 
     private fun handleError(code: Int, message: String) {
         if (code == ErrorMessage.code) {
@@ -422,7 +203,7 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
 
             if (data?.category!=null && data.category.size>0){
                 category=data.category
-                searchMealCatAdapter = SearchMealCatAdapter(data.category, requireActivity())
+                searchMealCatAdapter = SearchMealCatAdapter(data.category, requireActivity(),this)
                 binding.rcyPopularCat.adapter = searchMealCatAdapter
                 binding.llPopularCat.visibility=View.VISIBLE
             }else{
@@ -449,7 +230,6 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
             showAlert(e.message, false)
         }
     }
-
 
     private fun initialize() {
 
@@ -519,7 +299,7 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
         val filteredList: MutableList<Category> =
             java.util.ArrayList<Category>()
         for (item in category!!) {
-            if (item.name!!.toLowerCase().contains(editText.lowercase(Locale.getDefault()))) {
+            if (item.name!!.lowercase().contains(editText.lowercase(Locale.getDefault()))) {
                 filteredList.add(item)
             }
         }
@@ -535,7 +315,7 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
         val filteredList: MutableList<MealType> =
             java.util.ArrayList<MealType>()
         for (item in mealType!!) {
-            if (item.name!!.toLowerCase().contains(editText.lowercase(Locale.getDefault()))) {
+            if (item.name!!.lowercase().contains(editText.lowercase(Locale.getDefault()))) {
                 filteredList.add(item)
             }
         }
@@ -551,7 +331,7 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
         val filteredList: MutableList<Ingredient> =
             java.util.ArrayList<Ingredient>()
         for (item in ingredient!!) {
-            if (item.name!!.toLowerCase().contains(editText.lowercase(Locale.getDefault()))) {
+            if (item.name!!.lowercase().contains(editText.lowercase(Locale.getDefault()))) {
                 filteredList.add(item)
             }
         }
@@ -564,7 +344,7 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
     }
 
     private fun addRecipeFromWeb() {
-        val dialogWeb: Dialog = requireActivity().let { Dialog(it) }
+        val dialogWeb = Dialog(requireActivity())
         dialogWeb.setContentView(R.layout.alert_dialog_add_recipe_form_web)
         dialogWeb.window!!.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -736,13 +516,10 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
-        /*if (type=="meal"){*/
             val bundle = Bundle().apply {
                 putString("recipeName",status)
             }
             findNavController().navigate(R.id.searchedRecipeBreakfastFragment,bundle)
-
-//        }
     }
 
 

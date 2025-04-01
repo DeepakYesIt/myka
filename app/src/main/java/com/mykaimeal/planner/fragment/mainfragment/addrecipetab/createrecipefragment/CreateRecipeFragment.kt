@@ -57,12 +57,15 @@ import com.mykaimeal.planner.fragment.mainfragment.addrecipetab.createrecipefrag
 import com.mykaimeal.planner.fragment.mainfragment.addrecipetab.createrecipefromimage.model.RecyclerViewItemModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
 import com.mykaimeal.planner.messageclass.ErrorMessage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
 
+
+@AndroidEntryPoint
 class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImage,AdapterCookIngredientsItem.CookIngName {
 
-    private var binding: FragmentCreateRecipeBinding? = null
+    private lateinit var binding: FragmentCreateRecipeBinding
     private var quantity: Int = 1
     private var file: File? = null
     private var ingredientList: MutableList<RecyclerViewItemModel>? = null
@@ -81,24 +84,27 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
     private lateinit var createRecipeViewModel: CreateRecipeViewModel
     private lateinit var commonWorkUtils: CommonWorkUtils
 
+
     private var recipeName:String?=""
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
         mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         // Inflate the layout for this fragment
         binding = FragmentCreateRecipeBinding.inflate(layoutInflater, container, false)
-
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
+        
+        (activity as? MainActivity)?.binding?.let {
+            it.llIndicator.visibility = View.GONE
+            it.llBottomNavigation.visibility = View.GONE
+        }
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
         createRecipeViewModel = ViewModelProvider(requireActivity())[CreateRecipeViewModel::class.java]
 
-        recipeName = arguments?.getString("name", "").toString()
+        recipeName = arguments?.getString("name", "")?:""
 
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
@@ -110,7 +116,7 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
 
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
 
@@ -126,23 +132,21 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
                 // Now you can send the image URI to Vision API for processing
                 // Convert image to Base64
 
-                binding!!.addImageIcon.visibility = View.GONE
+                binding.addImageIcon.visibility = View.GONE
                 checkBase64Url=true
                 recipeMainImageUri = UriToBase64(requireActivity(), uri)
                 Glide.with(this)
                     .load(uri)
                     .placeholder(R.drawable.no_image)
                     .error(R.drawable.no_image)
-                    .into(binding!!.addImages)
+                    .into(binding.addImages)
             }
         }
     }
 
     private fun initialize() {
 
-        if (cookbookList != null) {
-            cookbookList.clear()
-        }
+        cookbookList.clear()
 
         val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
                 "", "", 0, "", "Favorites", 0, "", 0)
@@ -155,23 +159,23 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
 
         // Set up RecyclerView and Adapter
         adapter = AdapterCreateIngredientsItem(ingredientList!!, requireActivity(), this)
-        binding!!.rcyCreateIngredients.adapter = adapter
+        binding.rcyCreateIngredients.adapter = adapter
 
         // Handle "+" button click
-        binding!!.imageCrtIngPlus.setOnClickListener {
+        binding.imageCrtIngPlus.setOnClickListener {
             if (adapter!!.isAllFieldsFilled()){
                 adapter!!.addNewItem()
-                binding!!.rcyCreateIngredients.scrollToPosition(ingredientList!!.size - 1) // Scroll to the new item
+                binding.rcyCreateIngredients.scrollToPosition(ingredientList!!.size - 1) // Scroll to the new item
             }else{
                 // Highlight empty fields
-                adapter!!.highlightEmptyFields(binding!!.rcyCreateIngredients)
+                adapter!!.highlightEmptyFields(binding.rcyCreateIngredients)
             }
         }
 
         // Update the model when quantity changes
-        binding!!.etRecipeName.addTextChangedListener(object : TextWatcher {
+        binding.etRecipeName.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                updateBackground(binding!!.llCreateTitle, s.toString())
+                updateBackground(binding.llCreateTitle, s.toString())
             }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -180,27 +184,27 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
         cookList = mutableListOf()
 
         // Initialize with Step-1 by default
-        cookList!!.add(RecyclerViewCookIngModel(1))
+        cookList?.add(RecyclerViewCookIngModel(1))
 
         // Setup RecyclerView
         adapterCook = AdapterCookIngredientsItem(cookList!!,requireActivity(),this)
-        binding!!.rcyCookInstructions.apply {
+        binding.rcyCookInstructions.apply {
             adapter = adapterCook
         }
 
         // Handle "+" button click
-        binding!!.imageCookIns.setOnClickListener {
+        binding.imageCookIns.setOnClickListener {
      /*       adapterCook!!.addNewItem() // Add new step dynamically*/
             if (adapterCook!!.isAllIngFieldFilled()){
                 adapterCook!!.addNewItem()
-                binding!!.rcyCookInstructions.scrollToPosition(cookList!!.size - 1) // Scroll to the new item
+                binding.rcyCookInstructions.scrollToPosition(cookList!!.size - 1) // Scroll to the new item
             }else{
                 // Highlight empty fields
-                adapterCook!!.highlightEmptyIngFields(binding!!.rcyCookInstructions)
+                adapterCook!!.highlightEmptyIngFields(binding.rcyCookInstructions)
             }
         }
 
-        binding!!.imgMinus.setOnClickListener {
+        binding.imgMinus.setOnClickListener {
             if (quantity > 1) {
                 quantity--
                 updateValue()
@@ -209,18 +213,18 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
             }
         }
 
-        binding!!.imgPlus.setOnClickListener {
+        binding.imgPlus.setOnClickListener {
             if (quantity < 99) {
                 quantity++
                 updateValue()
             }
         }
 
-        binding!!.relBacks.setOnClickListener {
+        binding.relBacks.setOnClickListener {
             addRecipeDiscardDialog()
         }
 
-        binding!!.layBottom.setOnClickListener {
+        binding.layBottom.setOnClickListener {
             if (validate()) {
                 if (BaseApplication.isOnline(requireActivity())) {
                     createRecipeApi()
@@ -228,47 +232,17 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }
-            /*  addRecipeSuccessDialog()*/
         }
 
-        binding!!.textPrivate.setOnClickListener {
-            val drawableStart =
-                ContextCompat.getDrawable(requireActivity(), R.drawable.radio_uncheck_gray_icon)
-            drawableStart!!.setBounds(0, 0, drawableStart.intrinsicWidth, drawableStart.intrinsicHeight
-            )
-            binding!!.textPublic.setCompoundDrawables(drawableStart, null, null, null)
-
-            val drawableStart1 =
-                ContextCompat.getDrawable(requireActivity(), R.drawable.radio_check_icon)
-            drawableStart1!!.setBounds(0, 0, drawableStart1.intrinsicWidth, drawableStart.intrinsicHeight)
-            binding!!.textPrivate.setCompoundDrawables(drawableStart1, null, null, null)
-            recipeStatus="0"
+        binding.textPrivate.setOnClickListener {
+            radioButton(true)
+        }
+        binding.textPublic.setOnClickListener {
+            radioButton(false)
         }
 
-        binding!!.textPublic.setOnClickListener {
-            val drawableStart =
-                ContextCompat.getDrawable(requireActivity(), R.drawable.radio_check_icon)
-            drawableStart!!.setBounds(0, 0, drawableStart.intrinsicWidth, drawableStart.intrinsicHeight)
-            binding!!.textPublic.setCompoundDrawables(drawableStart, null, null, null)
-
-            val drawableStart1 =
-                ContextCompat.getDrawable(requireActivity(), R.drawable.radio_uncheck_gray_icon)
-            drawableStart1!!.setBounds(
-                0,
-                0,
-                drawableStart1.intrinsicWidth,
-                drawableStart.intrinsicHeight
-            )
-            binding!!.textPrivate.setCompoundDrawables(drawableStart1, null, null, null)
-            recipeStatus="1"
-        }
-
-        binding!!.addImages.setOnClickListener {
-            ImagePicker.with(requireActivity())
-                .crop() // Crop image (Optional)
-                .compress(1024 * 5) // Compress the image to less than 5 MB
-                .maxResultSize(250, 250) // Set max resolution
-                .createIntent { intent -> pickImageLauncher.launch(intent) }
+        binding.addImages.setOnClickListener {
+            openCameraGallery(false)
         }
 
         if (BaseApplication.isOnline(requireActivity())) {
@@ -278,15 +252,27 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
         }
     }
 
-    private fun validate(): Boolean {
+    private fun radioButton(type: Boolean) {
+        if (type){
+            recipeStatus="0"
+            binding.textPublic.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_uncheck_gray_icon, 0, 0, 0)
+            binding.textPrivate.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_check_icon, 0, 0, 0)
+        }else{
+            binding.textPublic.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_check_icon, 0, 0, 0)
+            binding.textPrivate.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_uncheck_gray_icon, 0, 0, 0)
+            recipeStatus="1"
+        }
 
-        if (binding!!.etRecipeName.text.toString().trim().isEmpty()) {
+    }
+
+    private fun validate(): Boolean {
+        if (binding.etRecipeName.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.recipeName, false)
             return false
-        } else if (binding!!.edtTotalTime.text.toString().trim().isEmpty()) {
+        } else if (binding.edtTotalTime.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validTotalTime, false)
             return false
-        } /*else if (binding!!.spinnerCookBook.text.toString().trim().isEmpty()){
+        } /*else if (binding.spinnerCookBook.text.toString().trim().isEmpty()){
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.selectCookBookError, false)
             return false
         }*/
@@ -327,21 +313,21 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
             }
 
             var cookBookID = ""
-            if (binding!!.spinnerCookBook.text.toString().isNotEmpty()) {
-                cookBookID = cookbookList[binding!!.spinnerCookBook.selectedIndex].id.toString()
+            if (binding.spinnerCookBook.text.toString().isNotEmpty()) {
+                cookBookID = cookbookList[binding.spinnerCookBook.selectedIndex].id.toString()
             }
 
             // Add data to JSON object
             jsonObject.addProperty("recipe_key", recipeStatus.toString())
             jsonObject.addProperty("cook_book", cookBookID)
-            jsonObject.addProperty("title", binding!!.etRecipeName.text.toString().trim())
+            jsonObject.addProperty("title", binding.etRecipeName.text.toString().trim())
             jsonObject.add("ingr", ingArray)
-            jsonObject.addProperty("summary", binding!!.edtSummary.text.toString().trim())
-            jsonObject.addProperty("yield", binding!!.textValue.text.toString().trim())
-            jsonObject.addProperty("totalTime", binding!!.edtTotalTime.text.toString().trim())
+            jsonObject.addProperty("summary", binding.edtSummary.text.toString().trim())
+            jsonObject.addProperty("yield", binding.textValue.text.toString().trim())
+            jsonObject.addProperty("totalTime", binding.edtTotalTime.text.toString().trim())
             jsonObject.add("prep", prepArray)
             jsonObject.addProperty("img", recipeMainImageUri ?: "")  // Ensure it's not null
-            jsonObject.addProperty("tags", binding!!.etRecipeName.text.toString().trim())
+            jsonObject.addProperty("tags", binding.etRecipeName.text.toString().trim())
 
             Log.d("json object", "******$jsonObject")
 
@@ -415,7 +401,7 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
                     val recipe : Recipe? =recipeNameModelData[0].recipe
                     if (recipe!=null){
                         if (recipe.label !=null){
-                            binding!!.etRecipeName.setText(recipe.label.toString())
+                            binding.etRecipeName.setText(recipe.label.toString())
                         }
 
                         if (recipe.images?.SMALL?.url!=null){
@@ -433,8 +419,8 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
                                         target: Target<Drawable>?,
                                         isFirstResource: Boolean
                                     ): Boolean {
-                                        binding!!.layProgess.root.visibility= View.GONE
-                                        binding!!.addImageIcon.visibility= View.VISIBLE
+                                        binding.layProgess.root.visibility= View.GONE
+                                        binding.addImageIcon.visibility= View.VISIBLE
                                         return false
                                     }
 
@@ -445,15 +431,15 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
                                         dataSource: DataSource?,
                                         isFirstResource: Boolean
                                     ): Boolean {
-                                        binding!!.layProgess.root.visibility= View.GONE
-                                        binding!!.addImageIcon.visibility= View.GONE
+                                        binding.layProgess.root.visibility= View.GONE
+                                        binding.addImageIcon.visibility= View.GONE
                                         return false
                                     }
                                 })
-                                .into(binding!!.addImages)
+                                .into(binding.addImages)
                         }else{
-                            binding!!.layProgess.root.visibility= View.GONE
-                            binding!!.addImageIcon.visibility= View.VISIBLE
+                            binding.layProgess.root.visibility= View.GONE
+                            binding.addImageIcon.visibility= View.VISIBLE
                         }
 
                         if (recipe.instructionLines!=null){
@@ -469,7 +455,7 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
                         }
 
                         if (recipe.totalTime!=null && recipe.totalTime!=0){
-                            binding!!.edtTotalTime.setText(recipe.totalTime.toString())
+                            binding.edtTotalTime.setText(recipe.totalTime.toString())
                         }
 
                         if (recipe.ingredients!=null){
@@ -516,12 +502,13 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 if (apiModel.data != null && apiModel.data.size > 0) {
-              /*      binding!!.spinnerCookBook.setItems(cookbookList.map { it.name })*/
+              /*      binding.spinnerCookBook.setItems(cookbookList.map { it.name })*/
                     cookbookList.retainAll { it == cookbookList[0] }
                     cookbookList.addAll(apiModel.data)
-                    // OR directly modify the original list
-                    binding!!.spinnerCookBook.setItems(cookbookList.map { it.name })
+
                 }
+                // OR directly modify the original list
+                binding.spinnerCookBook.setItems(cookbookList.map { it.name })
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -558,7 +545,7 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
     }
 
     private fun updateValue() {
-        binding!!.textValue.text = String.format("%02d", quantity)
+        binding.textValue.text = String.format("%02d", quantity)
     }
 
     private fun addRecipeDiscardDialog() {
@@ -608,12 +595,24 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
         this.showCrossIngImage = cross
         this.position = pos
         this.root = root
+        openCameraGallery(true)
+    }
 
-        ImagePicker.with(requireActivity())
-            .crop() // Crop image (Optional)
-            .compress(1024 * 5) // Compress the image to less than 5 MB
-            .maxResultSize(250, 250) // Set max resolution
-            .createIntent { intent -> pickImageLauncher1.launch(intent) }
+
+    private fun openCameraGallery(type:Boolean){
+        if (type){
+            ImagePicker.with(requireActivity())
+                .crop() // Crop image (Optional)
+                .compress(1024 * 5) // Compress the image to less than 5 MB
+                .maxResultSize(250, 250) // Set max resolution
+                .createIntent { intent -> pickImageLauncher1.launch(intent) }
+        }else{
+            ImagePicker.with(requireActivity())
+                .crop() // Crop image (Optional)
+                .compress(1024 * 5) // Compress the image to less than 5 MB
+                .maxResultSize(250, 250) // Set max resolution
+                .createIntent { intent -> pickImageLauncher.launch(intent) }
+        }
     }
 
     private val pickImageLauncher1: ActivityResultLauncher<Intent> = registerForActivityResult(

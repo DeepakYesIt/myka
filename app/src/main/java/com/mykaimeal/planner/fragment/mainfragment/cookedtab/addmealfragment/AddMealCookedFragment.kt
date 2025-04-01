@@ -386,7 +386,7 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
 
                             val searchModel = gson.fromJson(it.data, SearchModel::class.java)
                             if (searchModel.code == 200 && searchModel.success) {
-                                showDataInUi(searchModel.data)
+                                searchModel.data?.let { it1 -> showDataInUi(it1) }
                             } else {
 //                                binding!!.cardViewSearchRecipe.visibility=View.GONE
 //                                binding!!.rcySearchCooked.visibility=View.GONE

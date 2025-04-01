@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <RelativeLayout
         android:id="@+id/layTittle"
         android:layout_width="match_parent"
@@ -31,7 +30,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_marginStart="@dimen/_5sdp"
             android:fontFamily="@font/montserrat_semibold"
             android:text="Dinner"
             android:textColor="#000000"
@@ -54,15 +52,24 @@
             android:layout_centerVertical="true"
             android:src="@drawable/yellow_basket_icon" />
     </RelativeLayout>
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcySearchedItem"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@+id/layTittle"
         android:layout_marginHorizontal="@dimen/_10sdp"
-        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_margin="@dimen/_10sdp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="2" />
-
+    <TextView
+        android:id="@+id/tvnoData"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fontFamily="@font/montserrat_semibold"
+        android:text="@string/no_recipes_yet"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:singleLine="true"
+        android:textSize="@dimen/_15sdp" />
 </RelativeLayout>

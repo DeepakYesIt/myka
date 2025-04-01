@@ -4,15 +4,17 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +26,7 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
@@ -44,20 +47,22 @@ import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+
 class CreateRecipeImageFragment : Fragment() {
 
-    private var binding: FragmentCreateRecipeImageBinding? = null
+    private lateinit var binding: FragmentCreateRecipeImageBinding
     private var imageCapture: ImageCapture? = null
     private lateinit var cameraExecutor: ExecutorService
     private var isFlashOn = false
-    private var capturedImageUri: android.net.Uri? = null
+    private var capturedImageUri: Uri? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding= FragmentCreateRecipeImageBinding.inflate(layoutInflater,container,false)
+
 
         requireActivity().onBackPressedDispatcher.addCallback(
             requireActivity(),
@@ -66,12 +71,17 @@ class CreateRecipeImageFragment : Fragment() {
                     findNavController().navigateUp()
                 }
             })
+        
+        (activity as? MainActivity)?.binding?.let {
+            it.llIndicator.visibility = View.GONE
+            it.llBottomNavigation.visibility = View.GONE
+        }
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
+
 
         initialize()
-        return binding!!.root
+
+        return binding.root
     }
 
     private fun initialize() {
@@ -82,9 +92,15 @@ class CreateRecipeImageFragment : Fragment() {
             requestPermissions()
         }
 
+
+
         clickListener()
+
         cameraExecutor = Executors.newSingleThreadExecutor()
+
     }
+
+
 
     private fun convertImageToBase64(uri: Uri): String {
         val inputStream: InputStream? = requireContext().contentResolver.openInputStream(uri)
@@ -97,14 +113,14 @@ class CreateRecipeImageFragment : Fragment() {
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
             val preview = Preview.Builder().build().also {
-                it.surfaceProvider = binding!!.previewView.surfaceProvider
+                it.surfaceProvider = binding.previewView.surfaceProvider
             }
 
-            imageCapture = ImageCapture.Builder().setFlashMode(
-                if (isFlashOn) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF
-            ).build()
+
 
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+            imageCapture = ImageCapture.Builder().setFlashMode(if (isFlashOn) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF).build()
 
             try {
                 cameraProvider.unbindAll()
@@ -125,33 +141,34 @@ class CreateRecipeImageFragment : Fragment() {
 
 
     private fun clickListener() {
-        binding!!.galleryBtn.setOnClickListener {
+        binding.galleryBtn.setOnClickListener {
             galleryIntent()
         }
 
-        binding!!.camera.setOnClickListener {
+        binding.camera.setOnClickListener {
             takePhoto()
         }
 
-        binding!!.flashIcon.setOnClickListener {
+        binding.flashIcon.setOnClickListener {
             flashWorking()
         }
 
-        binding?.backBtn!!.setOnClickListener {
+        binding.backBtn.setOnClickListener {
             findNavController().navigateUp()
         }
 
         // Tick button
-        binding?.okBtn!!.setOnClickListener {
+        binding.okBtn.setOnClickListener {
             recognizeImage(convertImageToBase64(capturedImageUri!!))
-            restoreCameraView()
         }
 
         // Cancel button
-        binding!!.noBtn.setOnClickListener {
-            Toast.makeText(requireActivity(), "Preview canceled", Toast.LENGTH_SHORT).show()
+        binding.noBtn.setOnClickListener {
             restoreCameraView()
         }
+
+
+
     }
 
     private fun recognizeImage(base64Image: String) {
@@ -165,16 +182,8 @@ class CreateRecipeImageFragment : Fragment() {
         val request = Request(image, features)
         val visionRequest = VisionRequest(listOf(request))
 
-        /*/////old api key
-        // Pass your API key (this is just for demonstration, don't hardcode your API key)
-        val apiKey = "AIzaSyB1WtrB2oHQmyIX1ZpaXzbI9kOA2FlkCXk"*/
-
-        /////old api key
-//        val apiKey = "AIzaSyDBGkONqxKXls4kQ9DlyZmfjvuUKbDUHUw"
-
         /////new api key
         val apiKey = "AIzaSyCjOLbQCG6foFlN05JOFKBpjNqV8DE9vi8"
-
         val call = visionApiService.annotateImage(apiKey, visionRequest)
         call.enqueue(object : retrofit2.Callback<VisionResponse> {
             override fun onResponse(call: Call<VisionResponse>, response: retrofit2.Response<VisionResponse>) {
@@ -183,7 +192,6 @@ class CreateRecipeImageFragment : Fragment() {
                     val webDetection = response.body()?.responses?.get(0)?.webDetection
                     if (webDetection!=null){
                         if (webDetection.webEntities.isNotEmpty()){
-
                             val bundle = Bundle().apply {
                                 putString("name", webDetection.webEntities[0].description.toString())
                             }
@@ -192,7 +200,9 @@ class CreateRecipeImageFragment : Fragment() {
                             Log.d("Google Vision", "Similar Image: "+ webDetection.webEntities[0].description.toString())
                         }
                     }
+                    restoreCameraView()
                 }else{
+                    restoreCameraView()
                     Toast.makeText(requireContext(),"Failed :-"+response.message(),Toast.LENGTH_LONG).show()
                 }
             }
@@ -200,6 +210,7 @@ class CreateRecipeImageFragment : Fragment() {
             override fun onFailure(call: Call<VisionResponse>, t: Throwable) {
                 Log.e("Google Vision", "API call failed", t)
                 Toast.makeText(requireContext(),"Error :-"+t.message,Toast.LENGTH_LONG).show()
+                restoreCameraView()
             }
         })
     }
@@ -212,29 +223,29 @@ class CreateRecipeImageFragment : Fragment() {
     }
 
     private fun showCapturedPreview() {
-        binding!!.previewView.visibility = View.GONE
-        binding!!.galleryBtn.visibility = View.GONE
-        binding!!.camera.visibility = View.GONE
-        binding!!.flashIcon.visibility = View.GONE
-        binding!!.backBtn.visibility = View.GONE
+        binding.previewView.visibility = View.GONE
+        binding.galleryBtn.visibility = View.GONE
+        binding.camera.visibility = View.GONE
+        binding.flashIcon.visibility = View.GONE
+        binding.backBtn.visibility = View.GONE
 
-        binding!!.ImageView.visibility = View.VISIBLE
-        binding!!.ImageView.setImageURI(capturedImageUri)
+        binding.ImageView.visibility = View.VISIBLE
+        binding.ImageView.setImageURI(capturedImageUri)
 
-        binding!!.okBtn.visibility = View.VISIBLE
-        binding!!.noBtn.visibility = View.VISIBLE
+        binding.okBtn.visibility = View.VISIBLE
+        binding.noBtn.visibility = View.VISIBLE
     }
 
     private fun restoreCameraView() {
-        binding!!.previewView.visibility = View.VISIBLE
-        binding!!.galleryBtn.visibility = View.VISIBLE
-        binding!!.camera.visibility = View.VISIBLE
-        binding!!.flashIcon.visibility = View.VISIBLE
-        binding!!.backBtn.visibility = View.VISIBLE
+        binding.previewView.visibility = View.VISIBLE
+        binding.galleryBtn.visibility = View.VISIBLE
+        binding.camera.visibility = View.VISIBLE
+        binding.flashIcon.visibility = View.VISIBLE
+        binding.backBtn.visibility = View.VISIBLE
 
-        binding!!.ImageView.visibility = View.GONE
-        binding!!.okBtn.visibility = View.GONE
-        binding!!.noBtn.visibility = View.GONE
+        binding.ImageView.visibility = View.GONE
+        binding.okBtn.visibility = View.GONE
+        binding.noBtn.visibility = View.GONE
         capturedImageUri = null
     }
 
@@ -242,7 +253,11 @@ class CreateRecipeImageFragment : Fragment() {
     private fun flashWorking() {
         isFlashOn = !isFlashOn
         imageCapture?.flashMode = if (isFlashOn) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF
-        /*Toast.makeText(this, "Flash ${if (isFlashOn) "On" else "Off"}", Toast.LENGTH_SHORT).show()*/
+
+
+
+
+
     }
 
 
@@ -271,8 +286,6 @@ class CreateRecipeImageFragment : Fragment() {
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     capturedImageUri = output.savedUri
-
-//                    Toast.makeText(baseContext, "Image captured successfully", Toast.LENGTH_SHORT).show()
                     showCapturedPreview()
                 }
             }

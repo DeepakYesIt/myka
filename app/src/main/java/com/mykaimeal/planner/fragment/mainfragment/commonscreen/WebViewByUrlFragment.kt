@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -16,32 +17,36 @@ import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.databinding.FragmentWebViewByUrlBinding
 
 class WebViewByUrlFragment : Fragment() {
-    private var binding: FragmentWebViewByUrlBinding? = null
+    private lateinit var binding: FragmentWebViewByUrlBinding
     private var url: String = ""
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentWebViewByUrlBinding.inflate(inflater, container, false)
 
-        url = arguments?.getString("url", "").toString()
+        url = arguments?.getString("url", "")?:""
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
+        (activity as? MainActivity)?.binding?.let {
+            it.llIndicator.visibility = View.GONE
+            it.llBottomNavigation.visibility = View.GONE
+        }
+
 
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private fun initialize() {
 
-        binding!!.relBack.setOnClickListener{
+        binding.relBack.setOnClickListener{
             findNavController().navigateUp()
         }
 
-        val webSettings: WebSettings = binding!!.webView.settings
+        val webSettings: WebSettings = binding.webView.settings
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
         webSettings.loadsImagesAutomatically = true
@@ -51,7 +56,7 @@ class WebViewByUrlFragment : Fragment() {
         webSettings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
         // Set a WebViewClient to capture URL clicks
-        binding!!.webView.webViewClient = object : WebViewClient() {
+        binding.webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
                 // Capture the clicked URL
 //                Toast.makeText(requireContext(), "Clicked URL: $url", Toast.LENGTH_SHORT).show()
@@ -62,13 +67,13 @@ class WebViewByUrlFragment : Fragment() {
             }
         }
         Log.d("url", "****$url")
-        binding!!.webView.loadUrl(url)
+        binding.webView.loadUrl(url)
 
-        binding!!.rlImportApp.setOnClickListener{
+        binding.rlImportApp.setOnClickListener{
             val bundle = Bundle().apply {
                 putString("ClickedUrl",url)
             }
-            findNavController().navigate(R.id.searchFragment,bundle)
+            findNavController().navigate(R.id.searchFragmentDummy,bundle)
         }
 
     }

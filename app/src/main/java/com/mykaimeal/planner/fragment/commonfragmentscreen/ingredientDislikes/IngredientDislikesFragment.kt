@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.commonfragmentscreen.ingredientDislikes
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -12,19 +13,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
-import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.OnItemClickedListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.AdapterDislikeIngredientItem
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentIngredientDislikesBinding
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.UpdatePreferenceSuccessfully
@@ -36,27 +36,27 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 @AndroidEntryPoint
 class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
 
-    private var binding: FragmentIngredientDislikesBinding? = null
+    private lateinit var binding: FragmentIngredientDislikesBinding
     private var dislikeIngredientModelData = mutableListOf<DislikedIngredientsModelData>()
     private var dislikeIngredientsAdapter: AdapterDislikeIngredientItem? = null
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue: Int = 0
     private var status: String? = ""
-    private var itemCount:String = "2"  // Default count
+    private var itemCount:String = "5"  // Default count
     private var dislikeSelectedId = mutableListOf<String>()
     private lateinit var dislikeIngredientsViewModel: DislikeIngredientsViewModel
     private lateinit var textListener: TextWatcher
     private var textChangedJob: Job? = null
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentIngredientDislikesBinding.inflate(inflater, container, false)
 
@@ -65,68 +65,63 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
         sessionManagement = SessionManagement(requireContext())
 
         dislikeIngredientsAdapter = AdapterDislikeIngredientItem(dislikeIngredientModelData, requireActivity(), this)
-        binding!!.rcyIngDislikes.adapter = dislikeIngredientsAdapter
+        binding.rcyIngDislikes.adapter = dislikeIngredientsAdapter
 
-        if (sessionManagement.getCookingFor().equals("Myself")) {
-            binding!!.tvIngDislikes.text = "Pick or search the ingredients you dislike"
-            binding!!.progressBar4.max = 10
-            totalProgressValue = 10
-            updateProgress(4)
-        } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-            binding!!.tvIngDislikes.text = "Select ingredients that you and your partner dislike"
-            binding!!.progressBar4.max = 11
-            totalProgressValue = 11
-            updateProgress(4)
+        val cookingFor = sessionManagement.getCookingFor()
+        val progressValue: Int
+        val maxProgress: Int
+        val restrictionText: String
+
+        if (cookingFor.equals("Myself")) {
+            restrictionText = "Pick or search the ingredients you dislike"
+            maxProgress = 10
+            progressValue=4
+        } else if (cookingFor.equals("MyPartner")) {
+            restrictionText = "Select ingredients that you and your partner dislike"
+            maxProgress = 11
+            progressValue=4
         } else {
-            binding!!.tvIngDislikes.text = "Ingredients that you dislike"
-            binding!!.progressBar4.max = 11
-            totalProgressValue = 11
-            updateProgress(4)
+            restrictionText = "Ingredients that you dislike"
+            maxProgress = 11
+            progressValue=4
         }
 
-        if (sessionManagement.getCookingScreen().equals("Profile")) {
-            binding!!.llBottomBtn.visibility = View.GONE
-            binding!!.rlUpdateIngDislike.visibility = View.VISIBLE
-            if (BaseApplication.isOnline(requireContext())) {
+        binding.tvIngDislikes.text = restrictionText
+        binding.progressBar4.max = maxProgress
+        totalProgressValue = maxProgress
+        updateProgress(progressValue)
+
+        val isProfileScreen = sessionManagement.getCookingScreen().equals("Profile",true)
+        binding.llBottomBtn.visibility = if (isProfileScreen) View.GONE else View.VISIBLE
+        binding.rlUpdateIngDislike.visibility = if (isProfileScreen) View.VISIBLE else View.GONE
+
+        if (BaseApplication.isOnline(requireContext())) {
+            if (isProfileScreen) {
                 ingredientDislikeSelectApi()
             } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                dislikeIngredientsViewModel.getDislikeIngData()?.let {
+                    showDataInUi(it)
+                } ?: ingredientDislikeApi()
             }
         } else {
-            binding!!.llBottomBtn.visibility = View.VISIBLE
-            binding!!.rlUpdateIngDislike.visibility = View.GONE
-
-            if (dislikeIngredientsViewModel.getDislikeIngData() != null) {
-                showDataInUi(dislikeIngredientsViewModel.getDislikeIngData()!!)
-                if (status == "2") {
-                    binding!!.tvNextBtn.isClickable = true
-                    binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-                }
-            } else {
-                ///checking the device of mobile data in online and offline(show network error message)
-                if (BaseApplication.isOnline(requireContext())) {
-                    ingredientDislikeApi()
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            }
-
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
+        backButton()
 
+        initialize()
 
+        return binding.root
+    }
 
+    private fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
                 }
             })
-
-        initialize()
-
-        return binding!!.root
     }
 
     private fun ingredientDislikeSelectApi() {
@@ -166,30 +161,31 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateProgress(progress: Int) {
-        binding!!.progressBar4.progress = progress
-        binding!!.tvProgressText.text = "$progress/$totalProgressValue"
+        binding.progressBar4.progress = progress
+        binding.tvProgressText.text = "$progress/$totalProgressValue"
     }
 
     private fun initialize() {
 
-        binding!!.imbBackIngDislikes.setOnClickListener {
+        binding.imbBackIngDislikes.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.tvSkipBtn.setOnClickListener {
+        binding.tvSkipBtn.setOnClickListener {
             stillSkipDialog()
         }
 
-        binding!!.tvNextBtn.setOnClickListener {
+        binding.tvNextBtn.setOnClickListener {
             if (status == "2") {
-                dislikeIngredientsViewModel.setDislikeIngData(dislikeIngredientModelData,binding!!.etIngDislikesSearchBar.text.toString())
+                dislikeIngredientsViewModel.setDislikeIngData(dislikeIngredientModelData,binding.etIngDislikesSearchBar.text.toString())
                 sessionManagement.setDislikeIngredientList(dislikeSelectedId)
                 findNavController().navigate(R.id.allergensIngredientsFragment)
             }
         }
 
-//        binding!!.etIngDislikesSearchBar.addTextChangedListener(object :
+//        binding.etIngDislikesSearchBar.addTextChangedListener(object :
 //            TextWatcher {
 //            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 //            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
@@ -284,7 +280,7 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
               }
           }*/
 
-        binding!!.rlUpdateIngDislike.setOnClickListener {
+        binding.rlUpdateIngDislike.setOnClickListener {
             if (BaseApplication.isOnline(requireContext())) {
                 updateIngDislikeApi()
             } else {
@@ -292,7 +288,7 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
             }
         }
 
-        binding!!.relMoreButton.setOnClickListener { v ->
+        binding.relMoreButton.setOnClickListener {
             itemCount = (itemCount.toInt() + 10).toString()  // Convert to Int, add 10, convert back to String
             if (sessionManagement.getCookingScreen().equals("Profile")) {
                 if (BaseApplication.isOnline(requireContext())) {
@@ -391,15 +387,17 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
                 }
                 var selected = false
                 dislikeIngModelData.forEach { if (it.selected) selected = true }
-                if (!selected) { dislikeIngModelData.set(0, DislikedIngredientsModelData(id = -1, selected = true, "None")) }
+                if (!selected) {
+                    dislikeIngModelData[0] = DislikedIngredientsModelData(id = -1, selected = true, "None")
+                }
                 dislikeIngredientModelData = dislikeIngModelData.toMutableList()
                 dislikeIngredientsAdapter?.filterList(dislikeIngredientModelData)
                 /*dislikeIngredientsAdapter = AdapterDislikeIngredientItem(dislikeIngModelData, requireActivity(), this)
-                binding!!.rcyIngDislikes.adapter = dislikeIngredientsAdapter*/
+                binding.rcyIngDislikes.adapter = dislikeIngredientsAdapter*/
                 if (dislikeIngredientsViewModel.getEditStatus().equals("")){
-                    binding!!.relMoreButton.visibility=View.VISIBLE
+                    binding.relMoreButton.visibility=View.VISIBLE
                 }else{
-                    binding!!.relMoreButton.visibility=View.GONE
+                    binding.relMoreButton.visibility=View.GONE
                 }
 
             }
@@ -416,13 +414,13 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
                 dislikeIngredientModelData.addAll(dislikeIngModelData.toMutableList())
                 dislikeIngredientsAdapter?.filterList(dislikeIngredientModelData)
                 if (type.equals("search",true)){
-                    binding!!.relMoreButton.visibility=View.GONE
+                    binding.relMoreButton.visibility=View.GONE
                 }else{
-                    binding!!.relMoreButton.visibility=View.VISIBLE
+                    binding.relMoreButton.visibility=View.VISIBLE
                 }
-                binding!!.rcyIngDislikes.visibility=View.VISIBLE
+                binding.rcyIngDislikes.visibility=View.VISIBLE
             }else{
-                binding!!.rcyIngDislikes.visibility=View.GONE
+                binding.rcyIngDislikes.visibility=View.GONE
             }
 
 
@@ -436,10 +434,10 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
     }
 
     private fun searchable(editText: String) {
-        binding!!.layProgess.visibility=View.VISIBLE
+        binding.layProgess.visibility=View.VISIBLE
         lifecycleScope.launch {
             dislikeIngredientsViewModel.getDislikeSearchIngredients({
-                binding!!.layProgess.visibility=View.GONE
+                binding.layProgess.visibility=View.GONE
                 when (it) {
                     is NetworkResult.Success -> {
                         val gson = Gson()
@@ -503,7 +501,7 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
 
 
     /*    if (editText!=""){
-            binding!!.relMoreButton.visibility=View.GONE
+            binding.relMoreButton.visibility=View.GONE
             val filteredList: MutableList<DislikedIngredientsModelData> =
                 java.util.ArrayList<DislikedIngredientsModelData>()
             for (item in dislikeIngredientModelData) {
@@ -513,12 +511,12 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
             }
             if (filteredList.size > 0) {
                 dislikeIngredientsAdapter!!.filterList(filteredList)
-                binding!!.rcyIngDislikes.visibility = View.VISIBLE
+                binding.rcyIngDislikes.visibility = View.VISIBLE
             } else {
-                binding!!.rcyIngDislikes.visibility = View.GONE
+                binding.rcyIngDislikes.visibility = View.GONE
             }
         }else{
-            binding!!.relMoreButton.visibility=View.VISIBLE
+            binding.relMoreButton.visibility=View.VISIBLE
         }*/
     }
 
@@ -556,30 +554,30 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
                 dislikeSelectedId = list!!
             }
             status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             return
         }
 
         if (type.equals("true")) {
             status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             dislikeSelectedId = list!!
         } else {
             status = ""
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
 
 
     override fun onResume() {
         super.onResume()
-        binding!!.etIngDislikesSearchBar.addTextChangedListener(textListener)
+        binding.etIngDislikesSearchBar.addTextChangedListener(textListener)
     }
 
     override fun onPause() {
-        binding!!.etIngDislikesSearchBar.removeTextChangedListener(textListener)
+        binding.etIngDislikesSearchBar.removeTextChangedListener(textListener)
         super.onPause()
     }
 

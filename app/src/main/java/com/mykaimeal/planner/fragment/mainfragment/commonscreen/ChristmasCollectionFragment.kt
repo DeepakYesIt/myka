@@ -55,7 +55,7 @@ import java.util.Locale
 @AndroidEntryPoint
 class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
 
-    private var binding: FragmentChristmasCollectionBinding?=null
+    private lateinit var binding: FragmentChristmasCollectionBinding
     private var adapterCookBookDetailsItem:AdapterCookBookDetailsItem?=null
     private var tvWeekRange: TextView? = null
     private var id:String?=""
@@ -80,9 +80,13 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         binding=FragmentChristmasCollectionBinding.inflate(layoutInflater, container, false)
         sessionManagement = SessionManagement(requireContext())
         commonWorkUtils = CommonWorkUtils(requireActivity())
-
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
+        
+        (activity as? MainActivity)?.binding?.let {
+            it.llIndicator.visibility = View.GONE
+            it.llBottomNavigation.visibility = View.GONE
+        }
+        
+        
         viewModel = ViewModelProvider(requireActivity())[CookBookViewModel::class.java]
         cookbookList.clear()
 
@@ -94,6 +98,20 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
          image=sessionManagement.getCookBookImage()
          type=sessionManagement.getCookBookType()
 
+         backButton()
+
+        initialize()
+
+        if (BaseApplication.isOnline(requireActivity())) {
+            getCookBookTypeList()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+
+        return binding.root
+    }
+
+    private fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 sessionManagement.setCookBookId("")
@@ -103,15 +121,6 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
                 findNavController().navigateUp()
             }
         })
-
-        initialize()
-
-        if (BaseApplication.isOnline(requireActivity())) {
-            getCookBookTypeList()
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
-        return binding!!.root
     }
 
     private fun getCookBookTypeList(){
@@ -161,11 +170,7 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
                     spinnerActivityLevel.setItems(cookbookList.map { it.name })
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -182,32 +187,39 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
                 apiModel.data?.let { localData.addAll(it) }
                 if (localData.size>0){
                     adapterCookBookDetailsItem = AdapterCookBookDetailsItem(localData, requireActivity(),this)
-                    binding!!.rcyChristmasCollection.adapter = adapterCookBookDetailsItem
-                    binding!!.rcyChristmasCollection.visibility=View.VISIBLE
-                    binding!!.tvnoData.visibility=View.GONE
+                    binding.rcyChristmasCollection.adapter = adapterCookBookDetailsItem
+                    binding.rcyChristmasCollection.visibility=View.VISIBLE
+                    binding.tvnoData.visibility=View.GONE
                 }else{
-                    binding!!.rcyChristmasCollection.visibility=View.GONE
-                    binding!!.tvnoData.visibility=View.VISIBLE
+                    binding.rcyChristmasCollection.visibility=View.GONE
+                    binding.tvnoData.visibility=View.VISIBLE
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
     }
 
+
+    private fun handleError(code: Int, message: String) {
+        if (code == ErrorMessage.code) {
+            showAlert(message, true)
+        } else {
+            showAlert(message, false)
+        }
+    }
+
+
+
     private fun initialize() {
 
         if (name!=null){
-            binding!!.tvName.text = name
+            binding.tvName.text = name
         }
 
-        binding!!.imgBackChristmas.setOnClickListener{
+        binding.imgBackChristmas.setOnClickListener{
             sessionManagement.setCookBookId("")
             sessionManagement.setCookBookName("")
             sessionManagement.setCookBookImage("")
@@ -215,45 +227,36 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.imgThreeDotIcon.setOnClickListener {
-            if (binding!!.cardViewMenuPopUp.visibility == View.VISIBLE) {
-                binding!!.cardViewMenuPopUp.visibility = View.GONE
+        binding.imgThreeDotIcon.setOnClickListener {
+            if (binding.cardViewMenuPopUp.visibility == View.VISIBLE) {
+                binding.cardViewMenuPopUp.visibility = View.GONE
             } else {
-                binding!!.cardViewMenuPopUp.visibility = View.VISIBLE
+                binding.cardViewMenuPopUp.visibility = View.VISIBLE
             }
         }
 
-        binding!!.relEditCookBook.setOnClickListener{
-            binding!!.cardViewMenuPopUp.visibility = View.GONE
+        binding.relEditCookBook.setOnClickListener{
+            binding.cardViewMenuPopUp.visibility = View.GONE
             val bundle=Bundle()
             bundle.putString("value","Edit")
             findNavController().navigate(R.id.createCookBookFragment,bundle)
         }
 
-        binding!!.relShareCookBook.setOnClickListener{
+        binding.relShareCookBook.setOnClickListener{
             if (type=="1"){
-                binding!!.cardViewMenuPopUp.visibility = View.GONE
+                binding.cardViewMenuPopUp.visibility = View.GONE
                 copyShareInviteLink()
             }else{
                 commonWorkUtils.alertDialog(requireContext(),ErrorMessage.shareCookBookError,false)
             }
-
-  /*          val appPackageName: String = requireActivity().packageName
-            val myIntent = Intent(Intent.ACTION_SEND)
-            myIntent.type = "text/plain"
-            val body = "https://play.google.com/store/apps/details?id=$appPackageName"
-            val sub = "Your Subject"
-            myIntent.putExtra(Intent.EXTRA_SUBJECT, sub)
-            myIntent.putExtra(Intent.EXTRA_TEXT, body)
-            startActivity(Intent.createChooser(myIntent, "Share Using"))*/
         }
 
-        binding!!.relDeleteCookBook.setOnClickListener{
-            binding!!.cardViewMenuPopUp.visibility = View.GONE
+        binding.relDeleteCookBook.setOnClickListener{
+            binding.cardViewMenuPopUp.visibility = View.GONE
             removeCookBookDialog()
         }
 
-        binding!!.rlAddRecipes.setOnClickListener {
+        binding.rlAddRecipes.setOnClickListener {
             findNavController().navigate(R.id.createRecipeFragment)
         }
     }
@@ -419,19 +422,15 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
                 localData.removeAt(position ?: return) // Safely handle null position, return if null
                 if (localData.size>0){
                     adapterCookBookDetailsItem?.updateList(localData)
-                    binding!!.rcyChristmasCollection.visibility=View.VISIBLE
-                    binding!!.tvnoData.visibility=View.GONE
+                    binding.rcyChristmasCollection.visibility=View.VISIBLE
+                    binding.tvnoData.visibility=View.GONE
                 }else{
-                    binding!!.tvnoData.visibility=View.VISIBLE
-                    binding!!.rcyChristmasCollection.visibility=View.GONE
+                    binding.tvnoData.visibility=View.VISIBLE
+                    binding.rcyChristmasCollection.visibility=View.GONE
                 }
                 dialogRemoveRecipe.dismiss()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -447,11 +446,7 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
                 dialogRemoveCookBook.dismiss()
                 findNavController().navigateUp()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -735,11 +730,11 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         }
 
         tvSnacks.setOnClickListener {
-            updateSelection("Snack", tvSnacks, allViews)
+            updateSelection("Snacks", tvSnacks, allViews)
         }
 
         tvTeatime.setOnClickListener {
-            updateSelection("Teatime", tvTeatime, allViews)
+            updateSelection("Brunch", tvTeatime, allViews)
         }
 
 
@@ -825,11 +820,7 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
                 dialogChooseMealDay.dismiss()
                 Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)

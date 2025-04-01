@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,9 +15,9 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
@@ -54,7 +53,7 @@ import java.util.Locale
 @AndroidEntryPoint
 class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
 
-    private var binding: FragmentCookBookBinding? = null
+    private lateinit var binding: FragmentCookBookBinding
     private var adapterCookBookItem: AdapterCookBookItem? = null
     private var adapterCookBookDetailsItem: AdapterCookBookDetailsItem? = null
     private var tvWeekRange: TextView? = null
@@ -74,8 +73,13 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         // Inflate the layout for this fragment
         binding = FragmentCookBookBinding.inflate(layoutInflater, container, false)
         sessionManagement = SessionManagement(requireContext())
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
+         
+        (activity as? MainActivity)?.binding?.let {
+            it.llIndicator.visibility = View.VISIBLE
+            it.llBottomNavigation.visibility = View.VISIBLE
+        }
+        
+        
         viewModel = ViewModelProvider(requireActivity())[CookBookViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -101,7 +105,7 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun getCookBookList(){
@@ -140,22 +144,27 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
                 apiModel.data?.let { localData.addAll(it) }
                 if (localData.size>0){
                     adapterCookBookDetailsItem = AdapterCookBookDetailsItem(localData, requireActivity(),this)
-                    binding!!.rcyCookBookDetails.adapter = adapterCookBookDetailsItem
-                    binding!!.rcyCookBookDetails.visibility=View.VISIBLE
-                    binding!!.tvnoData.visibility=View.GONE
+                    binding.rcyCookBookDetails.adapter = adapterCookBookDetailsItem
+                    binding.rcyCookBookDetails.visibility=View.VISIBLE
+                    binding.tvnoData.visibility=View.GONE
                 }else{
-                    binding!!.rcyCookBookDetails.visibility=View.GONE
-                    binding!!.tvnoData.visibility=View.VISIBLE
+                    binding.rcyCookBookDetails.visibility=View.GONE
+                    binding.tvnoData.visibility=View.VISIBLE
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
+        }
+    }
+
+
+    private fun handleError(code: Int, message: String) {
+        if (code == ErrorMessage.code) {
+            showAlert(message, true)
+        } else {
+            showAlert(message, false)
         }
     }
 
@@ -166,21 +175,17 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 if (apiModel.data!=null && apiModel.data.size>0){
-                    binding!!.llCookBookItems.visibility=View.VISIBLE
+                    binding.llCookBookItems.visibility=View.VISIBLE
                     cookbookList.addAll(apiModel.data)
                 }else{
-                    binding!!.llCookBookItems.visibility=View.VISIBLE
+                    binding.llCookBookItems.visibility=View.VISIBLE
                 }
                 // OR directly modify the original list
                 adapterCookBookItem = AdapterCookBookItem(cookbookList, requireActivity(), this)
-                binding!!.rcyCookBookAdding.adapter = adapterCookBookItem
+                binding.rcyCookBookAdding.adapter = adapterCookBookItem
                 getCookBookTypeList()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -193,16 +198,18 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
 
     private fun initialize() {
 
-        binding!!.imgBackCookbook.setOnClickListener {
+        binding.imgBackCookbook.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.rlAddRecipes.setOnClickListener {
+        binding.rlAddRecipes.setOnClickListener {
             val bundle = Bundle().apply {
                 putString("name","")
             }
             findNavController().navigate(R.id.createRecipeFragment,bundle)
         }
+
+
     }
 
     private fun getCookBookTypeList(){
@@ -275,11 +282,7 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
             if (apiModel.code == 200 && apiModel.success) {
                 Toast.makeText(requireContext(),apiModel.message, Toast.LENGTH_LONG).show()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -457,11 +460,11 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         }
 
         tvSnacks.setOnClickListener {
-            updateSelection("Snack", tvSnacks, allViews)
+            updateSelection("Snacks", tvSnacks, allViews)
         }
 
         tvTeatime.setOnClickListener {
-            updateSelection("Teatime", tvTeatime, allViews)
+            updateSelection("Brunch", tvTeatime, allViews)
         }
 
 
@@ -545,11 +548,7 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
                 dialogChooseMealDay.dismiss()
                 Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -607,19 +606,15 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
                 localData.removeAt(position ?: return) // Safely handle null position, return if null
                 if (localData.size>0){
                     adapterCookBookDetailsItem?.updateList(localData)
-                    binding!!.rcyCookBookDetails.visibility=View.VISIBLE
-                    binding!!.tvnoData.visibility=View.GONE
+                    binding.rcyCookBookDetails.visibility=View.VISIBLE
+                    binding.tvnoData.visibility=View.GONE
                 }else{
-                    binding!!.rcyCookBookDetails.visibility=View.GONE
-                    binding!!.tvnoData.visibility=View.VISIBLE
+                    binding.rcyCookBookDetails.visibility=View.GONE
+                    binding.tvnoData.visibility=View.VISIBLE
                 }
                 dialogRemoveRecipe.dismiss()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)

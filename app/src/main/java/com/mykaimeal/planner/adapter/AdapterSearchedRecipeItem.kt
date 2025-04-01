@@ -52,9 +52,6 @@ class AdapterSearchedRecipeItem(var datalist: MutableList<Recipe>?, private var 
                 }
             }
 
-           /* if (item?.review!=null){
-                holder.binding.tvRatingReviews.text = ""+ item.review +"("+ item.review_number +")"
-            }*/
 
             if (item?.recipe!=null){
                 if (item.recipe.images?.SMALL?.url!=null){

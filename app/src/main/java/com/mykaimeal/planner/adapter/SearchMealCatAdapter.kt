@@ -11,11 +11,12 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterMealItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.apiresponse.Category
 
-class SearchMealCatAdapter(var datalist: MutableList<Category>?, private var requireActivity: FragmentActivity): RecyclerView.Adapter<SearchMealCatAdapter.ViewHolder>() {
+class SearchMealCatAdapter(var datalist: MutableList<Category>?, private var requireActivity: FragmentActivity,var onItemClickListener: OnItemClickListener): RecyclerView.Adapter<SearchMealCatAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -24,15 +25,15 @@ class SearchMealCatAdapter(var datalist: MutableList<Category>?, private var req
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-         val data= datalist?.get(position)
+        val data = datalist?.get(position)
 
 
-        if (data?.name!=null){
-            holder.binding.tvRecipeName.text= data.name
+        if (data?.name != null) {
+            holder.binding.tvRecipeName.text = data.name
         }
 
 
-        if (data?.image!=null){
+        if (data?.image != null) {
             Glide.with(requireActivity)
                 .load(data.image)
                 .error(R.drawable.no_image)
@@ -44,7 +45,7 @@ class SearchMealCatAdapter(var datalist: MutableList<Category>?, private var req
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        holder.binding.layProgess.root.visibility= View.GONE
+                        holder.binding.layProgess.root.visibility = View.GONE
                         return false
                     }
 
@@ -55,16 +56,21 @@ class SearchMealCatAdapter(var datalist: MutableList<Category>?, private var req
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        holder.binding.layProgess.root.visibility= View.GONE
+                        holder.binding.layProgess.root.visibility = View.GONE
                         return false
                     }
                 })
                 .into(holder.binding.imgRecipe)
-        }else{
-            holder.binding.layProgess.root.visibility= View.GONE
+        } else {
+            holder.binding.layProgess.root.visibility = View.GONE
         }
 
+        holder.itemView.setOnClickListener {
+            onItemClickListener.itemClick(position, data!!.name, "meal")
+        }
     }
+
+
 
     override fun getItemCount(): Int {
         return datalist!!.size

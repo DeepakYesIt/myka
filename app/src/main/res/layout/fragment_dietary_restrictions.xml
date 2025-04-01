@@ -88,6 +88,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
+                    android:nestedScrollingEnabled="false"
                     android:orientation="vertical"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
@@ -97,6 +98,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/rcyDietaryRestrictions"
                     android:layout_marginTop="@dimen/_10sdp"
+                    android:visibility="gone"
                     android:background="@drawable/gray_box_border_bg">
 
                     <TextView
