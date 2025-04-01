@@ -522,9 +522,9 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 findNavController().navigate(R.id.planFragment)
             }
 
-            R.id.imgFreeTrial -> {
+          /*  R.id.imgFreeTrial -> {
                 findNavController().navigate(R.id.homeSubscriptionFragment)
-            }
+            }*/
         }
     }
 

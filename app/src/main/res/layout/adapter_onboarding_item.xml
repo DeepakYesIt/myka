@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/dummy_img"
-        app:shapeAppearanceOverlay="@style/CornerCut" />
+        android:src="@drawable/banner_images_subscription"
+        app:shapeAppearanceOverlay="@style/CornerCut"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

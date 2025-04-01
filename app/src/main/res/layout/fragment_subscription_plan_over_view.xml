@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/subscription_background_images"
     android:orientation="vertical"
-
     tools:context=".fragment.mainfragment.profilesetting.subscriptionplan.SubscriptionPlanOverViewFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
