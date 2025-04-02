@@ -274,7 +274,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
             binding!!.tvAddNumber.setTextColor(Color.parseColor("#000000"))
         }
 
-        data.address?.let { address ->
+/*        data.address?.let { address ->
             if (!address.type.isNullOrEmpty() &&
                 !address.apart_num.isNullOrEmpty() &&
                 !address.street_name.isNullOrEmpty() &&
@@ -299,7 +299,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
                 // Set text in TextView
                 binding?.tvAddressNames?.text = storedAddress
             }
-        }
+        }*/
 
 
 

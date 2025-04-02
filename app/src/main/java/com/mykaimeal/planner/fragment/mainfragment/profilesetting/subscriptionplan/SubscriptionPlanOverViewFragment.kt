@@ -134,6 +134,9 @@ class SubscriptionPlanOverViewFragment : Fragment() {
             }
         }
 
+        binding.crossImages.setOnClickListener{
+            findNavController().navigateUp()
+        }
 
         binding.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()

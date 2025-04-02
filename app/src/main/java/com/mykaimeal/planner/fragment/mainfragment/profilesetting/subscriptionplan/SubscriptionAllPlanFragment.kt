@@ -36,11 +36,19 @@ class SubscriptionAllPlanFragment : Fragment() {
                 }
             })
 
+        initialize()
+
         /*binding!!.imageCrossing.setOnClickListener{
             findNavController().navigateUp()
         }*/
 
         return binding!!.root
+    }
+
+    private fun initialize() {
+        binding!!.crossImages.setOnClickListener{
+            findNavController().navigateUp()
+        }
     }
 
 

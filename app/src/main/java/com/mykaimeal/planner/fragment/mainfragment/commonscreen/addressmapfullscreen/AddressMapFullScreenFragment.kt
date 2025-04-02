@@ -2,6 +2,7 @@ package com.mykaimeal.planner.fragment.mainfragment.commonscreen.addressmapfulls
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -96,7 +97,9 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
 
         sessionManagement = SessionManagement(requireContext())
 
-        if (sessionManagement.getLatitude() != "") {
+        getLatLongFromAddress(requireActivity(),"188 King Street, San Francisco, CA 94107, USA")
+
+      /*  if (sessionManagement.getLatitude() != "") {
             latitude = sessionManagement.getLatitude().toString()
         } else {
             latitude = "37.7786155"
@@ -107,17 +110,37 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
         } else {
             longitude = "-122.3940943"
         }
-
+*/
         if (sessionManagement.getUserAddress() != "") {
             binding!!.tvAddress.text = sessionManagement.getUserAddress().toString()
         } else {
-            binding!!.tvAddress.text = "188, King street,San Francisco, CA"
+            binding!!.tvAddress.text = "188 King Street, San Francisco, CA 94107, USA"
         }
 
         initialize()
 
         return binding!!.root
     }
+
+
+    private fun getLatLongFromAddress(context: Context, address: String): Pair<Double, Double>? {
+        val geocoder = Geocoder(context, Locale.getDefault()) // Create Geocoder instance
+        return try {
+            val addressList: List<Address>? = geocoder.getFromLocationName(address, 1) // Fetch location
+            if (!addressList.isNullOrEmpty()) {
+                val location = addressList[0]
+                latitude= location.latitude.toString()
+                longitude= location.longitude.toString()
+                Pair(location.latitude, location.longitude) // Return Latitude & Longitude
+            } else {
+                null
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
 
     private fun initialize() {
 
