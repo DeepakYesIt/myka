@@ -113,6 +113,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         if (main != null) {
             // Check if 24 hours have passed since the last dialog was shown
             if (main.shouldShowDialog()) {
+                main.saveCurrentDate()
                 // fetch location form the user
                 getLatLong()
             }

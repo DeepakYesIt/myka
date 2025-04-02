@@ -75,8 +75,10 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     private lateinit var startDate: Date
     private lateinit var endDate: Date
     private lateinit var sharedPreferences: SharedPreferences
-    private val prefsName = "MyPrefs"
-    private val lastShownTimeKey = "last_dialog_time"
+    private val PREF_NAME = "ToastPrefs"
+    private val KEY_LAST_SHOWN_DATE = "last_shown_date"
+
+
     private val oneDayMillis = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -88,7 +90,8 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         commonWorkUtils = CommonWorkUtils(this)
 
         // Initialize SharedPreferences
-        sharedPreferences = getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+
 
         handleDeepLink(intent)
 
@@ -144,16 +147,16 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     }
 
     fun shouldShowDialog(): Boolean {
-        val lastShownTime = sharedPreferences.getLong(lastShownTimeKey, 0)
-        val currentTime = System.currentTimeMillis()
-        val data=(currentTime - lastShownTime) >= oneDayMillis
-        Log.d("currentTime","*****"+currentTime)
-        Log.d("lastShownTime","*****"+lastShownTime)
-        Log.d("data","*****"+data)
-        return data
+        val lastShownDate = sharedPreferences.getString(KEY_LAST_SHOWN_DATE, null) ?: return true
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val lastDate = sdf.parse(lastShownDate)
+        val currentDate = sdf.parse(sdf.format(Date()))
+
+        return lastDate == null || currentDate!!.after(lastDate)
+
     }
 
-        private fun handleDeepLink(intent: Intent?) {
+    private fun handleDeepLink(intent: Intent?) {
             intent?.data?.let { uri ->
                 val deepLinkValue = uri.getQueryParameter("deep_link_value")
                 val deepLinkSub1 = uri.getQueryParameter("deep_link_sub1")
@@ -171,7 +174,6 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 }
             }
         }
-
 
     private fun startDestination() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.frameContainerMain) as NavHostFragment
@@ -885,4 +887,14 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             Log.d("Token ","******"+BaseApplication.fetchFcmToken())
         }
     }
+
+    fun saveCurrentDate() {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val currentDate = sdf.format(Date())
+        sharedPreferences.edit()
+            .putString(KEY_LAST_SHOWN_DATE, currentDate)
+            .apply()
+    }
+
+
 }
