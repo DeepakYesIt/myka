@@ -80,6 +80,7 @@ class LoginFragment : Fragment() {
     private var reasonTakeAway: String? = ""
     private var reasonTakeAwayDesc: String? = ""
     private var token: String = ""
+    private var isFirstTimeTouched = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -132,10 +133,13 @@ class LoginFragment : Fragment() {
 
         logOutGoogle()
 
-        binding.etSignEmailPhone.onFocusChangeListener = View.OnFocusChangeListener { _, _ ->
-            val data: String = sessionManagement.getRememberMe()
-            if (data.isNotEmpty()) {
-                showRememberDialog()
+        binding.etSignEmailPhone.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && isFirstTimeTouched) { // Only trigger on first touch
+                val data: String = sessionManagement.getRememberMe()
+                if (data.isNotEmpty()) {
+                    showRememberDialog()
+                }
+                isFirstTimeTouched = false // Set flag to false so it doesn't trigger again
             }
         }
 

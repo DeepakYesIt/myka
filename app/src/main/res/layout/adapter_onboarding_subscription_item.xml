@@ -1,172 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:id="@+id/imageView"
+    android:layout_marginEnd="@dimen/_5sdp"
+    android:background="@drawable/image_1"
     android:layout_height="match_parent">
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/imageView"
+    <LinearLayout
+        android:id="@+id/layData"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:adjustViewBounds="true"
-        android:scaleType="centerCrop"
-        android:src="@drawable/banner_images_subscription"
-        app:shapeAppearanceOverlay="@style/CornerCut">
-
-    </com.google.android.material.imageview.ShapeableImageView>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginHorizontal="@dimen/_15sdp">
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/imageProfile"
-            android:layout_width="@dimen/_100sdp"
-            android:layout_height="@dimen/_100sdp"
-            android:src="@drawable/mask_group_icon"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/_50sdp"
-            app:civ_border_color="@color/orange"
-            app:civ_border_width="@dimen/_2sdp" />
-
-        <TextView
-            android:id="@+id/tvTextNames"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="You’ve got a gift from Kai"
-            android:textSize="@dimen/_17sdp"
-            android:fontFamily="@font/montserrat_semibold"
-            android:layout_marginTop="@dimen/_30sdp"
-            android:textColor="@color/black"
-            android:layout_below="@id/imageProfile"/>
-
+        android:orientation="vertical"
+        android:weightSum="1"
+        android:layout_marginStart="@dimen/_20sdp"
+        android:layout_marginEnd="@dimen/_30sdp"
+        android:layout_alignParentTop="true">
         <RelativeLayout
-            android:id="@+id/relFreeTrials"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvTextNames"
-            android:layout_marginTop="@dimen/_60sdp">
-
-            <ImageView
-                android:id="@+id/imageGifts"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/gift_icon"/>
-
-            <TextView
-                android:id="@+id/tvTrialName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="7- days free trial"
-                android:textSize="@dimen/_13sdp"
-                android:layout_marginStart="@dimen/_10sdp"
-                android:layout_toEndOf="@+id/imageGifts"
-                android:fontFamily="@font/montserrat"
-                android:textColor="@color/black" />
+            android:layout_height="wrap_content">
 
         </RelativeLayout>
-
         <RelativeLayout
-            android:id="@+id/relLifeTime"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/relFreeTrials"
-            android:layout_marginTop="@dimen/_10sdp">
-
-            <ImageView
-                android:id="@+id/imageLifeTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/dollar_icon"/>
-
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:layout_weight="0.7">
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/imageProfile"
+                android:layout_width="@dimen/_60sdp"
+                android:layout_height="@dimen/_60sdp"
+                android:src="@drawable/mask_group_icon"
+                android:layout_centerHorizontal="true"
+                app:civ_border_color="@color/orange"
+                app:civ_border_width="@dimen/_2sdp" />
             <TextView
-                android:id="@+id/tvLifeTimeOff"
+                android:id="@+id/tvTextNames"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Lifetime 50% of  My-kai"
-                android:textSize="@dimen/_13sdp"
-                android:layout_marginStart="@dimen/_10sdp"
-                android:layout_toEndOf="@+id/imageLifeTime"
-                android:fontFamily="@font/montserrat"
-                android:textColor="@color/black" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/relSecretCookBook"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/relLifeTime"
-            android:layout_marginTop="@dimen/_10sdp">
-
-            <ImageView
-                android:id="@+id/imgSecretCookBook"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/secret_cookbook_icon"/>
-
-            <TextView
-                android:id="@+id/tvSecretCookBook"
+                android:text="You’ve got a gift from Kai"
+                android:textSize="@dimen/_12sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:fontFamily="@font/montserrat_semibold"
+                android:textColor="@color/black"
+                android:layout_below="@id/imageProfile"/>
+            <RelativeLayout
+                android:id="@+id/relFreeTrials"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Kai’s secret cookbook"
-                android:textSize="@dimen/_13sdp"
-                android:layout_marginStart="@dimen/_10sdp"
-                android:layout_toEndOf="@+id/imgSecretCookBook"
-                android:fontFamily="@font/montserrat"
-                android:textColor="@color/black" />
+                android:layout_marginTop="@dimen/_20sdp"
+                android:layout_below="@+id/tvTextNames">
+                <TextView
+                    android:id="@+id/tvTrialName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="7- days free trial"
+                    android:textSize="@dimen/_11sdp"
+                    android:drawableStart="@drawable/gift_icon"
+                    android:drawablePadding="@dimen/_10sdp"
+                    android:fontFamily="@font/montserrat"
+                    android:textColor="@color/black" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/relLifeTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relFreeTrials"
+                android:layout_marginTop="@dimen/_5sdp">
+                <TextView
+                    android:id="@+id/tvLifeTimeOff"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Lifetime 50% of  My-kai"
+                    android:textSize="@dimen/_11sdp"
+                    android:drawableStart="@drawable/dollar_icon"
+                    android:drawablePadding="@dimen/_10sdp"
+                    android:fontFamily="@font/montserrat"
+                    android:textColor="@color/black" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/relSecretCookBook"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relLifeTime"
+                android:layout_marginTop="@dimen/_5sdp">
 
+                <TextView
+                    android:id="@+id/tvSecretCookBook"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Kai’s secret cookbook"
+                    android:textSize="@dimen/_11sdp"
+                    android:drawableStart="@drawable/secret_cookbook_icon"
+                    android:drawablePadding="@dimen/_10sdp"
+                    android:fontFamily="@font/montserrat"
+                    android:textColor="@color/black" />
+            </RelativeLayout>
         </RelativeLayout>
-
-<!--        <pl.droidsonroids.gif.GifImageView-->
-<!--            android:id="@+id/ImageMainLogo"-->
-<!--            android:layout_width="@dimen/_55sdp"-->
-<!--            android:layout_height="@dimen/_55sdp"-->
-<!--            android:layout_alignParentBottom="true"-->
-<!--            android:layout_marginBottom="@dimen/_40sdp"-->
-<!--            android:layout_marginStart="@dimen/_10sdp"-->
-<!--            android:src="@drawable/paywall_gift_wiggle" />-->
-
-
-<!--
-        <TextView
-            android:id="@+id/tvLifeTimeOff"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Lifetime 50% of  My-kai"
-            android:textSize="@dimen/_13sdp"
-            android:drawablePadding="@dimen/_8sdp"
-            android:fontFamily="@font/montserrat_semibold"
-            android:layout_below="@+id/tvTrialName"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:textColor="@color/black"
-            app:drawableStartCompat="@drawable/dollar_icon" />
-
-        <TextView
-            android:id="@+id/tvSecretCookbook"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="kai's secret cookbook"
-            android:textSize="@dimen/_13sdp"
-            android:drawablePadding="@dimen/_8sdp"
-            android:fontFamily="@font/montserrat_semibold"
-            android:layout_below="@+id/tvLifeTimeOff"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:textColor="@color/black"
-            app:drawableStartCompat="@drawable/secret_cookbook_icon" />-->
-
-
-    </RelativeLayout>
-
-    <!--    <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:adjustViewBounds="true"
-            android:scaleType="centerCrop"
-            android:src="@drawable/dummy_img"
-            app:shapeAppearanceOverlay="@style/CornerCut" />-->
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/ImageMainLogo"
+        android:layout_width="@dimen/_55sdp"
+        android:layout_height="@dimen/_55sdp"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/_10sdp"
+        android:src="@drawable/paywall_gift_wiggle" />
+</RelativeLayout>
