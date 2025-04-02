@@ -82,6 +82,8 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
                 binding.rcyOrderHistory.visibility = View.VISIBLE
             }
         }
+
+
     }
 
 
