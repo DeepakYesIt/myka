@@ -1975,11 +1975,11 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
 
     override suspend fun addAddressUrl(
         successCallback: (response: NetworkResult<String>) -> Unit,
-        latitude: String?, longitude: String?,streetName:String?,streetNum:String?,apartNum:String?,city:String?,country:String?,
+        latitude: String?, longitude: String?,streetName:String?,streetNum:String?,apartNum:String?,city:String?,state:String?,country:String?,
         zipcode:String?,primary:String?,id:String?,type:String?
     ) {
         try {
-            api.addAddressUrl(latitude, longitude,streetName,streetNum,apartNum,city,country,zipcode, primary, id, type).apply {
+            api.addAddressUrl(latitude, longitude,streetName,streetNum,apartNum,city,state,country,zipcode, primary, id, type).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -2107,10 +2107,46 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
 
 
     override suspend fun addCardMealMeUrl(
-        successCallback: (response: NetworkResult<String>) -> Unit,cardNumber:String?,expMonth:String?,expYear:String?,cvv:String?
+        successCallback: (response: NetworkResult<String>) -> Unit,cardNumber:String?,expMonth:String?,expYear:String?,cvv:String?,status:String?
     ) {
         try {
-            api.addCardMealMeUrl(cardNumber,expMonth,expYear,cvv).apply {
+            api.addCardMealMeUrl(cardNumber,expMonth,expYear,cvv,status).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+    override suspend fun deleteCardMealMeUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,id:String?
+    ) {
+        try {
+            api.deleteCardMealMeUrl(id).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+    override suspend fun setPreferredCardMealMeUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,id:String?
+    ) {
+        try {
+            api.setPreferredCardMealMeUrl(id).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

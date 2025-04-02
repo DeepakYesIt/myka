@@ -699,7 +699,22 @@ interface ApiInterface {
         @Field("card_number") card_number: String?,
         @Field("exp_month") exp_month: String?,
         @Field("exp_year") exp_year: String?,
-        @Field("cvv") cvv: String?
+        @Field("cvv") cvv: String?,
+        @Field("status") status:String?
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.deleteCardMealMeUrl)
+    suspend fun deleteCardMealMeUrl(
+        @Field("id") id: String?
+    ): Response<JsonObject>
+
+
+  @FormUrlEncoded
+    @POST(ApiEndPoint.setPreferredCardMealMeUrl)
+    suspend fun setPreferredCardMealMeUrl(
+        @Field("id") id: String?
     ): Response<JsonObject>
 
     @FormUrlEncoded
@@ -716,6 +731,7 @@ interface ApiInterface {
         @Query("street_num") streetNum: String?,
         @Query("apart_num") apartNum: String?,
         @Query("city") city: String?,
+        @Query("state") state: String?,
         @Query("country") country: String?,
         @Query("zipcode") zipcode: String?,
         @Query("primary") primary: String?,

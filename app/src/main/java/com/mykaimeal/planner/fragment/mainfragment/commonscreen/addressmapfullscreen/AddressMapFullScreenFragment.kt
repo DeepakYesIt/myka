@@ -1,8 +1,11 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen.addressmapfullscreen
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
@@ -12,6 +15,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -29,7 +36,9 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
+import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentAddressMapFullScreenBinding
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addressmapfullscreen.model.AddAddressModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addressmapfullscreen.viewmodel.AddressMapFullScreenViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
@@ -43,9 +52,16 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
 
     private var binding: FragmentAddressMapFullScreenBinding? = null
     private lateinit var sessionManagement: SessionManagement
-    private lateinit var addressMapFullScreenViewModel:AddressMapFullScreenViewModel
+    private lateinit var addressMapFullScreenViewModel: AddressMapFullScreenViewModel
     private lateinit var mMap: GoogleMap
     private var marker: Marker? = null
+    private lateinit var edtStreetName: EditText
+    private lateinit var edtStreetNumber: EditText
+    private lateinit var edtApartNumber: EditText
+    private lateinit var edtCity: EditText
+    private lateinit var edtStates: EditText
+    private lateinit var edtPostalCode: EditText
+    private lateinit var edtAddress: EditText
     private var address: String? = ""
     private var setStatus: String? = "Home"
     private var latitude: String? = ""
@@ -54,9 +70,12 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
     private var streetNum: String? = ""
     private var apartNum: String? = ""
     private var city: String? = ""
+    private var states: String? = ""
     private var country: String? = ""
     private var zipcode: String? = ""
     private var primary: String? = "1"
+    private lateinit var commonWorkUtils: CommonWorkUtils
+
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -66,23 +85,26 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
         // Inflate the layout for this fragment
         binding = FragmentAddressMapFullScreenBinding.inflate(layoutInflater, container, false)
 
-        addressMapFullScreenViewModel = ViewModelProvider(requireActivity())[AddressMapFullScreenViewModel::class.java]
+        addressMapFullScreenViewModel =
+            ViewModelProvider(requireActivity())[AddressMapFullScreenViewModel::class.java]
+
+        commonWorkUtils = CommonWorkUtils(requireActivity())
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         sessionManagement = SessionManagement(requireContext())
 
-        if (sessionManagement.getLatitude()!=""){
-            latitude=sessionManagement.getLatitude().toString()
-        }else{
-            latitude="40.7128"
+        if (sessionManagement.getLatitude() != "") {
+            latitude = sessionManagement.getLatitude().toString()
+        } else {
+            latitude = "40.7128"
         }
 
-        if (sessionManagement.getLongitude()!=""){
-            longitude=sessionManagement.getLongitude().toString()
-        }else{
-            longitude="-74.0060"
+        if (sessionManagement.getLongitude() != "") {
+            longitude = sessionManagement.getLongitude().toString()
+        } else {
+            longitude = "-74.0060"
         }
 
         initialize()
@@ -93,14 +115,14 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
     private fun initialize() {
 
         binding?.llSetHome?.setOnClickListener {
-            setStatus="Home"
+            setStatus = "Home"
             binding!!.llSetHome.setBackgroundResource(R.drawable.outline_green_border_bg)
             binding!!.llSetWork.setBackgroundResource(R.drawable.height_type_bg)
 
         }
 
         binding?.llSetWork?.setOnClickListener {
-            setStatus="Work"
+            setStatus = "Work"
             binding!!.llSetHome.setBackgroundResource(R.drawable.height_type_bg)
             binding!!.llSetWork.setBackgroundResource(R.drawable.outline_address_green_border_bg)
         }
@@ -110,11 +132,11 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
         }
 
         binding!!.tvConfirmBtn.setOnClickListener {
-
-            sessionManagement.setLatitude(latitude.toString())
-            sessionManagement.setLongitude(longitude.toString())
-            sessionManagement.setAddress(address.toString())
-            findNavController().navigateUp()
+            fullAddressDialog()
+            /*        sessionManagement.setLatitude(latitude.toString())
+                    sessionManagement.setLongitude(longitude.toString())
+                    sessionManagement.setAddress(address.toString())
+                    findNavController().navigateUp()*/
             /*if (BaseApplication.isOnline(requireContext())){
                 addFullAddressApi()
             }else{
@@ -123,13 +145,123 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+
+    private fun fullAddressDialog() {
+        val dialogMiles: Dialog = context?.let { Dialog(it) }!!
+        dialogMiles.setContentView(R.layout.alert_dialog_address_popup)
+        dialogMiles.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialogMiles.setCancelable(false)
+        dialogMiles.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        val relConfirm = dialogMiles.findViewById<RelativeLayout>(R.id.relConfirm)
+        val imageCross = dialogMiles.findViewById<ImageView>(R.id.imageCross)
+        edtStreetName = dialogMiles.findViewById(R.id.edtStreetName)
+        edtStreetNumber = dialogMiles.findViewById(R.id.edtStreetNumber)
+        edtApartNumber = dialogMiles.findViewById(R.id.edtApartNumber)
+        edtCity = dialogMiles.findViewById(R.id.edtCity)
+        edtStates = dialogMiles.findViewById(R.id.edtStates)
+        edtPostalCode = dialogMiles.findViewById(R.id.edtPostalCode)
+        edtAddress = dialogMiles.findViewById(R.id.edtAddress)
+        dialogMiles.show()
+
+        if (streetName != "") {
+            edtStreetName.setText(streetName.toString())
+        }
+
+        if (streetNum != "") {
+            edtStreetNumber.setText(streetNum.toString())
+        }
+
+        if (apartNum != "") {
+            edtApartNumber.setText(apartNum.toString())
+        }
+
+        if (city != "") {
+            edtCity.setText(city.toString())
+        }
+
+        if (states!=""){
+            edtStates.setText(states.toString())
+        }
+
+        if (address != "") {
+            edtAddress.setText(address.toString())
+        }
+
+        if (zipcode != "") {
+            edtPostalCode.setText(zipcode.toString())
+        }
+
+        dialogMiles.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        relConfirm.setOnClickListener {
+       /*     if (BaseApplication.isOnline(requireContext())) {
+                if (validate()) {
+                    streetName=edtStreetName.text.toString().trim()
+                    streetNum=edtStreetNumber.text.toString().trim()
+                    apartNum=edtApartNumber.text.toString().trim()
+                    city=edtCity.text.toString().trim()
+                    states=edtStates.text.toString().trim()
+                    address=edtAddress.text.toString().trim()
+                    zipcode=edtPostalCode.text.toString().trim()
+                    addFullAddressApi()
+                }
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }*/
+               sessionManagement.setLatitude(latitude.toString())
+               sessionManagement.setLongitude(longitude.toString())
+               sessionManagement.setAddress(address.toString())
+               findNavController().navigateUp()
+            dialogMiles.dismiss()
+        }
+
+        imageCross.setOnClickListener {
+                sessionManagement.setLatitude(latitude.toString())
+                sessionManagement.setLongitude(longitude.toString())
+                sessionManagement.setAddress(address.toString())
+                findNavController().navigateUp()
+            dialogMiles.dismiss()
+        }
+    }
+
+    private fun validate(): Boolean {
+        // Check if email/phone is empty
+        if (edtStreetName.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.streetNameError, false)
+            return false
+        } else if (edtStreetNumber.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.streetNumberError, false)
+            return false
+        } else if (edtApartNumber.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.apartNumberError, false)
+            return false
+        } else if (edtCity.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.cityEnterError, false)
+            return false
+        } else if (edtStates.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.statesEnterError, false)
+            return false
+        }else if (edtAddress.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.addressError, false)
+            return false
+        } else if (edtPostalCode.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.postalCodeError, false)
+            return false
+        }
+        return true
+    }
+
     private fun addFullAddressApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            addressMapFullScreenViewModel.addAddressUrl({
-                BaseApplication.dismissMe()
-                handleApiAddAddressResponse(it)
-            },latitude,longitude,streetName,streetNum,apartNum,city,country,zipcode,"1","",setStatus)
+            addressMapFullScreenViewModel.addAddressUrl(
+                {
+                    BaseApplication.dismissMe()
+                    handleApiAddAddressResponse(it)
+                }, latitude, longitude, streetName, streetNum, apartNum, city,states, country, zipcode, "1", "", setStatus
+            )
         }
     }
 
@@ -144,9 +276,9 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
     @SuppressLint("SetTextI18n")
     private fun handleSuccessAddAddressResponse(data: String) {
         try {
-            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            val apiModel = Gson().fromJson(data, AddAddressModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
-            if (apiModel.code == 200 && apiModel.success) {
+            if (apiModel.code == 200 && apiModel.success == true) {
                 findNavController().navigateUp()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
@@ -171,12 +303,13 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
             val addresses: List<Address> = geocoder.getFromLocation(latitude, longitude, 1)!!
             if (addresses.isNotEmpty()) {
                 val address = addresses[0]
-                streetName = address.thoroughfare ?: "N/A" // Street Name
-                streetNum = address.subThoroughfare ?: "N/A" // Street Number
-                apartNum = address.premises ?: "N/A" // Apartment Number
-                city = address.subLocality ?: "N/A" // City
-                country = address.countryName ?: "N/A" // Country
-                zipcode = address.postalCode ?: "N/A" // Zip Code
+                streetName = address.thoroughfare ?: "" // Street Name
+                streetNum = address.subThoroughfare ?: "" // Street Number
+                apartNum = address.premises ?: "" // Apartment Number
+                city = address.subLocality ?: "" // City
+                states = address.adminArea ?: "" // State/Province
+                country = address.countryName ?: "" // Country
+                zipcode = address.postalCode ?: "" // Zip Code
 
                 Log.d("Address", "Street Name: $streetName")
                 Log.d("Address", "Street Number: $streetNum")
@@ -191,7 +324,8 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        val lat = latitude?.toDoubleOrNull() ?: 0.0  // Convert String to Double, default to 0.0 if null
+        val lat =
+            latitude?.toDoubleOrNull() ?: 0.0  // Convert String to Double, default to 0.0 if null
         val lng = longitude?.toDoubleOrNull() ?: 0.0
         mMap = googleMap
         // 🔹 Clear all markers (if any exist)
@@ -228,11 +362,11 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
             // ✅ Ensure LatLng is not null before calling function
             val lat = centerPosition.latitude
             val lng = centerPosition.longitude
-            latitude= centerPosition.latitude.toString()
-            longitude=centerPosition.longitude.toString()
+            latitude = centerPosition.latitude.toString()
+            longitude = centerPosition.longitude.toString()
             binding!!.tvAddress.text = getAddressFromLatLng(lat, lng)
             address = getAddressFromLatLng(lat, lng)
-            getAddressFromLocation(lat,lng)
+            getAddressFromLocation(lat, lng)
         }
     }
 

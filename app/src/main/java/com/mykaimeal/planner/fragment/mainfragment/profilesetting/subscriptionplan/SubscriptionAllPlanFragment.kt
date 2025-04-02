@@ -1,6 +1,5 @@
 package com.mykaimeal.planner.fragment.mainfragment.profilesetting.subscriptionplan
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,16 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.CompositePageTransformer
-import androidx.viewpager2.widget.MarginPageTransformer
-import androidx.viewpager2.widget.ViewPager2
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.SubscriptionAdaptor
 import com.mykaimeal.planner.databinding.FragmentHomeSubscriptionAllPlanBinding
 import com.mykaimeal.planner.model.SubscriptionModel
 import java.util.ArrayList
-import kotlin.math.abs
 
 class SubscriptionAllPlanFragment : Fragment() {
 
@@ -36,7 +30,7 @@ class SubscriptionAllPlanFragment : Fragment() {
         (activity as MainActivity?)!!.binding.llBottomNavigation.visibility=View.GONE
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(), object : OnBackPressedCallback(true) {
+            viewLifecycleOwner, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
                 }

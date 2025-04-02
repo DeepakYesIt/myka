@@ -8,7 +8,7 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_80sdp"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_margin="@dimen/_5sdp"
         android:background="#FFFFFF"
@@ -22,7 +22,7 @@
             android:orientation="vertical">
 
             <RelativeLayout
-                android:id="@+id/relpreferred"
+                android:id="@+id/relPreferred"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_15sdp">
@@ -44,7 +44,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_8sdp"
-                android:layout_below="@+id/relpreferred">
+                android:layout_marginBottom="@dimen/_10sdp"
+                android:layout_below="@+id/relPreferred">
 
                 <TextView
                     android:layout_width="match_parent"

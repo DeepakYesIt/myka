@@ -54,7 +54,8 @@ data class Card(
     val id: Int,
     val payment_id: String,
     val updated_at: String,
-    val user_id: Int
+    val user_id: Int,
+    val status: Int
 )
 
 data class Addres(

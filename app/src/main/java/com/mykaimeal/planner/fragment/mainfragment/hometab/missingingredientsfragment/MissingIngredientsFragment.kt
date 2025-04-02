@@ -61,8 +61,7 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
             }
         })
 
-        missingIngredientViewModel =
-            ViewModelProvider(requireActivity())[MissingIngredientViewModel::class.java]
+        missingIngredientViewModel = ViewModelProvider(requireActivity())[MissingIngredientViewModel::class.java]
 
         shcId = arguments?.getString("schId", "").toString()
         recipeUri = arguments?.getString("uri", "").toString()
@@ -250,7 +249,7 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
             missingIngredientViewModel.addToCartUrlApi({
                 BaseApplication.dismissMe()
                 handleCartApiResponse(it)
-            }, foodIds, shcId,foodName,statusType)
+            }, foodIds, "1",foodName,statusType)
         }
     }
 

@@ -48,7 +48,7 @@ class IngredientsRecipeAdapter(var datalist: MutableList<IngredientsModel>?, var
                     // Capitalize the first letter and make the rest lowercase
                     it.replaceFirstChar { char -> char.uppercase() } + it.drop(1).lowercase()
                 }
-                holder.binding.tvTitleName.text = formattedFoodName
+                holder.binding.tvTitleName.text = data.food
             }
 
             if (data.status){

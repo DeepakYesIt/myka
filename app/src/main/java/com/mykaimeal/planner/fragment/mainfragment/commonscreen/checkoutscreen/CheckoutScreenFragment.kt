@@ -66,7 +66,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     private var longitude: String? = ""
     private var totalPrices: String? = ""
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -126,7 +125,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
 
 
         binding!!.layEdit.setOnClickListener {
-
             findNavController().navigate(R.id.addressMapFullScreenFragment)
         }
 
@@ -213,65 +211,8 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
             showAlert(e.message, false)
         }
 
-        getCardMealMe()
-
     }
 
-
-    private fun getCardMealMe() {
-        if (BaseApplication.isOnline(requireActivity())) {
-            fetchUserCardData()
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
-    }
-
-    private fun fetchUserCardData() {
-//        BaseApplication.showMe(requireContext())
-        lifecycleScope.launch {
-            checkoutScreenViewModel.getCardMealMeUrl { result ->
-                BaseApplication.dismissMe()
-                handleGetCardApiResponse(result)
-            }
-        }
-    }
-
-    private fun handleGetCardApiResponse(result: NetworkResult<String>) {
-        when (result) {
-            is NetworkResult.Success -> processGetCardSuccessResponse(result.data.toString())
-            is NetworkResult.Error -> showAlert(result.message, false)
-            else -> showAlert(result.message, false)
-        }
-    }
-
-    private fun processGetCardSuccessResponse(response: String) {
-        try {
-            val apiModel = Gson().fromJson(response, GetCardMealMeModel::class.java)
-            Log.d("@@@ Response cardBank ", "message :- $response")
-            if (apiModel.code == 200 && apiModel.success==true) {
-                showDataInUi(apiModel.data)
-            } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
-            }
-        } catch (e: Exception) {
-            showAlert(e.message, false)
-        }
-    }
-
-    private fun showDataInUi(data: MutableList<GetCardMealMeModelData>?) {
-
-        if (data!=null && data.size>0){
-            binding!!.rcyDebitCreditCard.visibility=View.VISIBLE
-            adapterPaymentCreditDebitItem = AdapterCardPreferredItem(requireContext(), data,  this,0)
-            binding!!.rcyDebitCreditCard.adapter = adapterPaymentCreditDebitItem
-        }else{
-            binding!!.rcyDebitCreditCard.visibility=View.GONE
-        }
-    }
 
     @SuppressLint("SetTextI18n")
     private fun showDataInUI(data: CheckoutScreenModelData?) {
@@ -324,6 +265,15 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
             binding!!.textDeliveryPrice.text = "$$roundedDelivery"
         }
 
+        if (data.card!=null){
+            binding!!.relCardDetails.visibility=View.VISIBLE
+            if (data.card.card_num!=null){
+                binding!!.tvCardNumber.text="**** **** **** "+data.card.card_num.toString()
+            }
+        }else{
+            binding!!.relCardDetails.visibility=View.GONE
+        }
+
         if (data.total != null) {
             val roundedTotal = data.total.let {
                 BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
@@ -367,8 +317,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
                 })
                 .into(binding!!.imageWelmart)
         }
-
-
     }
 
     private fun addressDialog() {
