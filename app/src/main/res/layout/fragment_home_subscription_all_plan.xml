@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/black"
     android:orientation="vertical"
     tools:context=".fragment.mainfragment.profilesetting.subscriptionplan.SubscriptionAllPlanFragment">
@@ -16,6 +17,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_20sdp"
             android:layout_marginTop="@dimen/_15sdp">
 
             <ImageView
@@ -45,6 +47,35 @@
                 android:layout_below="@+id/tvTittles"
                 android:background="@drawable/subscription_main_image">
 
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/_20sdp">
+
+                    <TextView
+                        android:id="@+id/tvTextNames"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="You’ve got a gift from kai"
+                        android:textSize="@dimen/_12sdp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="@dimen/_20sdp"
+                        android:fontFamily="@font/montserrat_semibold"
+                        android:textColor="@color/black" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/imageProfile"
+                        android:layout_width="@dimen/_60sdp"
+                        android:layout_height="@dimen/_60sdp"
+                        android:layout_below="@+id/tvTextNames"
+                        android:src="@drawable/mask_group_icon"
+                        android:layout_marginTop="@dimen/_20sdp"
+                        android:layout_centerHorizontal="true"
+                        app:civ_border_color="@color/orange"
+                        app:civ_border_width="@dimen/_2sdp" />
+
+                </RelativeLayout>
+
 
             </RelativeLayout>
 
@@ -67,10 +98,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <ImageView
+                        <TextView
+                            android:id="@+id/tvStarter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/basic_starter_bg" />
+                            android:layout_centerVertical="true"
+                            android:background="@drawable/basic_click_bg"
+                            android:fontFamily="@font/poppins"
+                            android:padding="@dimen/_2sdp"
+                            android:text="Starter"
+                            android:textColor="#121212"
+                            android:textSize="@dimen/_11sdp" />
 
                         <ImageView
                             android:id="@+id/imgBasicClick"
@@ -139,10 +177,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <ImageView
+                        <TextView
+                            android:id="@+id/tvPopular"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/popular_icon" />
+                            android:layout_centerVertical="true"
+                            android:background="@drawable/popular_click_bg"
+                            android:fontFamily="@font/poppins"
+                            android:padding="@dimen/_2sdp"
+                            android:text="Popular"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/_11sdp" />
 
                         <ImageView
                             android:id="@+id/imgPopularClick"
@@ -284,7 +329,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
-                        android:paddingHorizontal="@dimen/_50sdp"
                         android:paddingVertical="@dimen/_8sdp"
                         android:text="Start Your 7 days free trial"
                         android:textColor="@color/white"

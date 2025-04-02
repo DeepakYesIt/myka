@@ -33,8 +33,10 @@ class AdapterOnBoardingSubscriptionItem(private val onboardingItems: List<OnSubs
             binding.imageView.setBackgroundResource(item.image)
             if (item.status){
                 binding.layData.visibility=View.VISIBLE
+                binding.ImageMainLogo.visibility=View.VISIBLE
             }else{
                 binding.layData.visibility=View.GONE
+                binding.ImageMainLogo.visibility=View.GONE
             }
         }
     }

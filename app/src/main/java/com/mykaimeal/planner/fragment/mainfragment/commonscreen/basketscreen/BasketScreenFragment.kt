@@ -65,7 +65,6 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentBasketScreenBinding.inflate(layoutInflater, container, false)
-        
 
         (activity as? MainActivity)?.binding?.apply {
             llIndicator.visibility = View.GONE

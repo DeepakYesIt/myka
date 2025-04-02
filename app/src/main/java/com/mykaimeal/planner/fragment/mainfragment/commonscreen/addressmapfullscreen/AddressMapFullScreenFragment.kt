@@ -62,6 +62,7 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
     private lateinit var edtStates: EditText
     private lateinit var edtPostalCode: EditText
     private lateinit var edtAddress: EditText
+    private var userAddress: String? = ""
     private var address: String? = ""
     private var setStatus: String? = "Home"
     private var latitude: String? = ""
@@ -98,13 +99,19 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
         if (sessionManagement.getLatitude() != "") {
             latitude = sessionManagement.getLatitude().toString()
         } else {
-            latitude = "40.7128"
+            latitude = "37.7786155"
         }
 
         if (sessionManagement.getLongitude() != "") {
             longitude = sessionManagement.getLongitude().toString()
         } else {
-            longitude = "-74.0060"
+            longitude = "-122.3940943"
+        }
+
+        if (sessionManagement.getUserAddress() != "") {
+            binding!!.tvAddress.text = sessionManagement.getUserAddress().toString()
+        } else {
+            binding!!.tvAddress.text = "188, King street,San Francisco, CA"
         }
 
         initialize()
@@ -132,11 +139,11 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
         }
 
         binding!!.tvConfirmBtn.setOnClickListener {
-            fullAddressDialog()
-            /*        sessionManagement.setLatitude(latitude.toString())
-                    sessionManagement.setLongitude(longitude.toString())
-                    sessionManagement.setAddress(address.toString())
-                    findNavController().navigateUp()*/
+//            fullAddressDialog()
+            sessionManagement.setLatitude(latitude.toString())
+            sessionManagement.setLongitude(longitude.toString())
+            sessionManagement.setAddress(address.toString())
+            findNavController().navigateUp()
             /*if (BaseApplication.isOnline(requireContext())){
                 addFullAddressApi()
             }else{
@@ -182,7 +189,7 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
             edtCity.setText(city.toString())
         }
 
-        if (states!=""){
+        if (states != "") {
             edtStates.setText(states.toString())
         }
 
@@ -196,32 +203,32 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
 
         dialogMiles.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         relConfirm.setOnClickListener {
-       /*     if (BaseApplication.isOnline(requireContext())) {
-                if (validate()) {
-                    streetName=edtStreetName.text.toString().trim()
-                    streetNum=edtStreetNumber.text.toString().trim()
-                    apartNum=edtApartNumber.text.toString().trim()
-                    city=edtCity.text.toString().trim()
-                    states=edtStates.text.toString().trim()
-                    address=edtAddress.text.toString().trim()
-                    zipcode=edtPostalCode.text.toString().trim()
-                    addFullAddressApi()
-                }
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }*/
-               sessionManagement.setLatitude(latitude.toString())
-               sessionManagement.setLongitude(longitude.toString())
-               sessionManagement.setAddress(address.toString())
-               findNavController().navigateUp()
+            /*      if (BaseApplication.isOnline(requireContext())) {
+                      if (validate()) {
+                          streetName=edtStreetName.text.toString().trim()
+                          streetNum=edtStreetNumber.text.toString().trim()
+                          apartNum=edtApartNumber.text.toString().trim()
+                          city=edtCity.text.toString().trim()
+                          states=edtStates.text.toString().trim()
+                          address=edtAddress.text.toString().trim()
+                          zipcode=edtPostalCode.text.toString().trim()
+                          addFullAddressApi()
+                      }
+                  } else {
+                      BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                  }*/
+            sessionManagement.setLatitude(latitude.toString())
+            sessionManagement.setLongitude(longitude.toString())
+            sessionManagement.setAddress(address.toString())
+            findNavController().navigateUp()
             dialogMiles.dismiss()
         }
 
         imageCross.setOnClickListener {
-                sessionManagement.setLatitude(latitude.toString())
-                sessionManagement.setLongitude(longitude.toString())
-                sessionManagement.setAddress(address.toString())
-                findNavController().navigateUp()
+            sessionManagement.setLatitude(latitude.toString())
+            sessionManagement.setLongitude(longitude.toString())
+            sessionManagement.setAddress(address.toString())
+            findNavController().navigateUp()
             dialogMiles.dismiss()
         }
     }
@@ -243,7 +250,7 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
         } else if (edtStates.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.statesEnterError, false)
             return false
-        }else if (edtAddress.text.toString().trim().isEmpty()) {
+        } else if (edtAddress.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.addressError, false)
             return false
         } else if (edtPostalCode.text.toString().trim().isEmpty()) {
@@ -260,7 +267,19 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
                 {
                     BaseApplication.dismissMe()
                     handleApiAddAddressResponse(it)
-                }, latitude, longitude, streetName, streetNum, apartNum, city,states, country, zipcode, "1", "", setStatus
+                },
+                latitude,
+                longitude,
+                streetName,
+                streetNum,
+                apartNum,
+                city,
+                states,
+                country,
+                zipcode,
+                "1",
+                "",
+                setStatus
             )
         }
     }

@@ -420,6 +420,16 @@ reinvented version of your favorite meal."
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <ImageView
+                android:id="@+id/crossImages"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="@dimen/_15sdp"
+                android:visibility="invisible"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:src="@drawable/gray_circle_fill" />
+
             <TextView
                 android:id="@+id/tvHeadingTitle"
                 android:layout_width="wrap_content"

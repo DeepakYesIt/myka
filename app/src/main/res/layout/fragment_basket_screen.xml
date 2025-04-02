@@ -253,7 +253,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/montserrat_medium"
                         android:paddingHorizontal="@dimen/_20sdp"
-                        android:text="Recipe"
+                        android:text="Recipes"
                         android:textColor="#4A4A4A" />
 
                     <TextView
