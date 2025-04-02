@@ -47,6 +47,7 @@
             android:layout_height="wrap_content">
 
             <RelativeLayout
+                android:id="@+id/relSavedCards"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -102,7 +103,9 @@
                 app:cardCornerRadius="@dimen/_10sdp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/relSavedCards"
                 android:layout_marginHorizontal="@dimen/_10sdp"
+                app:cardBackgroundColor="#FFF7F0"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginBottom="@dimen/_20sdp"
                 android:visibility="gone">
@@ -119,7 +122,7 @@
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="@dimen/_10sdp"
                         android:fontFamily="@font/montserrat_medium"
-                        android:text="Debit Card"
+                        android:text="Credit or Debit Card"
                         android:textColor="@color/black"
                         android:textStyle="bold" />
 

@@ -58,4 +58,10 @@ class PlanViewModel @Inject constructor(private val repository: MainRepository) 
     }
 
 
+    suspend fun addDayToBasketAllUrl(successCallback: (response: NetworkResult<String>) -> Unit, date:String?
+    ){
+        repository.addToBasketAllUrl({ successCallback(it) },date)
+    }
+
+
 }

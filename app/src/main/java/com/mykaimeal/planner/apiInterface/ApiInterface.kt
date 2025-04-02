@@ -676,6 +676,10 @@ interface ApiInterface {
     @POST(ApiEndPoint.getSelectProductsUrl)
     suspend fun getSelectProductsUrl(@Field("id") id:String?,@Field("product_id") product_id:String?): Response<JsonObject>
 
+    @FormUrlEncoded
+    @POST(ApiEndPoint.getAllIngredientsUrl)
+    suspend fun getAllIngredientsUrl(@Field("category") category:String?,@Field("search") search:String?,@Field("number") number:String?): Response<JsonObject>
+
 
     @FormUrlEncoded
     @POST(ApiEndPoint.recipeSwapUrl)
@@ -696,6 +700,12 @@ interface ApiInterface {
         @Field("exp_month") exp_month: String?,
         @Field("exp_year") exp_year: String?,
         @Field("cvv") cvv: String?
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.addToBasketAllUrl)
+    suspend fun addToBasketAllUrl(
+        @Field("date") date: String?
     ): Response<JsonObject>
 
     @GET(ApiEndPoint.addAddressUrl)

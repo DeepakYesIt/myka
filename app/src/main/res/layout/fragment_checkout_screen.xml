@@ -737,7 +737,6 @@
                             android:layout_marginEnd="@dimen/_10sdp"
                             android:src="@drawable/radio_uncheck_gray_icon" />
 
-
                     </RelativeLayout>
 
                     <androidx.recyclerview.widget.RecyclerView

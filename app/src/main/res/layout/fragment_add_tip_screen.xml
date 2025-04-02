@@ -62,7 +62,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/imageCoin"
-                android:fontFamily="@font/poppins_semibold"
+                android:textColor="@color/light_black"
+                android:fontFamily="@font/poppins_medium"
                 android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:text="100% of your tip goes to your courier. Tips are based on your order total of £49.23 before any discounts or promotions."
@@ -128,7 +129,7 @@
                         android:text="$7"
                         android:fontFamily="@font/poppins_semibold"
                         android:gravity="center"
-                        android:textSize="@dimen/_12sdp"/>
+                        android:textSize="@dimen/_11sdp"/>
 
                 </LinearLayout>
                 <LinearLayout
@@ -194,7 +195,7 @@
                         android:gravity="center"
                         android:text="$12"
                         android:fontFamily="@font/poppins_semibold"
-                        android:textSize="@dimen/_10sdp"/>
+                        android:textSize="@dimen/_11sdp"/>
 
                 </LinearLayout>
                 <LinearLayout
@@ -227,7 +228,7 @@
                         android:textColor="@color/light_green"
                         android:text="$15"
                         android:fontFamily="@font/poppins_semibold"
-                        android:textSize="@dimen/_10sdp"/>
+                        android:textSize="@dimen/_11sdp"/>
 
                 </LinearLayout>
             </LinearLayout>

@@ -103,6 +103,7 @@ interface MainRepository {
  suspend fun recipeAddBasketRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)
 
  suspend fun recipeAddToPlanRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)
+ suspend fun addToBasketAllUrl(successCallback: (response: NetworkResult<String>) -> Unit,date: String?)
  suspend fun addMealTypeApiUrl(successCallback: (response: NetworkResult<String>) -> Unit,uri: String?,planType: String?)
  suspend fun createRecipeRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)
  suspend fun updateMealUrl(successCallback: (response: NetworkResult<String>) -> Unit,jsonObject: JsonObject)
@@ -249,6 +250,7 @@ interface MainRepository {
     suspend fun getOrderProductUrl(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getStoreProductUrl(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit)
+    suspend fun getAllIngredientsUrl(successCallback: (response: NetworkResult<String>) -> Unit,category:String?,search:String?,number:String?)
     suspend fun addCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit,cardNumber:String?,expMonth:String?,expYear:String?,cvv:String?)
 
     suspend fun getProductsUrl(successCallback: (response: NetworkResult<String>) -> Unit,query:String?)

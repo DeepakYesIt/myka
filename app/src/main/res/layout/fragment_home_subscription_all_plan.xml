@@ -7,152 +7,64 @@
     android:orientation="vertical"
     tools:context=".fragment.mainfragment.profilesetting.subscriptionplan.SubscriptionAllPlanFragment">
 
-    <!--<ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/black"
-            android:orientation="vertical">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-
-                <TextView
-                    android:id="@+id/textUnlockTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/_10sdp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:text="Unlock Myka"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_13ssp" />
-
-                <TextView
-                    android:id="@+id/text2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/textUnlockTitle"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/_5sdp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:maxWidth="@dimen/_180sdp"
-                    android:text="Start saving time and money with your personal kitchen assistant"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_12ssp" />
-
-                <ImageView
-                    android:id="@+id/imageCrossing"
-                    android:layout_width="@dimen/_13sdp"
-                    android:layout_height="@dimen/_13sdp"
-                    android:layout_below="@+id/textUnlockTitle"
-                    android:layout_gravity="end"
-                    android:layout_marginStart="@dimen/_15sdp"
-                    android:layout_marginTop="@dimen/_10sdp"
-                    android:layout_toEndOf="@+id/text2"
-                    android:src="@drawable/ic_cross_icon" />
-
-            </RelativeLayout>
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/_160sdp"
-                android:layout_marginHorizontal="@dimen/_40sdp"
-                android:layout_marginTop="@dimen/_10sdp"
-                android:src="@drawable/ic_dish_robo_icon" />
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#0DF4D20F"
-                android:orientation="horizontal"
-                android:paddingHorizontal="@dimen/_18sdp"
-                android:paddingVertical="@dimen/_10sdp"
-                android:weightSum="2">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/_10sdp"
-                        android:fontFamily="@font/montserrat_medium"
-                        android:text="You've Got a Gift!"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/_12ssp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/_8sdp"
-                        android:fontFamily="@font/poppins"
-                        android:text="Zamy has gifted you 7- days free trial plus a LIFETIME 50% OFF Myka. "
-                        android:textColor="#F9D50D"
-                        android:textSize="@dimen/_11ssp" />
-
-
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/_120sdp"
-                    android:layout_weight="0.8"
-                    android:src="@drawable/ic_head_of_chef" />
-
-
-            </LinearLayout>
-
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/viewpager"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_140sdp"
-                android:layout_marginTop="@dimen/_20sdp"
-                android:paddingStart="@dimen/_40sdp"
-                android:paddingEnd="@dimen/_40sdp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_15sdp"
-                android:layout_marginBottom="@dimen/_60sdp"
-                android:background="@drawable/gray_btn_unselect_background"
-                android:fontFamily="@font/poppins"
-                android:gravity="center_horizontal"
-                android:paddingVertical="@dimen/_8sdp"
-                android:text="Buy Now"
-                android:textColor="@color/white"
-                android:textSize="@dimen/_13ssp" />
-
-        </LinearLayout>
-    </ScrollView>-->
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="@drawable/subscription_main_bg"
         android:fillViewport="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_15sdp">
+
+            <ImageView
+                android:id="@+id/crossImages"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="@dimen/_15sdp"
+                android:src="@drawable/gray_circle_fill"/>
+
+            <TextView
+                android:id="@+id/tvTittles"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save time, save money, eat better"
+                android:textSize="@dimen/_17sdp"
+                android:layout_marginHorizontal="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:fontFamily="@font/montserrat_semibold"
+                android:layout_below="@+id/crossImages"
+                android:textColor="@color/light_green"/>
+
+            <RelativeLayout
+                android:id="@+id/relSubscriptionFrame"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvTittles"
+                android:background="@drawable/subscription_main_image">
 
 
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relSubscriptionFrame">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_15sdp">
+
+
+
+                </RelativeLayout>
+
+            </RelativeLayout>
 
         </RelativeLayout>
-
 
 
     </ScrollView>

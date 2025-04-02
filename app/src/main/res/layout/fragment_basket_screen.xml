@@ -82,7 +82,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/_15sdp"
                         android:fontFamily="@font/montserrat_medium"
-                        android:text="Supermarket"
+                        android:text="Grocery stores"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_12ssp"
                         android:textStyle="bold" />

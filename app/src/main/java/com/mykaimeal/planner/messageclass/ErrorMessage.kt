@@ -25,6 +25,7 @@ object ErrorMessage {
 
      const val apiKey:String="AIzaSyC9NuN_f-wESHh3kihTvpbvdrmKlTQurxw"
      const val emailPhone:String="Please Enter Email/Phone"
+     const val enterIngName:String="Enter a ingredients name"
      const val deliveryInstructions:String="Please Enter Delivery Instructions"
      const val selectLists:String="Please select atleast one"
      const val recipeName:String="Please Enter Recipe Name"

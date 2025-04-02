@@ -98,11 +98,14 @@ object ApiEndPoint {
     const val getProductsDetailsUrl="get-products"
 
     const val getSelectProductsUrl="select-product"
+    const val getAllIngredientsUrl="ingredients"
 
     const val recipeSwapUrl="swap"
 
     const val basketYourRecipeIncDescUrl="add-to-basket"
     const val basketIngIncDescUrl="change-cart"
+
+    const val addToBasketAllUrl="add-to-basket-all"
 
 
 }

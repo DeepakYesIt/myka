@@ -31,6 +31,17 @@
                 android:textColor="@color/black"/>
 
             <TextView
+                android:id="@+id/tvPreferred"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/tvVisaName"
+                android:layout_marginStart="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_2sdp"
+                android:text="Preferred"
+                android:textSize="@dimen/_10sdp"
+                android:textColor="#FE9F45"/>
+
+            <TextView
                 android:id="@+id/tvCardNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

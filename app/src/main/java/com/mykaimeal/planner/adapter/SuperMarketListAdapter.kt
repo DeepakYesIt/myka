@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.graphics.Color
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -16,6 +17,8 @@ import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterLayoutSupermarketBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Store
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 class SuperMarketListAdapter(
     private var storesData: MutableList<Store>?,
@@ -33,6 +36,7 @@ class SuperMarketListAdapter(
         return ViewHolder(binding)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
 
         val data = storesData?.get(position)
@@ -45,7 +49,26 @@ class SuperMarketListAdapter(
         }
 
         data?.let {
-            holder.binding.tvSuperMarketItems.text = it.store_name ?: ""
+            if (it.all_items==1){
+                if (it.missing!=null){
+                    holder.binding.tvSuperMarketItems.setTextColor(android.graphics.Color.parseColor("#FF3232"))
+                    holder.binding.tvSuperMarketItems.text=it.missing.toString()+"ITEMS MISSING"
+                }
+            }else{
+                holder.binding.tvSuperMarketItems.setTextColor(android.graphics.Color.parseColor("#06C169"))
+                holder.binding.tvSuperMarketItems.text="ALL ITEMS"
+            }
+
+            if (it.total!=null){
+                val roundedNetTotal = it.total.let {
+                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+                }
+                holder.binding.tvSuperMarketRupees.text= "$$roundedNetTotal"
+            }
+
+
+/*
+            holder.binding.tvSuperMarketItems.text = it.store_name ?: ""*/
 
             // ✅ Load image with Glide
             Glide.with(requireActivity)

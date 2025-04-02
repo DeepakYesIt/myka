@@ -21,20 +21,24 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
     private lateinit var binding: FragmentOrderHistoryBinding 
     private var dataList3: MutableList<DataModel> = mutableListOf()
     private var adapterOrderHistoryItem: AdapterOrderHistoryItem? = null
+    private var id:String=""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentOrderHistoryBinding.inflate(inflater, container, false)
+
 
         val mainActivity = activity as? MainActivity
         mainActivity?.binding?.apply {
             llIndicator.visibility = View.VISIBLE
             llBottomNavigation.visibility = View.VISIBLE
         }
-
+        
+        id=arguments?.getString("id","")?:""
+        
         setupBackNavigation()
 
         initialize()
@@ -45,24 +49,38 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
     }
 
     private fun setupBackNavigation() {
+
+        if (id=="yes"){
+            binding.relNoOrders.visibility = View.GONE
+            binding.rcyOrderHistory.visibility = View.VISIBLE
+        }else{
+            binding.relNoOrders.visibility = View.VISIBLE
+            binding.rcyOrderHistory.visibility = View.GONE
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    findNavController().navigateUp()
+                    findNavController().navigate(R.id.settingProfileFragment)
                 }
             })
     }
 
     private fun initialize() {
 
+
         binding.imgBackOrderHistory.setOnClickListener {
             findNavController().navigateUp()
-        }
 
-        binding.rlStartOrder.setOnClickListener {
-            binding.relNoOrders.visibility = View.GONE
-            binding.rcyOrderHistory.visibility = View.VISIBLE
+            binding.imgBackOrderHistory.setOnClickListener {
+                findNavController().navigate(R.id.settingProfileFragment)
+            }
+
+            binding.rlStartOrder.setOnClickListener {
+                binding.relNoOrders.visibility = View.GONE
+                binding.rcyOrderHistory.visibility = View.VISIBLE
+            }
         }
     }
 

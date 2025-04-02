@@ -176,7 +176,7 @@
                         android:id="@+id/tvLogInType"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/_2sdp"
+                        android:layout_marginStart="@dimen/_2sdp"
                         android:layout_toEndOf="@+id/textPleaseCheck"
                         android:fontFamily="@font/montserrat_bold"
                         android:text="Phone"
@@ -273,7 +273,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/relResendVerificationTimer"
-                    android:text="Please try again verification is not working."
+                    android:text="The verification code is invalid. Please try again"
                     android:textColor="#FF3232"
                     android:textSize="@dimen/_13sdp"
                     android:visibility="gone" />
