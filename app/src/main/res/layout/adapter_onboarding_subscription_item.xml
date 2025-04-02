@@ -120,14 +120,14 @@
 
         </RelativeLayout>
 
-        <pl.droidsonroids.gif.GifImageView
-            android:id="@+id/ImageMainLogo"
-            android:layout_width="@dimen/_55sdp"
-            android:layout_height="@dimen/_55sdp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="@dimen/_40sdp"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:src="@drawable/paywall_gift_wiggle" />
+<!--        <pl.droidsonroids.gif.GifImageView-->
+<!--            android:id="@+id/ImageMainLogo"-->
+<!--            android:layout_width="@dimen/_55sdp"-->
+<!--            android:layout_height="@dimen/_55sdp"-->
+<!--            android:layout_alignParentBottom="true"-->
+<!--            android:layout_marginBottom="@dimen/_40sdp"-->
+<!--            android:layout_marginStart="@dimen/_10sdp"-->
+<!--            android:src="@drawable/paywall_gift_wiggle" />-->
 
 
 <!--

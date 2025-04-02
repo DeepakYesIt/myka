@@ -107,7 +107,7 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
         recipeName = arguments?.getString("name", "")?:""
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     addRecipeDiscardDialog()

@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -46,8 +47,7 @@ import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
-class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener,
-    OnMapReadyCallback {
+class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener, OnMapReadyCallback {
     private lateinit var binding: FragmentSuperMarketsNearByBinding
     private var adapter: AdapterSuperMarket? = null
     private lateinit var basketDetailsSuperMarketViewModel: BasketDetailsSuperMarketViewModel
@@ -62,7 +62,7 @@ class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener,
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding=FragmentSuperMarketsNearByBinding.inflate(layoutInflater, container, false)
 
@@ -70,7 +70,7 @@ class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener,
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
@@ -92,19 +92,11 @@ class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener,
         }
 
         binding.textDelivery.setOnClickListener {
-            binding.textDelivery.setBackgroundResource(R.drawable.selected_button_bg)
-            binding.textCollect.setBackgroundResource(R.drawable.unselected_button_bg)
-            binding.textDelivery.setTextColor(Color.WHITE)
-            binding.textCollect.setTextColor(Color.BLACK)
-
+            updateButtonStyles(binding.textDelivery, binding.textCollect)
         }
 
         binding.textCollect.setOnClickListener {
-            binding.textDelivery.setBackgroundResource(R.drawable.unselected_button_bg)
-            binding.textCollect.setBackgroundResource(R.drawable.selected_button_bg)
-            binding.textDelivery.setTextColor(Color.BLACK)
-            binding.textCollect.setTextColor(Color.WHITE)
-
+            updateButtonStyles(binding.textCollect, binding.textDelivery)
         }
 
         if (BaseApplication.isOnline(requireActivity())){
@@ -132,6 +124,13 @@ class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener,
 
     }
 
+
+    private fun updateButtonStyles(selected: View, unselected: View) {
+        selected.setBackgroundResource(R.drawable.selected_button_bg)
+        unselected.setBackgroundResource(R.drawable.unselected_button_bg)
+        (selected as TextView).setTextColor(Color.WHITE)
+        (unselected as TextView).setTextColor(Color.BLACK)
+    }
 
     @SuppressLint("MissingPermission")
     private fun getCurrentLocation() {
@@ -281,10 +280,6 @@ class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener,
         if (storeLocations.isNotEmpty()) {
             updateMap(mMap!!)
         }
-        /*mMap = gmap
-        val newYork = LatLng(40.7128, -74.0060)
-        mMap?.addMarker(MarkerOptions().position(newYork).title("Marker in New York"))
-        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(newYork, 12f))*/
     }
 
     // Manage MapView Lifecycle

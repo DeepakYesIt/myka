@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -25,9 +26,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class NotificationFragment : Fragment(), View.OnClickListener {
 
-    private var binding: FragmentNotificationBinding? = null
+    private lateinit var binding: FragmentNotificationBinding
     private lateinit var viewModel: NotificationViewModel
-
     private var pushNotification: Int = 0
     private var recipeRecommendations: Int = 0
     private var productUpdates: Int = 0
@@ -41,15 +41,17 @@ class NotificationFragment : Fragment(), View.OnClickListener {
         setupBackButtonHandler()
         fetchNotificationList()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun setupUI() {
-        val activity = activity as MainActivity
-        activity.binding!!.llIndicator.visibility = View.GONE
-        activity.binding!!.llBottomNavigation.visibility = View.GONE
 
-        binding!!.apply {
+        (activity as MainActivity).binding.apply {
+            llIndicator.visibility = View.GONE
+            llBottomNavigation.visibility = View.GONE
+        }
+
+        binding.apply {
             imgBackNotification.setOnClickListener(this@NotificationFragment)
             textEnableNotification.setOnClickListener(this@NotificationFragment)
             textPushNotification.setOnClickListener(this@NotificationFragment)
@@ -65,7 +67,7 @@ class NotificationFragment : Fragment(), View.OnClickListener {
 
     private fun setupBackButtonHandler() {
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(), object : OnBackPressedCallback(true) {
+            viewLifecycleOwner, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
                 }
@@ -103,7 +105,6 @@ class NotificationFragment : Fragment(), View.OnClickListener {
         try {
             val apiModel = Gson().fromJson(data, NotificationApiResponse::class.java)
             Log.d("@@@ notification profile", "message :- $data")
-
             if (apiModel.code == 200 && apiModel.success) {
                 updateNotificationStates(apiModel)
                 updateUI()
@@ -131,29 +132,34 @@ class NotificationFragment : Fragment(), View.OnClickListener {
     }
 
     private fun updateUI() {
-        binding!!.apply {
-            textPushNotification.setCompoundDrawablesWithIntrinsicBounds(
-                R.drawable.push_notification_icon, 0,
-                if (pushNotification == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon, 0
+        fun setCompoundDrawable(textView: TextView, icon: Int, toggle: Int) {
+            textView.setCompoundDrawablesWithIntrinsicBounds(icon, 0, toggle, 0)
+        }
+
+        binding.apply {
+            setCompoundDrawable(
+                textPushNotification, R.drawable.push_notification_icon,
+                if (pushNotification == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon
             )
-            textRecipeRecommendations.setCompoundDrawablesWithIntrinsicBounds(
-                R.drawable.recipe_recommendation_icon, 0,
-                if (recipeRecommendations == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon, 0
+            setCompoundDrawable(
+                textRecipeRecommendations, R.drawable.recipe_recommendation_icon,
+                if (recipeRecommendations == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon
             )
-            textProductUpdates.setCompoundDrawablesWithIntrinsicBounds(
-                R.drawable.product_updates_icon, 0,
-                if (productUpdates == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon, 0
+            setCompoundDrawable(
+                textProductUpdates, R.drawable.product_updates_icon,
+                if (productUpdates == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon
             )
-            textPromotionalUpdates.setCompoundDrawablesWithIntrinsicBounds(
-                R.drawable.promotional_icon, 0,
-                if (promotionalUpdates == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon, 0
+            setCompoundDrawable(
+                textPromotionalUpdates, R.drawable.promotional_icon,
+                if (promotionalUpdates == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon
             )
-            textEnableNotification.setCompoundDrawablesWithIntrinsicBounds(
-                R.drawable.notification_icons, 0,
-                if (allNotifications == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon, 0
+            setCompoundDrawable(
+                textEnableNotification, R.drawable.notification_icons,
+                if (allNotifications == 0) R.drawable.toggle_gray_off_icon else R.drawable.toggle_on_icon
             )
         }
     }
+
 
     private fun showAlert(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)

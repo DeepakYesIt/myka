@@ -4,6 +4,8 @@ object ErrorMessage {
 
 
      const val networkError:String="Please check your internet connection"
+     const val servingError:String="The minimum serving value is at least one."
+     const val ingredientError:String="The minimum ingredient value is at least one."
      const val apiError:String="Something went wrong"
      const val deviceType:String="Android"
      const val emailPatter:String="[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]"

@@ -42,8 +42,10 @@ class HealthDataFragment : Fragment() {
         _binding = FragmentHealthDataBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[SettingViewModel::class.java]
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.VISIBLE
+            llBottomNavigation.visibility = View.VISIBLE
+        }
 
         setupUi()
 
@@ -66,12 +68,6 @@ class HealthDataFragment : Fragment() {
 
     private fun setupUi() {
 
-        (activity as MainActivity).apply {
-            binding?.llIndicator?.visibility = View.VISIBLE
-            binding?.llBottomNavigation?.visibility = View.VISIBLE
-        }
-
-//        binding.spinnerActivityLevel.setItems(listOf("High Protein", "Low Carb", "Balanced"))
         binding.spinnerActivityLevel.setItems(listOf("Sedentary", "Lightly active", "Moderately active", "Very active", "Super active"))
 
         binding.spinnerHeight.setItems(listOf("Inch", "Centimeter", "Feet"))
@@ -184,10 +180,6 @@ class HealthDataFragment : Fragment() {
                 // Update the TextView with the selected date
                 val date = "${selectedMonth + 1}/$selectedDay/$selectedYear"
                 Log.d("******", "" + date)
-
-/*
-                binding.etDateOfBirth.text = BaseApplication.changeDateFormatHealth(date)
-*/
                 binding.etDateOfBirth.text = date
             },
             year,
@@ -205,7 +197,7 @@ class HealthDataFragment : Fragment() {
 
     private fun setupBackNavigation() {
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(), object : OnBackPressedCallback(true) {
+            viewLifecycleOwner, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     viewModel.clearData()
                     findNavController().navigateUp()

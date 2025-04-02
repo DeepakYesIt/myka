@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class FilterSearchFragment : Fragment(),OnItemClickListener {
 
-    private var binding: FragmentFilterSearchBinding?=null
+    private lateinit var binding: FragmentFilterSearchBinding
     private var adapterFilterMealItem: AdapterFilterMealItem? = null
     private var adapterFilterDietItem: AdapterFilterDietItem? = null
     private var adapterFilterCookBookItem: AdapterFilterCookTimeItem? = null
@@ -44,25 +44,33 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding= FragmentFilterSearchBinding.inflate(inflater, container, false)
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.GONE
+            llBottomNavigation.visibility = View.GONE
+        }
+
+
         filterSearchViewModel = ViewModelProvider(this)[FilterSearchViewModel::class.java]
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
+        backButton()
 
         initialize()
         // This Api call when the screen in loaded
         launchApi()
 
-        return binding!!.root
+        return binding.root
+    }
+    
+    private fun backButton(){
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                findNavController().navigateUp()
+            }
+        })
     }
 
     private fun launchApi() {
@@ -116,8 +124,8 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
                         justifyContent = JustifyContent.FLEX_START
                     }
                     adapterFilterMealItem = AdapterFilterMealItem(data.mealType, requireActivity(),this)
-                    binding!!.rcyMealType.layoutManager = flexboxLayoutManager
-                    binding!!.rcyMealType.adapter = adapterFilterMealItem
+                    binding.rcyMealType.layoutManager = flexboxLayoutManager
+                    binding.rcyMealType.adapter = adapterFilterMealItem
                 }
             }
 
@@ -131,8 +139,8 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
                         justifyContent = JustifyContent.FLEX_START
                     }
                     adapterFilterDietItem = AdapterFilterDietItem(data.Diet, requireActivity(),this)
-                    binding!!.rcyDiet.layoutManager = flexboxLayoutManager
-                    binding!!.rcyDiet.adapter = adapterFilterDietItem
+                    binding.rcyDiet.layoutManager = flexboxLayoutManager
+                    binding.rcyDiet.adapter = adapterFilterDietItem
                 }
             }
             if (data.cook_time!=null && data.cook_time.size>0){
@@ -146,8 +154,8 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
                     }
                     //        adjustSpanCount(gridLayoutManager)// Default: 2 items per row
                     adapterFilterCookBookItem = AdapterFilterCookTimeItem(data.cook_time, requireActivity(),this)
-                    binding!!.rcyCookTime.layoutManager = flexboxLayoutManager
-                    binding!!.rcyCookTime.adapter = adapterFilterCookBookItem
+                    binding.rcyCookTime.layoutManager = flexboxLayoutManager
+                    binding.rcyCookTime.adapter = adapterFilterCookBookItem
                 }
             }
 
@@ -161,34 +169,13 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
     }
 
     private fun initialize() {
-
-        binding!!.relBackFiltered.setOnClickListener{
+        binding.relBackFiltered.setOnClickListener{
             findNavController().navigateUp()
         }
-
-        binding!!.relApplyBtn.setOnClickListener{
+        binding.relApplyBtn.setOnClickListener{
             findNavController().navigate(R.id.searchedRecipeBreakfastFragment)
         }
     }
-
-
-//    private fun adjustSpanCount(gridLayoutManager: GridLayoutManager) {
-//        // Get screen width in pixels
-//        val screenWidth = resources.displayMetrics.widthPixels
-//
-//        // Set span count based on the screen width or any other condition
-//        if (screenWidth > 120) {
-//            gridLayoutManager.spanCount = 3
-//            // For large screens (e.g., tablets or larger devices), use 4 items per row
-//
-//        } else if (screenWidth > 800) {
-//            // For medium-sized screens, use 3 items per row
-//            gridLayoutManager.spanCount = 4
-//        } else {
-//            // For small screens, use 2 items per row
-//            gridLayoutManager.spanCount = 3
-//        }
-//    }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
 

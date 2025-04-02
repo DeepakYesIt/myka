@@ -16,6 +16,8 @@ import com.bumptech.glide.request.target.Target
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterIngredientsRecipeBinding
 import com.mykaimeal.planner.fragment.mainfragment.hometab.missingingredientsfragment.model.MissingIngredientModelData
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 
 class AdapterMissingIngredientAvailableItem(var datalist: MutableList<MissingIngredientModelData>?, var requireActivity: FragmentActivity): RecyclerView.Adapter<AdapterMissingIngredientAvailableItem.ViewHolder>() {
@@ -31,7 +33,11 @@ class AdapterMissingIngredientAvailableItem(var datalist: MutableList<MissingIng
             val data=datalist!![position]
 
             if (data.food!=null){
-                holder.binding.tvTitleName.text=data.food.toString()
+                val foodName = data.food
+                val result = foodName.mapIndexed { index, c ->
+                    if (index == 0 || c.isUpperCase()) c.uppercaseChar() else c
+                }.joinToString("")
+                holder.binding.tvTitleName.text=result
             }
 
             holder.binding.imgCheckbox.setImageResource(R.drawable.orange_checkbox_images)
@@ -69,10 +75,13 @@ class AdapterMissingIngredientAvailableItem(var datalist: MutableList<MissingIng
             }
 
             if (data.quantity!=null){
+                val roundedQuantity = data.quantity.let {
+                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
+                }
                 if (!data.measure.equals("<unit>")){
-                    holder.binding.tvTitleDesc.text =""+data.quantity+" "+data.measure
+                    holder.binding.tvTitleDesc.text =""+roundedQuantity+" "+data.measure
                 }else{
-                    holder.binding.tvTitleDesc.text =""+data.quantity
+                    holder.binding.tvTitleDesc.text =""+roundedQuantity
                 }
             }
 

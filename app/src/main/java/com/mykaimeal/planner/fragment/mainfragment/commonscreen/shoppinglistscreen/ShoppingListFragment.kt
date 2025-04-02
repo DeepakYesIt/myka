@@ -46,20 +46,20 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private var tvCounter: TextView? = null
     private var quantity: Int = 1
     private var recipe: MutableList<Recipes>? = null
-    private var ingredientList: MutableList<Ingredient>? = null
+    private var ingredientList: MutableList<
+            Ingredient>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentShoppingListBinding.inflate(layoutInflater, container, false)
 
-        shoppingListViewModel =
-            ViewModelProvider(requireActivity())[ShoppingListViewModel::class.java]
+        shoppingListViewModel = ViewModelProvider(requireActivity())[ShoppingListViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
@@ -77,6 +77,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         return binding.root
     }
 
+    @SuppressLint("DefaultLocale")
     private fun updateValue() {
         tvCounter!!.text = String.format("%02d", quantity)
 
@@ -93,9 +94,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         binding.rlAddMore.setOnClickListener {
-
             addItemDialog()
-            /*     findNavController().navigate(R.id.addMoreItemsFragment)*/
         }
     }
 
@@ -127,7 +126,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             } else {
                 Toast.makeText(
                     requireActivity(),
-                    "Minimum serving atleast value is one",
+                    ErrorMessage.servingError,
                     Toast.LENGTH_LONG
                 ).show()
             }

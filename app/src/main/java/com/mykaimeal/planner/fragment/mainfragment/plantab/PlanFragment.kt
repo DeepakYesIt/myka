@@ -68,7 +68,7 @@ import java.util.Locale
 class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListener,
     OnItemMealTypeListener {
 
-    private var binding: FragmentPlanBinding? = null
+    private lateinit var binding: FragmentPlanBinding
     private var tvWeekRange: TextView? = null
     private var clickable: String? = ""
     private lateinit var viewModel: PlanViewModel
@@ -102,8 +102,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     private var mealTypeAdapter: AdapterMealType? = null
     private lateinit var spinnerActivityLevel: PowerSpinnerView
     private var mealRoutineList: MutableList<MealRoutineModelData> = mutableListOf()
-    private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
-        mutableListOf()
+    private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -113,24 +112,28 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         // Inflate the layout for this fragment
         binding = FragmentPlanBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[PlanViewModel::class.java]
+        
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.VISIBLE
+            llBottomNavigation.visibility = View.VISIBLE
+        }
+        (activity as MainActivity?)?.changeBottom("plan")
 
         sessionManagement = SessionManagement(requireContext())
+        
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+           viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
                 }
             })
 
-        (activity as MainActivity?)?.changeBottom("plan")
+       
         cookbookList.clear()
 
-        val data =
-            com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("", "", 0, "", "Favorites", 0, "", 0)
+        val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("", "", 0, "", "Favorites", 0, "", 0)
         cookbookList.add(0, data)
 
         if (sessionManagement.getImage() != null) {
@@ -138,13 +141,13 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 .load(BaseUrl.imageBaseUrl + sessionManagement.getImage())
                 .placeholder(R.drawable.mask_group_icon)
                 .error(R.drawable.mask_group_icon)
-                .into(binding!!.imageProfile)
+                .into(binding.imageProfile)
         }
 
         currentDateSelected = BaseApplication.currentDateFormat().toString()
 
         if (sessionManagement.getUserName() != null) {
-            binding?.tvName?.text = sessionManagement.getUserName() + "’s week"
+            binding.tvName.text = sessionManagement.getUserName() + "’s week"
         }
 
         setUpListener()
@@ -155,7 +158,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         // Display current week dates
         showWeekDates()
 
-        return binding!!.root
+        return binding.root
     }
 
     @SuppressLint("SetTextI18n")
@@ -187,8 +190,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         // Print the dates
         println("Days between $startDate and ${endDate}:")
         daysBetween.forEach { println(it) }
-        binding!!.tvDate.text = BaseApplication.formatOnlyMonthYear(startDate)
-        binding!!.textWeekRange.text = "" + formatDate(startDate) + "-" + formatDate(endDate)
+        binding.tvDate.text = BaseApplication.formatOnlyMonthYear(startDate)
+        binding.textWeekRange.text = "" + formatDate(startDate) + "-" + formatDate(endDate)
 
         tvWeekRange?.text = "" + formatDate(startDate) + "-" + formatDate(endDate)
 
@@ -233,7 +236,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 }
             }
         // Update the RecyclerView
-        binding!!.recyclerViewWeekDays.adapter = calendarAdapter
+        binding.recyclerViewWeekDays.adapter = calendarAdapter
 
     }
 
@@ -501,51 +504,51 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 }
             }
 
-            binding!!.llCalculateBmr.visibility = View.GONE
+            binding.llCalculateBmr.visibility = View.GONE
 
             // Breakfast
             if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
                 breakfastAdapter =
-                    setupMealAdapter(recipesModel?.Breakfast, binding!!.rcyBreakFast, "BreakFast")
-                binding!!.linearBreakfast.visibility = View.VISIBLE
+                    setupMealAdapter(recipesModel?.Breakfast, binding.rcyBreakFast, "BreakFast")
+                binding.linearBreakfast.visibility = View.VISIBLE
             } else {
-                binding!!.linearBreakfast.visibility = View.GONE
+                binding.linearBreakfast.visibility = View.GONE
             }
 
             // Lunch
             if (recipesModel?.Lunch != null && recipesModel?.Lunch?.size!! > 0) {
-                lunchAdapter = setupMealAdapter(recipesModel?.Lunch, binding!!.rcyLunch, "Lunch")
-                binding!!.linearLunch.visibility = View.VISIBLE
+                lunchAdapter = setupMealAdapter(recipesModel?.Lunch, binding.rcyLunch, "Lunch")
+                binding.linearLunch.visibility = View.VISIBLE
             } else {
-                binding!!.linearLunch.visibility = View.GONE
+                binding.linearLunch.visibility = View.GONE
             }
 
             // Dinner
             if (recipesModel?.Dinner != null && recipesModel?.Dinner?.size!! > 0) {
                 dinnerAdapter =
-                    setupMealAdapter(recipesModel?.Dinner, binding!!.rcyDinner, "Dinner")
-                binding!!.linearDinner.visibility = View.VISIBLE
+                    setupMealAdapter(recipesModel?.Dinner, binding.rcyDinner, "Dinner")
+                binding.linearDinner.visibility = View.VISIBLE
             } else {
-                binding!!.linearDinner.visibility = View.GONE
+                binding.linearDinner.visibility = View.GONE
             }
 
 
             // Snacks
             if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
                 snackesAdapter =
-                    setupMealAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snacks")
-                binding!!.linearSnacks.visibility = View.VISIBLE
+                    setupMealAdapter(recipesModel?.Snack, binding.rcySnacks, "Snacks")
+                binding.linearSnacks.visibility = View.VISIBLE
             } else {
-                binding!!.linearSnacks.visibility = View.GONE
+                binding.linearSnacks.visibility = View.GONE
             }
 
             // TeaTime
             if (recipesModel?.Teatime != null && recipesModel?.Teatime?.size!! > 0) {
                 teaTimeAdapter =
-                    setupMealAdapter(recipesModel?.Teatime, binding!!.rcyTeatime, "Brunch")
-                binding!!.linearTeatime.visibility = View.VISIBLE
+                    setupMealAdapter(recipesModel?.Teatime, binding.rcyTeatime, "Brunch")
+                binding.linearTeatime.visibility = View.VISIBLE
             } else {
-                binding!!.linearTeatime.visibility = View.GONE
+                binding.linearTeatime.visibility = View.GONE
             }
         }
 
@@ -557,6 +560,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private fun showDataAccordingDate(data: DataPlayByDate?) {
 
         recipesDateModel = null
@@ -567,11 +571,11 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         if (recipesDateModel != null) {
 
             if (recipesDateModel!!.show == 0) {
-                binding!!.imgBmr.visibility = View.VISIBLE
-                binding!!.llCalculateBmr.visibility = View.VISIBLE
+                binding.imgBmr.visibility = View.VISIBLE
+                binding.llCalculateBmr.visibility = View.VISIBLE
             } else {
-                binding!!.imgBmr.visibility = View.GONE
-                binding!!.llCalculateBmr.visibility = View.VISIBLE
+                binding.imgBmr.visibility = View.GONE
+                binding.llCalculateBmr.visibility = View.VISIBLE
             }
 
 
@@ -580,19 +584,19 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                     recipesDateModel!!.kcal?.toInt() != 0 || recipesDateModel!!.carbs?.toInt() != 0
                 ) {
                     if (recipesDateModel!!.show == 1) {
-                        binding!!.tvCalories.text = String.format("%.2f", recipesDateModel!!.kcal)
-                        binding!!.tvCalories.text = binding!!.tvCalories.text.toString()
+                        binding.tvCalories.text = String.format("%.2f", recipesDateModel!!.kcal)
+                        binding.tvCalories.text = binding.tvCalories.text.toString()
                             .take(6) // Allows only the first 5 characters
-                        binding!!.tvFats.text = String.format("%.2f", recipesDateModel!!.fat)
-                        binding!!.tvFats.text = binding!!.tvFats.text.toString()
+                        binding.tvFats.text = String.format("%.2f", recipesDateModel!!.fat)
+                        binding.tvFats.text = binding.tvFats.text.toString()
                             .take(6) // Allows only the first 5 characters
-                        binding!!.tvCarbohydrates.text =
+                        binding.tvCarbohydrates.text =
                             String.format("%.2f", recipesDateModel!!.carbs)
-                        binding!!.tvCarbohydrates.text = binding!!.tvCarbohydrates.text.toString()
+                        binding.tvCarbohydrates.text = binding.tvCarbohydrates.text.toString()
                             .take(6) // Allows only the first 5 characters
-                        binding!!.tvProteins.text =
+                        binding.tvProteins.text =
                             String.format("%.2f", recipesDateModel!!.protein)
-                        binding!!.tvProteins.text = binding!!.tvProteins.text.toString()
+                        binding.tvProteins.text = binding.tvProteins.text.toString()
                             .take(6) // Allows only the first 5 characters
                     }
                 }
@@ -634,97 +638,97 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             if (recipesDateModel?.Breakfast != null && recipesDateModel?.Breakfast?.size!! > 0) {
                 adapterPlanBreakByDateFast = setupMealAdapter(
                     recipesDateModel!!.Breakfast!!,
-                    binding!!.rcyBreakFast,
+                    binding.rcyBreakFast,
                     "BreakFast"
                 )
-                binding!!.linearBreakfast.visibility = View.VISIBLE
+                binding.linearBreakfast.visibility = View.VISIBLE
                 status = true
             } else {
                 // Breakfast
                 if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
                     breakfastAdapter = setupMealTopAdapter(
                         recipesModel?.Breakfast,
-                        binding!!.rcyBreakFast,
+                        binding.rcyBreakFast,
                         "BreakFast"
                     )
-                    binding!!.linearBreakfast.visibility = View.VISIBLE
+                    binding.linearBreakfast.visibility = View.VISIBLE
                 } else {
-                    binding!!.linearBreakfast.visibility = View.GONE
+                    binding.linearBreakfast.visibility = View.GONE
                 }
             }
 
             // Lunch
             if (recipesDateModel?.Lunch != null && recipesDateModel?.Lunch?.size!! > 0) {
-                adapterLunchByDateFast = setupMealAdapter(data?.Lunch, binding!!.rcyLunch, "Lunch")
-                binding!!.linearLunch.visibility = View.VISIBLE
+                adapterLunchByDateFast = setupMealAdapter(data?.Lunch, binding.rcyLunch, "Lunch")
+                binding.linearLunch.visibility = View.VISIBLE
                 status = true
             } else {
                 if (recipesModel?.Lunch != null && recipesModel?.Lunch?.size!! > 0) {
                     lunchAdapter =
-                        setupMealTopAdapter(recipesModel?.Lunch, binding!!.rcyLunch, "Lunch")
-                    binding!!.linearLunch.visibility = View.VISIBLE
+                        setupMealTopAdapter(recipesModel?.Lunch, binding.rcyLunch, "Lunch")
+                    binding.linearLunch.visibility = View.VISIBLE
                 } else {
-                    binding!!.linearLunch.visibility = View.GONE
+                    binding.linearLunch.visibility = View.GONE
                 }
             }
 
             // Dinner
             if (recipesDateModel?.Dinner != null && recipesDateModel?.Dinner?.size!! > 0) {
                 adapterDinnerByDateFast =
-                    setupMealAdapter(data?.Dinner, binding!!.rcyDinner, "Dinner")
-                binding!!.linearDinner.visibility = View.VISIBLE
+                    setupMealAdapter(data?.Dinner, binding.rcyDinner, "Dinner")
+                binding.linearDinner.visibility = View.VISIBLE
                 status = true
             } else {
                 // Dinner
                 if (recipesModel?.Dinner != null && recipesModel?.Dinner?.size!! > 0) {
                     dinnerAdapter =
-                        setupMealTopAdapter(recipesModel?.Dinner, binding!!.rcyDinner, "Dinner")
-                    binding!!.linearDinner.visibility = View.VISIBLE
+                        setupMealTopAdapter(recipesModel?.Dinner, binding.rcyDinner, "Dinner")
+                    binding.linearDinner.visibility = View.VISIBLE
                 } else {
-                    binding!!.linearDinner.visibility = View.GONE
+                    binding.linearDinner.visibility = View.GONE
                 }
             }
 
             // Snacks
             if (recipesDateModel?.Snack != null && recipesDateModel?.Snack?.size!! > 0) {
                 adapterSnacksByDateFast =
-                    setupMealAdapter(data?.Snack, binding!!.rcySnacks, "Snacks")
-                binding!!.linearSnacks.visibility = View.VISIBLE
+                    setupMealAdapter(data?.Snack, binding.rcySnacks, "Snacks")
+                binding.linearSnacks.visibility = View.VISIBLE
                 status = true
             } else {
                 // Snacks
                 if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
                     snackesAdapter =
-                        setupMealTopAdapter(recipesModel?.Snack, binding!!.rcySnacks, "Snacks")
-                    binding!!.linearSnacks.visibility = View.VISIBLE
+                        setupMealTopAdapter(recipesModel?.Snack, binding.rcySnacks, "Snacks")
+                    binding.linearSnacks.visibility = View.VISIBLE
                 } else {
-                    binding!!.linearSnacks.visibility = View.GONE
+                    binding.linearSnacks.visibility = View.GONE
                 }
             }
 
             // TeaTime
             if (recipesDateModel?.Teatime != null && recipesDateModel?.Teatime?.size!! > 0) {
                 AdapterteaTimeByDateFast =
-                    setupMealAdapter(data?.Teatime, binding!!.rcyTeatime, "Brunch")
-                binding!!.linearTeatime.visibility = View.VISIBLE
+                    setupMealAdapter(data?.Teatime, binding.rcyTeatime, "Brunch")
+                binding.linearTeatime.visibility = View.VISIBLE
                 status = true
             } else {
                 // TeaTime
                 if (recipesModel?.Teatime != null && recipesModel?.Teatime?.size!! > 0) {
                     teaTimeAdapter =
-                        setupMealTopAdapter(recipesModel?.Teatime, binding!!.rcyTeatime, "Brunch")
-                    binding!!.linearTeatime.visibility = View.VISIBLE
+                        setupMealTopAdapter(recipesModel?.Teatime, binding.rcyTeatime, "Brunch")
+                    binding.linearTeatime.visibility = View.VISIBLE
                 } else {
-                    binding!!.linearTeatime.visibility = View.GONE
+                    binding.linearTeatime.visibility = View.GONE
                 }
             }
 
             if (status) {
-                binding!!.rlAddDayToBasket.isClickable = true
-                binding!!.rlAddDayToBasket.setBackgroundResource(R.drawable.gray_btn_select_background)
+                binding.rlAddDayToBasket.isClickable = true
+                binding.rlAddDayToBasket.setBackgroundResource(R.drawable.gray_btn_select_background)
             } else {
-                binding!!.rlAddDayToBasket.isClickable = false
-                binding!!.rlAddDayToBasket.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                binding.rlAddDayToBasket.isClickable = false
+                binding.rlAddDayToBasket.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             }
         }
     }
@@ -733,9 +737,10 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         BaseApplication.alertError(requireContext(), message, status)
     }
 
+    @SuppressLint("DefaultLocale")
     private fun setUpListener() {
 
-        binding!!.tvAddAnotherMealBtn.setOnClickListener {
+        binding.tvAddAnotherMealBtn.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
                 val mainActivity = requireActivity() as MainActivity
                 mainActivity.mealRoutineSelectApi { data ->
@@ -745,11 +750,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                         addAnotherMealDialog()
                     } else {
                         // Handle the case where the list is empty
-                        BaseApplication.alertError(
-                            requireContext(),
-                            "No meal routines available.",
-                            false
-                        )
+                        BaseApplication.alertError(requireContext(), "No meal routines available.", false)
                     }
                 }
             } else {
@@ -757,54 +758,55 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             }
         }
 
-        binding!!.imageProfile.setOnClickListener {
+        binding.imageProfile.setOnClickListener {
             findNavController().navigate(R.id.settingProfileFragment)
         }
 
-        binding!!.imgHearRedIcons.setOnClickListener {
+        binding.imgHearRedIcons.setOnClickListener {
             findNavController().navigate(R.id.cookBookFragment)
         }
 
-        binding!!.imgBasketIcon.setOnClickListener {
+        binding.imgBasketIcon.setOnClickListener {
             findNavController().navigate(R.id.basketScreenFragment)
         }
 
-        binding!!.rlAddDayToBasket.setOnClickListener {
+        binding.rlAddDayToBasket.setOnClickListener {
             if (clickable == "") {
+
             } else {
                 findNavController().navigate(R.id.basketScreenFragment)
             }
         }
 
-        binding!!.imgAddBreakFast.setOnClickListener {
+        binding.imgAddBreakFast.setOnClickListener {
             val bundle = Bundle().apply {
                 putString("ClickedUrl","")
             }
             findNavController().navigate(R.id.searchFragment,bundle)
         }
 
-        binding!!.imgAddLunch.setOnClickListener {
+        binding.imgAddLunch.setOnClickListener {
             val bundle = Bundle().apply {
                 putString("ClickedUrl","")
             }
             findNavController().navigate(R.id.searchFragment,bundle)
         }
 
-        binding!!.imgAddDinner.setOnClickListener {
+        binding.imgAddDinner.setOnClickListener {
             val bundle = Bundle().apply {
                 putString("ClickedUrl","")
             }
             findNavController().navigate(R.id.searchFragment,bundle)
         }
 
-        binding?.imgAddSnacks?.setOnClickListener {
+        binding.imgAddSnacks.setOnClickListener {
             val bundle = Bundle().apply {
                 putString("ClickedUrl","")
             }
             findNavController().navigate(R.id.searchFragment,bundle)
         }
 
-        binding?.imgAddTeaTime1?.setOnClickListener {
+        binding.imgAddTeaTime1.setOnClickListener {
             val bundle = Bundle().apply {
                 putString("ClickedUrl","")
             }
@@ -812,20 +814,20 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
 
-        binding!!.imgBmr.setOnClickListener {
+        binding.imgBmr.setOnClickListener {
             if (recipesDateModel != null) {
                 if (recipesDateModel!!.show == 1) {
                     if (recipesDateModel!!.fat != null || recipesDateModel!!.protein != null || recipesDateModel!!.kcal != null || recipesDateModel!!.carbs != null) {
                         if (recipesDateModel!!.fat?.toInt() != 0 || recipesDateModel!!.protein?.toInt() != 0 ||
                             recipesDateModel!!.kcal?.toInt() != 0 || recipesDateModel!!.carbs?.toInt() != 0
                         ) {
-                            binding!!.imgBmr.visibility = View.GONE
-                            binding!!.tvCalories.text =
+                            binding.imgBmr.visibility = View.GONE
+                            binding.tvCalories.text =
                                 String.format("%.2f", recipesDateModel!!.kcal)
-                            binding!!.tvFats.text = String.format("%.2f", recipesDateModel!!.fat)
-                            binding!!.tvCarbohydrates.text =
+                            binding.tvFats.text = String.format("%.2f", recipesDateModel!!.fat)
+                            binding.tvCarbohydrates.text =
                                 String.format("%.2f", recipesDateModel!!.carbs)
-                            binding!!.tvProteins.text =
+                            binding.tvProteins.text =
                                 String.format("%.2f", recipesDateModel!!.protein)
                         }
                     } else {
@@ -839,12 +841,11 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
 
-        binding!!.relMonthYear.setOnClickListener {
+        binding.relMonthYear.setOnClickListener {
             openDialog()
         }
 
-        binding!!.imagePrevious.setOnClickListener {
-//            changeWeekRange(-1)
+        binding.imagePrevious.setOnClickListener {
             val calendar = Calendar.getInstance()
             calendar.time = currentDate
             calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
@@ -855,8 +856,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             showWeekDates()
         }
 
-        binding!!.imageNext.setOnClickListener {
-            /*changeWeekRange(1)*/
+        binding.imageNext.setOnClickListener {
             // Simulate clicking the "Next" button to move to the next week
             val calendar = Calendar.getInstance()
             calendar.time = currentDate
@@ -896,7 +896,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
 
         val calendarView = dialog.findViewById<CalendarView>(R.id.calendar)
-        calendarView.setOnDateChangeListener { view: CalendarView?, year: Int, month: Int, dayOfMonth: Int ->
+        calendarView.setOnDateChangeListener { _: CalendarView?, year: Int, month: Int, dayOfMonth: Int ->
             val calendar = Calendar.getInstance()
             calendar.set(year, month, dayOfMonth)
             val date = calendar.time  // This is the Date object
@@ -1125,13 +1125,13 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         val rlAddToPlan = dialogAddItem.findViewById<RelativeLayout>(R.id.rlAddToPlan)
-        val rcy_meal = dialogAddItem.findViewById<RecyclerView>(R.id.rcy_meal)
+        val rcyMeal = dialogAddItem.findViewById<RecyclerView>(R.id.rcy_meal)
         dialogAddItem.show()
         dialogAddItem.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
         if (mealRoutineList.size > 0) {
             mealTypeAdapter = AdapterMealType(mealRoutineList, requireActivity(), this)
-            rcy_meal.adapter = mealTypeAdapter
+            rcyMeal.adapter = mealTypeAdapter
         }
 
         rlAddToPlan.setOnClickListener {
@@ -1352,9 +1352,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         dialogAddRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val rlDoneBtn = dialogAddRecipe.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         spinnerActivityLevel = dialogAddRecipe.findViewById(R.id.spinnerActivityLevel)
-        val relCreateNewCookBook =
-            dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
-        val relFavourites = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relFavourites)
+        val relCreateNewCookBook = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
         val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
 
         spinnerActivityLevel.setItems(cookbookList.map { it.name })
@@ -1700,8 +1698,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "BreakFast" -> {
                 breakfastAdapter = updateMealSection(
                     mealList,
-                    binding!!.rcyBreakFast,
-                    binding!!.linearBreakfast,
+                    binding.rcyBreakFast,
+                    binding.linearBreakfast,
                     type
                 )
             }
@@ -1709,8 +1707,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "Lunch" -> {
                 lunchAdapter = updateMealSection(
                     mealList,
-                    binding!!.rcyLunch,
-                    binding!!.linearLunch,
+                    binding.rcyLunch,
+                    binding.linearLunch,
                     type
                 )
             }
@@ -1718,8 +1716,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "Dinner" -> {
                 dinnerAdapter = updateMealSection(
                     mealList,
-                    binding!!.rcyDinner,
-                    binding!!.linearDinner,
+                    binding.rcyDinner,
+                    binding.linearDinner,
                     type
                 )
             }
@@ -1727,8 +1725,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "Snacks" -> {
                 snackesAdapter = updateMealSection(
                     mealList,
-                    binding!!.rcySnacks,
-                    binding!!.linearSnacks,
+                    binding.rcySnacks,
+                    binding.linearSnacks,
                     type
                 )
             }
@@ -1736,8 +1734,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             "Brunch" -> {
                 teaTimeAdapter = updateMealSection(
                     mealList,
-                    binding!!.rcyTeatime,
-                    binding!!.linearTeatime,
+                    binding.rcyTeatime,
+                    binding.linearTeatime,
                     type
                 )
             }

@@ -27,19 +27,20 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class TermsConditionFragment : Fragment() {
 
-    private var binding: FragmentTermsConditionBinding? = null
-    private var adapterTermsCondition: AdapterTermsCondition? = null
+    private lateinit var binding: FragmentTermsConditionBinding
     private lateinit var termsConditionViewModel: TermsConditionViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentTermsConditionBinding.inflate(layoutInflater, container, false)
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.GONE
+            llBottomNavigation.visibility = View.GONE
+        }
 
         termsConditionViewModel = ViewModelProvider(this)[TermsConditionViewModel::class.java]
 
@@ -52,13 +53,25 @@ class TermsConditionFragment : Fragment() {
                 }
             })
 
-        binding!!.imgBackTermsAndCondition.setOnClickListener {
+        binding.imgBackTermsAndCondition.setOnClickListener {
             findNavController().navigateUp()
         }
 
+
+        backButton()
+        
         initialize()
 
-        return binding!!.root
+        return binding.root
+    }
+
+    private fun backButton(){
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                findNavController().navigateUp()
+
+            }
+        })
     }
 
     private fun initialize() {
@@ -83,12 +96,14 @@ class TermsConditionFragment : Fragment() {
                             val gson = Gson()
                             val termConditionModel = gson.fromJson(it.data, TermsConditionModel::class.java)
                             if (termConditionModel.code == 200 && termConditionModel.success) {
-                                val termsText = termConditionModel.data.description
-                                binding!!.descText.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    Html.fromHtml(termsText, Html.FROM_HTML_MODE_LEGACY)
-                                } else {
-                                    Html.fromHtml(termsText)
+                                termConditionModel.data.description?.let {
+                                    binding.descText.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        Html.fromHtml(it, Html.FROM_HTML_MODE_LEGACY)
+                                    } else {
+                                        Html.fromHtml(it)
+                                    }
                                 }
+
                             } else {
                                 if (termConditionModel.code == ErrorMessage.code) {
                                     showAlertFunction(termConditionModel.message, true)

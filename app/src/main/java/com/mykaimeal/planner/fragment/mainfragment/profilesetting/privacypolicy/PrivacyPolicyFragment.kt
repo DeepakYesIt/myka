@@ -27,40 +27,44 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class PrivacyPolicyFragment : Fragment() {
 
-    private var binding: FragmentPrivacyPolicyBinding?=null
-    private var adapterPrivacyPolicy: AdapterTermsCondition? = null
+    private lateinit var binding: FragmentPrivacyPolicyBinding
     private lateinit var privacyPolicyViewModel: PrivacyPolicyViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding= FragmentPrivacyPolicyBinding.inflate(layoutInflater, container, false)
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.GONE
+            llBottomNavigation.visibility = View.GONE
+        }
 
         privacyPolicyViewModel = ViewModelProvider(this)[PrivacyPolicyViewModel::class.java]
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
+        backButton()
 
-            }
-        })
-
-        binding!!.imgBackPrivacyPolicy.setOnClickListener{
+        binding.imgBackPrivacyPolicy.setOnClickListener{
             findNavController().navigateUp()
         }
 
         initialize()
 
-        return binding!!.root
+        return binding.root
+    }
+
+    private fun backButton(){
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                findNavController().navigateUp()
+
+            }
+        })
     }
 
     private fun initialize() {
-
         if (BaseApplication.isOnline(requireActivity())) {
             privacyPolicyApi()
         } else {
@@ -80,11 +84,12 @@ class PrivacyPolicyFragment : Fragment() {
                             val gson = Gson()
                             val termConditionModel = gson.fromJson(it.data, TermsConditionModel::class.java)
                             if (termConditionModel.code == 200 && termConditionModel.success) {
-                                val termsText = termConditionModel.data.description
-                                binding!!.descText.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    Html.fromHtml(termsText, Html.FROM_HTML_MODE_LEGACY)
-                                } else {
-                                    Html.fromHtml(termsText)
+                                termConditionModel.data.description?.let {
+                                    binding.descText.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        Html.fromHtml(it, Html.FROM_HTML_MODE_LEGACY)
+                                    } else {
+                                        Html.fromHtml(it)
+                                    }
                                 }
                             } else {
                                 if (termConditionModel.code == ErrorMessage.code) {

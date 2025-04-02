@@ -112,14 +112,13 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
         binding = FragmentPaymentMethodBinding.inflate(layoutInflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[WalletViewModel::class.java]
         stripe = Stripe(requireContext(), getString(R.string.publish_key))
-        (activity as MainActivity).binding?.apply {
+
+        (activity as MainActivity).binding.apply {
             llIndicator.visibility = View.VISIBLE
             llBottomNavigation.visibility = View.VISIBLE
         }
 
-        if (arguments != null) {
-            amount = requireArguments().getString("amount", "$ 0").toString()
-        }
+        amount = arguments?.getString("amount", "$ 0")?:"$ 0"
 
         ActivityCompat.requestPermissions(requireActivity(), permissions(), REQUEST_CODE_STORAGE_PERMISSION)
 
@@ -1263,7 +1262,7 @@ class PaymentMethodFragment : Fragment(), CardBankListener {
 
     private fun setupBackNavigation() {
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+           viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()

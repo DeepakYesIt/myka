@@ -20,10 +20,12 @@ import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.AdapterPrepareCookItem
 import com.mykaimeal.planner.databinding.FragmentDirectionStepsRecipeDetailsBinding
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.recipedetails.RecipeDetailsViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class DirectionSteps1RecipeDetailsFragment : Fragment() {
 
-    private var binding: FragmentDirectionStepsRecipeDetailsBinding?=null
+    private lateinit var binding: FragmentDirectionStepsRecipeDetailsBinding
     private var totalProgressValue:Int=0
     private var adapterPrepareCookItem: AdapterPrepareCookItem? = null
     private lateinit var viewModel: RecipeDetailsViewModel
@@ -38,30 +40,29 @@ class DirectionSteps1RecipeDetailsFragment : Fragment() {
         binding=FragmentDirectionStepsRecipeDetailsBinding.inflate(layoutInflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[RecipeDetailsViewModel::class.java]
 
-        mealType = arguments?.getString("mealType", "").toString()
-        uri = arguments?.getString("uri", "").toString()
+        mealType = arguments?.getString("mealType", "")?:""
+        uri = arguments?.getString("uri", "")?:""
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.GONE
+            llBottomNavigation.visibility = View.GONE
+        }
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-//                findNavController().navigate(R.id.recipeDetailsFragment)
                 findNavController().navigateUp()
             }
         })
 
-        binding!!.progressBar.max=2
+        binding.progressBar.max=2
         totalProgressValue=2
         updateProgress(1)
-
-
 
         initialize()
 
         setData()
 
-        return binding!!.root
+        return binding.root
     }
 
     @SuppressLint("SetTextI18n")
@@ -79,7 +80,7 @@ class DirectionSteps1RecipeDetailsFragment : Fragment() {
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding!!.layProgess.root.visibility = View.GONE
+                        binding.layProgess.root.visibility = View.GONE
                         return false
                     }
 
@@ -90,29 +91,29 @@ class DirectionSteps1RecipeDetailsFragment : Fragment() {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding!!.layProgess.root.visibility = View.GONE
+                        binding.layProgess.root.visibility = View.GONE
                         return false
                     }
                 })
-                .into(binding!!.imageData)
+                .into(binding.imageData)
         } else {
-            binding!!.layProgess.root.visibility = View.GONE
+            binding.layProgess.root.visibility = View.GONE
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.label != null) {
-            binding!!.tvTitle.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.label
+            binding.tvTitle.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.label
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.source != null) {
-            binding!!.tvBy.text = "By " + viewModel.getRecipeData()?.get(0)!!.recipe?.source
+            binding.tvBy.text = "By " + viewModel.getRecipeData()?.get(0)!!.recipe?.source
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients != null && viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients!!.size > 0) {
             adapterPrepareCookItem = AdapterPrepareCookItem(viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients, requireActivity())
-            binding!!.rcyPrepareToCook.adapter = adapterPrepareCookItem
-            binding!!.rcyPrepareToCook.visibility = View.VISIBLE
+            binding.rcyPrepareToCook.adapter = adapterPrepareCookItem
+            binding.rcyPrepareToCook.visibility = View.VISIBLE
         } else {
-            binding!!.rcyPrepareToCook.visibility = View.GONE
+            binding.rcyPrepareToCook.visibility = View.GONE
         }
 
 
@@ -120,23 +121,22 @@ class DirectionSteps1RecipeDetailsFragment : Fragment() {
 
     private fun initialize() {
 
-        binding!!.imgStep1RecipeDetails.setOnClickListener{
-//            findNavController().navigate(R.id.recipeDetailsFragment)
+        binding.imgStep1RecipeDetails.setOnClickListener{
             findNavController().navigateUp()
         }
 
-        binding!!.relNextStep.setOnClickListener{
+        binding.relNextStep.setOnClickListener{
             val bundle=Bundle()
             bundle.putString("uri",uri)
             bundle.putString("mealType",mealType)
-//            findNavController().navigate(R.id.directionSteps1RecipeDetailsFragment,bundle)
             findNavController().navigate(R.id.directionSteps2RecipeDetailsFragmentFragment,bundle)
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateProgress(progress: Int) {
-        binding!!.progressBar.progress = progress
-        binding!!.tvProgressText.text = "$progress /$totalProgressValue"
+        binding.progressBar.progress = progress
+        binding.tvProgressText.text = "$progress /$totalProgressValue"
     }
 
 

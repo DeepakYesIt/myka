@@ -27,10 +27,12 @@ import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.customview.SpendingChartView
 import com.mykaimeal.planner.databinding.FragmentStatisticsGraphBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class StatisticsGraphFragment : Fragment() {
 
-    private var binding: FragmentStatisticsGraphBinding?=null
+    private lateinit var binding: FragmentStatisticsGraphBinding
     private lateinit var sessionManagement: SessionManagement
 
     override fun onCreateView(
@@ -39,13 +41,17 @@ class StatisticsGraphFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         binding=FragmentStatisticsGraphBinding.inflate(layoutInflater, container, false)
+        
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.VISIBLE
+            llBottomNavigation.visibility = View.VISIBLE
+        }
+
 
         sessionManagement = SessionManagement(requireActivity())
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
@@ -57,7 +63,7 @@ class StatisticsGraphFragment : Fragment() {
             SpendingChartView.BarData(200f, "14 June", Color.parseColor("#FF0000")),  // Red
             SpendingChartView.BarData(400f, "21 June", Color.parseColor("#FFA500"))   // Orange
         )
-        binding!!.spendingChart.setData(spendingData)*/
+        binding.spendingChart.setData(spendingData)*/
 
         // Create chart data
         val data = listOf(
@@ -70,21 +76,12 @@ class StatisticsGraphFragment : Fragment() {
             SpendingChartView.BarData(300f, "07","Jun", Color.parseColor("#32CD32")),*/
             )
 
-        binding!!.spendingChart.setData(data, 1566f, 60f)
-
-       /* val values = listOf(300.0, 600.0, 200.0, 400.0)
-        val colors = listOf(
-            Color.parseColor("#FFA500"),  // Orange
-            Color.parseColor("#00FF00"),  // Green
-            Color.parseColor("#FF0000"),  // Red
-            Color.parseColor("#FFA500")   // Orange
-        )
-
-        binding!!.spendingChart.setData(values, colors)*/
+        binding.spendingChart.setData(data, 1566f, 60f)
+        
 
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun initialize() {
@@ -116,11 +113,11 @@ class StatisticsGraphFragment : Fragment() {
             }
         }
 
-        binding!!.imgBackStats.setOnClickListener {
+        binding.imgBackStats.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.relInvite.setOnClickListener{
+        binding.relInvite.setOnClickListener{
             findNavController().navigate(R.id.invitationsScreenFragment)
         }
 
@@ -133,16 +130,16 @@ class StatisticsGraphFragment : Fragment() {
 
         val dataSet = BarDataSet(entries, "")
         val barData = BarData(dataSet)
-        binding!!.barChart.data = barData
-        binding!!.barChart.invalidate()
+        binding.barChart.data = barData
+        binding.barChart.invalidate()
 
         // Customize labels
-        val xAxis = binding!!.barChart.xAxis
+        val xAxis = binding.barChart.xAxis
         xAxis.valueFormatter = IndexAxisValueFormatter(listOf("01 June", "07 June", "14 June", "28 June"))
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.granularity = 1f
 
-        binding!!.textInviteFriends.setOnClickListener {
+        binding.textInviteFriends.setOnClickListener {
             /*shareApp(requireActivity())*/
 
             copyShareInviteLink()
@@ -157,7 +154,7 @@ class StatisticsGraphFragment : Fragment() {
             startActivity(Intent.createChooser(myIntent, "Share Using"))*/
         }
 
-        binding!!.barChart.setOnClickListener{
+        binding.barChart.setOnClickListener{
             findNavController().navigate(R.id.statisticsWeekYearFragment)
         }
     }

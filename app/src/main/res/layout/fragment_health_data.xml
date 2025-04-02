@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_20sdp"
                 android:fontFamily="@font/poppins_medium"
-                android:text="General"
+                android:text="Filling out your health data allows me to give you an estimate of your daily nutrition based on your goals"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_14sdp" />
 
@@ -120,6 +120,7 @@
                 android:layout_marginTop="@dimen/_20sdp"
                 android:fontFamily="@font/poppins_medium"
                 android:text="Health"
+                android:visibility="gone"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_14sdp" />
 

@@ -1,40 +1,30 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.Drawable
 import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentAddressMapFullScreenBinding
-import com.mykaimeal.planner.databinding.FragmentDropOffOptionsScreenBinding
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
 
+@AndroidEntryPoint
 class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
 
-    private var binding: FragmentAddressMapFullScreenBinding? = null
+    private lateinit var binding: FragmentAddressMapFullScreenBinding
     private lateinit var sessionManagement: SessionManagement
     private lateinit var mMap: GoogleMap
     private var marker: Marker? = null
@@ -44,7 +34,7 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentAddressMapFullScreenBinding.inflate(layoutInflater, container, false)
 
@@ -55,16 +45,16 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
 
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun initialize() {
 
-        binding!!.imageCrossWeb.setOnClickListener {
+        binding.imageCrossWeb.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.tvConfirmBtn.setOnClickListener{
+        binding.tvConfirmBtn.setOnClickListener{
             sessionManagement.setAddress(address.toString())
             findNavController().navigateUp()
         }
@@ -83,7 +73,7 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
             Log.d("TESTING_MAP", "Map is moving...")
 
             // Change marker image while dragging
-            binding!!.markerImage.setImageResource(R.drawable.current_location_marker)
+            binding.markerImage.setImageResource(R.drawable.current_location_marker)
         }
 
         mMap.setOnCameraIdleListener {
@@ -99,12 +89,12 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
                 marker?.position = centerPosition // ✅ Move marker to the center
             }
             // Change marker image while dragging
-            binding!!.markerImage.setImageResource(R.drawable.marker_icon_larg)
+            binding.markerImage.setImageResource(R.drawable.marker_icon_larg)
             Log.d("TESTING_MAP", "Dragging started at: ${marker?.position?.latitude}, ${marker?.position?.longitude}")
             // ✅ Ensure LatLng is not null before calling function
             val lat = centerPosition.latitude
             val lng = centerPosition.longitude
-            binding!!.tvAddress.text = getAddressFromLatLng(lat, lng)
+            binding.tvAddress.text = getAddressFromLatLng(lat, lng)
             address=getAddressFromLatLng(lat,lng)
         }
 
@@ -121,47 +111,6 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
             e.printStackTrace()
             null // Return null if an error occurs
         }
-    }
-
-
-    private fun bitmapDescriptorFromVector(vectorResId: Int, width: Int, height: Int): BitmapDescriptor? {
-        val vectorDrawable: Drawable? = ContextCompat.getDrawable(requireContext(), vectorResId) ?: return null
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        vectorDrawable?.setBounds(0, 0, canvas.width, canvas.height)
-        vectorDrawable?.draw(canvas)
-        return BitmapDescriptorFactory.fromBitmap(bitmap)
-    }
-
-    // Manage MapView Lifecycle
-    override fun onResume() {
-        super.onResume()
-
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-    }
-
-    override fun onPause() {
-
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-
-        super.onDestroy()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-
     }
 
 }

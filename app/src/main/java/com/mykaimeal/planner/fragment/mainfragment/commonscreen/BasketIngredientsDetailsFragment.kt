@@ -8,19 +8,22 @@ import android.view.ViewGroup
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.FragmentBaseketIngredientsDetailsBinding
 import com.mykaimeal.planner.databinding.FragmentOrderDetailsScreenBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class BasketIngredientsDetailsFragment : Fragment() {
-    private var binding: FragmentBaseketIngredientsDetailsBinding? = null
+    private lateinit var binding: FragmentBaseketIngredientsDetailsBinding
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentBaseketIngredientsDetailsBinding.inflate(inflater, container, false)
 
-        return binding!!.root
+        return binding.root
     }
 
 }

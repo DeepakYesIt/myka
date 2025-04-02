@@ -10,10 +10,13 @@ import androidx.navigation.fragment.findNavController
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.databinding.FragmentRateYourMealBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class RateYourMealFragment : Fragment() {
 
-    private var binding: FragmentRateYourMealBinding?=null
+    private lateinit var binding: FragmentRateYourMealBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -21,27 +24,33 @@ class RateYourMealFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         binding=FragmentRateYourMealBinding.inflate(layoutInflater, container, false)
+        
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.GONE
+            llBottomNavigation.visibility = View.GONE
+        }
+        
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
+        backButton()
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-//                findNavController().navigate(R.id.directionSteps2RecipeDetailsFragmentFragment)
-            }
-        })
-
-        binding!!.imgBackRateMeal.setOnClickListener{
+        binding.imgBackRateMeal.setOnClickListener{
             findNavController().navigateUp()
-//            findNavController().navigate(R.id.directionSteps2RecipeDetailsFragmentFragment)
         }
 
-        binding!!.relPublishReview.setOnClickListener{
+        binding.relPublishReview.setOnClickListener{
             findNavController().navigate(R.id.homeFragment)
         }
 
-        return binding!!.root
+        return binding.root
     }
+
+    private fun backButton(){
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                findNavController().navigateUp()
+            }
+        })
+    }
+
 
 }

@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,7 +12,10 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.ShoppingMissingIngredientsAdapter
 import com.mykaimeal.planner.databinding.FragmentShoppingMissingIngredientsBinding
 import com.mykaimeal.planner.model.DataModel
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class ShoppingMissingIngredientsFragment : Fragment() {
 
     private lateinit var binding: FragmentShoppingMissingIngredientsBinding
@@ -21,12 +25,12 @@ class ShoppingMissingIngredientsFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding =
             FragmentShoppingMissingIngredientsBinding.inflate(layoutInflater, container, false)
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
@@ -94,6 +98,7 @@ class ShoppingMissingIngredientsFragment : Fragment() {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private fun initialize() {
 
         binding.imageBackIcon.setOnClickListener {

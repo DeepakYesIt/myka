@@ -49,7 +49,11 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
             }
 
             if (data.name!=null){
-                holder.binding.tvFoodName.text=data.name
+                val foodName = data.name
+                val result = foodName.mapIndexed { index, c ->
+                    if (index == 0 || c.isUpperCase()) c.uppercaseChar() else c
+                }.joinToString("")
+                holder.binding.tvFoodName.text=result
             }
 
             if (data.pro_img!=null){

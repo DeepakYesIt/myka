@@ -18,7 +18,7 @@ import com.mykaimeal.planner.model.DataModel
 
 class OrderHistoryFragment : Fragment(), OnItemClickedListener {
 
-    private var binding: FragmentOrderHistoryBinding? = null
+    private lateinit var binding: FragmentOrderHistoryBinding 
     private var dataList3: MutableList<DataModel> = mutableListOf()
     private var adapterOrderHistoryItem: AdapterOrderHistoryItem? = null
 
@@ -29,8 +29,11 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
         // Inflate the layout for this fragment
         binding = FragmentOrderHistoryBinding.inflate(inflater, container, false)
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
+        val mainActivity = activity as? MainActivity
+        mainActivity?.binding?.apply {
+            llIndicator.visibility = View.VISIBLE
+            llBottomNavigation.visibility = View.VISIBLE
+        }
 
         setupBackNavigation()
 
@@ -38,7 +41,7 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
 
         orderHistoryModel()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun setupBackNavigation() {
@@ -53,13 +56,13 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
 
     private fun initialize() {
 
-        binding!!.imgBackOrderHistory.setOnClickListener {
+        binding.imgBackOrderHistory.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.rlStartOrder.setOnClickListener {
-            binding!!.relNoOrders.visibility = View.GONE
-            binding!!.rcyOrderHistory.visibility = View.VISIBLE
+        binding.rlStartOrder.setOnClickListener {
+            binding.relNoOrders.visibility = View.GONE
+            binding.rcyOrderHistory.visibility = View.VISIBLE
         }
     }
 
@@ -114,7 +117,7 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
         dataList3.add(data5)
 
         adapterOrderHistoryItem = AdapterOrderHistoryItem(dataList3, requireActivity(), this)
-        binding!!.rcyOrderHistory.adapter = adapterOrderHistoryItem
+        binding.rcyOrderHistory.adapter = adapterOrderHistoryItem
     }
 
     override fun itemClicked(

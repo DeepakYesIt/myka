@@ -65,7 +65,7 @@ class CreateRecipeImageFragment : Fragment() {
 
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+           viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()

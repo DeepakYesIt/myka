@@ -56,7 +56,7 @@ import java.util.Locale
 @AndroidEntryPoint
 class SettingProfileFragment : Fragment(), View.OnClickListener {
 
-    private var binding: FragmentSettingProfileBinding? = null
+    private lateinit var binding: FragmentSettingProfileBinding
     private var isAboutAppExpanded: Boolean = false
     private var isPostalCodeExpanded: Boolean = false
     private lateinit var commonWorkUtils: CommonWorkUtils
@@ -72,9 +72,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
         binding = FragmentSettingProfileBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[SettingViewModel::class.java]
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(
-            requireActivity()
-        )
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         setupUIVisibility()
 
@@ -90,7 +88,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
 
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun initialize() {
@@ -141,7 +139,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
                     latitude = location.latitude.toString()
                     longitude = location.longitude.toString()
 
-                    binding!!.etEnterCode.setText(postalCode)
+                    binding.etEnterCode.setText(postalCode)
 
                 } else {
                     // When location result is null
@@ -159,7 +157,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
                             longitude = location1.longitude.toString()
 
                             getAddress(location1.latitude,location1.longitude)
-                            binding!!.etEnterCode.setText(postalCode)
+                            binding.etEnterCode.setText(postalCode)
                         }
                     }
                     fusedLocationClient!!.requestLocationUpdates(
@@ -179,12 +177,11 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun getAddress(lat: Double, longi: Double): String? {
+    private fun getAddress(lat: Double, longi: Double): String {
         var address = ""
         try {
-            val geocoder: Geocoder
             val addresses: List<Address>?
-            geocoder = Geocoder(requireActivity(), Locale.getDefault())
+            val geocoder = Geocoder(requireActivity(), Locale.getDefault())
             addresses = geocoder.getFromLocation(
                 lat,
                 longi,
@@ -194,8 +191,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
             //            String state = addresses.get(0).getAdminArea();
             val postCode = addresses[0].postalCode
             postalCode = postCode
-            //            String postalCode = addresses.get(0).getPostalCode();
-//            String knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
+
         } catch (ex: java.lang.Exception) {
             ex.printStackTrace()
         }
@@ -301,21 +297,21 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     @SuppressLint("SetTextI18n")
     private fun updateUI(data: Data) {
 
-        binding?.tvBio?.isEnabled=false
+        binding.tvBio.isEnabled =false
 
         if (data.name!=null){
-            binding?.tvUserName?.text = data.name
+            binding.tvUserName.text = data.name
         }
 
         if (data.bio!=null){
             if (!data.bio.equals("null")){
-                binding?.tvBio?.visibility=View.GONE
-                binding?.tvBio?.setText(data.bio)
+                binding.tvBio.visibility =View.GONE
+                binding.tvBio.setText(data.bio)
             }else{
-                binding?.tvBio?.visibility=View.GONE
+                binding.tvBio.visibility =View.GONE
             }
         }else{
-            binding?.tvBio?.visibility=View.GONE
+            binding.tvBio.visibility =View.GONE
         }
 
         if (data.profile_img!=null){
@@ -323,31 +319,31 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
                 .load(BaseUrl.imageBaseUrl+data.profile_img)
                 .placeholder(R.drawable.mask_group_icon)
                 .error(R.drawable.mask_group_icon)
-                .into(binding?.imageProfile!!)
+                .into(binding.imageProfile)
         }
 
         if ((data.calories ?: 0) == 0 ) {
-            binding?.tvCalories?.text=""+0
+            binding.tvCalories.text =""+0
         } else {
-            binding?.tvCalories?.text=""+data.calories!!.toInt()
+            binding.tvCalories.text =""+data.calories!!.toInt()
         }
 
         if ( (data.carbs ?: 0) == 0) {
-            binding?.tvCarbs?.text=""+0
+            binding.tvCarbs.text =""+0
         } else {
-            binding?.tvCarbs?.text=""+data.carbs!!.toInt()
+            binding.tvCarbs.text =""+data.carbs!!.toInt()
         }
 
         if ((data.fat ?: 0) == 0) {
-            binding?.tvFat?.text=""+0
+            binding.tvFat.text =""+0
         } else {
-            binding?.tvFat?.text=""+data.fat!!.toInt()
+            binding.tvFat.text =""+data.fat!!.toInt()
         }
 
         if ( (data.protien ?: 0) == 0) {
-            binding?.tvProtein?.text=""+0
+            binding.tvProtein.text =""+0
         } else {
-            binding?.tvProtein?.text=""+data.protien!!.toInt()
+            binding.tvProtein.text =""+data.protien!!.toInt()
         }
 
 
@@ -359,8 +355,8 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
 
     private fun setupUIVisibility() {
         (activity as MainActivity?)?.apply {
-            binding?.llIndicator?.visibility = View.GONE
-            binding?.llBottomNavigation?.visibility = View.GONE
+            binding.llIndicator.visibility = View.GONE
+            binding.llBottomNavigation.visibility = View.GONE
         }
     }
 
@@ -377,7 +373,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     }
 
     private fun setupClickListeners() {
-        binding?.apply {
+        binding.apply {
             arrayOf(
                 imageEditProfile, relMyWallet,relOrderHistory, relHealthData, relPreferences, imageNameEditable,
                 imageEditTargets, imageProfile, imgBackProfileSetting, imgThreeDotIcon,relNotifications, relPrivacyTerms, relAboutApp,
@@ -415,7 +411,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     }
 
     private fun moveToNextScreen() {
-        binding?.relMacroNutTrg?.setBackgroundResource(R.drawable.profile_editable_bg)
+        binding.relMacroNutTrg.setBackgroundResource(R.drawable.profile_editable_bg)
         navigateToFragment(R.id.healthDataFragment)
     }
 
@@ -423,7 +419,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
         val inflater = requireContext().getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater?
         val popupView: View? = inflater?.inflate(R.layout.item_profile, null)
         val popupWindow = PopupWindow(popupView, 500, RelativeLayout.LayoutParams.WRAP_CONTENT, true)
-        popupWindow.showAsDropDown(binding?.imgThreeDotIcon,  0, 0, Gravity.END)
+        popupWindow.showAsDropDown(binding.imgThreeDotIcon,  0, 0, Gravity.END)
         // Access views inside the inflated layout using findViewById
         val relLogout = popupView?.findViewById<RelativeLayout>(R.id.relLogout)
         val relDeleteAccount = popupView?.findViewById<RelativeLayout>(R.id.relDeleteAccount)
@@ -442,7 +438,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
 
     private fun toggleAboutAppVisibility() {
         isAboutAppExpanded = !isAboutAppExpanded
-        binding?.apply {
+        binding.apply {
             imgDropAboutApp.setImageResource(
                 if (isAboutAppExpanded) R.drawable.drop_up_small_icon else R.drawable.drop_down_small_icon
             )
@@ -453,7 +449,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
 
     private fun togglePostalCodeVisibility() {
         isPostalCodeExpanded = !isPostalCodeExpanded
-        binding?.apply {
+        binding.apply {
             imgDropPostCode.setImageResource(
                 if (isPostalCodeExpanded) R.drawable.drop_up_small_icon else R.drawable.drop_down_small_icon
             )
@@ -462,7 +458,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     }
 
     private fun handlePostalCodeSubmit() {
-        binding?.etEnterCode?.text?.toString()?.trim().takeIf { it.isNullOrEmpty() }?.let {
+        binding.etEnterCode.text?.toString()?.trim().takeIf { it.isNullOrEmpty() }?.let {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.postCode, false)
         } ?: postCodeApi()/*closePostalCodeSection()*/
     }
@@ -516,7 +512,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     }
 
     private fun closePostalCodeSection() {
-        binding?.apply {
+        binding.apply {
             imgDropPostCode.setImageResource(R.drawable.drop_up_small_icon)
             relEnterCode.visibility = View.GONE
         }
@@ -524,17 +520,17 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
     }
 
     private fun enableProfileEditing() {
-        binding?.tvBio?.isEnabled = true
-        binding?.tvBio?.visibility = View.GONE
-        binding?.imageEditTargets?.visibility = View.VISIBLE
-        binding?.imageProfile?.isClickable = true
-        binding?.imageNameEditable?.visibility = View.VISIBLE
-        binding?.relProfileNameImage?.setBackgroundResource(R.drawable.profile_editable_bg)
+        binding.tvBio.isEnabled = true
+        binding.tvBio.visibility = View.GONE
+        binding.imageEditTargets.visibility = View.VISIBLE
+        binding.imageProfile.isClickable = true
+        binding.imageNameEditable.visibility = View.VISIBLE
+        binding.relProfileNameImage.setBackgroundResource(R.drawable.profile_editable_bg)
     }
 
     private fun disableProfileEditing() {
         if (BaseApplication.isOnline(requireActivity())) {
-            if (binding?.tvBio?.text.toString().trim().isEmpty()){
+            if (binding.tvBio.text.toString().trim().isEmpty()){
                 BaseApplication.alertError(requireContext(), ErrorMessage.bioError, false)
             }else{
                 upDateProfile()
@@ -551,7 +547,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
                 {
                     BaseApplication.dismissMe()
                     handleApiUpdateResponse(it)
-                }, binding?.tvBio?.text.toString())
+                }, binding.tvBio.text.toString())
         }
     }
 
@@ -569,13 +565,13 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
             val apiModel = Gson().fromJson(data, ProfileRootResponse::class.java)
             Log.d("@@@ Health profile", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                binding?.apply {
+                binding.apply {
                     tvBio.visibility = View.GONE
                     tvBio.isEnabled = false
                     imageNameEditable.visibility = View.GONE
                     imageEditTargets.visibility = View.GONE
                     relProfileNameImage.setBackgroundResource(R.drawable.calendar_events_bg)
-                    sessionManagement.setUserName(binding!!.tvUserName.text.toString())
+                    sessionManagement.setUserName(binding.tvUserName.text.toString())
                     apiModel.data.profile_img?.let { sessionManagement.setImage(it) }
                 }
             } else {

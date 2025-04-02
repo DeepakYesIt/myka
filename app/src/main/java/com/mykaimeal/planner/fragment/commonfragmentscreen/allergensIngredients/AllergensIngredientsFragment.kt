@@ -112,36 +112,6 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
-
-//        if (sessionManagement.getCookingScreen().equals("Profile")) {
-//            binding.llBottomBtn.visibility = View.GONE
-//            binding.rlUpdateAllergens.visibility = View.VISIBLE
-//            if (BaseApplication.isOnline(requireActivity())) {
-//                searchable("","count")
-//            } else {
-//                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-//            }
-//        } else {
-//            binding.llBottomBtn.visibility = View.VISIBLE
-//            binding.rlUpdateAllergens.visibility = View.GONE
-//
-//            if (allergenIngredientViewModel.getAllergensData() != null) {
-//                showDataInUi(allergenIngredientViewModel.getAllergensData()!!)
-//                if (status=="2"){
-//                    binding.tvNextBtn.isClickable = true
-//                    binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-//                }
-//            } else {
-//                /// allergies api implement
-//                if (BaseApplication.isOnline(requireContext())) {
-////                    allergenIngredientApi()
-//                    searchable("","count")
-//                } else {
-//                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-//                }
-//            }
-//        }
-
         backButton()
 
         ///main function using all triggered of this screen
@@ -153,7 +123,7 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
     private fun backButton(){
         //// handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()

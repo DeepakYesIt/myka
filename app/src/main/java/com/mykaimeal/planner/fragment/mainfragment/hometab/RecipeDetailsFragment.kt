@@ -37,7 +37,6 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.AdapterRecipeItem
 import com.mykaimeal.planner.adapter.ChooseDayAdapter
-import com.mykaimeal.planner.adapter.CookWareAdapter
 import com.mykaimeal.planner.adapter.IngredientsRecipeAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
@@ -59,13 +58,10 @@ import java.util.Locale
 @AndroidEntryPoint
 class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
 
-    private var binding: FragmentRecipeDetailsBinding? = null
+    private lateinit var binding: FragmentRecipeDetailsBinding
     private var ingredientsRecipeAdapter: IngredientsRecipeAdapter? = null
-    private var cookWareAdapter: CookWareAdapter? = null
     private var adapterRecipeItem: AdapterRecipeItem? = null
     val dataList = ArrayList<DataModel>()
-    private val dataList1 = ArrayList<DataModel>()
-    private val dataList2 = ArrayList<DataModel>()
     private var tvWeekRange: TextView? = null
     private var selectAll: Boolean = false
     private var quantity: Int = 1
@@ -86,23 +82,25 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         binding = FragmentRecipeDetailsBinding.inflate(layoutInflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[RecipeDetailsViewModel::class.java]
 
-        uri = arguments?.getString("uri", "").toString()
-        mealType = arguments?.getString("mealType", "").toString()
+        uri = arguments?.getString("uri", "")?:""
+        mealType = arguments?.getString("mealType", "")?:""
 
-//        Toast.makeText(requireContext(), "mealType$mealType",Toast.LENGTH_LONG).show()
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
+        Log.d("@@@@@ ERROR", "uri :- $uri")
+
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.GONE
+            llBottomNavigation.visibility = View.GONE
+        }
 
         setupBackNavigation()
-
-//        ingredientsModel()
+        
         initialize()
 
         // When screen load then api call
         fetchDataOnLoad()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun fetchDataOnLoad() {
@@ -169,8 +167,8 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                 if (apiModel.data != null && apiModel.data.size > 0) {
                     showData(apiModel.data)
                 } else {
-                    binding!!.layBottom.visibility = View.GONE
-                    binding!!.webView.visibility = View.GONE
+                    binding.layBottom.visibility = View.GONE
+                    binding.webView.visibility = View.GONE
                 }
             } else {
                 if (apiModel.code == ErrorMessage.code) {
@@ -202,7 +200,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding!!.layProgess.root.visibility = View.GONE
+                        binding.layProgess.root.visibility = View.GONE
                         return false
                     }
 
@@ -213,62 +211,62 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding!!.layProgess.root.visibility = View.GONE
+                        binding.layProgess.root.visibility = View.GONE
                         return false
                     }
                 })
-                .into(binding!!.imageData)
+                .into(binding.imageData)
         } else {
-            binding!!.layProgess.root.visibility = View.GONE
+            binding.layProgess.root.visibility = View.GONE
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.source!=null){
-            binding!!.tvSourcesName.text="By "+ viewModel.getRecipeData()?.get(0)!!.recipe?.source
+            binding.tvSourcesName.text="By "+ viewModel.getRecipeData()?.get(0)!!.recipe?.source
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.review!=null){
-            binding!!.tvRating.text = ""+viewModel.getRecipeData()?.get(0)!!.review+"("+viewModel.getRecipeData()?.get(0)!!.review_number+")"
+            binding.tvRating.text = ""+viewModel.getRecipeData()?.get(0)!!.review+"("+viewModel.getRecipeData()?.get(0)!!.review_number+")"
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.label != null) {
-            binding!!.tvTitle.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.label
+            binding.tvTitle.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.label
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.calories != null) {
-            binding!!.tvCalories.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.calories?.toInt()
+            binding.tvCalories.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.calories?.toInt()
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.FAT?.quantity != null) {
-            binding!!.tvFat.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.FAT?.quantity?.toInt()
+            binding.tvFat.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.FAT?.quantity?.toInt()
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.PROCNT?.quantity != null) {
-            binding!!.tvProtein.text =
+            binding.tvProtein.text =
                 "" + viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.PROCNT?.quantity?.toInt()
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.CHOCDF?.quantity != null) {
-            binding!!.tvCarbs.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.CHOCDF?.quantity?.toInt()
+            binding.tvCarbs.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.totalNutrients?.CHOCDF?.quantity?.toInt()
         }
 
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.totalTime != null) {
-            binding!!.tvTotaltime.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.totalTime + " min "
+            binding.tvTotaltime.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.totalTime + " min "
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients != null && viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients!!.size > 0) {
             ingredientsRecipeAdapter = IngredientsRecipeAdapter(viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients, requireActivity(), this)
-            binding!!.rcyIngCookWareRecipe.adapter = ingredientsRecipeAdapter
-            binding!!.layBottom.visibility = View.VISIBLE
+            binding.rcyIngCookWareRecipe.adapter = ingredientsRecipeAdapter
+            binding.layBottom.visibility = View.VISIBLE
         } else {
-            binding!!.layBottom.visibility = View.GONE
+            binding.layBottom.visibility = View.GONE
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines != null && viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines!!.size > 0) {
             adapterRecipeItem = AdapterRecipeItem(viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines!!, requireActivity())
-            binding!!.layBottom.visibility = View.VISIBLE
+            binding.layBottom.visibility = View.VISIBLE
         } else {
-            binding!!.layBottom.visibility = View.GONE
+            binding.layBottom.visibility = View.GONE
         }
     }
 
@@ -279,7 +277,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
 
     private fun setupBackNavigation() {
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
@@ -290,56 +288,52 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
 
     private fun initialize() {
 
-        binding!!.imgPlusValue.setOnClickListener {
+        binding.imgPlusValue.setOnClickListener {
             if (quantity < 99) {
                 quantity++
                 updateValue()
             }
         }
 
-        binding!!.imgMinusValue.setOnClickListener {
+        binding.imgMinusValue.setOnClickListener {
             if (quantity > 1) {
                 quantity--
                 updateValue()
             } else {
-                Toast.makeText(
-                    requireActivity(),
-                    "Minimum serving atleast value is one",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(requireActivity(), ErrorMessage.servingError, Toast.LENGTH_LONG).show()
             }
         }
 
-        binding!!.tvAddToPlan.setOnClickListener {
+        binding.tvAddToPlan.setOnClickListener {
             chooseDayDialog()
         }
 
-        binding!!.relBack.setOnClickListener {
+        binding.relBack.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.llIngredients.setOnClickListener {
-            binding!!.textIngredients.setBackgroundResource(R.drawable.select_bg)
-            binding!!.textCookWare.setBackgroundResource(R.drawable.unselect_bg)
-            binding!!.textRecipe.setBackgroundResource(R.drawable.unselect_bg)
+        binding.llIngredients.setOnClickListener {
+            binding.textIngredients.setBackgroundResource(R.drawable.select_bg)
+            binding.textCookWare.setBackgroundResource(R.drawable.unselect_bg)
+            binding.textRecipe.setBackgroundResource(R.drawable.unselect_bg)
 
-            binding!!.textIngredients.setTextColor(Color.parseColor("#FFFFFF"))
-            binding!!.textCookWare.setTextColor(Color.parseColor("#3C4541"))
-            binding!!.textRecipe.setTextColor(Color.parseColor("#3C4541"))
+            binding.textIngredients.setTextColor(Color.parseColor("#FFFFFF"))
+            binding.textCookWare.setTextColor(Color.parseColor("#3C4541"))
+            binding.textRecipe.setTextColor(Color.parseColor("#3C4541"))
 
 
-            binding!!.relRecipe.visibility = View.GONE
-            binding!!.textStepInstructions.visibility = View.GONE
-            binding!!.relTittleList.visibility = View.VISIBLE
-            binding!!.relServingsPeople.visibility = View.VISIBLE
-            binding!!.layBottomPlanBasket.visibility = View.VISIBLE
-            binding!!.relIngSelectAll.visibility = View.VISIBLE
-            binding!!.webView.visibility = View.GONE
+            binding.relRecipe.visibility = View.GONE
+            binding.textStepInstructions.visibility = View.GONE
+            binding.relTittleList.visibility = View.VISIBLE
+            binding.relServingsPeople.visibility = View.VISIBLE
+            binding.layBottomPlanBasket.visibility = View.VISIBLE
+            binding.relIngSelectAll.visibility = View.VISIBLE
+            binding.webView.visibility = View.GONE
             if (viewModel.getRecipeData()?.size!! > 0) {
                 // Update the drawable based on the selectAll state
                 val drawableRes =
                     if (selectAll) R.drawable.orange_checkbox_images else R.drawable.orange_uncheck_box_images
-                binding?.tvSelectAllBtn?.setCompoundDrawablesWithIntrinsicBounds(
+                binding.tvSelectAllBtn.setCompoundDrawablesWithIntrinsicBounds(
                     0,
                     0,
                     drawableRes,
@@ -347,56 +341,47 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                 )
                 // Notify adapter with updated data
                 ingredientsRecipeAdapter?.updateList(viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients!!)
-                binding!!.rcyIngCookWareRecipe.adapter = ingredientsRecipeAdapter
-                binding!!.layBottom.visibility = View.VISIBLE
+                binding.rcyIngCookWareRecipe.adapter = ingredientsRecipeAdapter
+                binding.layBottom.visibility = View.VISIBLE
             }else{
-                binding!!.layBottom.visibility = View.GONE
+                binding.layBottom.visibility = View.GONE
             }
         }
 
-        binding!!.llCookWare.setOnClickListener {
-            binding!!.textIngredients.setBackgroundResource(R.drawable.unselect_bg)
-            binding!!.textCookWare.setBackgroundResource(R.drawable.select_bg)
-            binding!!.textRecipe.setBackgroundResource(R.drawable.unselect_bg)
-
-            binding!!.textIngredients.setTextColor(Color.parseColor("#3C4541"))
-            binding!!.textCookWare.setTextColor(Color.parseColor("#FFFFFF"))
-            binding!!.textRecipe.setTextColor(Color.parseColor("#3C4541"))
-
-            binding!!.layBottom.visibility = View.GONE
-
+        binding.llCookWare.setOnClickListener {
+            binding.textIngredients.setBackgroundResource(R.drawable.unselect_bg)
+            binding.textCookWare.setBackgroundResource(R.drawable.select_bg)
+            binding.textRecipe.setBackgroundResource(R.drawable.unselect_bg)
+            binding.textIngredients.setTextColor(Color.parseColor("#3C4541"))
+            binding.textCookWare.setTextColor(Color.parseColor("#FFFFFF"))
+            binding.textRecipe.setTextColor(Color.parseColor("#3C4541"))
+            binding.layBottom.visibility = View.GONE
             loadUrl()
-//            cookWareModel()
-
         }
 
-        binding!!.llRecipe.setOnClickListener {
-            binding!!.textIngredients.setBackgroundResource(R.drawable.unselect_bg)
-            binding!!.textCookWare.setBackgroundResource(R.drawable.unselect_bg)
-            binding!!.textRecipe.setBackgroundResource(R.drawable.select_bg)
-
-            binding!!.textIngredients.setTextColor(Color.parseColor("#3C4541"))
-            binding!!.textCookWare.setTextColor(Color.parseColor("#3C4541"))
-            binding!!.textRecipe.setTextColor(Color.parseColor("#FFFFFF"))
-
-            binding!!.textStepInstructions.visibility = View.VISIBLE
-            binding!!.relRecipe.visibility = View.VISIBLE
-            binding!!.relTittleList.visibility = View.VISIBLE
-            binding!!.relServingsPeople.visibility = View.GONE
-            binding!!.relIngSelectAll.visibility = View.GONE
-            binding!!.relCookware.visibility = View.GONE
-            binding!!.layBottomPlanBasket.visibility = View.GONE
-
+        binding.llRecipe.setOnClickListener {
+            binding.textIngredients.setBackgroundResource(R.drawable.unselect_bg)
+            binding.textCookWare.setBackgroundResource(R.drawable.unselect_bg)
+            binding.textRecipe.setBackgroundResource(R.drawable.select_bg)
+            binding.textIngredients.setTextColor(Color.parseColor("#3C4541"))
+            binding.textCookWare.setTextColor(Color.parseColor("#3C4541"))
+            binding.textRecipe.setTextColor(Color.parseColor("#FFFFFF"))
+            binding.textStepInstructions.visibility = View.VISIBLE
+            binding.relRecipe.visibility = View.VISIBLE
+            binding.relTittleList.visibility = View.VISIBLE
+            binding.relServingsPeople.visibility = View.GONE
+            binding.relIngSelectAll.visibility = View.GONE
+            binding.relCookware.visibility = View.GONE
+            binding.layBottomPlanBasket.visibility = View.GONE
             if (viewModel.getRecipeData()?.size!!  > 0) {
-                binding!!.rcyIngCookWareRecipe.adapter = adapterRecipeItem
-                binding!!.layBottom.visibility = View.VISIBLE
+                binding.rcyIngCookWareRecipe.adapter = adapterRecipeItem
+                binding.layBottom.visibility = View.VISIBLE
             }else{
-                binding!!.layBottom.visibility = View.GONE
+                binding.layBottom.visibility = View.GONE
             }
         }
 
-        binding!!.textStepInstructions.setOnClickListener {
-//            findNavController().navigate(R.id.directionSteps1RecipeDetailsFragment)
+        binding.textStepInstructions.setOnClickListener {
             if (viewModel.getRecipeData()!=null){
                 if (viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines!!.size > 0) {
                     val bundle=Bundle()
@@ -407,13 +392,13 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             }
         }
 
-        binding!!.tvSelectAllBtn.setOnClickListener {
+        binding.tvSelectAllBtn.setOnClickListener {
             if (viewModel.getRecipeData()?.size!!>0) {
                 selectAll = !selectAll // Toggle the selectAll value
                 // Update the drawable based on the selectAll state
                 val drawableRes =
                     if (selectAll) R.drawable.orange_checkbox_images else R.drawable.orange_uncheck_box_images
-                binding?.tvSelectAllBtn?.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableRes, 0)
+                binding.tvSelectAllBtn.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableRes, 0)
 
                 // Update the status of each ingredient dynamically
                 viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients?.forEach { ingredient ->
@@ -424,17 +409,15 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             }
         }
 
-        binding!!.layBasket.setOnClickListener {
+        binding.layBasket.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
                 if (viewModel.getRecipeData()?.size!!> 0) {
                     try {
-                        // Create a JsonObject for the main JSON structure
-                        val jsonObject = JsonObject()
-                        jsonObject.addProperty("serving", binding!!.tvValues.text.toString())
+                        var status=false
                         // Create a JsonArray for ingredients
                         val jsonArray = JsonArray()
                         // Iterate through the ingredients and add them to the array if status is true
-                         viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients?.forEach { ingredientsModel ->
+                        viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients?.forEach { ingredientsModel ->
                             if (ingredientsModel.status) {
                                 // Create a JsonObject for each ingredient
                                 val ingredientObject = JsonObject()
@@ -448,13 +431,22 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                                 ingredientObject.addProperty("status", "0")
                                 // Add the ingredient object to the array
                                 jsonArray.add(ingredientObject)
+                                status=true
                             }
                         }
-                        // Add the ingredients array to the main JSON object
-                        jsonObject.add("ingredients", jsonArray)
-                        // Log the final JSON data
-                        Log.d("final data", "******$jsonObject")
-                        addBasketDetailsApi(jsonObject)
+                        if (status){
+                            // Create a JsonObject for the main JSON structure
+                            val jsonObject = JsonObject()
+                            jsonObject.addProperty("serving", binding.tvValues.text.toString())
+                            // Add the ingredients array to the main JSON object
+                            jsonObject.add("ingredients", jsonArray)
+                            // Log the final JSON data
+                            Log.d("final data", "******$jsonObject")
+                            addBasketDetailsApi(jsonObject)
+                        }else{
+                            BaseApplication.alertError(requireContext(), ErrorMessage.ingredientError, false)
+                        }
+
                     } catch (e: Exception) {
                         BaseApplication.alertError(requireContext(), e.message, false)
                     }
@@ -477,9 +469,9 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun loadUrl() {
-        binding!!.webView.visibility = View.VISIBLE
+        binding.webView.visibility = View.VISIBLE
         if (viewModel.getRecipeData()?.size!!  > 0) {
-            val webSettings: WebSettings = binding!!.webView.settings
+            val webSettings: WebSettings = binding.webView.settings
             webSettings.javaScriptEnabled = true
             webSettings.domStorageEnabled = true
             webSettings.loadsImagesAutomatically = true
@@ -489,10 +481,10 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             webSettings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
             /*// Set WebViewClient to handle page loading within the WebView
-            binding!!.webView.webViewClient = WebViewClient()*/
+            binding.webView.webViewClient = WebViewClient()*/
 
             // Set a WebViewClient to capture URL clicks
-            binding!!.webView.webViewClient = object : WebViewClient() {
+            binding.webView.webViewClient = object : WebViewClient() {
                 override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
                     // Capture the clicked URL
                     Toast.makeText(requireContext(), "Clicked URL: $url", Toast.LENGTH_SHORT).show()
@@ -507,53 +499,14 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             val url = viewModel.getRecipeData()?.get(0)!!.recipe?.url?.replace("http:", "https:")
             Log.d("url", "****$url")
 
-            binding!!.webView.loadUrl("https://www.google.com/")
-
-            /*if (!url.isNullOrEmpty()) {
-                binding!!.webView.loadUrl("www.google.com")
-            } else {
-                Log.e("WebViewError", "URL is null or empty")
-            }*/
-
+            binding.webView.loadUrl("https://www.google.com/")
         }
     }
 
     @SuppressLint("DefaultLocale")
     private fun updateValue() {
-        binding!!.tvValues.text = String.format("%02d", quantity)
+        binding.tvValues.text = String.format("%02d", quantity)
     }
-
-    /*private fun chooseDayDialog() {
-        val dialogChooseDay: Dialog = context?.let { Dialog(it) }!!
-        dialogChooseDay.setContentView(R.layout.alert_dialog_choose_day)
-        dialogChooseDay.window!!.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
-        dialogChooseDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        rcyChooseDaySch = dialogChooseDay.findViewById(R.id.rcyChooseDaySch)
-        tvWeekRange = dialogChooseDay.findViewById(R.id.tvWeekRange)
-        val rlDoneBtn = dialogChooseDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
-        val btnPrevious = dialogChooseDay.findViewById<ImageView>(R.id.btnPrevious)
-        val btnNext = dialogChooseDay.findViewById<ImageView>(R.id.btnNext)
-        dialogChooseDay.show()
-        updateWeekRange()
-        dialogChooseDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        cookingScheduleModel()
-
-        rlDoneBtn.setOnClickListener {
-            chooseDayMealTypeDialog()
-            dialogChooseDay.dismiss()
-        }
-
-        btnPrevious.setOnClickListener {
-            changeWeek(-1)
-        }
-
-        btnNext.setOnClickListener {
-            changeWeek(1)
-        }
-    }*/
 
     @SuppressLint("SetTextI18n")
     private fun chooseDayDialog() {
@@ -585,14 +538,9 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             dataList.add(data)
         }
 
-
         rcyChooseDaySch!!.adapter = ChooseDayAdapter(dataList, requireActivity())
 
-
         rlDoneBtn.setOnClickListener {
-            /*dialogChooseDay.dismiss()
-            chooseDayMealTypeDialog()*/
-
             var status = false
             for (it in dataList) {
                 if (it.isOpen) {
@@ -647,7 +595,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         return Pair(startOfWeek, endOfWeek)
     }
 
-    fun formatDate(date: Date): String {
+    private fun formatDate(date: Date): String {
         val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
         return dateFormat.format(date)
     }
@@ -695,7 +643,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         val daysBetween = getDaysBetween(startDate, endDate)
 
         // Print the dates
-        println("Days between ${startDate} and ${endDate}:")
+        println("Days between $startDate and ${endDate}:")
         daysBetween.forEach { println(it) }
         tvWeekRange?.text = "" + formatDate(startDate) + "-" + formatDate(endDate)
 
@@ -780,7 +728,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         if (uri != null) {
             jsonObject.addProperty("type", selectType)
             jsonObject.addProperty("uri", uri)
-            jsonObject.addProperty("serving", binding?.tvValues?.text.toString())
+            jsonObject.addProperty("serving", binding.tvValues.text.toString())
             // Create a JsonArray for ingredients
             val jsonArray = JsonArray()
             val latestList = getDaysBetween(startDate, endDate)
@@ -854,15 +802,6 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         }
     }
 
-
-
-    private fun cookWareModel() {
-        cookWareAdapter = CookWareAdapter(dataList1, requireActivity())
-        binding!!.rcyIngCookWareRecipe.adapter = cookWareAdapter
-    }
-
-
-
     override fun itemSelect(position: Int?, status: String?, type: String?) {
 
         viewModel.getRecipeData()?.get(0)!!.recipe?.ingredients?.forEachIndexed { index, ingredient ->
@@ -877,7 +816,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
 
         // Update the drawable based on the selectAll state
         val drawableRes = if (selectAll) R.drawable.orange_checkbox_images else R.drawable.orange_uncheck_box_images
-        binding?.tvSelectAllBtn?.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableRes, 0)
+        binding.tvSelectAllBtn.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableRes, 0)
 
     }
 
