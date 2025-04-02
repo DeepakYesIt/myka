@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.commonfragmentscreen.spendingOnGroceries
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -7,7 +8,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,14 +15,15 @@ import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.mykaimeal.planner.R
-import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentSpendingOnGroceriesBinding
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.GrocereisExpenses
@@ -35,61 +36,60 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SpendingOnGroceriesFragment : Fragment() {
 
-    private var binding: FragmentSpendingOnGroceriesBinding? = null
+    private lateinit var binding: FragmentSpendingOnGroceriesBinding
     private var isOpen:Boolean=true
     private lateinit var sessionManagement: SessionManagement
     private var totalProgressValue:Int=0
     private var status:String=""
     private lateinit var spendingGroceriesViewModel: SpendingGroceriesViewModel
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         binding = FragmentSpendingOnGroceriesBinding.inflate(inflater, container, false)
 
         spendingGroceriesViewModel = ViewModelProvider(this)[SpendingGroceriesViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
-        if (sessionManagement.getCookingFor().equals("Myself")){
-            binding!!.tvSpendGroceries.text="How much do you typically spend on groceries per week/month?"
-            binding!!.progressBar9.max=10
-            totalProgressValue=10
-            updateProgress(8)
-        } else {
-            binding!!.tvSpendGroceries.text="How much do you normally spend on groceries each week or month?"
-            binding!!.progressBar9.max=11
-            totalProgressValue=11
-            updateProgress(9)
-        }
 
-        if (sessionManagement.getCookingScreen().equals("Profile")){
-            binding!!.llBottomBtn.visibility=View.GONE
-            binding!!.rlUpdateSpendingGroc.visibility=View.VISIBLE
-            ///checking the device of mobile data in online and offline(show network error message)
+        val message = "How much do you " + (if (sessionManagement.getCookingFor().equals("Myself",true)) "typically" else "normally") + " spend on groceries per week/month?"
+        val maxProgress = if (sessionManagement.getCookingFor().equals("Myself",true)) 10 else 11
+        val progressValue = maxProgress - 2
+
+        binding.tvSpendGroceries.text = message
+        binding.progressBar9.max = maxProgress
+        totalProgressValue = maxProgress
+        updateProgress(progressValue)
+
+
+        val isProfileScreen = sessionManagement.getCookingScreen().equals("Profile",true)
+        binding.llBottomBtn.visibility = if (isProfileScreen) View.GONE else View.VISIBLE
+        binding.rlUpdateSpendingGroc.visibility = if (isProfileScreen) View.VISIBLE else View.GONE
+
+        if (isProfileScreen) {
             if (BaseApplication.isOnline(requireContext())) {
                 spendingGroceriesApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        }else{
-            binding!!.llBottomBtn.visibility=View.VISIBLE
-            binding!!.rlUpdateSpendingGroc.visibility=View.GONE
-
-            if (spendingGroceriesViewModel.getGroceriesData()!=null){
-                showDataInUi(spendingGroceriesViewModel.getGroceriesData()!!)
+        } else {
+            spendingGroceriesViewModel.getGroceriesData()?.let {
+                showDataInUi(it)
             }
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+        backButton()
+
+        initialize()
+
+        return binding.root
+    }
+
+    private fun backButton(){
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
         })
-
-        initialize()
-        return binding!!.root
     }
 
     private fun spendingGroceriesApi() {
@@ -103,7 +103,7 @@ class SpendingOnGroceriesFragment : Fragment() {
                             val gson = Gson()
                             val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
                             if (bodyModel.code == 200 && bodyModel.success) {
-                                showDataInUi(bodyModel.data.grocereisExpenses)
+                                bodyModel.data.grocereisExpenses?.let { it1 -> showDataInUi(it1) }
                             } else {
                                 if (bodyModel.code == ErrorMessage.code) {
                                     showAlertFunction(bodyModel.message, true)
@@ -129,15 +129,12 @@ class SpendingOnGroceriesFragment : Fragment() {
 
     private fun showDataInUi(groceriesExercise: GrocereisExpenses) {
         try {
-            if (groceriesExercise!=null){
-                if (groceriesExercise.amount!=null){
-                    binding!!.etSpendingAmount.setText(groceriesExercise.amount.toString())
-                }
+            if (groceriesExercise.amount!=null){
+                binding.etSpendingAmount.setText(groceriesExercise.amount.toString())
+            }
 
-                if (groceriesExercise.duration!=null){
-                    binding!!.tvChooseDuration.text = groceriesExercise.duration.toString()
-                }
-
+            if (groceriesExercise.duration!=null){
+                binding.tvChooseDuration.text = groceriesExercise.duration.toString()
             }
         }catch (e:Exception){
             Log.d("SpendingGroceries","message:--"+e.message)
@@ -148,22 +145,23 @@ class SpendingOnGroceriesFragment : Fragment() {
         BaseApplication.alertError(requireContext(), message, status)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateProgress(progress: Int) {
-        binding!!.progressBar9.progress = progress
-        binding!!.tvProgressText.text = "$progress/$totalProgressValue"
+        binding.progressBar9.progress = progress
+        binding.tvProgressText.text = "$progress/$totalProgressValue"
     }
 
     private fun initialize() {
 
-        binding!!.imgBackSpendGroceries.setOnClickListener{
+        binding.imgBackSpendGroceries.setOnClickListener{
             findNavController().navigateUp()
         }
 
-        binding!!.tvSkipBtn.setOnClickListener{
+        binding.tvSkipBtn.setOnClickListener{
             stillSkipDialog()
         }
 
-        binding!!.tvNextBtn.setOnClickListener{
+        binding.tvNextBtn.setOnClickListener{
             if (status=="2"){
                 val groceriesLocalData = GrocereisExpenses(
                     amount = "",
@@ -174,19 +172,17 @@ class SpendingOnGroceriesFragment : Fragment() {
                     updated_at = "",
                     user_id = 0  // Default or appropriate user ID
                 )
-                groceriesLocalData.amount=binding!!.etSpendingAmount.text.toString().trim()
-                groceriesLocalData.duration=binding!!.tvChooseDuration.text.toString().trim().toLowerCase()
+                groceriesLocalData.amount=binding.etSpendingAmount.text.toString().trim()
+                groceriesLocalData.duration=binding.tvChooseDuration.text.toString().trim().toLowerCase()
                 spendingGroceriesViewModel.setGroceriesData(groceriesLocalData)
 
-                sessionManagement.setSpendingAmount(binding!!.etSpendingAmount.text.toString().trim())
-                sessionManagement.setSpendingDuration(binding!!.tvChooseDuration.text.toString().trim().toLowerCase())
+                sessionManagement.setSpendingAmount(binding.etSpendingAmount.text.toString().trim())
+                sessionManagement.setSpendingDuration(binding.tvChooseDuration.text.toString().trim().toLowerCase())
                 findNavController().navigate(R.id.eatingOutFragment)
             }
         }
 
-
-        binding!!.etSpendingAmount.addTextChangedListener(object :
-            TextWatcher {
+        binding.etSpendingAmount.addTextChangedListener(object : TextWatcher {
             private var isEditing = false
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
@@ -198,8 +194,8 @@ class SpendingOnGroceriesFragment : Fragment() {
 
                 if (text.isNotEmpty()) {
                     if (!text.startsWith("$")) {
-                        binding!!.etSpendingAmount.setText("$$text")
-                        binding!!.etSpendingAmount.setSelection(binding!!.etSpendingAmount.text.length) // Move cursor to end
+                        binding.etSpendingAmount.setText("$$text")
+                        binding.etSpendingAmount.setSelection(binding.etSpendingAmount.text.length) // Move cursor to end
                     }
                 }
 
@@ -214,50 +210,50 @@ class SpendingOnGroceriesFragment : Fragment() {
             }
         })
 
-
-        binding!!.rlSelectDuration.setOnClickListener{
+        binding.rlSelectDuration.setOnClickListener{
             if (isOpen){
                 isOpen=false
                 val drawableEnd = ContextCompat.getDrawable(requireContext(), R.drawable.drop_up_icon)
                 drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
-                binding!!.tvChooseDuration.setCompoundDrawables(null, null, drawableEnd, null)
-                binding!!.relSelectWeekMonthly.visibility=View.VISIBLE
+                binding.tvChooseDuration.setCompoundDrawables(null, null, drawableEnd, null)
+                binding.relSelectWeekMonthly.visibility=View.VISIBLE
             }else{
                 isOpen=true
                 val drawableEnd = ContextCompat.getDrawable(requireContext(), R.drawable.drop_down_icon)
                 drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
-                binding!!.tvChooseDuration.setCompoundDrawables(null, null, drawableEnd, null)
-                binding!!.relSelectWeekMonthly.visibility=View.GONE
+                binding.tvChooseDuration.setCompoundDrawables(null, null, drawableEnd, null)
+                binding.relSelectWeekMonthly.visibility=View.GONE
             }
         }
 
-        binding!!.rlSelectWeek.setOnClickListener{
-            binding!!.tvChooseDuration.text="Weekly"
-            binding!!.relSelectWeekMonthly.visibility=View.GONE
+        binding.rlSelectWeek.setOnClickListener{
+            binding.tvChooseDuration.text="Weekly"
+            binding.relSelectWeekMonthly.visibility=View.GONE
             val drawableEnd = ContextCompat.getDrawable(requireContext(), R.drawable.drop_down_icon)
             drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
-            binding!!.tvChooseDuration.setCompoundDrawables(null, null, drawableEnd, null)
+            binding.tvChooseDuration.setCompoundDrawables(null, null, drawableEnd, null)
             isOpen=true
             searchable()
         }
 
-        binding!!.rlSelectMonthly.setOnClickListener{
-            binding!!.tvChooseDuration.text="Monthly"
-            binding!!.relSelectWeekMonthly.visibility=View.GONE
+        binding.rlSelectMonthly.setOnClickListener{
+            binding.tvChooseDuration.text="Monthly"
+            binding.relSelectWeekMonthly.visibility=View.GONE
             val drawableEnd = ContextCompat.getDrawable(requireContext(), R.drawable.drop_down_icon)
             drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
-            binding!!.tvChooseDuration.setCompoundDrawables(null, null, drawableEnd, null)
+            binding.tvChooseDuration.setCompoundDrawables(null, null, drawableEnd, null)
             isOpen=true
             searchable()
         }
 
-        binding!!.rlUpdateSpendingGroc.setOnClickListener{
+        binding.rlUpdateSpendingGroc.setOnClickListener{
             if (BaseApplication.isOnline(requireContext())) {
                 updateSpendingGrocApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
+
     }
 
     private fun updateSpendingGrocApi() {
@@ -286,22 +282,22 @@ class SpendingOnGroceriesFragment : Fragment() {
                         showAlertFunction(it.message, false)
                     }
                 }
-            },binding!!.etSpendingAmount.text.toString().trim(),binding!!.tvChooseDuration.text.toString().trim())
+            },binding.etSpendingAmount.text.toString().trim(),binding.tvChooseDuration.text.toString().trim())
         }
     }
 
     private fun searchable() {
-        if (binding!!.etSpendingAmount.text.isNotEmpty()){
-            if (binding!!.tvChooseDuration.text.isNotEmpty()){
+        if (binding.etSpendingAmount.text.isNotEmpty()){
+            if (binding.tvChooseDuration.text.isNotEmpty()){
                 status="2"
-                binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             }else{
                 status="1"
-                binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             }
         }else{
             status="1"
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
 
     }

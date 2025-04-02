@@ -75,8 +75,10 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     private lateinit var startDate: Date
     private lateinit var endDate: Date
     private lateinit var sharedPreferences: SharedPreferences
-    private val prefsName = "MyPrefs"
-    private val lastShownTimeKey = "last_dialog_time"
+    private val PREF_NAME = "ToastPrefs"
+    private val KEY_LAST_SHOWN_DATE = "last_shown_date"
+
+
     private val oneDayMillis = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -88,7 +90,8 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         commonWorkUtils = CommonWorkUtils(this)
 
         // Initialize SharedPreferences
-        sharedPreferences = getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+
 
         handleDeepLink(intent)
 
@@ -131,7 +134,8 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         /// using function for find destination graph
         startDestination()
 
-        // Check if 24 hours have passed since the last dialog was shown
+
+//        // Check if 24 hours have passed since the last dialog was shown
 //        if (shouldShowDialog()) {
 ////            dialogDailyInspiration()
 //        }
@@ -142,17 +146,17 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
     }
 
-    private fun shouldShowDialog(): Boolean {
-        val lastShownTime = sharedPreferences.getLong(lastShownTimeKey, 0)
-        val currentTime = System.currentTimeMillis()
-        val data=(currentTime - lastShownTime) >= oneDayMillis
-        Log.d("currentTime","*****"+currentTime)
-        Log.d("lastShownTime","*****"+lastShownTime)
-        Log.d("data","*****"+data)
-        return data
+    fun shouldShowDialog(): Boolean {
+        val lastShownDate = sharedPreferences.getString(KEY_LAST_SHOWN_DATE, null) ?: return true
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val lastDate = sdf.parse(lastShownDate)
+        val currentDate = sdf.parse(sdf.format(Date()))
+
+        return lastDate == null || currentDate!!.after(lastDate)
+
     }
 
-        private fun handleDeepLink(intent: Intent?) {
+    private fun handleDeepLink(intent: Intent?) {
             intent?.data?.let { uri ->
                 val deepLinkValue = uri.getQueryParameter("deep_link_value")
                 val deepLinkSub1 = uri.getQueryParameter("deep_link_sub1")
@@ -171,7 +175,6 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             }
         }
 
-
     private fun startDestination() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.frameContainerMain) as NavHostFragment
         val navController = navHostFragment.navController
@@ -180,103 +183,49 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         navController.graph = navGraph
     }
 
-    /// this function using set custom bottom navigation
     fun changeBottom(status: String) {
-        if (status.equals("home", true)) {
+        val selectedColor = ContextCompat.getColor(this, R.color.light_green)
+        val defaultColor = ContextCompat.getColor(this, R.color.light_grays)
+        val textDefaultColor = ContextCompat.getColor(this, R.color.black)
 
-            binding.cardViewAddRecipe.visibility = View.GONE
-            binding.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
-            binding.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.light_green))
-            binding.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
+        val views = listOf("home", "search", "addRecipe", "plan", "cooked")
 
-            binding.llHomeIndicator.visibility = View.VISIBLE
-            binding.llSearchIndicator.visibility = View.INVISIBLE
-            binding.llAddRecipeIndicator.visibility = View.INVISIBLE
-            binding.llPlanIndicator.visibility = View.INVISIBLE
-            binding.llCookedIndicator.visibility = View.INVISIBLE
+        views.forEach { view ->
+            val isSelected = status.equals(view, true)
+            val color = if (isSelected) selectedColor else defaultColor
+            val textColor = if (isSelected) selectedColor else textDefaultColor
+            val visibility = if (isSelected) View.VISIBLE else View.INVISIBLE
+
+            when (view) {
+                "home" -> {
+                    binding.imgHome.setColorFilter(color)
+                    binding.tvHome.setTextColor(textColor)
+                    binding.llHomeIndicator.visibility = visibility
+                }
+                "search" -> {
+                    binding.imgSearch.setColorFilter(color)
+                    binding.tvSearch.setTextColor(textColor)
+                    binding.llSearchIndicator.visibility = visibility
+                }
+                "addRecipe" -> {
+                    binding.imgAddRecipe.setColorFilter(color)
+                    binding.tvAddRecipe.setTextColor(textColor)
+                    binding.llAddRecipeIndicator.visibility = visibility
+                }
+                "plan" -> {
+                    binding.imgPlan.setColorFilter(color)
+                    binding.tvPlan.setTextColor(textColor)
+                    binding.llPlanIndicator.visibility = visibility
+                }
+                "cooked" -> {
+                    binding.imgCooked.setColorFilter(color)
+                    binding.tvCooked.setTextColor(textColor)
+                    binding.llCookedIndicator.visibility = visibility
+                }
+            }
         }
-        if (status.equals("search", true)) {
-            binding.cardViewAddRecipe.visibility = View.GONE
-            binding.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
-            binding.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.light_green))
-            binding.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
 
-            binding.llHomeIndicator.visibility = View.INVISIBLE
-            binding.llSearchIndicator.visibility = View.VISIBLE
-            binding.llAddRecipeIndicator.visibility = View.INVISIBLE
-            binding.llPlanIndicator.visibility = View.INVISIBLE
-            binding.llCookedIndicator.visibility = View.INVISIBLE
-        }
-        if (status.equals("addRecipe", true)) {
-            binding.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
-            binding.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.light_green))
-            binding.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
-
-            binding.llHomeIndicator.visibility = View.INVISIBLE
-            binding.llSearchIndicator.visibility = View.INVISIBLE
-            binding.llAddRecipeIndicator.visibility = View.VISIBLE
-            binding.llPlanIndicator.visibility = View.INVISIBLE
-            binding.llCookedIndicator.visibility = View.INVISIBLE
-        }
-        if (status.equals("plan", true)) {
-            binding.cardViewAddRecipe.visibility = View.GONE
-            binding.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
-            binding.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.light_green))
-            binding.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
-
-            binding.llHomeIndicator.visibility = View.INVISIBLE
-            binding.llSearchIndicator.visibility = View.INVISIBLE
-            binding.llAddRecipeIndicator.visibility = View.INVISIBLE
-            binding.llPlanIndicator.visibility = View.VISIBLE
-            binding.llCookedIndicator.visibility = View.INVISIBLE
-        }
-        if (status.equals("cooked", true)) {
-            binding.cardViewAddRecipe.visibility = View.GONE
-            binding.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-            binding.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
-            binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
-            binding.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.light_green))
-
-            binding.llHomeIndicator.visibility = View.INVISIBLE
-            binding.llSearchIndicator.visibility = View.INVISIBLE
-            binding.llAddRecipeIndicator.visibility = View.INVISIBLE
-            binding.llPlanIndicator.visibility = View.INVISIBLE
-            binding.llCookedIndicator.visibility = View.VISIBLE
-        }
+        binding.cardViewAddRecipe.visibility = if (status.equals("addRecipe", true)) View.VISIBLE else View.GONE
     }
 
     /// add recipe screen
@@ -938,4 +887,14 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             Log.d("Token ","******"+BaseApplication.fetchFcmToken())
         }
     }
+
+    fun saveCurrentDate() {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val currentDate = sdf.format(Date())
+        sharedPreferences.edit()
+            .putString(KEY_LAST_SHOWN_DATE, currentDate)
+            .apply()
+    }
+
+
 }

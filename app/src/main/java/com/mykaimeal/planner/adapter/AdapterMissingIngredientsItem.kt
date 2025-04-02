@@ -36,7 +36,11 @@ class AdapterMissingIngredientsItem(var datalist: MutableList<MissingIngredientM
             val data=datalist!![position]
 
             if (data.food!=null){
-                holder.binding.tvTitleName.text=data.food.toString()
+                val foodName = data.food
+                val result = foodName.mapIndexed { index, c ->
+                    if (index == 0 || c.isUpperCase()) c.uppercaseChar() else c
+                }.joinToString("")
+                holder.binding.tvTitleName.text=result
             }
 
             if (data.status){
@@ -78,8 +82,6 @@ class AdapterMissingIngredientsItem(var datalist: MutableList<MissingIngredientM
             }
 
             if (data.quantity!=null){
-                Log.d("@@@@@@@@$$$$$$$$","Quantity******"+datalist!![0].quantity)
-
                 val roundedQuantity = data.quantity.let {
                     BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
                 }

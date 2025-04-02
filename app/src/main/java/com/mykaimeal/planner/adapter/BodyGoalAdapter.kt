@@ -1,6 +1,5 @@
 package com.mykaimeal.planner.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,15 +44,15 @@ class BodyGoalAdapter(private var datalist: List<BodyGoalModelData>, private var
                 // Deselect all items
                 datalist.forEach { it.selected = false }
                 onItemClickListener.itemClick(data.id,"false" , position.toString())
-                notifyDataSetChanged()
             } else {
                 // Deselect all items
                 datalist.forEach { it.selected = false }
                 onItemClickListener.itemClick(data.id, "true",position.toString())
                 // Select the new item
                 datalist[position].selected = true
-                notifyDataSetChanged()
             }
+
+            notifyDataSetChanged()
         }
     }
 

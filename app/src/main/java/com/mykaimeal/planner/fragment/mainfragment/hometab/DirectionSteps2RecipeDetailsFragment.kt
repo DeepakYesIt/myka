@@ -39,14 +39,16 @@ import com.mykaimeal.planner.databinding.FragmentDirectionSteps2RecipeDetailsFra
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.recipedetails.RecipeDetailsViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+@AndroidEntryPoint
 class DirectionSteps2RecipeDetailsFragment : Fragment() {
 
-    private var binding: FragmentDirectionSteps2RecipeDetailsFragmentBinding?=null
+    private lateinit var binding: FragmentDirectionSteps2RecipeDetailsFragmentBinding
     private var totalProgressValue:Int=0
     private val START_TIME_IN_MILLIS: Long = 30000
     private var mTimeLeftInMillis = START_TIME_IN_MILLIS
@@ -68,38 +70,36 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
         uri = arguments?.getString("uri", "").toString()
 
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.GONE
+            llBottomNavigation.visibility = View.GONE
+        }
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
 
+        backButton()
 
         totalProgressValue= viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines?.size!!
-        binding!!.progressBar.max=totalProgressValue
+        binding.progressBar.max=totalProgressValue
         updateProgress(1)
 
-        binding!!.imgStep2RecipeDetails.setOnClickListener{
+        binding.imgStep2RecipeDetails.setOnClickListener{
             findNavController().navigateUp()
         }
 
-        binding!!.textStartTimer.setOnClickListener{
-            binding!!.textStartTimer.isEnabled = false
+        binding.textStartTimer.setOnClickListener{
+            binding.textStartTimer.isEnabled = false
             mTimeLeftInMillis= convertTimeToMillis(viewModel.getRecipeData()?.get(0)!!.recipe?.totalTime.toString())
             startTime()
         }
 
-        binding!!.tvPreviousBtn.setOnClickListener{
+        binding.tvPreviousBtn.setOnClickListener{
             if (totalProgressValue>=count){
                 count -= 1
                 updateProgress(count)
             }
         }
 
-        binding!!.tvNextStepBtn.setOnClickListener{
+        binding.tvNextStepBtn.setOnClickListener{
             if (totalProgressValue>count){
                 count += 1
                 updateProgress(count)
@@ -110,7 +110,16 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
 
         setData()
 
-        return binding!!.root
+        return binding.root
+    }
+
+
+    private fun backButton(){
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                findNavController().navigateUp()
+            }
+        })
     }
 
     private fun convertTimeToMillis(time: String): Long {
@@ -160,7 +169,7 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding!!.layProgess.root.visibility = View.GONE
+                        binding.layProgess.root.visibility = View.GONE
                         return false
                     }
 
@@ -171,34 +180,34 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding!!.layProgess.root.visibility = View.GONE
+                        binding.layProgess.root.visibility = View.GONE
                         return false
                     }
                 })
-                .into(binding!!.imageData)
+                .into(binding.imageData)
         } else {
-            binding!!.layProgess.root.visibility = View.GONE
+            binding.layProgess.root.visibility = View.GONE
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.label != null) {
-            binding!!.tvTitle.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.label
-            binding!!.textPrepare.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.label +":"
+            binding.tvTitle.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.label
+            binding.textPrepare.text = "" + viewModel.getRecipeData()?.get(0)!!.recipe?.label +":"
         }
 
         if (viewModel.getRecipeData()?.get(0)!!.recipe?.totalTime!=null){
             if (viewModel.getRecipeData()?.get(0)!!.recipe?.totalTime!=0) {
-                binding!!.layTimmer.visibility=View.VISIBLE
-                binding!!.tvTiming.text =
+                binding.layTimmer.visibility=View.VISIBLE
+                binding.tvTiming.text =
                     "" + viewModel.getRecipeData()?.get(0)!!.recipe?.totalTime?.let {
                         formatToHHMMSS(
                             it
                         )
                     }
             }else{
-                binding!!.layTimmer.visibility=View.GONE
+                binding.layTimmer.visibility=View.GONE
             }
         }else{
-            binding!!.layTimmer.visibility=View.GONE
+            binding.layTimmer.visibility=View.GONE
         }
 
 
@@ -287,20 +296,6 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
             if (type.equals("",true)){
                 BaseApplication.alertError(requireContext(), ErrorMessage.cookedMealsError, false)
             }else{
-
-           /*     // Create a JsonObject for the main JSON structure
-                val jsonObject = JsonObject()
-                if (uri!= null) {
-                    val currentDate = LocalDate.now()
-                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                    val formattedDate = currentDate.format(formatter)
-                    jsonObject.addProperty("type", mealType)
-                    jsonObject.addProperty("plan_type", type)
-                    jsonObject.addProperty("uri", uri)
-                    jsonObject.addProperty("date", formattedDate)
-                }
-                Log.d("json object ", "******$jsonObject")
-*/
                 BaseApplication.showMe(requireContext())
                 lifecycleScope.launch {
                     viewModel.addMealTypeApiUrl({
@@ -363,14 +358,14 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
         object : CountDownTimer(mTimeLeftInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 mTimeLeftInMillis = millisUntilFinished
-                binding!!.textStartTimer.setTextColor(Color.parseColor("#828282"))
+                binding.textStartTimer.setTextColor(Color.parseColor("#828282"))
                 updateCountDownText()
             }
 
             override fun onFinish() {
                 mTimeLeftInMillis = 120000
-                binding!!.textStartTimer.setTextColor(Color.parseColor("#06C169"))
-                binding!!.textStartTimer.isEnabled = true
+                binding.textStartTimer.setTextColor(Color.parseColor("#06C169"))
+                binding.textStartTimer.isEnabled = true
             }
         }.start()
     }
@@ -390,20 +385,20 @@ class DirectionSteps2RecipeDetailsFragment : Fragment() {
         val minutes = mTimeLeftInMillis.toInt() / 1000 / 60
         val seconds = mTimeLeftInMillis.toInt() / 1000 % 60
         val timeLeftFormatted = String.format(Locale.getDefault(), "%02d: %02d", minutes, seconds)
-        binding!!.tvTiming.text = "00 : $timeLeftFormatted"
+        binding.tvTiming.text = "00 : $timeLeftFormatted"
     }
 
     @SuppressLint("SetTextI18n")
     private fun updateProgress(progress: Int) {
-        binding!!.progressBar.progress = progress
-        binding!!.tvProgressText.text = "$progress /$totalProgressValue"
+        binding.progressBar.progress = progress
+        binding.tvProgressText.text = "$progress /$totalProgressValue"
 
-        binding!!.textPrepareDesc.text = viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines?.get(progress-1)!!
+        binding.textPrepareDesc.text = viewModel.getRecipeData()?.get(0)!!.recipe?.instructionLines?.get(progress-1)!!
 
         if (progress==1){
-            binding!!.tvPreviousBtn.visibility=View.GONE
+            binding.tvPreviousBtn.visibility=View.GONE
         }else{
-            binding!!.tvPreviousBtn.visibility=View.VISIBLE
+            binding.tvPreviousBtn.visibility=View.VISIBLE
         }
 
 

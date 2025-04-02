@@ -26,13 +26,13 @@ import com.mykaimeal.planner.fragment.mainfragment.hometab.missingingredientsfra
 import com.mykaimeal.planner.fragment.mainfragment.hometab.missingingredientsfragment.viewmodel.MissingIngredientViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
-import com.mykaimeal.planner.model.DataModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
-    private var binding: FragmentMissingIngredientsBinding? = null
+
+    private lateinit var binding: FragmentMissingIngredientsBinding
     private var adapterMissingIngredientsItem: AdapterMissingIngredientsItem? = null
     private var adapterMissingIngAvailItem: AdapterMissingIngredientAvailableItem? = null
     private var selectAll:Boolean?=false
@@ -48,72 +48,66 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentMissingIngredientsBinding.inflate(inflater, container, false)
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
+        val mainActivity = activity as? MainActivity
+        mainActivity?.binding?.llIndicator?.visibility = View.VISIBLE
+        mainActivity?.binding?.llBottomNavigation?.visibility = View.VISIBLE
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+        missingIngredientViewModel = ViewModelProvider(requireActivity())[MissingIngredientViewModel::class.java]
+
+        shcId = arguments?.getString("schId", "")?:""
+        recipeUri = arguments?.getString("uri", "")?:""
+
+        backButton()
+
+        initialize()
+
+        return binding.root
+    }
+
+    private fun backButton(){
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
         })
-
-        missingIngredientViewModel = ViewModelProvider(requireActivity())[MissingIngredientViewModel::class.java]
-
-        shcId = arguments?.getString("schId", "").toString()
-        recipeUri = arguments?.getString("uri", "").toString()
-
-        addedIngredientsModel()
-        missingIngredientsModel()
-
-        initialize()
-
-        return binding!!.root
     }
 
     private fun initialize() {
 
-        binding!!.imgBackMissingIng.setOnClickListener{
+        binding.imgBackMissingIng.setOnClickListener{
             findNavController().navigateUp()
         }
 
-        binding!!.checkBoxImg.setOnClickListener{
-            if (missingIngredientViewModel.getRecipeData()?.size!!> 0) {
-                selectAll = !selectAll!! // Toggle the selectAll value
-                // Update the drawable based on the selectAll state
-                val drawableRes = if (selectAll as Boolean) R.drawable.orange_checkbox_images else R.drawable.orange_uncheck_box_images
-              binding!!.checkBoxImg.setImageResource(drawableRes)
-                // Update the status of each ingredient dynamically
-                missingIngredientViewModel.getRecipeData()!!
-                    .forEach { ingredient -> ingredient.status = selectAll as Boolean
-                }
-                // Notify adapter with updated data
-                adapterMissingIngredientsItem?.updateList(missingIngredientViewModel.getRecipeData()!!)
+        binding.checkBoxImg.setOnClickListener{
+            if (missingIngredientList.size>0){
+                 updatechecBox()
             }
         }
 
-        binding!!.tvAddToBasket.setOnClickListener{
-            if (statusType.size!=null){
-                statusType.clear()
-            }
+        binding.tvAddToBasket.setOnClickListener{
+            clearList()
             if (BaseApplication.isOnline(requireActivity())) {
-                if (missingIngredientViewModel.getRecipeData()?.size!!  > 0) {
+                if (missingIngredientList.size  > 0) {
                     try {
+                        var status=false
                         // Iterate through the ingredients and add them to the array if status is true
-                        missingIngredientViewModel.getRecipeData()?.forEach { ingredientsModel ->
+                        missingIngredientList.forEach { ingredientsModel ->
                             if (ingredientsModel.status) {
                                 foodIds.add(ingredientsModel.foodId.toString())
                                 foodName.add(ingredientsModel.food.toString())
                                 statusType.add("0")
+                                status=true
                             }
                         }
-                        // Log the final JSON data
-                        Log.d("final data", "******$foodIds")
-                        Log.d("final data", "******$foodName")
-                        addToCartApi()
+                        if (status){
+                            addToCartApi()
+                        }else{
+                            BaseApplication.alertError(requireContext(), ErrorMessage.ingredientError, false)
+                        }
                     } catch (e: Exception) {
                         BaseApplication.alertError(requireContext(), e.message, false)
                     }
@@ -124,25 +118,27 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
         }
 
 
-        binding!!.tvPurchasedBtn.setOnClickListener{
-            if (statusType.size!=null){
-                statusType.clear()
-            }
+        binding.tvPurchasedBtn.setOnClickListener{
+             clearList()
+            availableIngredientList.clear()
             if (BaseApplication.isOnline(requireActivity())) {
-                if (missingIngredientViewModel.getRecipeData()?.size!!  > 0) {
+                if (missingIngredientList.size > 0) {
                     try {
-                        // Iterate through the ingredients and add them to the array if status is true
-                        missingIngredientViewModel.getRecipeData()?.forEach { ingredientsModel ->
+                        var status=false
+                        missingIngredientList.forEach { ingredientsModel ->
                             if (ingredientsModel.status) {
                                 foodIds.add(ingredientsModel.foodId.toString())
                                 foodName.add(ingredientsModel.food.toString())
                                 statusType.add("1")
+                                availableIngredientList.add(ingredientsModel)
+                                status=true
                             }
                         }
-                        // Log the final JSON data
-                        Log.d("final data", "******$foodIds")
-                        Log.d("final data", "******$foodName")
-                        addToCartApi()
+                        if (status){
+                            addToCartApi()
+                        }else{
+                            BaseApplication.alertError(requireContext(), ErrorMessage.ingredientError, false)
+                        }
                     } catch (e: Exception) {
                         BaseApplication.alertError(requireContext(), e.message, false)
                     }
@@ -151,12 +147,40 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
+
+
+        adapterMissingIngredientsItem = AdapterMissingIngredientsItem(missingIngredientList, requireActivity(),this)
+        binding.rcyIngredientsRecipe.adapter = adapterMissingIngredientsItem
+
+        adapterMissingIngAvailItem = AdapterMissingIngredientAvailableItem(availableIngredientList, requireActivity())
+        binding.rcyAddedIngredientsRecipes.adapter = adapterMissingIngAvailItem
 
         if (BaseApplication.isOnline(requireActivity())) {
             missingIngredientApi()
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
+
+
+    }
+
+    private fun clearList(){
+        foodIds.clear()
+        foodName.clear()
+        statusType.clear()
+    }
+
+    private fun updatechecBox(){
+        selectAll = !selectAll!! // Toggle the selectAll value
+        // Update the drawable based on the selectAll state
+        val drawableRes = if (selectAll as Boolean) R.drawable.orange_checkbox_images else R.drawable.orange_uncheck_box_images
+        binding.checkBoxImg.setImageResource(drawableRes)
+        // Update the status of each ingredient dynamically
+        missingIngredientList.forEach {
+                ingredient -> ingredient.status = selectAll as Boolean
+        }
+        // Notify adapter with updated data
+        adapterMissingIngredientsItem?.updateList(missingIngredientList)
     }
 
     private fun missingIngredientApi() {
@@ -185,21 +209,27 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
             if (apiModel.code == 200 && apiModel.success == true) {
                 showDataInUi(apiModel.data)
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
     }
 
+    private fun handleError(code: Int?, message: String?) {
+        if (code == ErrorMessage.code) {
+            showAlert(message, true)
+        } else {
+            showAlert(message, false)
+        }
+    }
+
     private fun showDataInUi(data: MutableList<MissingIngredientModelData>?) {
         try {
             if (data!=null && data.size>0){
-                // Assuming you have a response object of type MissingIngredientModel
+                missingIngredientList.clear()
+                availableIngredientList.clear()
+              // Assuming you have a response object of type MissingIngredientModel
                 data.forEach { ingredient ->
                     if (ingredient.is_missing == 0) {
                         missingIngredientList.add(ingredient) // Add to missing ingredients list
@@ -208,35 +238,45 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
                     }
                 }
 
-                Log.d("dffdsss","ffdfdd"+missingIngredientList.size)
-                Log.d("dffd","22222:___"+availableIngredientList.size)
+                showLatestData()
 
-
-                missingIngredientViewModel.setRecipeData(missingIngredientList)
-                if (missingIngredientList!=null && missingIngredientList.size>0){
-                    binding!!.rcyIngredientsRecipe.visibility=View.VISIBLE
-                    adapterMissingIngredientsItem = AdapterMissingIngredientsItem(missingIngredientList, requireActivity(),this)
-                    binding!!.rcyIngredientsRecipe.adapter = adapterMissingIngredientsItem
-                }else{
-                    findNavController().navigateUp()
-                    binding!!.rcyIngredientsRecipe.visibility=View.GONE
-                }
-
-                if (availableIngredientList!=null && availableIngredientList.size>0){
-                    binding!!.rcyAddedIngredientsRecipes.visibility=View.VISIBLE
-                    adapterMissingIngAvailItem = AdapterMissingIngredientAvailableItem(availableIngredientList, requireActivity())
-                    binding!!.rcyAddedIngredientsRecipes.adapter = adapterMissingIngAvailItem
-                    binding!!.relAddedIngredients.visibility=View.VISIBLE
-                }else{
-                    binding!!.rcyAddedIngredientsRecipes.visibility=View.GONE
-                    binding!!.relAddedIngredients.visibility=View.GONE
-                }
             }else{
-//                binding!!.llSearchRecipientIng.visibility=View.GONE
+                hideData()
             }
         }catch (e:Exception){
+            hideData()
             Log.d("MissingIngredient@@@@","Data List:------"+e.message)
         }
+    }
+
+    private fun showLatestData(){
+        if (missingIngredientList.size>0){
+            binding.rcyIngredientsRecipe.visibility=View.VISIBLE
+            binding.llBasketPurchasedBtn.visibility=View.VISIBLE
+            binding.relIngredientsMissing.visibility=View.VISIBLE
+            adapterMissingIngredientsItem?.updateList(missingIngredientList)
+        }else{
+            binding.rcyIngredientsRecipe.visibility=View.GONE
+            binding.llBasketPurchasedBtn.visibility=View.GONE
+            binding.relIngredientsMissing.visibility=View.GONE
+        }
+        if (availableIngredientList.size>0){
+            binding.rcyAddedIngredientsRecipes.visibility=View.VISIBLE
+            adapterMissingIngAvailItem?.updateList(availableIngredientList)
+            binding.relAddedIngredients.visibility=View.VISIBLE
+        }else{
+            binding.rcyAddedIngredientsRecipes.visibility=View.GONE
+            binding.relAddedIngredients.visibility=View.GONE
+        }
+    }
+
+
+    private fun hideData(){
+        binding.rcyIngredientsRecipe.visibility=View.GONE
+        binding.llBasketPurchasedBtn.visibility=View.GONE
+        binding.relIngredientsMissing.visibility=View.GONE
+        binding.rcyAddedIngredientsRecipes.visibility=View.GONE
+        binding.relAddedIngredients.visibility=View.GONE
     }
 
     private fun showAlert(message: String?, status: Boolean) {
@@ -268,105 +308,39 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
             Log.d("@@@ Recipe Details ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
-                if (statusType[0]=="0"){
+                if (statusType[0].equals("0",true)){
                     findNavController().navigateUp()
                 }else{
-                    if (BaseApplication.isOnline(requireActivity())) {
-                        missingIngredientApi()
-                    } else {
-                        BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                    clearList()
+                    missingIngredientList.removeIf { ingredientsModel ->
+                        ingredientsModel.status
+                    }
+                    if (missingIngredientList.size>0){
+                        showLatestData()
+                    }else{
+                        findNavController().navigateUp()
                     }
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
     }
 
-    private fun addedIngredientsModel() {
-        val dataList = ArrayList<DataModel>()
-        val data1 = DataModel()
-        val data2 = DataModel()
-
-        data1.title = "Tomato"
-        data1.description = "0.5 kg"
-        data1.isOpen = false
-        data1.type = "AddedIng"
-        data1.image = R.drawable.tomato_ing_image
-
-        data2.title = "Tomato"
-        data2.description = "0.5 kg"
-        data2.isOpen = false
-        data2.type = "AddedIng"
-        data2.image = R.drawable.tomato_ing_image
-
-        dataList.add(data1)
-        dataList.add(data2)
-
-        /*ingredientsRecipeAdapter = IngredientsRecipeAdapter(dataList, requireActivity())
-        binding!!.rcyAddedIngredientsRecipes.adapter = ingredientsRecipeAdapter*/
-    }
-
-    private fun missingIngredientsModel() {
-        val dataList = ArrayList<DataModel>()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-
-        data1.title = "Olive Oil"
-        data1.description = "1 Tbsp"
-        data1.isOpen = false
-        data1.type = "MissingIng"
-        data1.image = R.drawable.olive_image
-
-        data2.title = "Garlic Mayo"
-        data2.description = "3 Tbsp"
-        data2.isOpen = false
-        data2.type = "MissingIng"
-        data2.image = R.drawable.garlic_mayo_image
-
-        data3.title = "Olive Oil"
-        data3.description = "3 Tbsp"
-        data3.isOpen = false
-        data3.type = "MissingIng"
-        data3.image = R.drawable.olive_oil_image2
-
-        data4.title = "Olive Oil"
-        data4.description = "1 kg"
-        data4.isOpen = false
-        data4.type = "MissingIng"
-        data4.image = R.drawable.olive_chicken_image
-
-        dataList.add(data1)
-        dataList.add(data2)
-        dataList.add(data3)
-        dataList.add(data4)
-
-      /*  ingredientsRecipeAdapter = IngredientsRecipeAdapter(dataList, requireActivity())
-        binding!!.rcyIngredientsRecipe.adapter = ingredientsRecipeAdapter*/
-    }
-
     override fun itemSelect(position: Int?, status: String?, type: String?) {
-        missingIngredientViewModel.getRecipeData()?.forEachIndexed { index, ingredient ->
+        missingIngredientList.forEachIndexed { index, ingredient ->
             if (index == position) {
-                ingredient.status = missingIngredientViewModel.getRecipeData()?.get(position)!!.status != true
+                ingredient.status = missingIngredientList[position].status != true
             }
         }
-        // Notify adapter with updated data
-        adapterMissingIngredientsItem?.updateList(missingIngredientViewModel.getRecipeData()!!)
-
-        selectAll = missingIngredientViewModel.getRecipeData()?.all { it.status } == true
-
+        selectAll = !missingIngredientList.any { !it.status }
         // Update the drawable based on the selectAll state
         val drawableRes = if (selectAll as Boolean) R.drawable.orange_checkbox_images else R.drawable.orange_uncheck_box_images
-        binding!!.checkBoxImg.setImageResource(drawableRes)
+        binding.checkBoxImg.setImageResource(drawableRes)
+        // Notify adapter with updated data
+        adapterMissingIngredientsItem?.updateList(missingIngredientList)
 
     }
 }

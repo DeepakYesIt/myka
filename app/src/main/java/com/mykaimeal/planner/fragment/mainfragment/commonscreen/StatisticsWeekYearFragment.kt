@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -25,10 +26,13 @@ import com.mykaimeal.planner.adapter.ChooseDayAdapter
 import com.mykaimeal.planner.databinding.FragmentStatisticsWeekYearBinding
 import com.mykaimeal.planner.model.CalendarDataModel
 import com.mykaimeal.planner.model.DataModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+
+@AndroidEntryPoint
 class StatisticsWeekYearFragment : Fragment(),OnItemClickListener {
 
     private var binding: FragmentStatisticsWeekYearBinding?=null
@@ -49,14 +53,17 @@ class StatisticsWeekYearFragment : Fragment(),OnItemClickListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding=FragmentStatisticsWeekYearBinding.inflate(layoutInflater, container, false)
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.VISIBLE
+            llBottomNavigation.visibility = View.VISIBLE
+        }
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
@@ -168,6 +175,7 @@ class StatisticsWeekYearFragment : Fragment(),OnItemClickListener {
         rcyChooseDaySch!!.adapter = chooseDayAdapter
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateWeek() {
         val startOfWeek = calendar.apply {
             set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
@@ -203,6 +211,7 @@ class StatisticsWeekYearFragment : Fragment(),OnItemClickListener {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private fun updateWeekRange() {
         val startOfWeek = calendar.apply {
             set(Calendar.DAY_OF_WEEK, firstDayOfWeek)

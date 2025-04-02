@@ -18,7 +18,7 @@ import com.mykaimeal.planner.model.DataModel
 
 class OrderHistoryFragment : Fragment(), OnItemClickedListener {
 
-    private var binding: FragmentOrderHistoryBinding? = null
+    private lateinit var binding: FragmentOrderHistoryBinding 
     private var dataList3: MutableList<DataModel> = mutableListOf()
     private var adapterOrderHistoryItem: AdapterOrderHistoryItem? = null
     private var id:String=""
@@ -26,32 +26,36 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentOrderHistoryBinding.inflate(inflater, container, false)
 
-        (activity as MainActivity?)!!.binding.llIndicator.visibility = View.VISIBLE
-        (activity as MainActivity?)!!.binding.llBottomNavigation.visibility = View.VISIBLE
 
-        id=arguments?.getString("id","").toString()
-
+        val mainActivity = activity as? MainActivity
+        mainActivity?.binding?.apply {
+            llIndicator.visibility = View.VISIBLE
+            llBottomNavigation.visibility = View.VISIBLE
+        }
+        
+        id=arguments?.getString("id","")?:""
+        
         setupBackNavigation()
 
         initialize()
 
         orderHistoryModel()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun setupBackNavigation() {
 
         if (id=="yes"){
-            binding!!.relNoOrders.visibility = View.GONE
-            binding!!.rcyOrderHistory.visibility = View.VISIBLE
+            binding.relNoOrders.visibility = View.GONE
+            binding.rcyOrderHistory.visibility = View.VISIBLE
         }else{
-            binding!!.relNoOrders.visibility = View.VISIBLE
-            binding!!.rcyOrderHistory.visibility = View.GONE
+            binding.relNoOrders.visibility = View.VISIBLE
+            binding.rcyOrderHistory.visibility = View.GONE
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -65,14 +69,21 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
 
     private fun initialize() {
 
-        binding!!.imgBackOrderHistory.setOnClickListener {
-            findNavController().navigate(R.id.settingProfileFragment)
+
+        binding.imgBackOrderHistory.setOnClickListener {
+            findNavController().navigateUp()
+
+            binding.imgBackOrderHistory.setOnClickListener {
+                findNavController().navigate(R.id.settingProfileFragment)
+            }
+
+            binding.rlStartOrder.setOnClickListener {
+                binding.relNoOrders.visibility = View.GONE
+                binding.rcyOrderHistory.visibility = View.VISIBLE
+            }
         }
 
-        binding!!.rlStartOrder.setOnClickListener {
-            binding!!.relNoOrders.visibility = View.GONE
-            binding!!.rcyOrderHistory.visibility = View.VISIBLE
-        }
+
     }
 
 
@@ -126,7 +137,7 @@ class OrderHistoryFragment : Fragment(), OnItemClickedListener {
         dataList3.add(data5)
 
         adapterOrderHistoryItem = AdapterOrderHistoryItem(dataList3, requireActivity(), this)
-        binding!!.rcyOrderHistory.adapter = adapterOrderHistoryItem
+        binding.rcyOrderHistory.adapter = adapterOrderHistoryItem
     }
 
     override fun itemClicked(

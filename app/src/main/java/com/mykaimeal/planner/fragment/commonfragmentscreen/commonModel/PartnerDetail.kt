@@ -1,12 +1,12 @@
 package com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel
 
 data class PartnerDetail(
-    var age: String,
+    var age: String?,
     val created_at: String,
     val deleted_at: Any?,
-    var gender: String,
+    var gender: String?,
     val id: Int,
-    var name: String,
+    var name: String?,
     val updated_at: String,
     val user_id: Int
 )

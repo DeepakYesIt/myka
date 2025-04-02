@@ -28,7 +28,6 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.AdapterFoodListItem
 import com.mykaimeal.planner.adapter.CalendarDayDateAdapter
-import com.mykaimeal.planner.adapter.CalendarDayIndicatorAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentCookedBinding
@@ -39,7 +38,6 @@ import com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.view
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
-import com.mykaimeal.planner.model.CalendarDataModel
 import com.mykaimeal.planner.model.DateModel
 import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,17 +49,15 @@ import java.util.Locale
 
 @AndroidEntryPoint
 class CookedFragment : Fragment(), OnItemClickListener {
-    private var binding: FragmentCookedBinding? = null
-    private var cookedTabViewModel: CookedTabViewModel? = null
 
+    private lateinit var binding: FragmentCookedBinding
+    private var cookedTabViewModel: CookedTabViewModel? = null
     private var foodListBreakFastAdapter: AdapterFoodListItem? = null
     private var foodListLunchAdapter: AdapterFoodListItem? = null
     private var foodListDinnerAdapter: AdapterFoodListItem? = null
     private var foodListSnacksAdapter: AdapterFoodListItem? = null
     private var foodListTeaTimeAdapter: AdapterFoodListItem? = null
-    private var calendarDayAdapter: CalendarDayIndicatorAdapter? = null
     private var planType: String = "1"
-    private val calendar = Calendar.getInstance()
     private var currentDate = Date() // Current date
     private var currentDateLocal = Date() // Current date
 
@@ -75,16 +71,16 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+
         // Inflate the layout for this fragment
         binding = FragmentCookedBinding.inflate(inflater, container, false)
         (activity as MainActivity?)?.changeBottom("cooked")
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.VISIBLE
+        (activity as? MainActivity)?.binding?.let {
+            it.llIndicator.visibility = View.VISIBLE
+            it.llBottomNavigation.visibility = View.VISIBLE
+        }
 
         currentDateSelected = BaseApplication.currentDateFormat().toString()
         cookedTabViewModel = ViewModelProvider(this)[CookedTabViewModel::class.java]
@@ -92,49 +88,55 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
         val data= com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favorites",0,"",0)
         cookbookList.add(0,data)
+         
+        backButton()
+
+        initialize()
+
+        return binding.root
+    }
+    
+    private fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
                 }
             })
-
-        initialize()
-
-        return binding!!.root
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initialize() {
 
-        toggleFridgeToFreezer()
+        binding.textFridge.setOnClickListener { updateUI(true) }
+
+        binding.textFreezer.setOnClickListener { updateUI(false) }
 
         // Display current week dates
         showWeekDates()
 
-        binding!!.imageBreakFastCreate.setOnClickListener {
+        binding.imageBreakFastCreate.setOnClickListener {
             findNavController().navigate(R.id.addMealCookedFragment)
         }
 
-        binding!!.imageLunchCreate.setOnClickListener {
+        binding.imageLunchCreate.setOnClickListener {
             findNavController().navigate(R.id.addMealCookedFragment)
         }
 
-
-        binding!!.imageDinnerCreate.setOnClickListener {
+        binding.imageDinnerCreate.setOnClickListener {
             findNavController().navigate(R.id.addMealCookedFragment)
         }
 
-        binding!!.imageSnacksCreate.setOnClickListener {
+        binding.imageSnacksCreate.setOnClickListener {
             findNavController().navigate(R.id.addMealCookedFragment)
         }
 
-        binding!!.imageTeaTimeCreate.setOnClickListener {
+        binding.imageTeaTimeCreate.setOnClickListener {
             findNavController().navigate(R.id.addMealCookedFragment)
         }
 
-        binding!!.imagePrevious.setOnClickListener {
+        binding.imagePrevious.setOnClickListener {
             val calendar = Calendar.getInstance()
             calendar.time = currentDate
             calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
@@ -145,7 +147,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
             showWeekDates()
         }
 
-        binding!!.imageNext.setOnClickListener {
+        binding.imageNext.setOnClickListener {
             // Simulate clicking the "Next" button to move to the next week
             val calendar = Calendar.getInstance()
             calendar.time = currentDate
@@ -157,21 +159,21 @@ class CookedFragment : Fragment(), OnItemClickListener {
             showWeekDates()
         }
 
-        binding!!.imageBackIcon.setOnClickListener {
+        binding.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.relCalendarYear.setOnClickListener {
-            if (binding!!.llCalendarViewEvents.visibility == View.VISIBLE) {
-                binding!!.llCalendarViewEvents.visibility = View.GONE
-                binding!!.dropdown.setBackgroundResource(R.drawable.drop_down_small_icon)
+        binding.relCalendarYear.setOnClickListener {
+            if (binding.llCalendarViewEvents.visibility == View.VISIBLE) {
+                binding.llCalendarViewEvents.visibility = View.GONE
+                binding.dropdown.setBackgroundResource(R.drawable.drop_down_small_icon)
             } else {
-                binding!!.llCalendarViewEvents.visibility = View.VISIBLE
-                binding!!.dropdown.setBackgroundResource(R.drawable.drop_up_small_icon)
+                binding.llCalendarViewEvents.visibility = View.VISIBLE
+                binding.dropdown.setBackgroundResource(R.drawable.drop_up_small_icon)
             }
         }
 
-        binding!!.textAddMeals.setOnClickListener {
+        binding.textAddMeals.setOnClickListener {
             findNavController().navigate(R.id.addMealCookedFragment)
         }
 
@@ -189,18 +191,13 @@ class CookedFragment : Fragment(), OnItemClickListener {
         val (startDate, endDate) = getWeekDates(currentDate)
         this.startDate = startDate
         this.endDate = endDate
-
         // Get all dates between startDate and endDate
         val daysBetween = getDaysBetween(startDate, endDate)
-
         daysBetween.forEach { println(it) }
-        binding!!.textMonthAndYear.text = BaseApplication.formatonlyMonthYear(startDate)
-        binding!!.textWeekRange.text = "" + formatDate(startDate) + "-" + formatDate(endDate)
-
-
+        binding.textMonthAndYear.text = BaseApplication.formatonlyMonthYear(startDate)
+        binding.textWeekRange.text = "" + formatDate(startDate) + "-" + formatDate(endDate)
         // Update the RecyclerView
         val dateListLocal = getDaysBetween(startDate, endDate)
-
         dateListLocal.forEach { dateModel ->
             val date=BaseApplication.formatDate(currentDateLocal.toString())
             if (date == dateModel.date){
@@ -228,7 +225,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
             }
         }
         // Update the RecyclerView
-        binding!!.recyclerViewWeekDays.adapter = calendarAdapter
+        binding.recyclerViewWeekDays.adapter = calendarAdapter
 
     }
 
@@ -268,12 +265,10 @@ class CookedFragment : Fragment(), OnItemClickListener {
             localDate.day = dayName
             localDate.date = date
             // Combine both the day name and the date
-//            dateList.add("$dayName, $date")
             dateList.add(localDate)
             // Move to the next day
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
-
         return dateList
     }
 
@@ -323,11 +318,11 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
                     fun updateFridgeVisibility(condition: Boolean) {
                         if (condition) {
-                            binding!!.llEmptyFridge.visibility = View.VISIBLE
-                            binding!!.llFilledFridge.visibility = View.GONE
+                            binding.llEmptyFridge.visibility = View.VISIBLE
+                            binding.llFilledFridge.visibility = View.GONE
                         } else {
-                            binding!!.llEmptyFridge.visibility = View.GONE
-                            binding!!.llFilledFridge.visibility = View.VISIBLE
+                            binding.llEmptyFridge.visibility = View.GONE
+                            binding.llFilledFridge.visibility = View.VISIBLE
                         }
                     }
 
@@ -337,15 +332,13 @@ class CookedFragment : Fragment(), OnItemClickListener {
                         updateFridgeVisibility(cookedTabModelData.freezer == 0)
                     }
 
-                    binding!!.textFreezer.text = "Freezer (" + cookedTabModelData.freezer.toString() + ")"
-                    binding!!.textFridge.text = "Fridge (" + cookedTabModelData.fridge.toString() + ")"
+                    binding.textFreezer.text = "Freezer (" + cookedTabModelData.freezer.toString() + ")"
+                    binding.textFridge.text = "Fridge (" + cookedTabModelData.fridge.toString() + ")"
 
                 }else{
-                    binding!!.llEmptyFridge.visibility = View.VISIBLE
-                    binding!!.llFilledFridge.visibility = View.GONE
+                    binding.llEmptyFridge.visibility = View.VISIBLE
+                    binding.llFilledFridge.visibility = View.GONE
                 }
-
-
 
                 fun setupMealAdapter(mealRecipes: MutableList<Breakfast>?, recyclerView: RecyclerView, type: String): AdapterFoodListItem? {
                     return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
@@ -359,42 +352,42 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
                 // Breakfast
                 if (cookedTabModelData.Breakfast != null && cookedTabModelData.Breakfast.size >0) {
-                    foodListBreakFastAdapter = setupMealAdapter(cookedTabModelData.Breakfast, binding!!.rcvBreakfast, "BreakFast")
-                    binding!!.rlBreakfast.visibility = View.VISIBLE
+                    foodListBreakFastAdapter = setupMealAdapter(cookedTabModelData.Breakfast, binding.rcvBreakfast, "BreakFast")
+                    binding.rlBreakfast.visibility = View.VISIBLE
                 } else {
-                    binding!!.rlBreakfast.visibility = View.GONE
+                    binding.rlBreakfast.visibility = View.GONE
                 }
 
                 // Lunch
                 if (cookedTabModelData.Lunch != null && cookedTabModelData.Lunch.size >0) {
-                    foodListLunchAdapter = setupMealAdapter(cookedTabModelData.Lunch, binding!!.rcvLunch, "Lunch")
-                    binding!!.rlLunch.visibility = View.VISIBLE
+                    foodListLunchAdapter = setupMealAdapter(cookedTabModelData.Lunch, binding.rcvLunch, "Lunch")
+                    binding.rlLunch.visibility = View.VISIBLE
                 } else {
-                    binding!!.rlLunch.visibility = View.GONE
+                    binding.rlLunch.visibility = View.GONE
                 }
 
                 // Dinner
                 if (cookedTabModelData.Dinner != null && cookedTabModelData.Dinner.size >0) {
-                    foodListDinnerAdapter = setupMealAdapter(cookedTabModelData.Dinner, binding!!.rcvDinner, "Dinner")
-                    binding!!.relDinner.visibility = View.VISIBLE
+                    foodListDinnerAdapter = setupMealAdapter(cookedTabModelData.Dinner, binding.rcvDinner, "Dinner")
+                    binding.relDinner.visibility = View.VISIBLE
                 } else {
-                    binding!!.relDinner.visibility = View.GONE
+                    binding.relDinner.visibility = View.GONE
                 }
 
                 // Snacks
                 if (cookedTabModelData.Snacks != null && cookedTabModelData.Snacks.size >0) {
-                    foodListSnacksAdapter = setupMealAdapter(cookedTabModelData.Snacks, binding!!.rcvSnacks, "Snacks")
-                    binding!!.relSnacks.visibility = View.VISIBLE
+                    foodListSnacksAdapter = setupMealAdapter(cookedTabModelData.Snacks, binding.rcvSnacks, "Snacks")
+                    binding.relSnacks.visibility = View.VISIBLE
                 } else {
-                    binding!!.relSnacks.visibility = View.GONE
+                    binding.relSnacks.visibility = View.GONE
                 }
 
                 // Teatime
                 if (cookedTabModelData.Teatime != null && cookedTabModelData.Teatime.size >0) {
-                    foodListTeaTimeAdapter = setupMealAdapter(cookedTabModelData.Teatime, binding!!.rcvTeaTime, "Brunch")
-                    binding!!.relTeaTime.visibility = View.VISIBLE
+                    foodListTeaTimeAdapter = setupMealAdapter(cookedTabModelData.Teatime, binding.rcvTeaTime, "Brunch")
+                    binding.relTeaTime.visibility = View.VISIBLE
                 } else {
-                    binding!!.relTeaTime.visibility = View.GONE
+                    binding.relTeaTime.visibility = View.GONE
                 }
 
             }
@@ -407,61 +400,19 @@ class CookedFragment : Fragment(), OnItemClickListener {
         BaseApplication.alertError(requireContext(), message, status)
     }
 
-    private fun getDaysOfWeek(): List<CalendarDataModel.Day> {
-
-        val days = mutableListOf<CalendarDataModel.Day>()
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-
-        for (i in 0..6) {
-            days.add(
-                CalendarDataModel.Day(
-                    dayName = SimpleDateFormat("E", Locale.getDefault()).format(calendar.time),
-                    date = calendar.get(Calendar.DAY_OF_MONTH)
-                )
-            )
-            calendar.add(Calendar.DAY_OF_WEEK, 1)
+    private fun updateUI(isFridgeSelected: Boolean) {
+        binding.textFridge.setBackgroundResource(if (isFridgeSelected) R.drawable.selected_button_bg else R.drawable.unselected_button_bg)
+        binding.textFreezer.setBackgroundResource(if (isFridgeSelected) R.drawable.unselected_button_bg else R.drawable.selected_button_bg)
+        binding.textFridge.setTextColor(if (isFridgeSelected) Color.WHITE else Color.BLACK)
+        binding.textFreezer.setTextColor(if (isFridgeSelected) Color.BLACK else Color.WHITE)
+        binding.llFilledFridge.visibility = if (isFridgeSelected) View.VISIBLE else View.GONE
+        binding.llEmptyFridge.visibility = View.GONE
+        planType = if (isFridgeSelected) "1" else "2"
+        if (BaseApplication.isOnline(requireActivity())) {
+            cookedTabApi(currentDateSelected)
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
-
-        calendar.add(Calendar.DAY_OF_WEEK, -7) // Reset to start of week
-        return days
-
-    }
-
-    private fun toggleFridgeToFreezer() {
-
-        binding!!.textFridge.setOnClickListener {
-            binding!!.textFridge.setBackgroundResource(R.drawable.selected_button_bg)
-            binding!!.textFreezer.setBackgroundResource(R.drawable.unselected_button_bg)
-            binding!!.textFridge.setTextColor(Color.WHITE)
-            binding!!.textFreezer.setTextColor(Color.BLACK)
-            binding!!.llFilledFridge.visibility = View.VISIBLE
-            binding!!.llEmptyFridge.visibility = View.GONE
-            planType = "1"
-
-            if (BaseApplication.isOnline(requireActivity())) {
-                cookedTabApi(currentDateSelected)
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
-
-        binding!!.textFreezer.setOnClickListener {
-            binding!!.textFridge.setBackgroundResource(R.drawable.unselected_button_bg)
-            binding!!.textFreezer.setBackgroundResource(R.drawable.selected_button_bg)
-            binding!!.textFridge.setTextColor(Color.BLACK)
-            binding!!.textFreezer.setTextColor(Color.WHITE)
-            binding!!.llFilledFridge.visibility = View.GONE
-            binding!!.llEmptyFridge.visibility = View.GONE
-            planType = "2"
-
-
-            if (BaseApplication.isOnline(requireActivity())) {
-                cookedTabApi(currentDateSelected)
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
-
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
@@ -789,8 +740,6 @@ class CookedFragment : Fragment(), OnItemClickListener {
         }
     }
 
-
-
     private fun removeMealDialog(
         item: Breakfast,
         adapter: AdapterFoodListItem?,
@@ -857,11 +806,11 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
                                 // Define meal types and corresponding UI elements
                                 val mealVisibilityMap = mapOf(
-                                    "BreakFast" to binding!!.rlBreakfast,
-                                    "Lunch" to binding!!.rlLunch,
-                                    "Dinner" to binding!!.relDinner,
-                                    "Snacks" to binding!!.relSnacks,
-                                    "Teatime" to binding!!.relTeaTime
+                                    "BreakFast" to binding.rlBreakfast,
+                                    "Lunch" to binding.rlLunch,
+                                    "Dinner" to binding.relDinner,
+                                    "Snacks" to binding.relSnacks,
+                                    "Teatime" to binding.relTeaTime
                                 )
 
                                 // Update adapter and visibility
@@ -878,9 +827,9 @@ class CookedFragment : Fragment(), OnItemClickListener {
                                 dialogRemoveDay.dismiss()
 
                                 if (planType.equals("1",true)){
-                                    binding!!.textFridge.text = "Freezer ($count)"
+                                    binding.textFridge.text = "Freezer ($count)"
                                 }else{
-                                    binding!!.textFreezer.text = "Freezer ($count)"
+                                    binding.textFreezer.text = "Freezer ($count)"
                                 }
 
                             }catch (e:Exception){

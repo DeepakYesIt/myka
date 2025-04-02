@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen.trackorderwebviewscreen
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -16,7 +17,10 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.databinding.FragmentPaymentCreditDebitBinding
 import com.mykaimeal.planner.databinding.FragmentTrackOrderScreenBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class TrackOrderScreenFragment : Fragment() {
     private lateinit var binding: FragmentTrackOrderScreenBinding
     private var trackStatus:String=""
@@ -24,16 +28,17 @@ class TrackOrderScreenFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentTrackOrderScreenBinding.inflate(layoutInflater, container, false)
 
-        (activity as MainActivity?)!!.binding.llIndicator.visibility = View.GONE
-        (activity as MainActivity?)!!.binding.llBottomNavigation.visibility = View.GONE
 
-        if (arguments!=null){
-            trackStatus = arguments?.getString("tracking", "").toString()
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.GONE
+            llBottomNavigation.visibility = View.GONE
         }
+
+        trackStatus = arguments?.getString("tracking", "")?:""
 
         setupBackNavigation()
         initialize()
@@ -52,6 +57,7 @@ class TrackOrderScreenFragment : Fragment() {
         })
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private fun initialize() {
 
         binding.imgTrackOrder.setOnClickListener{
@@ -82,7 +88,7 @@ class TrackOrderScreenFragment : Fragment() {
             }
         }
         Log.d("url", "****$trackStatus")
-        binding!!.webView.loadUrl(trackStatus)
+        binding.webView.loadUrl(trackStatus)
     }
 
 }

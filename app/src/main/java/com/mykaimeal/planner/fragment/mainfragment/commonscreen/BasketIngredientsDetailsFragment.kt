@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -22,32 +22,34 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentBaseketIngredientsDetailsBinding
-import com.mykaimeal.planner.databinding.FragmentOrderDetailsScreenBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.model.BasketDetailsModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.model.BasketDetailsModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.viewmodel.BasketProductsDetailsViewModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class BasketIngredientsDetailsFragment : Fragment() {
     private lateinit var binding: FragmentBaseketIngredientsDetailsBinding
     private lateinit var basketProductsDetailsViewModel: BasketProductsDetailsViewModel
     private var proId: String = ""
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentBaseketIngredientsDetailsBinding.inflate(inflater, container, false)
 
-        proId = arguments?.getString("SwapProId", "").toString()
+        return binding.root
+
+        proId = arguments?.getString("SwapProId", "")?:""
 
         basketProductsDetailsViewModel = ViewModelProvider(requireActivity())[BasketProductsDetailsViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
@@ -166,5 +168,4 @@ class BasketIngredientsDetailsFragment : Fragment() {
             }
         }
     }
-
 }

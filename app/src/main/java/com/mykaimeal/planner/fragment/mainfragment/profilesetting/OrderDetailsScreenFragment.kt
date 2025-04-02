@@ -18,19 +18,22 @@ import com.mykaimeal.planner.model.DataModel
 
 class OrderDetailsScreenFragment : Fragment() {
 
-    private var binding: FragmentOrderDetailsScreenBinding? = null
+    private lateinit var binding: FragmentOrderDetailsScreenBinding
     private var dataList3: MutableList<DataModel> = mutableListOf()
     private var adapterOrderHistoryDetailsItem: AdapterOrderHistoryDetailsItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentOrderDetailsScreenBinding.inflate(inflater, container, false)
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.VISIBLE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.VISIBLE
+        val mainActivity = activity as? MainActivity
+        mainActivity?.binding?.apply {
+            llIndicator.visibility = View.VISIBLE
+            llBottomNavigation.visibility = View.VISIBLE
+        }
 
         setupBackNavigation()
 
@@ -38,18 +41,18 @@ class OrderDetailsScreenFragment : Fragment() {
 
         orderHistoryModel()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun initialize() {
 
-        binding!!.imgBackOrderDetails.setOnClickListener{
+        binding.imgBackOrderDetails.setOnClickListener{
             findNavController().navigateUp()
         }
     }
 
     private fun setupBackNavigation() {
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
@@ -106,7 +109,7 @@ class OrderDetailsScreenFragment : Fragment() {
         dataList3.add(data5)
 
         adapterOrderHistoryDetailsItem = AdapterOrderHistoryDetailsItem(dataList3, requireActivity())
-        binding!!.rcyOrderHistoryDetails.adapter = adapterOrderHistoryDetailsItem
+        binding.rcyOrderHistoryDetails.adapter = adapterOrderHistoryDetailsItem
     }
 
 

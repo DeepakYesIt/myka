@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.fragment.commonfragmentscreen.partnerinfoscreen
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -35,7 +36,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class PartnerInfoDetailsFragment : Fragment() {
 
-    private var binding: FragmentPartnerInfoDetailsBinding? = null
+    private lateinit var binding: FragmentPartnerInfoDetailsBinding
     private var statusCheck: Boolean = true
     private var status: String = ""
     private lateinit var sessionManagement: SessionManagement
@@ -52,42 +53,44 @@ class PartnerInfoDetailsFragment : Fragment() {
 
         partnerInfoViewModel = ViewModelProvider(this)[PartnerInfoViewModel::class.java]
 
-        if (sessionManagement.getCookingScreen().equals("Profile")){
-            binding!!.llBottomBtn.visibility=View.GONE
-            binding!!.rlUpdatePartInfo.visibility=View.VISIBLE
-            ///checking the device of mobile data in online and offline(show network error message)
+        val isProfileScreen = sessionManagement.getCookingScreen() == "Profile"
+
+        binding.apply {
+            llBottomBtn.visibility = if (isProfileScreen) View.GONE else View.VISIBLE
+            rlUpdatePartInfo.visibility = if (isProfileScreen) View.VISIBLE else View.GONE
+        }
+
+        if (isProfileScreen) {
             if (BaseApplication.isOnline(requireContext())) {
                 partnerInfoApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        }else{
-            binding!!.llBottomBtn.visibility=View.VISIBLE
-            binding!!.rlUpdatePartInfo.visibility=View.GONE
-
-            if (partnerInfoViewModel.getPartnerData()!=null){
-                showDataInUi(partnerInfoViewModel.getPartnerData()!!)
-            }
+        } else {
+            partnerInfoViewModel.getPartnerData()?.let { showDataInUi(it) }
         }
 
+        backButton()
 
+        initialize()
+
+        return binding.root
+    }
+
+    private fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (sessionManagement.getCookingScreen()=="Profile"){
+                    if (sessionManagement.getCookingScreen().equals("Profile",true)){
                         findNavController().navigateUp()
                     }else{
-                        /*val intent = Intent(requireActivity(), CookingForScreenActivity::class.java)
-                        startActivity(intent)*/
                         requireActivity().finish()
                     }
                 }
             })
-
-        initialize()
-        return binding!!.root
     }
+
 
     private fun partnerInfoApi() {
         BaseApplication.showMe(requireContext())
@@ -100,7 +103,9 @@ class PartnerInfoDetailsFragment : Fragment() {
                             val gson = Gson()
                             val bodyModel = gson.fromJson(it.data, GetUserPreference::class.java)
                             if (bodyModel.code == 200 && bodyModel.success) {
-                                showDataInUi(bodyModel.data.partnerDetail)
+                                bodyModel.data.partnerDetail.let {
+                                    showDataInUi(it)
+                                }
                             } else {
                                 if (bodyModel.code == ErrorMessage.code) {
                                     showAlertFunction(bodyModel.message, true)
@@ -123,68 +128,56 @@ class PartnerInfoDetailsFragment : Fragment() {
         }
     }
 
-    private fun showDataInUi(partnerModelData: PartnerDetail) {
+    private fun showDataInUi(partnerModelData: PartnerDetail?) {
         try {
             if (partnerModelData!=null){
-
                 if (partnerModelData.name!=null){
-                    binding!!.etPartnerName.setText(partnerModelData.name.toString())
+                    binding.etPartnerName.setText(partnerModelData.name.toString())
                 }
-
                 if (partnerModelData.age!=null){
-                    binding!!.etPartnerAge.setText(partnerModelData.age.toString())
+                    binding.etPartnerAge.setText(partnerModelData.age.toString())
                 }
 
                 if (partnerModelData.gender!=null){
-                    binding!!.tvChooseGender.text=partnerModelData.gender.toString()
+                    binding.tvChooseGender.text=partnerModelData.gender.toString()
                 }
-
             }
         }catch (e:Exception){
             Log.d("PartnerDetail","message:--"+e.message)
         }
-
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initialize() {
 
-        binding!!.etPartnerName.addTextChangedListener(object :
-            TextWatcher {
+        val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(editable: Editable) {
                 searchable()
             }
-        })
+        }
 
-        binding!!.etPartnerAge.addTextChangedListener(object :
-            TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(editable: Editable) {
-                searchable()
-            }
-        })
+        binding.etPartnerName.addTextChangedListener(textWatcher)
+        binding.etPartnerAge.addTextChangedListener(textWatcher)
 
-        binding!!.imgBackPartnerInfo.setOnClickListener {
-            if (sessionManagement.getCookingScreen()=="Profile"){
+        binding.imgBackPartnerInfo.setOnClickListener {
+            if (sessionManagement.getCookingScreen().equals("Profile",true)){
                 findNavController().navigateUp()
             }else{
-                /*val intent = Intent(requireActivity(), CookingForScreenActivity::class.java)
-                startActivity(intent)*/
                 requireActivity().finish()
             }
         }
 
-        binding!!.tvSkipBtn.setOnClickListener {
+        binding.tvSkipBtn.setOnClickListener {
             stillSkipDialog()
         }
 
-        binding!!.tvNextBtn.setOnClickListener {
+        binding.tvNextBtn.setOnClickListener {
             if (status=="2"){
                 val partnerLocalData = PartnerDetail(
                     age = "",
@@ -196,19 +189,19 @@ class PartnerInfoDetailsFragment : Fragment() {
                     updated_at = "",
                     user_id = 0  // Default value or appropriate user ID
                 )
-                partnerLocalData.name=binding!!.etPartnerName.text.toString().trim()
-                partnerLocalData.age=binding!!.etPartnerAge.text.toString().trim()
-                partnerLocalData.gender=binding!!.tvChooseGender.text.toString().trim()
+                partnerLocalData.name=binding.etPartnerName.text.toString().trim()
+                partnerLocalData.age=binding.etPartnerAge.text.toString().trim()
+                partnerLocalData.gender=binding.tvChooseGender.text.toString().trim()
                 partnerInfoViewModel.setPartnerData(partnerLocalData)
 
-                sessionManagement.setPartnerName(binding!!.etPartnerName.text.toString().trim())
-                sessionManagement.setPartnerAge(binding!!.etPartnerAge.text.toString().trim())
-                sessionManagement.setPartnerGender(binding!!.tvChooseGender.text.toString().trim())
+                sessionManagement.setPartnerName(binding.etPartnerName.text.toString().trim())
+                sessionManagement.setPartnerAge(binding.etPartnerAge.text.toString().trim())
+                sessionManagement.setPartnerGender(binding.tvChooseGender.text.toString().trim())
                 findNavController().navigate(R.id.bodyGoalsFragment)
             }
         }
 
-        binding!!.rlSelectGender.setOnClickListener {
+        binding.rlSelectGender.setOnClickListener {
             if (statusCheck) {
                 statusCheck = false
                 val drawableEnd =
@@ -219,8 +212,8 @@ class PartnerInfoDetailsFragment : Fragment() {
                     drawableEnd.intrinsicWidth,
                     drawableEnd.intrinsicHeight
                 )
-                binding!!.tvChooseGender.setCompoundDrawables(null, null, drawableEnd, null)
-                binding!!.relSelectedGender.visibility = View.VISIBLE
+                binding.tvChooseGender.setCompoundDrawables(null, null, drawableEnd, null)
+                binding.relSelectedGender.visibility = View.VISIBLE
             } else {
                 statusCheck = true
                 val drawableEnd =
@@ -231,38 +224,40 @@ class PartnerInfoDetailsFragment : Fragment() {
                     drawableEnd.intrinsicWidth,
                     drawableEnd.intrinsicHeight
                 )
-                binding!!.tvChooseGender.setCompoundDrawables(null, null, drawableEnd, null)
-                binding!!.relSelectedGender.visibility = View.GONE
+                binding.tvChooseGender.setCompoundDrawables(null, null, drawableEnd, null)
+                binding.relSelectedGender.visibility = View.GONE
             }
         }
 
-        binding!!.rlSelectMale.setOnClickListener {
-            binding!!.tvChooseGender.text = "Male"
-            binding!!.relSelectedGender.visibility = View.GONE
+        binding.rlSelectMale.setOnClickListener {
+            binding.tvChooseGender.text = "Male"
+            binding.relSelectedGender.visibility = View.GONE
             val drawableEnd = ContextCompat.getDrawable(requireContext(), R.drawable.drop_down_icon)
             drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
-            binding!!.tvChooseGender.setCompoundDrawables(null, null, drawableEnd, null)
+            binding.tvChooseGender.setCompoundDrawables(null, null, drawableEnd, null)
             statusCheck = true
             searchable()
         }
 
-        binding!!.rlSelectFemale.setOnClickListener {
-            binding!!.tvChooseGender.text = "Female"
-            binding!!.relSelectedGender.visibility = View.GONE
+        binding.rlSelectFemale.setOnClickListener {
+            binding.tvChooseGender.text = "Female"
+            binding.relSelectedGender.visibility = View.GONE
             val drawableEnd = ContextCompat.getDrawable(requireContext(), R.drawable.drop_down_icon)
             drawableEnd!!.setBounds(0, 0, drawableEnd.intrinsicWidth, drawableEnd.intrinsicHeight)
-            binding!!.tvChooseGender.setCompoundDrawables(null, null, drawableEnd, null)
+            binding.tvChooseGender.setCompoundDrawables(null, null, drawableEnd, null)
             statusCheck = true
             searchable()
         }
 
-        binding!!.rlUpdatePartInfo.setOnClickListener{
+        binding.rlUpdatePartInfo.setOnClickListener{
             if (BaseApplication.isOnline(requireContext())) {
                 updatePartnerInfoApi()
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
+
+
     }
 
     private fun updatePartnerInfoApi() {
@@ -295,27 +290,27 @@ class PartnerInfoDetailsFragment : Fragment() {
                         showAlertFunction(it.message, false)
                     }
                 }
-            }, binding!!.etPartnerName.text.toString().trim(),binding!!.etPartnerAge.text.toString().trim(),binding!!.tvChooseGender.text.toString().trim())
+            }, binding.etPartnerName.text.toString().trim(),binding.etPartnerAge.text.toString().trim(),binding.tvChooseGender.text.toString().trim())
         }
     }
 
     private fun searchable() {
-        if (binding!!.etPartnerName.text.isNotEmpty()) {
-            if (binding!!.etPartnerAge.text.isNotEmpty()) {
-                if (binding!!.tvChooseGender.text.toString().isNotEmpty()) {
+        if (binding.etPartnerName.text.isNotEmpty()) {
+            if (binding.etPartnerAge.text.isNotEmpty()) {
+                if (binding.tvChooseGender.text.toString().isNotEmpty()) {
                     status = "2"
-                    binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                    binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 } else {
                     status = "1"
-                    binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                    binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
                 }
             } else {
                 status = "1"
-                binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             }
         } else {
             status = "1"
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
 
     }

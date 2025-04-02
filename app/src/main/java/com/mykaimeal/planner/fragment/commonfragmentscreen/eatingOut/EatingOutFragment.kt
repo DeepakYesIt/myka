@@ -1,27 +1,30 @@
 package com.mykaimeal.planner.fragment.commonfragmentscreen.eatingOut
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
-import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.BodyGoalAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
+import com.mykaimeal.planner.basedata.BaseApplication.alertError
+import com.mykaimeal.planner.basedata.BaseApplication.isOnline
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentEatingOutBinding
 import com.mykaimeal.planner.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModel
 import com.mykaimeal.planner.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModelData
@@ -32,10 +35,11 @@ import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+
 @AndroidEntryPoint
 class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
 
-    private var binding: FragmentEatingOutBinding? = null
+    private lateinit var binding: FragmentEatingOutBinding
     private var status:String=""
     private var eatingOutSelect: String? = ""
     private var bodyGoalAdapter: BodyGoalAdapter? = null
@@ -44,59 +48,51 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
     private lateinit var eatingOutViewModel: EatingOutViewModel
     private var eatingOutModelsData: List<BodyGoalModelData>?=null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+
         // Inflate the layout for this fragment
         binding = FragmentEatingOutBinding.inflate(inflater, container, false)
 
         eatingOutViewModel = ViewModelProvider(this)[EatingOutViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
-        if (sessionManagement.getCookingFor().equals("Myself")){
-            binding!!.progressBar10.max=10
-            totalProgressValue=10
-            updateProgress(9)
-        } else {
-            binding!!.progressBar10.max=11
-            totalProgressValue=11
-            updateProgress(10)
-        }
 
-        if (sessionManagement.getCookingScreen().equals("Profile")){
-            binding!!.llBottomBtn.visibility=View.GONE
-            binding!!.rlUpdateEatingOut.visibility=View.VISIBLE
-            if (BaseApplication.isOnline(requireActivity())) {
+        val progressMax = if (sessionManagement.getCookingFor().equals("Myself",true)) 10 else 11
+        binding.progressBar10.max = progressMax
+        totalProgressValue = progressMax
+        updateProgress(progressMax - 1)
+
+
+        val isProfileScreen = sessionManagement.getCookingScreen().equals("Profile",true)
+        val isOnline = isOnline(requireContext())
+        binding.llBottomBtn.visibility = if (isProfileScreen) View.GONE else View.VISIBLE
+        binding.rlUpdateEatingOut.visibility = if (isProfileScreen) View.VISIBLE else View.GONE
+
+        if (isOnline) {
+            if (isProfileScreen) {
                 eatingOutSelectApi()
             } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                eatingOutViewModel.getEatingOutData()?.let {
+                    showDataInUi(it)
+                }?:eatingOutApi()
             }
-        }else{
-            binding!!.llBottomBtn.visibility=View.VISIBLE
-            binding!!.rlUpdateEatingOut.visibility=View.GONE
-
-            if (eatingOutViewModel.getEatingOutData()!=null){
-                showDataInUi(eatingOutViewModel.getEatingOutData()!!)
-            }else{
-                ///checking the device of mobile data in online and offline(show network error message)
-                if (BaseApplication.isOnline(requireContext())) {
-                    eatingOutApi()
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            }
+        } else {
+            alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+        backButton()
+
+        initialize()
+
+        return binding.root
+    }
+
+    private fun backButton(){
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
         })
-
-        initialize()
-
-        return binding!!.root
     }
 
     private fun eatingOutSelectApi() {
@@ -133,17 +129,17 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateProgress(progress: Int) {
-        binding!!.progressBar10.progress = progress
-        binding!!.tvProgressText.text = "$progress/$totalProgressValue"
+        binding.progressBar10.progress = progress
+        binding.tvProgressText.text = "$progress/$totalProgressValue"
     }
 
     private fun initialize() {
-
-        binding!!.imbBackEatingOut.setOnClickListener(this)
-        binding!!.tvSkipBtn.setOnClickListener(this)
-        binding!!.tvNextBtn.setOnClickListener(this)
-        binding!!.rlUpdateEatingOut.setOnClickListener(this)
+        binding.imbBackEatingOut.setOnClickListener(this)
+        binding.tvSkipBtn.setOnClickListener(this)
+        binding.tvNextBtn.setOnClickListener(this)
+        binding.rlUpdateEatingOut.setOnClickListener(this)
     }
 
     private fun stillSkipDialog() {
@@ -206,7 +202,7 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
             if (bodyModelData!=null && bodyModelData.isNotEmpty()){
                 eatingOutModelsData=bodyModelData
                 bodyGoalAdapter = BodyGoalAdapter(bodyModelData, requireActivity(), this)
-                binding!!.rcyEatingOut.adapter = bodyGoalAdapter
+                binding.rcyEatingOut.adapter = bodyGoalAdapter
             }
         }catch (e:Exception){
             Log.d("EatingOut","message"+e.message)
@@ -282,9 +278,9 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
 
     private fun status(){
         if (status != "2") {
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         } else {
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
 
         }
     }
@@ -293,20 +289,20 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
 
         if (status1.equals("-1")) {
             status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             eatingOutSelect = selectItem.toString()
             return
         }
 
         if (type.equals("true")) {
             status = "2"
-            binding!!.tvNextBtn.isClickable = true
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.tvNextBtn.isClickable = true
+            binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             eatingOutSelect = selectItem.toString()
         } else {
             status = ""
-            binding!!.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
 }

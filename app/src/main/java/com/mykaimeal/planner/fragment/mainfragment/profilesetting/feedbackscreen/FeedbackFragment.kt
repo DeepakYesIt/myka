@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class FeedbackFragment : Fragment() {
 
-    private var binding: FragmentFeedbackBinding?=null
+    private lateinit var binding: FragmentFeedbackBinding
     private lateinit var feedbackViewModel: FeedbackViewModel
     private lateinit var sessionManagement: SessionManagement
     private lateinit var commonWorkUtils: CommonWorkUtils
@@ -41,40 +41,34 @@ class FeedbackFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding=FragmentFeedbackBinding.inflate(layoutInflater, container, false)
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility=View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility=View.GONE
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.GONE
+            llBottomNavigation.visibility = View.GONE
+        }
 
         feedbackViewModel = ViewModelProvider(this)[FeedbackViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
         commonWorkUtils = CommonWorkUtils(requireActivity())
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (binding!!.edtDesc.text.toString().isNotEmpty()){
-                    feedbackDiscardDialog()
-                }else{
-                    findNavController().navigateUp()
-                }
-            }
-        })
+        backButton()
 
-        binding!!.imgBackFeedback.setOnClickListener{
-            if (binding!!.edtDesc.text.toString().isNotEmpty()){
+        binding.imgBackFeedback.setOnClickListener{
+            if (binding.edtDesc.text.toString().isNotEmpty()){
                 feedbackDiscardDialog()
             }else{
                 findNavController().navigateUp()
             }
         }
 
-        binding!!.edtEmail.text=sessionManagement.getEmail().toString()
+        binding.edtEmail.text=sessionManagement.getEmail().toString()
 
-        binding!!.relFeedbackSubmit.setOnClickListener{
-            if (binding!!.edtDesc.text.toString().trim().isEmpty()){
+        binding.relFeedbackSubmit.setOnClickListener{
+            if (binding.edtDesc.text.toString().trim().isEmpty()){
                 commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.feedbackDesc, false)
             }else{
                 if (BaseApplication.isOnline(requireActivity())) {
@@ -85,9 +79,20 @@ class FeedbackFragment : Fragment() {
             }
         }
 
-        return binding!!.root
+        return binding.root
     }
 
+    private fun  backButton(){
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.edtDesc.text.toString().isNotEmpty()){
+                    feedbackDiscardDialog()
+                }else{
+                    findNavController().navigateUp()
+                }
+            }
+        })
+    }
 
     /// Save Feedback api
     private fun saveFeedbackApi() {
@@ -100,7 +105,7 @@ class FeedbackFragment : Fragment() {
                         val gson = Gson()
                         val feedbackModel = gson.fromJson(it.data, FeedbackModel::class.java)
                         if (feedbackModel.code == 200 && feedbackModel.success) {
-                            binding!!.edtDesc.text.clear()
+                            binding.edtDesc.text.clear()
                             feedbackSubmitDialog()
                         } else {
                             if (feedbackModel.code == ErrorMessage.code) {
@@ -114,12 +119,11 @@ class FeedbackFragment : Fragment() {
                     is NetworkResult.Error -> {
                         showAlertFunction(it.message, false)
                     }
-
                     else -> {
                         showAlertFunction(it.message, false)
                     }
                 }
-            },sessionManagement.getEmail().toString(),binding!!.edtDesc.text.toString().trim())
+            },sessionManagement.getEmail().toString(),binding.edtDesc.text.toString().trim())
         }
     }
 
@@ -167,7 +171,7 @@ class FeedbackFragment : Fragment() {
         }
 
         tvDialogRemoveBtn.setOnClickListener {
-            binding!!.edtDesc.text.clear()
+            binding.edtDesc.text.clear()
             dialogFeedbackDiscard.dismiss()
             findNavController().navigateUp()
         }

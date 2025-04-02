@@ -3,21 +3,20 @@ package com.mykaimeal.planner.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.mykaimeal.planner.R
+import com.mykaimeal.planner.adapter.AdapterOnBoardingSubscriptionItem.OnboardingViewHolder
+import com.mykaimeal.planner.databinding.AdapterOnboardingSubscriptionItemBinding
+import com.mykaimeal.planner.model.OnSubscriptionModel
 import com.mykaimeal.planner.model.OnboardingItem
+import com.mykaimeal.planner.model.SubscriptionModel
 
-class AdapterOnBoardingSubscriptionItem(onboardingItems: List<OnboardingItem>) : RecyclerView.Adapter<AdapterOnBoardingSubscriptionItem.OnboardingViewHolder>() {
-    private val onboardingItems: List<OnboardingItem>
-
-    init {
-        this.onboardingItems = onboardingItems
-    }
+class AdapterOnBoardingSubscriptionItem(private val onboardingItems: List<OnSubscriptionModel>) : RecyclerView.Adapter<OnboardingViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OnboardingViewHolder {
-        val view: View = LayoutInflater.from(parent.context).inflate(R.layout.adapter_onboarding_subscription_item, parent, false)
-        return OnboardingViewHolder(view)
+        val binding = AdapterOnboardingSubscriptionItemBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return OnboardingViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: OnboardingViewHolder, position: Int) {
@@ -28,17 +27,15 @@ class AdapterOnBoardingSubscriptionItem(onboardingItems: List<OnboardingItem>) :
         return onboardingItems.size
     }
 
-    class OnboardingViewHolder(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
-        private val imageView: ImageView
-
-        init {
-            imageView = itemView.findViewById<ImageView>(R.id.imageView)
-        }
-
-        fun bind(item: OnboardingItem) {
-            imageView.setImageResource(item.image)
-
+    class OnboardingViewHolder(private val binding: AdapterOnboardingSubscriptionItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: OnSubscriptionModel) {
+            binding.imageView.setBackgroundResource(item.image)
+            if (item.status){
+                binding.layData.visibility=View.VISIBLE
+            }else{
+                binding.layData.visibility=View.GONE
+            }
         }
     }
 }

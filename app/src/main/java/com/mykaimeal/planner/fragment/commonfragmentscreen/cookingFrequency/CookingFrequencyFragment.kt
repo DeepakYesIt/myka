@@ -6,23 +6,23 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
-import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.BodyGoalAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentCookingFrequencyBinding
 import com.mykaimeal.planner.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModel
 import com.mykaimeal.planner.fragment.commonfragmentscreen.bodyGoals.model.BodyGoalModelData
@@ -57,22 +57,39 @@ class CookingFrequencyFragment : Fragment(), OnItemClickListener {
         cookingFrequencyViewModel = ViewModelProvider(this)[CookingFrequencyViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
-        if (sessionManagement.getCookingFor().equals("Myself")) {
-            binding.tvCookFreqDesc.text = "How often do you cook meals at home?"
-            binding.progressBar7.max = 10
-            totalProgressValue = 10
-            updateProgress(7)
-        } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
-            binding.tvCookFreqDesc.text = "How often do you cook meals at home?"
-            binding.progressBar7.max = 11
-            totalProgressValue = 11
-            updateProgress(8)
-        } else {
-            binding.tvCookFreqDesc.text = "How often do you cook meals for your family?"
-            binding.progressBar7.max = 11
-            totalProgressValue = 11
-            updateProgress(8)
+//        if (sessionManagement.getCookingFor().equals("Myself")) {
+//            binding.tvCookFreqDesc.text = "How often do you cook meals at home?"
+//            binding.progressBar7.max = 10
+//            totalProgressValue = 10
+//            updateProgress(7)
+//        } else if (sessionManagement.getCookingFor().equals("MyPartner")) {
+//            binding.tvCookFreqDesc.text = "How often do you cook meals at home?"
+//            binding.progressBar7.max = 11
+//            totalProgressValue = 11
+//            updateProgress(8)
+//        } else {
+//            binding.tvCookFreqDesc.text = "How often do you cook meals for your family?"
+//            binding.progressBar7.max = 11
+//            totalProgressValue = 11
+//            updateProgress(8)
+//        }
+
+        val cookingFor = sessionManagement.getCookingFor()
+        var progressValue = 8
+        var maxProgress = 11
+
+        if (cookingFor == "Myself") {
+            maxProgress = 10
+            progressValue = 7
         }
+
+        binding.tvCookFreqDesc.text =
+            if (cookingFor == "Myself" || cookingFor == "MyPartner") "How often do you cook meals at home?" else "How often do you cook meals for your family?"
+
+        binding.progressBar7.max = maxProgress
+        totalProgressValue = maxProgress
+        updateProgress(progressValue)
+
 
         if (sessionManagement.getCookingScreen().equals("Profile")) {
             binding.llBottomBtn.visibility = View.GONE
@@ -99,17 +116,22 @@ class CookingFrequencyFragment : Fragment(), OnItemClickListener {
             }
         }
 
+
+        backButton()
+
+        initialize()
+
+        return binding.root
+    }
+
+    private fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
                 }
             })
-
-        initialize()
-
-        return binding.root
     }
 
     @SuppressLint("SetTextI18n")

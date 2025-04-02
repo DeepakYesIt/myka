@@ -25,6 +25,8 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.AuthActivity
 import com.mykaimeal.planner.adapter.BodyGoalAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
+import com.mykaimeal.planner.basedata.BaseApplication.alertError
+import com.mykaimeal.planner.basedata.BaseApplication.isOnline
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentReasonsForTakeAwayBinding
@@ -36,6 +38,7 @@ import com.mykaimeal.planner.fragment.commonfragmentscreen.reasonTakeAway.viewmo
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+
 
 @AndroidEntryPoint
 class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
@@ -81,48 +84,46 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         reasonTakeAwayViewModel = ViewModelProvider(this)[ReasonTakeAwayViewModel::class.java]
 
         sessionManagement = SessionManagement(requireContext())
-        if (sessionManagement.getCookingFor().equals("Myself")) {
-            binding.progressBar11.max = 10
-            totalProgressValue = 10
-            updateProgress(10)
-        } else {
-            binding.progressBar11.max = 11
-            totalProgressValue = 11
-            updateProgress(11)
-        }
 
-        if (sessionManagement.getCookingScreen().equals("Profile")){
-            binding.llBottomBtn.visibility=View.GONE
-            binding.rlUpdateReasonTakeAway.visibility=View.VISIBLE
-            if (BaseApplication.isOnline(requireContext())) {
+
+        val progressValue = if (sessionManagement.getCookingFor().equals("Myself")) 10 else 11
+        binding.progressBar11.max = progressValue
+        totalProgressValue = progressValue
+        updateProgress(progressValue)
+
+
+        val isProfileScreen = sessionManagement.getCookingScreen().equals("Profile")
+        val isOnline = isOnline(requireContext())
+
+        binding.llBottomBtn.visibility = if (isProfileScreen) View.GONE else View.VISIBLE
+        binding.rlUpdateReasonTakeAway.visibility = if (isProfileScreen) View.VISIBLE else View.GONE
+
+        if (isOnline) {
+            if (isProfileScreen) {
                 reasonTakeAwaySelectApi()
             } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }else{
-            binding.llBottomBtn.visibility=View.VISIBLE
-            binding.rlUpdateReasonTakeAway.visibility=View.GONE
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireContext())) {
                 reasonTakeAwayApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
+        } else {
+            alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
+        backButton()
 
+        initialize()
+
+        return binding.root
+    }
+
+    private fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
                 }
             })
 
-
-        initialize()
-
-        return binding.root
     }
 
     private fun reasonTakeAwaySelectApi() {

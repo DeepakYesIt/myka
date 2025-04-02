@@ -122,7 +122,7 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
 
     private  fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()

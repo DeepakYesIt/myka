@@ -17,7 +17,7 @@ import com.mykaimeal.planner.databinding.FragmentPreferencesBinding
 
 class PreferencesFragment : Fragment(), OnItemClickListener {
 
-    private var binding: FragmentPreferencesBinding? = null
+    private lateinit var binding: FragmentPreferencesBinding
     private lateinit var sessionManagement: SessionManagement
     private var preferenceAdapter: PreferencesAdapter? = null
     private var screenType: String? = null
@@ -27,33 +27,37 @@ class PreferencesFragment : Fragment(), OnItemClickListener {
         binding = FragmentPreferencesBinding.inflate(inflater, container, false)
 
         (activity as MainActivity?)?.apply {
-            binding?.llIndicator?.visibility = View.GONE
-            binding?.llBottomNavigation?.visibility = View.GONE
+            binding.llIndicator.visibility = View.GONE
+            binding.llBottomNavigation.visibility = View.GONE
         }
 
         sessionManagement = SessionManagement(requireActivity())
         screenType = sessionManagement.getCookingFor()
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+        backButton()
+
+        initialize()
+
+        return binding.root
+    }
+    
+    private fun backButton(){
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
         })
-
-        initialize()
-
-        return binding!!.root
     }
 
     private fun initialize() {
         populateDataList(screenType)
 
-        binding!!.imgBackPreferences.setOnClickListener {
+        binding.imgBackPreferences.setOnClickListener {
             findNavController().navigateUp()
         }
 
         preferenceAdapter = PreferencesAdapter(dataList, requireActivity(), this)
-        binding!!.recyPreferences.adapter = preferenceAdapter
+        binding.recyPreferences.adapter = preferenceAdapter
 
     }
 

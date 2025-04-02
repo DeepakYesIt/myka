@@ -399,13 +399,12 @@
                         </LinearLayout>
                     </LinearLayout>
 
-                    <ImageView
+                    <RelativeLayout
                         android:id="@+id/img_bmr"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/bmr_no_add" />
+                        android:background="@drawable/plan_shadow"
+                        android:layout_height="@dimen/_170sdp">
+                    </RelativeLayout>
                 </RelativeLayout>
 
                 <LinearLayout

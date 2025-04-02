@@ -33,12 +33,13 @@ class WalletFragment : Fragment() {
         binding = FragmentWalletBinding.inflate(layoutInflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[WalletViewModel::class.java]
 
-        (activity as MainActivity).binding?.apply {
+        (activity as MainActivity).binding.apply {
             llIndicator.visibility = View.VISIBLE
             llBottomNavigation.visibility = View.VISIBLE
         }
 
         setupBackNavigation()
+
         setupUI()
 
         // When screen load then api call
@@ -111,7 +112,7 @@ class WalletFragment : Fragment() {
 
 
     private fun setupBackNavigation() {
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }

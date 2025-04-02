@@ -11,21 +11,24 @@ import androidx.navigation.fragment.findNavController
 import com.mykaimeal.planner.adapter.AdapterInviteItem
 import com.mykaimeal.planner.databinding.FragmentInvitationsScreenBinding
 import com.mykaimeal.planner.model.DataModel
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class InvitationsScreenFragment : Fragment() {
 
-    private var binding: FragmentInvitationsScreenBinding?=null
+    private lateinit var binding: FragmentInvitationsScreenBinding
     private var dataList: MutableList<DataModel> = mutableListOf()
     private var adapterInviteItem: AdapterInviteItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding=FragmentInvitationsScreenBinding.inflate(layoutInflater, container, false)
 
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
@@ -34,17 +37,17 @@ class InvitationsScreenFragment : Fragment() {
         inviteModel()
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
 
 
     private fun initialize() {
-        binding!!.imgBackInvite.setOnClickListener {
+        binding.imgBackInvite.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.textInviteFriends.setOnClickListener {
+        binding.textInviteFriends.setOnClickListener {
             val appPackageName: String = requireActivity().packageName
             val myIntent = Intent(Intent.ACTION_SEND)
             myIntent.type = "text/plain"
@@ -92,7 +95,7 @@ class InvitationsScreenFragment : Fragment() {
         dataList.add(data5)
 
         adapterInviteItem = AdapterInviteItem(dataList, requireActivity())
-        binding!!.rcyFriendsInvite.adapter = adapterInviteItem
+        binding.rcyFriendsInvite.adapter = adapterInviteItem
     }
 
 }

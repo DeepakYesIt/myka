@@ -449,8 +449,9 @@ reinvented version of your favorite meal."
 
                 <TextView
                     android:id="@+id/tvDescriptions"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:layout_centerHorizontal="true"
                     android:layout_toEndOf="@+id/imagesTick"
                     android:fontFamily="@font/montserrat"
@@ -468,7 +469,7 @@ reinvented version of your favorite meal."
                 android:layout_below="@+id/relDescriptions1"
                 android:layout_marginHorizontal="@dimen/_25sdp"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:visibility="gone">
+                android:visibility="invisible">
 
                 <ImageView
                     android:id="@+id/imagesTick2"
@@ -478,8 +479,9 @@ reinvented version of your favorite meal."
 
                 <TextView
                     android:id="@+id/tvDescriptions2"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:layout_centerHorizontal="true"
                     android:layout_toEndOf="@+id/imagesTick2"
                     android:fontFamily="@font/montserrat"
@@ -496,7 +498,7 @@ reinvented version of your favorite meal."
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/layOnboardingIndicator"
                 android:layout_below="@+id/relDescriptions2"
-                android:layout_marginHorizontal="@dimen/_35sdp"
+                android:layout_marginHorizontal="@dimen/_25sdp"
                 android:layout_marginTop="@dimen/_20sdp"
                 android:layout_marginBottom="@dimen/_20sdp" />
 

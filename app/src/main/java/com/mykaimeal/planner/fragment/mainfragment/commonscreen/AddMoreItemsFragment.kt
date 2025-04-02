@@ -19,7 +19,9 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.AddMoreItemsAdapter
 import com.mykaimeal.planner.databinding.FragmentAddMoreItemsBinding
 import com.mykaimeal.planner.model.DataModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AddMoreItemsFragment : Fragment(), OnItemClickListener {
 
     private lateinit var binding: FragmentAddMoreItemsBinding
@@ -31,12 +33,12 @@ class AddMoreItemsFragment : Fragment(), OnItemClickListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentAddMoreItemsBinding.inflate(layoutInflater, container, false)
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()

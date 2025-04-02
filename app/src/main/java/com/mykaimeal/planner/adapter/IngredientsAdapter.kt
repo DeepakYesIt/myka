@@ -19,6 +19,7 @@ import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterBasketIngItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
+import com.mykaimeal.planner.messageclass.ErrorMessage
 
 class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
                          private var requireActivity: FragmentActivity,
@@ -51,7 +52,11 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
             }
 
             if (data.name!=null){
-                holder.binding.tvFoodName.text=data.name
+                val foodName = data.name
+                val result = foodName.mapIndexed { index, c ->
+                    if (index == 0 || c.isUpperCase()) c.uppercaseChar() else c
+                }.joinToString("")
+                holder.binding.tvFoodName.text=result
             }
 
             if (data.pro_img!=null){
@@ -93,7 +98,7 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
             if (ingredientsData?.get(position)?.sch_id.toString().toInt() > 1) {
                 onItemSelectListener.itemSelect(position,"Minus","Ingredients")
             }else{
-                Toast.makeText(requireActivity,"Minimum serving at least value is one", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity,ErrorMessage.servingError, Toast.LENGTH_LONG).show()
             }
         }
 

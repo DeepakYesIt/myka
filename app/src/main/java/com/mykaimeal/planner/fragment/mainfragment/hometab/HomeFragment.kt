@@ -108,21 +108,32 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         locationManager = requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
 
-        (activity as MainActivity?)!!.binding?.llIndicator?.visibility = View.VISIBLE
-        (activity as MainActivity?)!!.binding?.llBottomNavigation?.visibility = View.VISIBLE
-        (activity as MainActivity?)?.changeBottom("home")
+        val main= (activity as MainActivity?)
+
+        if (main != null) {
+            // Check if 24 hours have passed since the last dialog was shown
+            if (main.shouldShowDialog()) {
+                main.saveCurrentDate()
+                // fetch location form the user
+                getLatLong()
+            }
+            main.changeBottom("home")
+            main.binding.apply {
+                llIndicator.visibility = View.VISIBLE
+                llBottomNavigation.visibility = View.VISIBLE
+            }
+        }
+
         cookbookList.clear()
-        val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
-            "", "", 0, "", "Favorites", 0, "", 0
-            )
+        val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("", "", 0, "", "Favorites", 0, "", 0)
         cookbookList.add(0, data)
-      
-        // fetch location form the user
-        getLatLong()
         
         initialize()
+
         // When screen load then api call
         fetchDataOnLoad()
+
+
         return binding.root
     }
 

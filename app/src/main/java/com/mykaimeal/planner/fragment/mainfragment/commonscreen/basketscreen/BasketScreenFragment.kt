@@ -48,7 +48,7 @@ import java.math.RoundingMode
 @AndroidEntryPoint
 class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListener,
     OnItemClickedListener {
-    private var binding: FragmentBasketScreenBinding? = null
+    private lateinit var binding: FragmentBasketScreenBinding
     private var adapter: SuperMarketListAdapter? = null
     private var adapterGetAddressItem: AdapterGetAddressItem? = null
     private var adapterRecipe: BasketYourRecipeAdapter? = null
@@ -62,67 +62,61 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentBasketScreenBinding.inflate(layoutInflater, container, false)
+        
 
-        (activity as MainActivity?)!!.binding!!.llIndicator.visibility = View.GONE
-        (activity as MainActivity?)!!.binding!!.llBottomNavigation.visibility = View.GONE
+        (activity as? MainActivity)?.binding?.apply {
+            llIndicator.visibility = View.GONE
+            llBottomNavigation.visibility = View.GONE
+        }
 
         basketScreenViewModel = ViewModelProvider(requireActivity())[BasketScreenViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
                 }
             })
 
-        /*
-                shoppingPreferencesDialog()
-        */
-//        addressDialog()
-
         if (BaseApplication.isOnline(requireActivity())){
             getBasketList()
         }else{
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
+
         initialize()
 
-        return binding!!.root
+        return binding.root
     }
 
     private fun initialize() {
 
-        binding!!.textSeeAll1.setOnClickListener {
+        binding.textSeeAll1.setOnClickListener {
             findNavController().navigate(R.id.superMarketsNearByFragment)
         }
 
-        binding!!.imageBackIcon.setOnClickListener {
+        binding.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding!!.textSeeAll2.setOnClickListener {
+        binding.textSeeAll2.setOnClickListener {
             findNavController().navigate(R.id.basketYourRecipeFragment)
         }
 
-        binding!!.textShoppingList.setOnClickListener {
+        binding.textShoppingList.setOnClickListener {
             findNavController().navigate(R.id.shoppingListFragment)
         }
 
-        binding!!.textConfirmOrder.setOnClickListener {
+        binding.textConfirmOrder.setOnClickListener {
             val bundle = Bundle().apply {
                 putString("storeUId",storeUid)
             }
             findNavController().navigate(R.id.basketDetailSuperMarketFragment,bundle)
-//             findNavController().navigate(R.id.tescoCartItemFragmentFragment)
         }
-
-     /*   binding!!.textSeeAll3.setOnClickListener {
-            findNavController().navigate(R.id.shoppingMissingIngredientsFragment)
-        }*/
 
     }
 
@@ -220,48 +214,48 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
         if (data.billing!=null){
             if (data.billing.recipes!=null){
-                binding!!.textRecipeCount.text=data.billing.recipes.toString()
+                binding.textRecipeCount.text=data.billing.recipes.toString()
             }
 
             if (data.billing.net_total!=null){
                 val roundedNetTotal = data.billing.net_total.let {
                     BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
                 }
-                binding!!.textNetTotalProduct.text=roundedNetTotal.toString()
+                binding.textNetTotalProduct.text=roundedNetTotal.toString()
             }
 
             if (data.billing.net_total!=null){
                 val roundedTotal = data.billing.net_total.let {
                     BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
                 }
-                binding!!.textTotalAmount.text= "$$roundedTotal*"
+                binding.textTotalAmount.text= "$$roundedTotal*"
             }
         }
 
         if (data.stores != null && data.stores.size > 0) {
-            binding!!.rlSuperMarket.visibility=View.VISIBLE
+            binding.rlSuperMarket.visibility=View.VISIBLE
             adapter = SuperMarketListAdapter(data.stores, requireActivity(), this,0)
-            binding!!.rcvSuperMarket.adapter = adapter
+            binding.rcvSuperMarket.adapter = adapter
         }else{
-            binding!!.rlSuperMarket.visibility=View.GONE
+            binding.rlSuperMarket.visibility=View.GONE
         }
 
         if (data.recipe != null && data.recipe.size > 0) {
-            binding!!.rlYourRecipes.visibility=View.VISIBLE
+            binding.rlYourRecipes.visibility=View.VISIBLE
             recipe=data.recipe
             adapterRecipe = BasketYourRecipeAdapter(data.recipe, requireActivity(), this)
-            binding!!.rcvYourRecipes.adapter = adapterRecipe
+            binding.rcvYourRecipes.adapter = adapterRecipe
         }else{
-            binding!!.rlYourRecipes.visibility=View.GONE
+            binding.rlYourRecipes.visibility=View.GONE
         }
 
         if (data.ingredient != null && data.ingredient.size > 0) {
             ingredientList=data.ingredient
-            binding!!.rlIngredients.visibility=View.VISIBLE
+            binding.rlIngredients.visibility=View.VISIBLE
             adapterIngredients = IngredientsAdapter(data.ingredient, requireActivity(), this)
-            binding!!.rcvIngredients.adapter = adapterIngredients
+            binding.rcvIngredients.adapter = adapterIngredients
         }else{
-            binding!!.rlIngredients.visibility=View.GONE
+            binding.rlIngredients.visibility=View.GONE
         }
     }
 
@@ -291,23 +285,6 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
     }
 
-    /*    private fun shoppingPreferencesDialog() {
-            val dialogMiles: Dialog = context?.let { Dialog(it) }!!
-            dialogMiles.setContentView(R.layout.alert_dialog_shopping_preferences)
-            dialogMiles.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            dialogMiles.window!!.setLayout(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.WRAP_CONTENT
-            )
-            val relDone = dialogMiles.findViewById<RelativeLayout>(R.id.relDone)
-            dialogMiles.show()
-            dialogMiles.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-
-            relDone.setOnClickListener {
-                dialogMiles.dismiss()
-            }
-        }*/
-
     override fun itemClick(position: Int?, status: String?, type: String?) {
       /*  if (status == "2") {
             removeRecipeBasketDialog(status)
@@ -336,7 +313,6 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-//            dialogAddItem.dismiss()
         }
     }
 
@@ -422,7 +398,6 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 }
             }
         }
-        /*findNavController().navigate(R.id.basketDetailSuperMarketFragment)*/
 
     }
 
@@ -456,7 +431,6 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     }
 
     private fun increaseIngRecipe(foodId: String?, quantity: String, item: Ingredient?, position: Int?) {
-//        BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             basketScreenViewModel.basketIngIncDescUrl({
                 BaseApplication.dismissMe()

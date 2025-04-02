@@ -34,8 +34,12 @@ class AdapterProductsDetailsSelectItem(
 
         val data = datalist[position]
 
-        if (data.name != null) {
-            holder.binding.textProductName.text = data.name.toString()
+        if (data.name!=null){
+            val foodName = data.name
+            val result = foodName.mapIndexed { index, c ->
+                if (index == 0 || c.isUpperCase()) c.uppercaseChar() else c
+            }.joinToString("")
+            holder.binding.textProductName.text=result
         }
 
         if (data.formatted_price != null) {

@@ -112,7 +112,8 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
         cookbookList.add(0,data)
         commonWorkUtils = CommonWorkUtils(requireActivity())
         sessionManagement = SessionManagement(requireContext())
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigateUp()
             }
@@ -127,7 +128,7 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
 
         initialize()
 
-//        // This Api call when the screen in loaded
+      // This Api call when the screen in loaded
         lunchApi()
 
         return binding.root
