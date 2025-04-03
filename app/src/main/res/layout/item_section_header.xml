@@ -46,9 +46,10 @@
             android:layout_height="wrap_content"
             android:text="Ketchup"
             android:fontFamily="@font/poppins"
+            android:maxLines="3"
             android:textColor="@color/black"
             android:textStyle="bold"
-            android:textSize="@dimen/_13sdp" />
+            android:textSize="@dimen/_10sdp" />
 
    <!--     <TextView
             android:id="@+id/textProductQuantity"
@@ -67,7 +68,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/swap_btn_icon"
             android:layout_below="@+id/textProductName"
-            android:layout_marginTop="@dimen/_10sdp"/>
+            android:layout_marginTop="@dimen/_5sdp"/>
 
        <!-- <TextView
             android:id="@+id/productSwap"

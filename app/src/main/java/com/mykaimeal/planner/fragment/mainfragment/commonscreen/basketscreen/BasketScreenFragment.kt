@@ -395,6 +395,12 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
+            }else if (recipeId=="Delete"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddIngServing( position, "Delete")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
 
@@ -426,6 +432,9 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 else -> count // No change if `apiType` doesn't match
             }
             increaseIngRecipe(foodId,count.toString(),item,position)
+        }else{
+            val foodId= item?.food_id
+            increaseIngRecipe(foodId,"0",item,position)
         }
     }
 
@@ -452,14 +461,17 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                // Toggle the is_like value
-                item?.sch_id = quantity.toInt()
-                if (item!= null) {
-                    ingredientList?.set(position!!, item)
-                }
-                // Update the adapter
-                if (ingredientList != null) {
-                    adapterIngredients.updateList(ingredientList!!)
+
+                if (quantity!="0"){
+                    // Toggle the is_like value
+                    item?.sch_id = quantity.toInt()
+                    if (item!= null) {
+                        ingredientList?.set(position!!, item)
+                    }
+                    // Update the adapter
+                    if (ingredientList != null) {
+                        adapterIngredients.updateList(ingredientList!!)
+                    }
                 }
 
                 getBasketList()

@@ -108,6 +108,7 @@ object ApiEndPoint {
     const val basketIngIncDescUrl="change-cart"
 
     const val addToBasketAllUrl="add-to-basket-all"
+    const val userDietSuggestionUrl="user-diet-suggetion"
 
 
 }

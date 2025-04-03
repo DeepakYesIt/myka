@@ -225,7 +225,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
 
     private fun showDataInUI(data: MutableList<BasketProductsDetailsModelData>) {
 
-        if (data.size != null && data.size > 0) {
+        if (data.size > 0) {
             binding.relNoProductsFound.visibility = View.GONE
             adapterProductsDetailsSelectItem = AdapterProductsDetailsSelectItem(data, requireActivity(), this)
             binding.rcyProductItems.adapter = adapterProductsDetailsSelectItem

@@ -59,8 +59,9 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="@dimen/_20sdp"
+                        android:textAlignment="center"
                         android:fontFamily="@font/montserrat_semibold"
-                        android:text="You’ve got a gift from kai"
+                        android:text="You’ve got a gift from\n kai"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_12sdp" />
 
@@ -88,10 +89,10 @@
                             android:layout_height="wrap_content"
                             android:text="7- days free"
                             android:textSize="@dimen/_11sdp"
-                            android:drawableStart="@drawable/gift_icon"
                             android:drawablePadding="@dimen/_10sdp"
                             android:fontFamily="@font/montserrat"
-                            android:textColor="@color/black" />
+                            android:textColor="@color/black"
+                            app:drawableStartCompat="@drawable/gift_icon" />
 
                     </RelativeLayout>
                     <RelativeLayout
@@ -107,11 +108,12 @@
                             android:layout_height="wrap_content"
                             android:text="Lifetime 50% of  My-kai"
                             android:textSize="@dimen/_11sdp"
-                            android:drawableStart="@drawable/dollar_icon"
                             android:drawablePadding="@dimen/_10sdp"
                             android:fontFamily="@font/montserrat"
-                            android:textColor="@color/black" />
+                            android:textColor="@color/black"
+                            app:drawableStartCompat="@drawable/dollar_icon" />
                     </RelativeLayout>
+
                     <RelativeLayout
                         android:id="@+id/relSecretCookBook"
                         android:layout_width="match_parent"
@@ -126,10 +128,10 @@
                             android:layout_height="wrap_content"
                             android:text="Kai’s secret cookbook"
                             android:textSize="@dimen/_11sdp"
-                            android:drawableStart="@drawable/secret_cookbook_icon"
                             android:drawablePadding="@dimen/_10sdp"
                             android:fontFamily="@font/montserrat"
-                            android:textColor="@color/black" />
+                            android:textColor="@color/black"
+                            app:drawableStartCompat="@drawable/secret_cookbook_icon" />
                     </RelativeLayout>
 
                 </RelativeLayout>
@@ -313,10 +315,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <ImageView
+                        <TextView
+                            android:id="@+id/tvBest"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/best_value_icon" />
+                            android:layout_centerVertical="true"
+                            android:background="@drawable/best_value_icon"
+                            android:fontFamily="@font/poppins"
+                            android:padding="@dimen/_2sdp"
+                            android:text="Popular"
+                            android:textColor="#121212"
+                            android:textSize="@dimen/_11sdp" />
 
                         <ImageView
                             android:id="@+id/imgBaseClick"

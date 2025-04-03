@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -16,6 +17,7 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterProductDetailsSelectItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.BasketProductDetailsFragment
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.model.BasketProductsDetailsModelData
+import com.mykaimeal.planner.messageclass.ErrorMessage
 
 class AdapterProductsDetailsSelectItem(
     private var datalist: MutableList<BasketProductsDetailsModelData>,
@@ -97,6 +99,23 @@ class AdapterProductsDetailsSelectItem(
         holder.binding.productDetails.setOnClickListener {
             onItemSelectListener.itemSelect(position, data.product_id, "swap")
         }
+
+
+
+      /*  holder.binding.imageMinusIcon.setOnClickListener{
+            if (ingredientsData?.get(position)?.sch_id.toString().toInt() > 1) {
+                onItemSelectListener.itemSelect(position,"Minus","Ingredients")
+            }else{
+                Toast.makeText(requireActivity, ErrorMessage.servingError, Toast.LENGTH_LONG).show()
+            }
+        }
+
+
+        holder.binding.imageAddIcon.setOnClickListener{
+            if (ingredientsData?.get(position)?.sch_id.toString().toInt() < 1000) {
+                onItemSelectListener.itemSelect(position,"Plus","Ingredients")
+            }
+        }*/
 
     }
 

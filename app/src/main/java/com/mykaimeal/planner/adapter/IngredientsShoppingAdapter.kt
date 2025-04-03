@@ -45,13 +45,11 @@ class IngredientsShoppingAdapter(private var ingredientsData: MutableList<Ingred
                     holder.binding.tvFoodPrice.text=data.pro_price.toString()
                 }else{
                     holder.binding.tvFoodPrice.text="$00"
-
                 }
             }
 
-            if (data.name!=null){
-
-                val foodName = data.name
+            if (data.pro_name!=null){
+                val foodName = data.pro_name
                 val result = foodName.mapIndexed { index, c ->
                     if (index == 0 || c.isUpperCase()) c.uppercaseChar() else c
                 }.joinToString("")

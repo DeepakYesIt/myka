@@ -294,7 +294,7 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
     private fun showDataInUi(favouriteModelData: MutableList<FavouriteCuisinesModelData>) {
         try {
             if (favouriteModelData != null && favouriteModelData.isNotEmpty()) {
-                if (favouriteCuisineViewModel.getFavouriteCuiData() == null) {
+            /*    if (favouriteCuisineViewModel.getFavouriteCuiData() == null) {
                     favouriteModelData.add(0, FavouriteCuisinesModelData(id = -1, selected = false, "None")) // ID set to -1 as an indicator
                 }
                 var selected = false
@@ -303,7 +303,7 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
                 }
                 if (!selected) {
                     favouriteModelData[0] = FavouriteCuisinesModelData(id = -1, selected = true, "None")
-                }
+                }*/
                 // Show "Show More" button only if there are more than 3 items
                 if (favouriteModelData.size > 5) {
                     binding.relMoreButton.visibility = View.VISIBLE
@@ -321,9 +321,9 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
     private fun showDataInFirstUi(favouriteModelData: MutableList<FavouriteCuisinesModelData>) {
         try {
             if (favouriteModelData != null && favouriteModelData.isNotEmpty()) {
-                if (favouriteCuisineViewModel.getFavouriteCuiData() == null) {
+          /*      if (favouriteCuisineViewModel.getFavouriteCuiData() == null) {
                     favouriteModelData.add(0, FavouriteCuisinesModelData(id = -1, selected = false, "None")) // ID set to -1 as an indicator
-                }
+                }*/
                 favouriteCuiModelData = favouriteModelData
                 // Show "Show More" button only if there are more than 3 items
                 if (favouriteModelData.size > 5) {

@@ -6,6 +6,7 @@ import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.http.Field
 import javax.inject.Inject
 
 class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : MainRepository {
@@ -2197,6 +2198,27 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
             successCallback(NetworkResult.Error(e.message.toString()))
         }
     }
+
+
+
+/*    override suspend fun updateDietSuggestionUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit, gender: String?, dob: String?, height: String?,
+        heightType: String?, weight: String?, weightType: String?, activityLevel: String?
+    ) {
+        try {
+            api.updateDietSuggestionUrl(gender,dob, height, heightType, weight, weightType, activityLevel).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }*/
 
 
 
