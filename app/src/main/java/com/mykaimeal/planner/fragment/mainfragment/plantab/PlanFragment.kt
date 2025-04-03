@@ -96,6 +96,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     private var lastDateSelected: String = ""
     private var swapMealType: String = ""
     private var swapId: Int = 0
+
     // Define global variables
     private lateinit var startDate: Date
     private lateinit var endDate: Date
@@ -103,7 +104,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     private var mealTypeAdapter: AdapterMealType? = null
     private lateinit var spinnerActivityLevel: PowerSpinnerView
     private var mealRoutineList: MutableList<MealRoutineModelData> = mutableListOf()
-    private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
+    private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
+        mutableListOf()
     var updatedDaysBetween: List<DateModel> = emptyList()
     val dataList = arrayListOf<DataModel>()
 
@@ -115,7 +117,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         // Inflate the layout for this fragment
         binding = FragmentPlanBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[PlanViewModel::class.java]
-        
+
 
         (activity as? MainActivity)?.binding?.apply {
             llIndicator.visibility = View.VISIBLE
@@ -125,19 +127,29 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         (activity as MainActivity?)?.changeBottom("plan")
 
         sessionManagement = SessionManagement(requireContext())
-        
+
         requireActivity().onBackPressedDispatcher.addCallback(
-           viewLifecycleOwner,
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
                 }
             })
 
-       
+
         cookbookList.clear()
 
-        val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("", "", 0, "", "Favorites", 0, "", 0)
+        val data =
+            com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
+                "",
+                "",
+                0,
+                "",
+                "Favorites",
+                0,
+                "",
+                0
+            )
         cookbookList.add(0, data)
 
         if (sessionManagement.getImage() != null) {
@@ -159,7 +171,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         // When screen load then api call
         fetchDataOnLoad()
-        lastDateSelected=currentDateSelected
+        lastDateSelected = currentDateSelected
         // Display current week dates
         showWeekDates()
 
@@ -173,7 +185,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         // Define the date format (update to match your `date` string format)
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val formattedCurrentDate = dateFormat.format(currentDate) // Format currentDate to match the string format
+        val formattedCurrentDate =
+            dateFormat.format(currentDate) // Format currentDate to match the string format
         val (startDate, endDate) = getWeekDates(currentDate)
         this.startDate = startDate
         this.endDate = endDate
@@ -202,11 +215,12 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         rcyChooseDaySch?.adapter = ChooseDayAdapter(dataList, requireActivity())
 
         // Initialize the adapter with the updated date list
-        calendarAdapter = CalendarDayDateAdapter(updatedDaysBetween.toMutableList()) { selectedPosition ->
+        calendarAdapter =
+            CalendarDayDateAdapter(updatedDaysBetween.toMutableList()) { selectedPosition ->
                 // Update the list to reflect the selected date
                 updatedDaysBetween.forEachIndexed { index, dateModel ->
                     dateModel.status = (index == selectedPosition)
-                    lastDateSelected=updatedDaysBetween[selectedPosition].date
+                    lastDateSelected = updatedDaysBetween[selectedPosition].date
                     Log.d("dateModel Date ", "*****${dateModel.date}")
                 }
                 Log.d("Date ", "*****$updatedDaysBetween")
@@ -317,6 +331,14 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
     }
 
+    private fun handleApiAddToBasketResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessAddDayToBasketResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
     private fun handleApiCookBookResponse(result: NetworkResult<String>) {
         when (result) {
             is NetworkResult.Success -> handleSuccessCookBookResponse(result.data.toString())
@@ -367,6 +389,33 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             showAlert(e.message, false)
         }
     }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessAddDayToBasketResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
+                // Fetch data for the selected date if online
+                if (BaseApplication.isOnline(requireActivity())) {
+                    dataFatchByDate(currentDateSelected)
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
 
     @SuppressLint("SetTextI18n")
     private fun handleSuccessAddToPlanResponse(data: String, dialogChooseMealDay: Dialog) {
@@ -702,6 +751,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             }
 
             if (status) {
+                clickable = "1"
                 binding.rlAddDayToBasket.isClickable = true
                 binding.rlAddDayToBasket.setBackgroundResource(R.drawable.gray_btn_select_background)
             } else {
@@ -728,7 +778,11 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                         addAnotherMealDialog()
                     } else {
                         // Handle the case where the list is empty
-                        BaseApplication.alertError(requireContext(), "No meal routines available.", false)
+                        BaseApplication.alertError(
+                            requireContext(),
+                            "No meal routines available.",
+                            false
+                        )
                     }
                 }
             } else {
@@ -749,44 +803,48 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
         binding.rlAddDayToBasket.setOnClickListener {
-            if (!clickable.equals("",true)) {
-                findNavController().navigate(R.id.basketScreenFragment)
+            if (!clickable.equals("", true)) {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    addDayToBasket()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
 
         binding.imgAddBreakFast.setOnClickListener {
             val bundle = Bundle().apply {
-                putString("ClickedUrl","")
+                putString("ClickedUrl", "")
             }
-            findNavController().navigate(R.id.searchFragment,bundle)
+            findNavController().navigate(R.id.searchFragment, bundle)
         }
 
         binding.imgAddLunch.setOnClickListener {
             val bundle = Bundle().apply {
-                putString("ClickedUrl","")
+                putString("ClickedUrl", "")
             }
-            findNavController().navigate(R.id.searchFragment,bundle)
+            findNavController().navigate(R.id.searchFragment, bundle)
         }
 
         binding.imgAddDinner.setOnClickListener {
             val bundle = Bundle().apply {
-                putString("ClickedUrl","")
+                putString("ClickedUrl", "")
             }
-            findNavController().navigate(R.id.searchFragment,bundle)
+            findNavController().navigate(R.id.searchFragment, bundle)
         }
 
         binding.imgAddSnacks.setOnClickListener {
             val bundle = Bundle().apply {
-                putString("ClickedUrl","")
+                putString("ClickedUrl", "")
             }
-            findNavController().navigate(R.id.searchFragment,bundle)
+            findNavController().navigate(R.id.searchFragment, bundle)
         }
 
         binding.imgAddTeaTime1.setOnClickListener {
             val bundle = Bundle().apply {
-                putString("ClickedUrl","")
+                putString("ClickedUrl", "")
             }
-            findNavController().navigate(R.id.searchFragment,bundle)
+            findNavController().navigate(R.id.searchFragment, bundle)
         }
 
 
@@ -822,7 +880,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
         binding.imagePrevious.setOnClickListener {
-             hidPastDate()
+            hidPastDate()
         }
 
         binding.imageNext.setOnClickListener {
@@ -840,9 +898,19 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
     }
 
+    private fun addDayToBasket() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.addDayToBasketAllUrl({
+                BaseApplication.dismissMe()
+                handleApiAddToBasketResponse(it)
+            }, currentDateSelected)
+        }
+    }
 
-    private fun hidPastDate(){
-        if (updatedDaysBetween.isNotEmpty()){
+
+    private fun hidPastDate() {
+        if (updatedDaysBetween.isNotEmpty()) {
             // Define the date format (update to match your `date` string format)
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val formattedCurrentDate = dateFormat.format(currentDate)
@@ -861,11 +929,11 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                     status = (date == formattedCurrentDate) // Compare formatted strings
                 }
             }
-            var status=false
+            var status = false
             updatedDaysBetween1.forEach {
                 status = it.date >= BaseApplication.currentDateFormat().toString()
             }
-            if (status){
+            if (status) {
                 val calendar = Calendar.getInstance()
                 calendar.time = currentDate
                 calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
@@ -873,8 +941,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 // Display next week dates
                 println("\nAfter clicking 'Next':")
                 showWeekDates()
-            }else{
-                Toast.makeText(requireContext(),ErrorMessage.slideError,Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(requireContext(), ErrorMessage.slideError, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -958,7 +1026,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         dialogChooseDay.show()
         dialogChooseDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         dataList.clear()
-        val daysOfWeek = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        val daysOfWeek =
+            listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
         for (day in daysOfWeek) {
             val data = DataModel().apply {
                 title = day
@@ -1164,16 +1233,16 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             if (BaseApplication.isOnline(requireActivity())) {
                 val selectId: MutableList<String> = mutableListOf()
                 selectId.clear()
-                var status=false
+                var status = false
                 mealRoutineList.forEach {
                     if (it.selected) {
                         selectId.add(it.id.toString())
-                        status=true
+                        status = true
                     }
                 }
-                if (status){
+                if (status) {
                     updateMealRoutineApi(selectId, dialogAddItem)
-                }else{
+                } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.mealTypetError, false)
                 }
             } else {
@@ -1311,7 +1380,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ user click  List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-               Toast.makeText(requireContext(),""+apiModel.message,Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "" + apiModel.message, Toast.LENGTH_LONG).show()
 
                 // Fetch data for the selected date if online
                 if (BaseApplication.isOnline(requireActivity())) {
@@ -1384,7 +1453,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         dialogAddRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val rlDoneBtn = dialogAddRecipe.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         spinnerActivityLevel = dialogAddRecipe.findViewById(R.id.spinnerActivityLevel)
-        val relCreateNewCookBook = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
+        val relCreateNewCookBook =
+            dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
         val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
 
         spinnerActivityLevel.setItems(cookbookList.map { it.name })
@@ -1691,10 +1761,10 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
         if (position != null) {
-            swapId=position
+            swapId = position
         }
 
-        swapMealType=type
+        swapMealType = type
 
         fun setupMealTopAdapter(
             mealRecipes: MutableList<BreakfastModel>?,

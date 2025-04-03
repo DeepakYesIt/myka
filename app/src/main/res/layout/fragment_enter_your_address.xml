@@ -73,11 +73,12 @@
                 android:weightSum="2">
 
                 <LinearLayout
+                    android:id="@+id/llHome"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="@drawable/height_type_bg"
+                    android:background="@drawable/outline_address_green_border_bg"
                     android:gravity="center"
                     android:orientation="horizontal"
                     android:padding="@dimen/_10sdp">
@@ -98,6 +99,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/llWork"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -193,12 +195,35 @@
                 android:layout_marginHorizontal="@dimen/_5sdp"
                 android:layout_below="@+id/relUseCurrentLocation">
 
-                <com.google.android.gms.maps.MapView
-                    android:id="@+id/mapView"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_centerInParent="true" />
+                    android:layout_height="wrap_content">
 
+                    <com.google.android.gms.maps.MapView
+                        android:id="@+id/mapView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true" />
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/layEdit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerInParent="true"
+                        android:layout_margin="@dimen/_15sdp"
+                        app:cardCornerRadius="@dimen/_30sdp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/montserrat_semibold"
+                            android:padding="@dimen/_8sdp"
+                            android:text="Edit Pin"
+                            android:textSize="@dimen/_13sdp" />
+                    </androidx.cardview.widget.CardView>
+
+                </RelativeLayout>
             </androidx.cardview.widget.CardView>
 
             <RelativeLayout

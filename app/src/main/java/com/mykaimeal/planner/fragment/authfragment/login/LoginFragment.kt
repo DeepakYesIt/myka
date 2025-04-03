@@ -143,6 +143,7 @@ class LoginFragment : Fragment() {
             }
         }
 
+
         binding.googleImages.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
                 val signInIntent = mGoogleSignInClient!!.signInIntent
