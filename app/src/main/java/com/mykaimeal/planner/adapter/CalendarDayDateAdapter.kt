@@ -2,6 +2,7 @@ package com.mykaimeal.planner.adapter
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -39,10 +40,20 @@ class CalendarDayDateAdapter(var days: MutableList<DateModel>, private val onDay
             holder.binding.tvDayDate.setTextColor(Color.parseColor("#3C4541"))
         }
 
+
         holder.itemView.setOnClickListener {
-            notifyDataSetChanged()
-            onDaySelected(position)
+            // Disable past dates
+            Log.d("list date ","*****"+day.date)
+            Log.d("current date ","*****"+BaseApplication.currentDateFormat().toString())
+            if (day.date >= BaseApplication.currentDateFormat().toString()) {
+                // Disable past dates
+                notifyDataSetChanged()
+                onDaySelected(position)
+            }
         }
+
+
+
     }
 
 

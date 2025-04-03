@@ -57,6 +57,7 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
     private var adapterCookBookItem: AdapterCookBookItem? = null
     private var adapterCookBookDetailsItem: AdapterCookBookDetailsItem? = null
     private var tvWeekRange: TextView? = null
+    private var rcyChooseDaySch: RecyclerView? = null
     private lateinit var viewModel: CookBookViewModel
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
     private var cookbookListLocal: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
@@ -295,14 +296,13 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         dialogChooseDay.setContentView(R.layout.alert_dialog_choose_day)
         dialogChooseDay.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
         dialogChooseDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val rcyChooseDaySch = dialogChooseDay.findViewById<RecyclerView>(R.id.rcyChooseDaySch)
+        rcyChooseDaySch = dialogChooseDay.findViewById<RecyclerView>(R.id.rcyChooseDaySch)
         tvWeekRange = dialogChooseDay.findViewById(R.id.tvWeekRange)
         val rlDoneBtn = dialogChooseDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         val btnPrevious = dialogChooseDay.findViewById<ImageView>(R.id.btnPrevious)
         val btnNext = dialogChooseDay.findViewById<ImageView>(R.id.btnNext)
         dialogChooseDay.show()
         dialogChooseDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        showWeekDates()
         dataList.clear()
         val daysOfWeek = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
         for (day in daysOfWeek) {
@@ -314,8 +314,7 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
             }
             dataList.add(data)
         }
-
-        rcyChooseDaySch!!.adapter = ChooseDayAdapter(dataList, requireActivity())
+        showWeekDates()
 
         rlDoneBtn.setOnClickListener {
 
@@ -337,13 +336,38 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         }
 
         btnPrevious.setOnClickListener {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val formattedCurrentDate = dateFormat.format(currentDate)
             val calendar = Calendar.getInstance()
             calendar.time = currentDate
             calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
-            currentDate = calendar.time
-            // Display next week dates
-            println("\nAfter clicking 'Next':")
-            showWeekDates()
+            val currentDate1 = calendar.time
+            val (startDate, endDate) = getWeekDates(currentDate1)
+            println("Week Start Date: ${formatDate(startDate)}")
+            println("Week End Date: ${formatDate(endDate)}")
+            // Get all dates between startDate and endDate
+            val daysBetween = getDaysBetween(startDate, endDate)
+            // Mark the current date as selected in the list
+            val updatedDaysBetween1 = daysBetween.map { dateModel ->
+                dateModel.apply {
+                    status = (date == formattedCurrentDate) // Compare formatted strings
+                }
+            }
+            var status=false
+            updatedDaysBetween1.forEach {
+                status = it.date >= BaseApplication.currentDateFormat().toString()
+            }
+            if (status){
+                val calendar = Calendar.getInstance()
+                calendar.time = currentDate
+                calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+                currentDate = calendar.time
+                // Display next week dates
+                println("\nAfter clicking 'Next':")
+                showWeekDates()
+            }else{
+                Toast.makeText(requireContext(),ErrorMessage.slideError,Toast.LENGTH_LONG).show()
+            }
         }
 
         btnNext.setOnClickListener {
@@ -369,6 +393,14 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         println("Week End Date: ${formatDate(endDate)}")
         // Get all dates between startDate and endDate
         val daysBetween = getDaysBetween(startDate, endDate)
+
+        // Mark the current date as selected in the list
+        daysBetween.zip(dataList).forEach { (dateModel, dataModel) ->
+            dataModel.date = dateModel.date
+            dataModel.isOpen = false
+        }
+
+        rcyChooseDaySch?.adapter = ChooseDayAdapter(dataList, requireActivity())
         // Print the dates
         println("Days between $startDate and ${endDate}:")
         daysBetween.forEach { println(it) }

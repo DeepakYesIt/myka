@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.CalendarView
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -70,6 +71,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
     private lateinit var binding: FragmentPlanBinding
     private var tvWeekRange: TextView? = null
+    private var rcyChooseDaySch: RecyclerView? = null
     private var clickable: String? = ""
     private lateinit var viewModel: PlanViewModel
     private var recipesModel: RecipesModel? = null
@@ -87,14 +89,13 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     private var teaTimeAdapter: AdapterPlanBreakFast? = null
     private var AdapterteaTimeByDateFast: AdapterPlanBreakByDateFast? = null
     private lateinit var sessionManagement: SessionManagement
-
     lateinit var adapter: ImageViewPagerAdapter
-    val dataList = arrayListOf<DataModel>()
+
     private var currentDate = Date() // Current date
     private var currentDateSelected: String = ""
+    private var lastDateSelected: String = ""
     private var swapMealType: String = ""
     private var swapId: Int = 0
-
     // Define global variables
     private lateinit var startDate: Date
     private lateinit var endDate: Date
@@ -103,6 +104,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     private lateinit var spinnerActivityLevel: PowerSpinnerView
     private var mealRoutineList: MutableList<MealRoutineModelData> = mutableListOf()
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
+    var updatedDaysBetween: List<DateModel> = emptyList()
+    val dataList = arrayListOf<DataModel>()
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -118,6 +121,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             llIndicator.visibility = View.VISIBLE
             llBottomNavigation.visibility = View.VISIBLE
         }
+
         (activity as MainActivity?)?.changeBottom("plan")
 
         sessionManagement = SessionManagement(requireContext())
@@ -145,6 +149,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
         currentDateSelected = BaseApplication.currentDateFormat().toString()
+        Log.d("currentDateSelected", "******$currentDateSelected")
 
         if (sessionManagement.getUserName() != null) {
             binding.tvName.text = sessionManagement.getUserName() + "’s week"
@@ -154,7 +159,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         // When screen load then api call
         fetchDataOnLoad()
-
+        lastDateSelected=currentDateSelected
         // Display current week dates
         showWeekDates()
 
@@ -164,29 +169,24 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     @SuppressLint("SetTextI18n")
     fun showWeekDates() {
         Log.d("currentDate :- ", "******$currentDate")
+        Log.d("lastDateSelected :- ", "******$lastDateSelected")
 
         // Define the date format (update to match your `date` string format)
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val formattedCurrentDate =
-            dateFormat.format(currentDate) // Format currentDate to match the string format
-
+        val formattedCurrentDate = dateFormat.format(currentDate) // Format currentDate to match the string format
         val (startDate, endDate) = getWeekDates(currentDate)
         this.startDate = startDate
         this.endDate = endDate
-
         println("Week Start Date: ${formatDate(startDate)}")
         println("Week End Date: ${formatDate(endDate)}")
-
         // Get all dates between startDate and endDate
         val daysBetween = getDaysBetween(startDate, endDate)
-
         // Mark the current date as selected in the list
-        val updatedDaysBetween = daysBetween.map { dateModel ->
+        updatedDaysBetween = daysBetween.map { dateModel ->
             dateModel.apply {
-                status = (date == formattedCurrentDate) // Compare formatted strings
+                status = (date == lastDateSelected) // Compare formatted strings
             }
         }
-
         // Print the dates
         println("Days between $startDate and ${endDate}:")
         daysBetween.forEach { println(it) }
@@ -195,30 +195,19 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         tvWeekRange?.text = "" + formatDate(startDate) + "-" + formatDate(endDate)
 
-        /*     calendarAdapter=CalendarDayDateAdapter(getDaysBetween(startDate, endDate)) {
-                 // Handle item click if needed
-                 val dateList = getDaysBetween(startDate, endDate)
-                 // Update the status of the item at the target position
-                 dateList.forEachIndexed { index, dateModel ->
-                     dateModel.status = index==it
-                 }
-                 Log.d("Date ", "*****$dateList")
-                 // Notify the adapter to refresh the changed position
-                 calendarAdapter!!.updateList(dateList)
-                 currentDateSelected=dateList[it].date
-                 if (BaseApplication.isOnline(requireActivity())) {
-                     dataFatchByDate(currentDateSelected)
-                 } else {
-                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                 }
-             }*/
+        daysBetween.zip(dataList).forEach { (dateModel, dataModel) ->
+            dataModel.date = dateModel.date
+            dataModel.isOpen = false
+        }
+        rcyChooseDaySch?.adapter = ChooseDayAdapter(dataList, requireActivity())
 
         // Initialize the adapter with the updated date list
-        calendarAdapter =
-            CalendarDayDateAdapter(updatedDaysBetween.toMutableList()) { selectedPosition ->
+        calendarAdapter = CalendarDayDateAdapter(updatedDaysBetween.toMutableList()) { selectedPosition ->
                 // Update the list to reflect the selected date
                 updatedDaysBetween.forEachIndexed { index, dateModel ->
                     dateModel.status = (index == selectedPosition)
+                    lastDateSelected=updatedDaysBetween[selectedPosition].date
+                    Log.d("dateModel Date ", "*****${dateModel.date}")
                 }
                 Log.d("Date ", "*****$updatedDaysBetween")
 
@@ -340,10 +329,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     @SuppressLint("SetTextI18n")
     private fun handleSuccessResponse(data: String) {
         try {
-            /*      val gson = GsonBuilder()
-                      .registerTypeAdapter(ImagesModel::class.java, ImagesDeserializer())
-                      .create()*/
-
             val apiModel = Gson().fromJson(data, PlanApiResponse::class.java)
             Log.d("@@@ Plan List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
@@ -360,13 +345,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
-
-  /*      // Fetch data for the selected date if online
-        if (BaseApplication.isOnline(requireActivity())) {
-            dataFatchByDate(currentDateSelected)
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }*/
     }
 
     @SuppressLint("SetTextI18n")
@@ -771,9 +749,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
         binding.rlAddDayToBasket.setOnClickListener {
-            if (clickable == "") {
-
-            } else {
+            if (!clickable.equals("",true)) {
                 findNavController().navigate(R.id.basketScreenFragment)
             }
         }
@@ -846,14 +822,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
         binding.imagePrevious.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            calendar.time = currentDate
-            calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
-            currentDate = calendar.time
-
-            // Display next week dates
-            println("\nAfter clicking 'Next':")
-            showWeekDates()
+             hidPastDate()
         }
 
         binding.imageNext.setOnClickListener {
@@ -862,12 +831,54 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             calendar.time = currentDate
             calendar.add(Calendar.WEEK_OF_YEAR, 1) // Move to next week
             currentDate = calendar.time
-
             // Display next week dates
             println("\nAfter clicking 'Next':")
             showWeekDates()
+
+        }
+
+
+    }
+
+
+    private fun hidPastDate(){
+        if (updatedDaysBetween.isNotEmpty()){
+            // Define the date format (update to match your `date` string format)
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val formattedCurrentDate = dateFormat.format(currentDate)
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+            val currentDate1 = calendar.time
+            val (startDate, endDate) = getWeekDates(currentDate1)
+            println("Week Start Date: ${formatDate(startDate)}")
+            println("Week End Date: ${formatDate(endDate)}")
+            // Get all dates between startDate and endDate
+            val daysBetween = getDaysBetween(startDate, endDate)
+            // Mark the current date as selected in the list
+            val updatedDaysBetween1 = daysBetween.map { dateModel ->
+                dateModel.apply {
+                    status = (date == formattedCurrentDate) // Compare formatted strings
+                }
+            }
+            var status=false
+            updatedDaysBetween1.forEach {
+                status = it.date >= BaseApplication.currentDateFormat().toString()
+            }
+            if (status){
+                val calendar = Calendar.getInstance()
+                calendar.time = currentDate
+                calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+                currentDate = calendar.time
+                // Display next week dates
+                println("\nAfter clicking 'Next':")
+                showWeekDates()
+            }else{
+                Toast.makeText(requireContext(),ErrorMessage.slideError,Toast.LENGTH_LONG).show()
+            }
         }
     }
+
 
     private fun getWeekDates(currentDate: Date): Pair<Date, Date> {
         val calendar = Calendar.getInstance()
@@ -896,6 +907,24 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
 
         val calendarView = dialog.findViewById<CalendarView>(R.id.calendar)
+        // Disable previous dates
+        calendarView.minDate = System.currentTimeMillis()
+
+        // Hide navigation arrows
+        try {
+            val fields = CalendarView::class.java.declaredFields
+            for (field in fields) {
+                if (field.name == "mNextButton" || field.name == "mPrevButton") {
+                    field.isAccessible = true
+                    val button = field.get(calendarView) as ImageButton
+                    button.isEnabled = false
+                    button.visibility = View.INVISIBLE
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
         calendarView.setOnDateChangeListener { _: CalendarView?, year: Int, month: Int, dayOfMonth: Int ->
             val calendar = Calendar.getInstance()
             calendar.set(year, month, dayOfMonth)
@@ -921,17 +950,15 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         dialogChooseDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val rcyChooseDaySch = dialogChooseDay.findViewById<RecyclerView>(R.id.rcyChooseDaySch)
+        rcyChooseDaySch = dialogChooseDay.findViewById<RecyclerView>(R.id.rcyChooseDaySch)
         tvWeekRange = dialogChooseDay.findViewById(R.id.tvWeekRange)
         val rlDoneBtn = dialogChooseDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         val btnPrevious = dialogChooseDay.findViewById<ImageView>(R.id.btnPrevious)
         val btnNext = dialogChooseDay.findViewById<ImageView>(R.id.btnNext)
         dialogChooseDay.show()
         dialogChooseDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        showWeekDates()
         dataList.clear()
-        val daysOfWeek =
-            listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        val daysOfWeek = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
         for (day in daysOfWeek) {
             val data = DataModel().apply {
                 title = day
@@ -941,11 +968,9 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             }
             dataList.add(data)
         }
-
-        rcyChooseDaySch!!.adapter = ChooseDayAdapter(dataList, requireActivity())
+        showWeekDates()
 
         rlDoneBtn.setOnClickListener {
-
             var status = false
             for (it in dataList) {
                 if (it.isOpen) {
@@ -962,13 +987,14 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
         btnPrevious.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            calendar.time = currentDate
-            calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
-            currentDate = calendar.time
-            // Display next week dates
-            println("\nAfter clicking 'Next':")
-            showWeekDates()
+//            val calendar = Calendar.getInstance()
+//            calendar.time = currentDate
+//            calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+//            currentDate = calendar.time
+//            // Display next week dates
+//            println("\nAfter clicking 'Next':")
+//            showWeekDates()
+            hidPastDate()
         }
 
         btnNext.setOnClickListener {
@@ -1138,12 +1164,18 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
             if (BaseApplication.isOnline(requireActivity())) {
                 val selectId: MutableList<String> = mutableListOf()
                 selectId.clear()
+                var status=false
                 mealRoutineList.forEach {
                     if (it.selected) {
                         selectId.add(it.id.toString())
+                        status=true
                     }
                 }
-                updateMealRoutineApi(selectId, dialogAddItem)
+                if (status){
+                    updateMealRoutineApi(selectId, dialogAddItem)
+                }else{
+                    BaseApplication.alertError(requireContext(), ErrorMessage.mealTypetError, false)
+                }
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }

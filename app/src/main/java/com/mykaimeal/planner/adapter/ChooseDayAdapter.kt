@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.mykaimeal.planner.R
+import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.databinding.AdapterChooseDayBinding
 import com.mykaimeal.planner.model.DataModel
 
@@ -33,10 +34,13 @@ class ChooseDayAdapter(private var datalist: MutableList<DataModel>, private var
         }
 
         holder.binding.relMainLayout.setOnClickListener{
-            val data = datalist[position]
-            data.isOpen = !datalist[position].isOpen
-            datalist[position] = data
-            notifyDataSetChanged()
+            if (datalist[position].date >= BaseApplication.currentDateFormat().toString()) {
+                val data = datalist[position]
+                data.isOpen = !datalist[position].isOpen
+                datalist[position] = data
+                notifyDataSetChanged()
+            }
+
         }
 
     }

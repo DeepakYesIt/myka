@@ -442,7 +442,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
     }
 
     private fun showAlertFunction(message: String?, status: Boolean) {
-        BaseApplication.alertError(requireContext(), message, status)
+        alertError(requireContext(), message, status)
     }
 
     private fun stillSkipDialog() {

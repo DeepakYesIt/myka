@@ -14,6 +14,7 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
@@ -70,6 +71,9 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private lateinit var spinnerActivityLevel: PowerSpinnerView
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
 
+    var updatedDaysBetween: List<DateModel> = emptyList()
+    private var lastDateSelected: String = ""
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
@@ -83,6 +87,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
         }
 
         currentDateSelected = BaseApplication.currentDateFormat().toString()
+        lastDateSelected=currentDateSelected
         cookedTabViewModel = ViewModelProvider(this)[CookedTabViewModel::class.java]
         cookbookList.clear()
 
@@ -137,14 +142,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
         }
 
         binding.imagePrevious.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            calendar.time = currentDate
-            calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
-            currentDate = calendar.time
-
-            // Display next week dates
-            println("\nAfter clicking 'Next':")
-            showWeekDates()
+            hidPastDate()
         }
 
         binding.imageNext.setOnClickListener {
@@ -186,6 +184,46 @@ class CookedFragment : Fragment(), OnItemClickListener {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
+    private fun hidPastDate(){
+        if (updatedDaysBetween.isNotEmpty()){
+            // Define the date format (update to match your `date` string format)
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val formattedCurrentDate = dateFormat.format(currentDate)
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+            val currentDate1 = calendar.time
+            val (startDate, endDate) = getWeekDates(currentDate1)
+            println("Week Start Date: ${formatDate(startDate)}")
+            println("Week End Date: ${formatDate(endDate)}")
+            // Get all dates between startDate and endDate
+            val daysBetween = getDaysBetween(startDate, endDate)
+            // Mark the current date as selected in the list
+            val updatedDaysBetween1 = daysBetween.map { dateModel ->
+                dateModel.apply {
+                    status = (date == formattedCurrentDate) // Compare formatted strings
+                }
+            }
+            var status=false
+            updatedDaysBetween1.forEach {
+                status = it.date >= BaseApplication.currentDateFormat().toString()
+            }
+            if (status){
+                val calendar = Calendar.getInstance()
+                calendar.time = currentDate
+                calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+                currentDate = calendar.time
+                // Display next week dates
+                println("\nAfter clicking 'Next':")
+                showWeekDates()
+            }else{
+                Toast.makeText(requireContext(),ErrorMessage.slideError,Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     fun showWeekDates() {
         val (startDate, endDate) = getWeekDates(currentDate)
@@ -197,23 +235,21 @@ class CookedFragment : Fragment(), OnItemClickListener {
         binding.textMonthAndYear.text = BaseApplication.formatonlyMonthYear(startDate)
         binding.textWeekRange.text = "" + formatDate(startDate) + "-" + formatDate(endDate)
         // Update the RecyclerView
-        val dateListLocal = getDaysBetween(startDate, endDate)
-        dateListLocal.forEach { dateModel ->
-            val date=BaseApplication.formatDate(currentDateLocal.toString())
-            if (date == dateModel.date){
-                dateModel.status=true
-            }else{
-                dateModel.status=false
+        updatedDaysBetween = daysBetween.map { dateModel ->
+            dateModel.apply {
+                status = (date == lastDateSelected) // Compare formatted strings
             }
         }
 
-        calendarAdapter = CalendarDayDateAdapter(dateListLocal) {
+        calendarAdapter = CalendarDayDateAdapter(updatedDaysBetween.toMutableList()) {
             // Handle item click if needed
             val dateList = getDaysBetween(startDate, endDate)
             // Update the status of the item at the target position
             dateList.forEachIndexed { index, dateModel ->
                 dateModel.status = index == it
+
             }
+            lastDateSelected=dateList[it].date
             currentDateSelected = dateList[it].date
             Log.d("Date ", "*****$dateList")
             // Notify the adapter to refresh the changed position
@@ -285,11 +321,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
                             if (cookedModel.code == 200 && cookedModel.success) {
                                 showDataInUi(cookedModel.data)
                             } else {
-                                if (cookedModel.code == ErrorMessage.code) {
-                                    showAlertFunction(cookedModel.message, true)
-                                } else {
-                                    showAlertFunction(cookedModel.message, false)
-                                }
+                                handleError(cookedModel.code,cookedModel.message)
                             }
                         }catch (e:Exception){
                             showAlertFunction(e.message, false)
@@ -306,6 +338,14 @@ class CookedFragment : Fragment(), OnItemClickListener {
                     }
                 }
             }, date, planType)
+        }
+    }
+
+    private fun handleError(code: Int, message: String) {
+        if (code == ErrorMessage.code) {
+            showAlertFunction(message, true)
+        } else {
+            showAlertFunction(message, false)
         }
     }
 
@@ -597,11 +637,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
                     adapter?.updateList(mealList, type)
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -633,11 +669,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
                 }
 
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -729,11 +761,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
                     spinnerActivityLevel.setItems(cookbookList.map { it.name })
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -837,11 +865,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
                             }
 
                         } else {
-                            if (cookedModel.code == ErrorMessage.code) {
-                                showAlertFunction(cookedModel.message, true)
-                            } else {
-                                showAlertFunction(cookedModel.message, false)
-                            }
+                            handleError(cookedModel.code,cookedModel.message)
                         }
                     }
 

@@ -141,7 +141,18 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
         binding.tvSkipBtn.setOnClickListener(this)
         binding.imgBackMealRoutine.setOnClickListener(this)
         binding.tvNextBtn.setOnClickListener(this)
-        binding.rlUpdateMealRoutine.setOnClickListener(this)
+
+        binding.rlUpdateMealRoutine.setOnClickListener {
+            if (isOnline(requireContext())) {
+                if (mealRoutineSelectedId.size>0){
+                    updateMealRoutineApi()
+                }else{
+                    alertError(requireContext(), ErrorMessage.mealTypetError, false)
+                }
+            } else {
+                alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
 
     }
 
@@ -272,14 +283,6 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
                     findNavController().navigate(R.id.cookingFrequencyFragment)
                 }
             }
-
-            R.id.rlUpdateMealRoutine -> {
-                if (isOnline(requireContext())) {
-                    updateMealRoutineApi()
-                } else {
-                    alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            }
         }
     }
 
@@ -329,7 +332,6 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
             status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
-
             return
         }
 

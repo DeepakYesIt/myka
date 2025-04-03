@@ -4,8 +4,9 @@ object ErrorMessage {
 
 
      const val networkError:String="Please check your internet connection"
-     const val servingError:String="The minimum serving value is at least one."
-     const val ingredientError:String="The minimum ingredient value is at least one."
+     const val servingError:String="The minimum serving count at least one."
+     const val ingredientError:String="Selected at least one ingredient."
+     const val mealTypetError:String="Selected at least one meal Type."
      const val apiError:String="Something went wrong"
      const val deviceType:String="Android"
      const val emailPatter:String="[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]"
@@ -16,6 +17,7 @@ object ErrorMessage {
      const val amountError:String="Invalid amount entered."
      const val mealTypeError:String="Select Meal type."
      const val weekNameError:String="Select Week Name."
+     const val slideError:String="Oops! You can only select today or a future date."
      const val selectCookBookError:String="Please select a cookbook."
      const val ratingError:String="Message can't be empty."
      const val cookBookSelectError:String="Select Cook Book"

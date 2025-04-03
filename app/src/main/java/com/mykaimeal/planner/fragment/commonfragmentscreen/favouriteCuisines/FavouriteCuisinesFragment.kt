@@ -295,7 +295,6 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
         try {
             if (favouriteModelData != null && favouriteModelData.isNotEmpty()) {
                 if (favouriteCuisineViewModel.getFavouriteCuiData() == null) {
-
                     favouriteModelData.add(0, FavouriteCuisinesModelData(id = -1, selected = false, "None")) // ID set to -1 as an indicator
                 }
                 var selected = false
