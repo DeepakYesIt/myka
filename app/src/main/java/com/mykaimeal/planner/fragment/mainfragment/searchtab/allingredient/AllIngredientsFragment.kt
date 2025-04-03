@@ -18,7 +18,6 @@ import com.mykaimeal.planner.model.DataModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
 
-
 @AndroidEntryPoint
 class AllIngredientsFragment : Fragment(),View.OnClickListener {
 

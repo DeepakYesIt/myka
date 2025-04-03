@@ -97,25 +97,29 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
 
         sessionManagement = SessionManagement(requireContext())
 
-        getLatLongFromAddress(requireActivity(),"188 King Street, San Francisco, CA 94107, USA")
 
-      /*  if (sessionManagement.getLatitude() != "") {
-            latitude = sessionManagement.getLatitude().toString()
-        } else {
-            latitude = "37.7786155"
-        }
+        /*  if (sessionManagement.getLatitude() != "") {
+              latitude = sessionManagement.getLatitude().toString()
+          } else {
+              latitude = "37.7786155"
+          }
 
-        if (sessionManagement.getLongitude() != "") {
-            longitude = sessionManagement.getLongitude().toString()
-        } else {
-            longitude = "-122.3940943"
-        }
-*/
+          if (sessionManagement.getLongitude() != "") {
+              longitude = sessionManagement.getLongitude().toString()
+          } else {
+              longitude = "-122.3940943"
+          }
+  */
+
         if (sessionManagement.getUserAddress() != "") {
             binding!!.tvAddress.text = sessionManagement.getUserAddress().toString()
+            userAddress=sessionManagement.getUserAddress().toString()
         } else {
+            userAddress="188 King Street, San Francisco, CA 94107, USA"
             binding!!.tvAddress.text = "188 King Street, San Francisco, CA 94107, USA"
         }
+
+        getLatLongFromAddress(requireActivity(), userAddress.toString())
 
         initialize()
 
@@ -126,11 +130,12 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
     private fun getLatLongFromAddress(context: Context, address: String): Pair<Double, Double>? {
         val geocoder = Geocoder(context, Locale.getDefault()) // Create Geocoder instance
         return try {
-            val addressList: List<Address>? = geocoder.getFromLocationName(address, 1) // Fetch location
+            val addressList: List<Address>? =
+                geocoder.getFromLocationName(address, 1) // Fetch location
             if (!addressList.isNullOrEmpty()) {
                 val location = addressList[0]
-                latitude= location.latitude.toString()
-                longitude= location.longitude.toString()
+                latitude = location.latitude.toString()
+                longitude = location.longitude.toString()
                 Pair(location.latitude, location.longitude) // Return Latitude & Longitude
             } else {
                 null
