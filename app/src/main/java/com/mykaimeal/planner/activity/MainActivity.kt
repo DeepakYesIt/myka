@@ -1,4 +1,4 @@
-package com.mykaimeal.planner.activity
+package com.mykaimeal .planner.activity
 
 import PlanApiResponse
 import android.annotation.SuppressLint
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     private var recipesModel: RecipesModel? = null
     private lateinit var layOnBoardingIndicator: LinearLayout
     val dataList = ArrayList<DataModel>()
-    private var adapter: ImageViewPagerAdapter? =null
+    private lateinit var  adapter: ImageViewPagerAdapter
     private var tvWeekRange: TextView? = null
     private var currentDate = Date() // Current date
 
@@ -92,43 +92,14 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
-
         handleDeepLink(intent)
-
-        binding.llHomeIndicator.visibility = View.VISIBLE
-        binding.llSearchIndicator.visibility = View.INVISIBLE
-        binding.llAddRecipeIndicator.visibility = View.INVISIBLE
-        binding.llPlanIndicator.visibility = View.INVISIBLE
-        binding.llCookedIndicator.visibility = View.INVISIBLE
 
         getFcmToken()
 
-        binding.imgHome.setColorFilter(ContextCompat.getColor(this, R.color.light_green))
-        binding.imgSearch.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-        binding.imgAddRecipe.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-        binding.imgPlan.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-        binding.imgCooked.setColorFilter(ContextCompat.getColor(this, R.color.light_grays))
-        binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.light_green))
-        binding.tvSearch.setTextColor(ContextCompat.getColor(this, R.color.black))
-        binding.tvAddRecipe.setTextColor(ContextCompat.getColor(this, R.color.black))
-        binding.tvPlan.setTextColor(ContextCompat.getColor(this, R.color.black))
-        binding.tvCooked.setTextColor(ContextCompat.getColor(this, R.color.black))
-
-        binding.llHome.setOnClickListener(this)
-        binding.llSearch.setOnClickListener(this)
-        binding.llAddRecipe.setOnClickListener(this)
-        binding.llPlan.setOnClickListener(this)
-        binding.llCooked.setOnClickListener(this)
-        binding.relAddRecipeWeb.setOnClickListener(this)
-        binding.relCreateNewRecipe.setOnClickListener(this)
-        binding.relRecipeImage.setOnClickListener(this)
+        setEvent()
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                101
-            )
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
         }
 
         /// using function for find destination graph
@@ -144,6 +115,23 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 //        fetchDataOnLoad()
 
 
+//        if (shouldShowDialog()) {
+//            fetchDataOnLoad()
+//        }
+
+//        fetchDataOnLoad()
+
+    }
+
+    private fun setEvent(){
+        binding.llHome.setOnClickListener(this)
+        binding.llSearch.setOnClickListener(this)
+        binding.llAddRecipe.setOnClickListener(this)
+        binding.llPlan.setOnClickListener(this)
+        binding.llCooked.setOnClickListener(this)
+        binding.relAddRecipeWeb.setOnClickListener(this)
+        binding.relCreateNewRecipe.setOnClickListener(this)
+        binding.relRecipeImage.setOnClickListener(this)
     }
 
     fun shouldShowDialog(): Boolean {
@@ -187,9 +175,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         val selectedColor = ContextCompat.getColor(this, R.color.light_green)
         val defaultColor = ContextCompat.getColor(this, R.color.light_grays)
         val textDefaultColor = ContextCompat.getColor(this, R.color.black)
-
         val views = listOf("home", "search", "addRecipe", "plan", "cooked")
-
         views.forEach { view ->
             val isSelected = status.equals(view, true)
             val color = if (isSelected) selectedColor else defaultColor
@@ -224,7 +210,6 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 }
             }
         }
-
         binding.cardViewAddRecipe.visibility = if (status.equals("addRecipe", true)) View.VISIBLE else View.GONE
     }
 
@@ -263,60 +248,78 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         }
     }
 
+    @SuppressLint("MissingInflatedId")
     private fun dialogDailyInspiration() {
         val dialog = Dialog(this@MainActivity, R.style.BottomSheetDialog)
         dialog.apply {
             setCancelable(true)
             setContentView(R.layout.alert_dialog_daily_inspiration)
-            window?.attributes = WindowManager.LayoutParams().apply {
-                copyFrom(window?.attributes)
+            window?.attributes = WindowManager.LayoutParams().apply { copyFrom(window?.attributes)
                 width = WindowManager.LayoutParams.MATCH_PARENT
                 height = WindowManager.LayoutParams.MATCH_PARENT
             }
 
             layOnBoardingIndicator = findViewById(R.id.layonboarding_indicator)
+
             val viewPager = findViewById<ViewPager2>(R.id.viewPager)
+            val tvnodata = findViewById<TextView>(R.id.tvnodata)
+
+            // Top
             val llBreakfast = findViewById<LinearLayout>(R.id.llBreakfast)
             val llLunch = findViewById<LinearLayout>(R.id.llLunch)
             val llDinner = findViewById<LinearLayout>(R.id.llDinner)
-            val rlAddPlanButton = findViewById<RelativeLayout>(R.id.rlAddPlanButton)
-            val rlAddCartButton = findViewById<RelativeLayout>(R.id.rlAddCartButton)
+            val llSnaks = findViewById<LinearLayout>(R.id.llSnaks)
+            val llBrunch = findViewById<LinearLayout>(R.id.llBrunch)
+
+            // Text
             val textBreakfast = findViewById<TextView>(R.id.textBreakfast)
-            val textDinner = findViewById<TextView>(R.id.textDinner)
             val textLunch = findViewById<TextView>(R.id.textLunch)
+            val textDinner = findViewById<TextView>(R.id.textDinner)
+            val textSnaks = findViewById<TextView>(R.id.textSnaks)
+            val textBrunch = findViewById<TextView>(R.id.textBrunch)
+
+            // Bottom view
             val viewBreakfast = findViewById<View>(R.id.viewBreakfast)
             val viewLunch = findViewById<View>(R.id.viewLunch)
             val viewDinner = findViewById<View>(R.id.viewDinner)
-            
-//            // Save the current time as the last shown time
-//            sharedPreferences.edit().putLong(lastShownTimeKey, System.currentTimeMillis()).apply()
+            val viewSnaks = findViewById<View>(R.id.viewSnaks)
+            val viewBrunch = findViewById<View>(R.id.viewBrunch)
 
-            llBreakfast.setOnClickListener {
-                viewBreakfast.visibility = View.VISIBLE
-                viewLunch.visibility = View.GONE
-                viewDinner.visibility = View.GONE
+            val rlAddPlanButton = findViewById<RelativeLayout>(R.id.rlAddPlanButton)
+            val rlAddCartButton = findViewById<RelativeLayout>(R.id.rlAddCartButton)
 
-                textBreakfast.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.orange))
-                textDinner.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.grey))
-                textLunch.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.grey))
+            fun setMealClickListener(mealLayout: View, mealView: View, mealText: TextView, mealName: String) {
+                mealLayout.setOnClickListener {
+                    listOf(viewBreakfast, viewLunch, viewDinner, viewSnaks, viewBrunch).forEach { it.visibility = View.INVISIBLE }
+                    mealView.visibility = View.VISIBLE
+
+                    listOf(textBreakfast, textLunch, textDinner, textSnaks, textBrunch).forEach {
+                        it.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.grey))
+                    }
+                    mealText.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.orange))
+                    updateList(mealName,viewPager,tvnodata)
+                }
             }
 
-            llLunch.setOnClickListener {
-                viewBreakfast.visibility = View.GONE
-                viewLunch.visibility = View.VISIBLE
-                viewDinner.visibility = View.GONE
-                textBreakfast.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.grey))
-                textLunch.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.orange))
-                textDinner.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.grey))
-            }
+            setMealClickListener(llBreakfast, viewBreakfast, textBreakfast, "Breakfast")
+            setMealClickListener(llLunch, viewLunch, textLunch, "Lunch")
+            setMealClickListener(llDinner, viewDinner, textDinner, "Dinner")
+            setMealClickListener(llSnaks, viewSnaks, textSnaks, "Snacks")
+            setMealClickListener(llBrunch, viewBrunch, textBrunch, "Brunch")
 
-            llDinner.setOnClickListener {
-                viewBreakfast.visibility = View.GONE
-                viewLunch.visibility = View.GONE
-                viewDinner.visibility = View.VISIBLE
-                textBreakfast.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.grey))
-                textLunch.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.grey))
-                textDinner.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.orange))
+
+            recipesModel?.let { model ->
+                model.Breakfast?.let { breakfast ->
+                    adapter = ImageViewPagerAdapter(this@MainActivity, breakfast)
+                    viewPager.adapter = adapter
+//                    setUpOnBoardingIndicator()
+//                    currentOnBoardingIndicator(0)
+                    viewPager.visibility = View.VISIBLE
+                    tvnodata.visibility = View.GONE
+                } ?: run {
+                    viewPager.visibility = View.GONE
+                    tvnodata.visibility = View.VISIBLE
+                }
             }
 
             rlAddPlanButton.setOnClickListener {
@@ -328,55 +331,80 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 findNavController(R.id.frameContainerMain).navigate(R.id.basketScreenFragment)
                 dismiss()
             }
-
-
-            if (recipesModel!=null){
-                adapter = ImageViewPagerAdapter(this@MainActivity, recipesModel!!.Dinner)
-            }
-            viewPager.adapter = adapter
-
-            // Set up ViewPager with images
-            setUpOnBoardingIndicator()
-            currentOnBoardingIndicator(0)
-
-
-        /*    /// set view pager position and value
-            viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                @SuppressLint("SetTextI18n")
-
-                override fun onPageSelected(position: Int) {
-                    super.onPageSelected(position)
-                *//*    if (position == 0) {
-                        binding.rlNextBtn.visibility= View.VISIBLE
-                        binding.relLetsGetStarted.visibility= View.GONE
-                        binding.tvHeading1.text="Plan a Meal"
-                        binding.tvTextDescriptions.text=getString(R.string.tvDescriptions1)
-
-                    }else if (position==1){
-                        binding.rlNextBtn.visibility= View.VISIBLE
-                        binding.relLetsGetStarted.visibility= View.GONE
-                        binding.tvHeading1.text="Track Food Expenses"
-                        binding.tvTextDescriptions.text=getString(R.string.tvDescriptions2)
-                    }else{
-                        binding.rlNextBtn.visibility= View.GONE
-                        binding.relLetsGetStarted.visibility= View.VISIBLE
-                        binding.tvHeading1.text="Smart Meal Shopping"
-                        binding.tvTextDescriptions.text=getString(R.string.tvDescription3)
-                    }*//*
-
-                    currentOnBoardingIndicator(position)
-                }
-            })
-*/
-            /*viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    super.onPageSelected(position)
-                    currentOnBoardingIndicator(position)
-                }
-            })
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))*/
-
             show()
+        }
+    }
+
+    private fun updateList(type: String, viewPager: ViewPager2, tvnodata: TextView){
+        if (type.equals("Breakfast",true)){
+            recipesModel?.Breakfast?.let {
+                viewPager.apply {
+                    adapter = ImageViewPagerAdapter(this@MainActivity, it)
+                    visibility = View.VISIBLE
+                    tvnodata.visibility = View.GONE
+//                    setUpOnBoardingIndicator()
+//                    currentOnBoardingIndicator(0)
+                }
+            } ?: run {
+                viewPager.visibility = View.GONE
+                tvnodata.visibility = View.VISIBLE
+            }
+        }
+        if (type.equals("Lunch",true)){
+            recipesModel?.Lunch?.let {
+                viewPager.apply {
+                    adapter = ImageViewPagerAdapter(this@MainActivity, it)
+                    visibility = View.VISIBLE
+                    tvnodata.visibility = View.GONE
+//                    setUpOnBoardingIndicator()
+//                    currentOnBoardingIndicator(0)
+                }
+            } ?: run {
+                viewPager.visibility = View.GONE
+                tvnodata.visibility = View.VISIBLE
+            }
+        }
+        if (type.equals("Dinner",true)){
+            recipesModel?.Dinner?.let {
+                viewPager.apply {
+                    adapter = ImageViewPagerAdapter(this@MainActivity, it)
+                    visibility = View.VISIBLE
+                    tvnodata.visibility = View.GONE
+//                    setUpOnBoardingIndicator()
+//                    currentOnBoardingIndicator(0)
+                }
+            } ?: run {
+                viewPager.visibility = View.GONE
+                tvnodata.visibility = View.VISIBLE
+            }
+        }
+        if (type.equals("Snacks",true)){
+            recipesModel?.Snack?.let {
+                viewPager.apply {
+                    adapter = ImageViewPagerAdapter(this@MainActivity, it)
+                    visibility = View.VISIBLE
+                    tvnodata.visibility = View.GONE
+//                    setUpOnBoardingIndicator()
+//                    currentOnBoardingIndicator(0)
+                }
+            } ?: run {
+                viewPager.visibility = View.GONE
+                tvnodata.visibility = View.VISIBLE
+            }
+        }
+        if (type.equals("Brunch",true)){
+            recipesModel?.Teatime?.let {
+                viewPager.apply {
+                    adapter = ImageViewPagerAdapter(this@MainActivity, it)
+                    visibility = View.VISIBLE
+                    tvnodata.visibility = View.GONE
+//                    setUpOnBoardingIndicator()
+//                    currentOnBoardingIndicator(0)
+                }
+            } ?: run {
+                viewPager.visibility = View.GONE
+                tvnodata.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -389,10 +417,8 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     }
 
     private fun fetchRecipeDetailsData() {
-//        BaseApplication.showMe(this@MainActivity)
         lifecycleScope.launch {
             mealRoutineViewModel.planRequest({
-//                BaseApplication.dismissMe()
                 handleApiResponse(it)
             }, "q")
         }
@@ -416,47 +442,30 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                     showData(apiModel.data)
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlertFunction(apiModel.message, true)
-                } else {
-                    showAlertFunction(apiModel.message, false)
-                }
+                 handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlertFunction(e.message, false)
         }
     }
 
+    private fun handleError(code: Int, message: String) {
+        if (code == ErrorMessage.code) {
+            showAlertFunction(message, true)
+        } else {
+            showAlertFunction(message, false)
+        }
+    }
+
     private fun showData(data: Data) {
         recipesModel = data.recipes
-        Log.d("ffdfdfd", "fffdfdf$recipesModel")
+        Log.d("24 hours api", "fffdfdf$recipesModel")
+//        saveCurrentDate()
         dialogDailyInspiration()
-   /*     if (recipesModel != null) {
-            fun setupMealAdapter(
-                mealRecipes: MutableList<BreakfastModel>?, recyclerView: RecyclerView, type: String): AdapterPlanBreakFast? {
-                return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
-                    val adapter = AdapterPlanBreakFast(mealRecipes, this@MainActivity, this, type)
-                    recyclerView.adapter = adapter
-                    adapter
-                } else {
-                    null
-                }
-            }
-
-
-            // Breakfast
-            if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
-                breakfastAdapter = setupMealAdapter(recipesModel?.Breakfast, binding.rcyBreakFast, "BreakFast")
-                binding.linearBreakfast.visibility = View.VISIBLE
-            } else {
-                binding.linearBreakfast.visibility = View.GONE
-            }
-
-        }*/
     }
 
     private fun setUpOnBoardingIndicator() {
-        val indicator = arrayOfNulls<ImageView>(adapter!!.itemCount)
+        val indicator = arrayOfNulls<ImageView>(adapter.itemCount)
         val layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -500,7 +509,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
     @SuppressLint("SetTextI18n")
     private fun chooseDayDialog(position: Int?, typeAdapter: String?) {
-        val dialogChooseDay: Dialog = Dialog(this@MainActivity)
+        val dialogChooseDay = Dialog(this@MainActivity)
         dialogChooseDay.setContentView(R.layout.alert_dialog_choose_day)
         dialogChooseDay.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
         dialogChooseDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

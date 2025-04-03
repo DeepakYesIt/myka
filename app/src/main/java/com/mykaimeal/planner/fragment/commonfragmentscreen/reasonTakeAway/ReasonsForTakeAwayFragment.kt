@@ -139,11 +139,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                             if (bodyModel.code == 200 && bodyModel.success) {
                                 showDataInUi(bodyModel.data.takeawayreason)
                             } else {
-                                if (bodyModel.code == ErrorMessage.code) {
-                                    showAlertFunction(bodyModel.message, true)
-                                }else{
-                                    showAlertFunction(bodyModel.message, false)
-                                }
+                                handleError(bodyModel.code,bodyModel.message)
                             }
                         }catch (e:Exception){
                             Log.d("ReasonTakeAway@@@","message:--"+e.message)
@@ -302,10 +298,10 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         }
 
         binding.rlUpdateReasonTakeAway.setOnClickListener{
-            if (BaseApplication.isOnline(requireContext())) {
+            if (isOnline(requireContext())) {
                 updateReasonTakeAwayApi()
             } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
     }
@@ -321,19 +317,10 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                             val gson = Gson()
                             val updateModel = gson.fromJson(it.data, UpdatePreferenceSuccessfully::class.java)
                             if (updateModel.code == 200 && updateModel.success) {
-//
                                 sessionManagement.setLoginSession(true)
                                 findNavController().navigate(R.id.turnOnLocationFragment)
-//                                val intent = Intent(requireActivity(), MainActivity::class.java)
-//                                startActivity(intent)
-//                                requireActivity().finish()
-
                             } else {
-                                if (updateModel.code == ErrorMessage.code) {
-                                    showAlertFunction(updateModel.message, true)
-                                }else{
-                                    showAlertFunction(updateModel.message, false)
-                                }
+                               handleError(updateModel.code,updateModel.message)
                             }
                         }catch (e:Exception){
                             Log.d("ReasonTakeAway@@@@@","message:--"+e.message)
@@ -349,6 +336,14 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
             },userName,cookingFor,userGender,bodyGoals,partnerName,partnerAge,partnerGender,familyMemName,
                 familyMemAge, familyMemStatus,dietarySelectedId,favouriteSelectedId,dislikeSelectedId,allergenSelectedId,mealRoutineSelectedId,
                 cookingFrequency,spendingAmount,spendingDuration,eatingOut, reasonSelect,reasonTakeAway)
+        }
+    }
+
+    private fun handleError(code: Int, message: String) {
+        if (code == ErrorMessage.code) {
+            showAlertFunction(message, true)
+        }else{
+            showAlertFunction(message, false)
         }
     }
 
@@ -408,11 +403,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                             if (bodyModel.code == 200 && bodyModel.success) {
                                 showDataInUi(bodyModel.data)
                             } else {
-                                if (bodyModel.code == ErrorMessage.code) {
-                                    showAlertFunction(bodyModel.message, true)
-                                }else{
-                                    showAlertFunction(bodyModel.message, false)
-                                }
+                                handleError(bodyModel.code,bodyModel.message)
                             }
                         }catch (e:Exception){
                             Log.d("ReasonTakeAway@@@@","message:--"+e.message)
@@ -493,8 +484,6 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 binding.tvNextBtn.isClickable = true
                 binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
             }
-
-
             return
         }
 

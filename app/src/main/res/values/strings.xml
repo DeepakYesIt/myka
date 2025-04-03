@@ -127,6 +127,7 @@
     <string name="no_recipes_yet">No recipes yet</string>
     <string name="confirm_your_address"><font color="#000000">Confirm your </font><font color="#06C169"> address</font></string>
     <string name="enter_address">Enter Address</string>
+    <string name="snacks">Snacks</string>
 
 
 </resources>

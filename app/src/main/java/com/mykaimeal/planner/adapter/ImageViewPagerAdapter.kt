@@ -27,6 +27,19 @@ class ImageViewPagerAdapter(private val context: Context, private var imageList:
 
         val data= imageList?.get(position)
 
+
+        if (data?.recipe?.label!=null){
+            holder.binding.tvname.text = data.recipe.label
+        }
+
+        if (data?.recipe?.totalTime!=null){
+            holder.binding.tvTime.text = ""+ data.recipe.totalTime +" min "
+        }
+
+        if (data?.review!=null){
+            holder.binding.textMin.text = ""+ data.review +"("+ data.review_number +")"
+        }
+
         if (data?.recipe?.images?.SMALL?.url != null) {
             Glide.with(context)
                 .load(data.recipe.images.SMALL.url)
@@ -48,8 +61,6 @@ class ImageViewPagerAdapter(private val context: Context, private var imageList:
             holder.binding.layProgess.root.visibility = View.GONE
         }
 
-
-/*        holder.binding.imageView.setImageResource(imageList[position])*/
     }
 
     override fun getItemCount(): Int {
@@ -60,9 +71,9 @@ class ImageViewPagerAdapter(private val context: Context, private var imageList:
 
     }
 
-   /* fun updateItem(list : MutableList<Int>){
+    fun updateItem(list : MutableList<BreakfastModel>){
         this.imageList = list
         notifyDataSetChanged()
 
-    }*/
+    }
 }

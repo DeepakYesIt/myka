@@ -47,7 +47,7 @@ class HealthDataFragment : Fragment() {
             llBottomNavigation.visibility = View.VISIBLE
         }
 
-        setupUi()
+
 
         setupBackNavigation()
 
@@ -62,6 +62,7 @@ class HealthDataFragment : Fragment() {
             }
         }
 
+        setupUi()
 
         return binding.root
     }
@@ -88,6 +89,7 @@ class HealthDataFragment : Fragment() {
         }
 
         binding.textMale.setOnClickListener { selectGender(true) }
+
         binding.textFemale.setOnClickListener { selectGender(false) }
 
         binding.etDateOfBirth.setOnClickListener {
@@ -302,9 +304,7 @@ class HealthDataFragment : Fragment() {
         }
 
 
-        if ((data.calories ?: 0) == 0 && (data.carbs ?: 0) == 0 && (data.fat
-                ?: 0) == 0 && (data.protien ?: 0) == 0
-        ) {
+        if ((data.calories ?: 0) == 0 && (data.carbs ?: 0) == 0 && (data.fat ?: 0) == 0 && (data.protien ?: 0) == 0) {
             // Corrected "protien" to "protein" if needed
             binding.llCalculateBMR.visibility = View.GONE
             binding.rlAddMoreGoals.visibility = View.VISIBLE
@@ -341,8 +341,6 @@ class HealthDataFragment : Fragment() {
             }
 
         }
-
-
     }
 
     private fun selectGender(isMale: Boolean) {

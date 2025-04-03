@@ -29,6 +29,10 @@ class NutritionGoalFragment : Fragment() {
     private lateinit var binding: FragmentNutritionGoalBinding
     private lateinit var viewModel: SettingViewModel
     private lateinit var sessionManagement: SessionManagement
+    var calories=0
+    var fat=0
+    var protien=0
+    var carbs=0
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -103,38 +107,47 @@ class NutritionGoalFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun updateUI(data: Data) {
+
         if (data.height_protein!=null && !data.height_protein.equals("null",true)){
             binding.spinnerHighProtein.text = data.height_protein
         }
 
         if (data.calories!=null){
+            calories=data.calories?.toInt() ?: 0
             binding.seekbarcalories.progress = data.calories?.toInt() ?: 0
             binding.textCalorisTotal.text=""+data.calories?.toInt()+"/500"
         }else{
+            calories= 0
             binding.seekbarcalories.progress =  0
             binding.textCalorisTotal.text="0/500"
         }
 
         if (data.fat!=null){
+            fat=data.fat?.toInt() ?: 0
             binding.seekbarFats.progress = data.fat?.toInt() ?: 0
             binding.textFatTotal.text=""+data.fat?.toInt()+"/500"
         }else{
+            fat= 0
             binding.seekbarFats.progress =  0
             binding.textFatTotal.text="0/500"
         }
 
         if (data.protien!=null){
+            protien=data.protien?.toInt() ?: 0
             binding.seekbarProtein.progress = data.protien?.toInt() ?: 0
             binding.textProtienTotal.text=""+data.protien?.toInt()+"/500"
         }else{
+            protien=0
             binding.seekbarProtein.progress =  0
             binding.textProtienTotal.text="0/500"
         }
 
         if (data.carbs!=null){
+            carbs=data.carbs?.toInt() ?: 0
             binding.seekbarCarbs.progress = data.carbs?.toInt() ?: 0
             binding.textCarbsTotal.text=""+data.carbs?.toInt()+"/500"
         }else{
+            carbs=0
             binding.seekbarCarbs.progress =  0
             binding.textCarbsTotal.text="0/500"
         }
@@ -164,30 +177,93 @@ class NutritionGoalFragment : Fragment() {
 
     private fun setSeekBarValue() {
 
-        // Helper function to set SeekBar change listener and update the corresponding TextView
-        fun setSeekBarListener(seekBar: SeekBar, textView: TextView) {
-            seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                @SuppressLint("SetTextI18n")
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    // Update TextView with SeekBar's current value
-                    textView.text = "$progress/500"
-                }
 
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                    // Optional: Do something when touch starts
+        binding.seekbarcalories.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            @SuppressLint("SetTextI18n")
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                // Update TextView with SeekBar's current value
+                binding.textCalorisTotal.text = "$progress/500"
+                // Enforce the minimum value constraint
+                if (progress <= calories) {
+                    seekBar?.progress = calories
+                }else{
+                    seekBar?.progress = progress
                 }
+            }
 
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                    // Optional: Do something when touch stops
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // Optional: Do something when touch starts
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // Optional: Do something when touch stops
+            }
+        })
+        binding.seekbarFats.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            @SuppressLint("SetTextI18n")
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                // Update TextView with SeekBar's current value
+                binding.textFatTotal.text = "$progress/500"
+                // Enforce the minimum value constraint
+                if (progress <= fat) {
+                    seekBar?.progress = fat
+                }else{
+                    seekBar?.progress = progress
                 }
-            })
-        }
+            }
 
-        // Set listeners for each SeekBar and corresponding TextView
-        setSeekBarListener(binding.seekbarcalories, binding.textCalorisTotal)
-        setSeekBarListener(binding.seekbarFats, binding.textFatTotal)
-        setSeekBarListener(binding.seekbarCarbs, binding.textCarbsTotal)
-        setSeekBarListener(binding.seekbarProtein, binding.textProtienTotal)
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // Optional: Do something when touch starts
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // Optional: Do something when touch stops
+            }
+        })
+        binding.seekbarCarbs.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            @SuppressLint("SetTextI18n")
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                // Update TextView with SeekBar's current value
+                binding.textCarbsTotal.text = "$progress/500"
+                // Enforce the minimum value constraint
+                if (progress <= carbs) {
+                    seekBar?.progress = carbs
+                }else{
+                    seekBar?.progress = progress
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // Optional: Do something when touch starts
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // Optional: Do something when touch stops
+            }
+        })
+        binding.seekbarProtein.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            @SuppressLint("SetTextI18n")
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                // Update TextView with SeekBar's current value
+                binding.textProtienTotal.text = "$progress/500"
+                // Enforce the minimum value constraint
+                if (progress <= protien) {
+                    seekBar?.progress = protien
+                }else{
+                    seekBar?.progress = progress
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // Optional: Do something when touch starts
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // Optional: Do something when touch stops
+            }
+        })
+
+
     }
 
     private fun setupSpinner() {

@@ -97,7 +97,7 @@ class OnBoardingActivity : AppCompatActivity() {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         layoutParams.setMargins(0, 0, 0, 0)
-        for (i in 0 until indicator.size) {
+        for (i in indicator.indices) {
             val img = ImageView(this)
             img.setImageDrawable(this.let {
                 ContextCompat.getDrawable(
