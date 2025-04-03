@@ -125,7 +125,6 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
             findNavController().navigate(R.id.checkoutScreenFragment)
         }
 
-
         if (BaseApplication.isOnline(requireActivity())){
             // This condition for check location run time permission
             if (ContextCompat.checkSelfPermission(
@@ -382,7 +381,7 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
             } else{
                 val mainId:String= products!![position!!].id.toString()
                 val productId:String= products!![position].pro_id.toString()
-                val productName:String= products!![position].pro_name.toString()
+                val productName:String= products!![position].name.toString()
                 val bundle = Bundle().apply {
                     putString("id",mainId)
                     putString("SwapProId",productId)

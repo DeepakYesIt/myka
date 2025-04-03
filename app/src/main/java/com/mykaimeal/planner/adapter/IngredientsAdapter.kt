@@ -47,12 +47,11 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
                     holder.binding.tvFoodPrice.text=data.pro_price.toString()
                 }else{
                     holder.binding.tvFoodPrice.text="$00"
-
                 }
             }
 
-            if (data.name!=null){
-                val foodName = data.name
+            if (data.pro_name!=null){
+                val foodName = data.pro_name
                 val result = foodName.mapIndexed { index, c ->
                     if (index == 0 || c.isUpperCase()) c.uppercaseChar() else c
                 }.joinToString("")
@@ -123,6 +122,10 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
                 // Optional: Gradually change color based on slide offset
             }
         })
+
+        holder.binding.deleteLayout.setOnClickListener{
+                onItemSelectListener.itemSelect(position,"Delete","Ingredients")
+        }
 
 
     }

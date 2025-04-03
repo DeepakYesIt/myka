@@ -52,7 +52,7 @@ class SuperMarketListAdapter(
             if (it.all_items==1){
                 if (it.missing!=null){
                     holder.binding.tvSuperMarketItems.setTextColor(android.graphics.Color.parseColor("#FF3232"))
-                    holder.binding.tvSuperMarketItems.text=it.missing.toString()+"ITEMS MISSING"
+                    holder.binding.tvSuperMarketItems.text=it.missing.toString()+" ITEMS MISSING"
                 }
             }else{
                 holder.binding.tvSuperMarketItems.setTextColor(android.graphics.Color.parseColor("#06C169"))

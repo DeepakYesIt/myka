@@ -48,8 +48,12 @@ class CategoryProductAdapter(
 
         fun bind(product: Product) {
 
-            if (product.name != null) {
-                binding.textProductName.text = product.name
+            if (product.pro_name!=null){
+                val foodName = product.pro_name
+                val result = foodName.mapIndexed { index, c ->
+                    if (index == 0 || c.isUpperCase()) c.uppercaseChar() else c
+                }.joinToString("")
+                binding.textProductName.text=result
             }
 
             if (product.pro_id != null) {

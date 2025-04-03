@@ -28,11 +28,10 @@ class AdapterFavouriteCuisinesItem(private var favouriteCuisineModelData: List<F
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.tvTitleName.text=favouriteCuisineModelData[position].name
+        holder.binding.tvTitleName.text = favouriteCuisineModelData[position].name
 
-        // Inside your adapter's onBindViewHolder method
         holder.binding.apply {
-            // Update UI based on the data model's 'selected' property
+            // Update UI based on the 'selected' property
             if (favouriteCuisineModelData[position].selected) {
                 imageRightTick.visibility = View.VISIBLE
                 relMainLayout.setBackgroundResource(R.drawable.orange_box_bg)
@@ -48,7 +47,46 @@ class AdapterFavouriteCuisinesItem(private var favouriteCuisineModelData: List<F
 
             // Handle item click
             relMainLayout.setOnClickListener {
-                if (position == 0) {
+                // Toggle selection state
+                favouriteCuisineModelData[position].selected = !favouriteCuisineModelData[position].selected
+
+                if (favouriteCuisineModelData[position].selected) {
+                    dietaryId.add(favouriteCuisineModelData[position].id.toString())
+                    selectedPositions.add(position)
+                } else {
+                    dietaryId.remove(favouriteCuisineModelData[position].id.toString())
+                    selectedPositions.remove(position)
+                }
+
+                // Callback to notify selection change
+                onItemClickedListener.itemClicked(position, dietaryId, "2", favouriteCuisineModelData[position].selected.toString())
+
+                notifyItemChanged(position) // Efficiently update only the clicked item
+            }
+        }
+
+
+        /*   holder.binding.tvTitleName.text=favouriteCuisineModelData[position].name
+
+           // Inside your adapter's onBindViewHolder method
+           holder.binding.apply {
+               // Update UI based on the data model's 'selected' property
+               if (favouriteCuisineModelData[position].selected) {
+                   imageRightTick.visibility = View.VISIBLE
+                   relMainLayout.setBackgroundResource(R.drawable.orange_box_bg)
+                   if (!dietaryId.contains(favouriteCuisineModelData[position].id.toString())) {
+                       dietaryId.add(favouriteCuisineModelData[position].id.toString())
+                   }
+                   onItemClickedListener.itemClicked(position, dietaryId, "-1", "")
+               } else {
+                   imageRightTick.visibility = View.GONE
+                   relMainLayout.setBackgroundResource(R.drawable.gray_box_border_bg)
+                   dietaryId.remove(favouriteCuisineModelData[position].id.toString())
+               }
+
+               // Handle item click
+               relMainLayout.setOnClickListener {
+                  *//* if (position == 0) {
                     // Handle "None" (first item) case
                     if (favouriteCuisineModelData[position].selected) {
                         // Deselect "None"
@@ -67,7 +105,7 @@ class AdapterFavouriteCuisinesItem(private var favouriteCuisineModelData: List<F
                         dietaryId.add(favouriteCuisineModelData[position].id.toString())
                         onItemClickedListener.itemClicked(position, dietaryId, "2", "true")
                     }
-                } else {
+                } else {*//*
                         favouriteCuisineModelData[0].selected = false
                         dietaryId.clear()
 
@@ -85,10 +123,10 @@ class AdapterFavouriteCuisinesItem(private var favouriteCuisineModelData: List<F
                         dietaryId.add(favouriteCuisineModelData[position].id.toString())
                         onItemClickedListener.itemClicked(position, dietaryId, "2", "true")
                     }
-                }
+                *//*}*//*
                 notifyDataSetChanged() // Refresh the UI
             }
-        }
+        }*/
     }
 
     fun setExpanded(expanded: Boolean) {

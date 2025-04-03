@@ -724,6 +724,19 @@ interface ApiInterface {
         @Field("date") date: String?
     ): Response<JsonObject>
 
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.userDietSuggestionUrl)
+    suspend fun updateDietSuggestionUrl(
+        @Field("gender") gender: String?,
+        @Field("dob") dob: String?,
+        @Field("height") height: String?,
+        @Field("height_type") heightType: String?,
+        @Field("weight") weight: String?,
+        @Field("weight_type") weightType: String?,
+        @Field("activityLevel") activityLevel: String?
+    ): Response<JsonObject>
+
     @FormUrlEncoded
     @POST(ApiEndPoint.addAddressUrl)
     suspend fun addAddressUrl(

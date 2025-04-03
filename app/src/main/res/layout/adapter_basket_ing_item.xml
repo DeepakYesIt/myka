@@ -1,35 +1,40 @@
-<?xml version="1.0" encoding="utf-8"?>
-<com.chauthai.swipereveallayout.SwipeRevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.chauthai.swipereveallayout.SwipeRevealLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipe_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/_3sdp"
-    android:layout_marginVertical="@dimen/_3sdp"
+    android:layout_margin="@dimen/_2sdp"
     android:padding="@dimen/_8sdp"
     app:dragEdge="left"
     app:mode="same_level"
     tools:ignore="MissingClass">
 
-    <LinearLayout
-        android:id="@+id/delete_layout"
+    <!-- Delete Layout Positioned Correctly -->
+    <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/_50sdp"
-        android:layout_margin="@dimen/_19sdp"
-        android:layout_marginTop="@dimen/_20sdp"
-        android:gravity="center">
+        android:layout_height="@dimen/_60sdp"
+        android:gravity="center_vertical">
 
-        <ImageView
-            android:id="@+id/img_notification"
+        <LinearLayout
+            android:id="@+id/deleteLayout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginHorizontal="@dimen/_15sdp"
-            android:background="@drawable/delete_con_basket"
-            android:gravity="center" />
-    </LinearLayout>
+            android:layout_height="@dimen/_50sdp"
+            android:layout_centerVertical="true">
 
+            <ImageView
+                android:id="@+id/img_notification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="@dimen/_15sdp"
+                android:background="@drawable/delete_con_basket"
+                android:gravity="center" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <!-- Main Item Layout -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -38,7 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/_4sdp"
-            android:elevation="@dimen/_5sdp"
+            android:elevation="@dimen/_4sdp"
             app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="@dimen/_10sdp">
 
@@ -50,6 +55,7 @@
                     android:id="@+id/relImageFood"
                     android:layout_width="@dimen/_50sdp"
                     android:layout_height="@dimen/_50sdp"
+                    android:layout_margin="@dimen/_5sdp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -69,7 +75,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true" />
-
                 </RelativeLayout>
 
                 <TextView
@@ -77,10 +82,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/_10sdp"
-                    android:layout_toRightOf="@+id/relImageFood"
-                    android:fontFamily="@font/poppins"
                     android:maxWidth="@dimen/_130sdp"
-                    android:singleLine="true"
+                    android:maxLines="3"
                     android:text="Sandwich"
                     android:textColor="#0A2533"
                     android:textSize="@dimen/_10ssp"
@@ -93,11 +96,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/_10sdp"
-                    android:fontFamily="@font/poppins"
                     android:singleLine="true"
                     android:text="60 G"
                     android:textColor="#999999"
                     android:textSize="@dimen/_10ssp"
+                    android:visibility="gone"
                     app:layout_constraintStart_toEndOf="@+id/relImageFood"
                     app:layout_constraintTop_toBottomOf="@+id/tvFoodName" />
 
@@ -106,7 +109,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/_38sdp"
-                    android:fontFamily="@font/poppins"
                     android:singleLine="true"
                     android:text="fdffdfh"
                     android:textColor="#06C169"
