@@ -96,7 +96,7 @@
                 android:layout_below="@+id/relWeekDate"
                 android:orientation="vertical"
                 android:layout_marginTop="@dimen/_7sdp"
-                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:layout_marginHorizontal="@dimen/_10sdp"
                 android:paddingHorizontal="@dimen/_6sdp"
                 android:paddingVertical="@dimen/_10sdp"
                 android:background="@drawable/calendar_events_bg">
@@ -140,7 +140,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginStart="@dimen/_5sdp"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     android:overScrollMode="never"/>
 

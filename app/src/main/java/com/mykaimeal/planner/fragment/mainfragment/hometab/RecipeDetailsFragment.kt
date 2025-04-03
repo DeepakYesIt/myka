@@ -63,6 +63,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
     private var adapterRecipeItem: AdapterRecipeItem? = null
     val dataList = ArrayList<DataModel>()
     private var tvWeekRange: TextView? = null
+    private var rcyChooseDaySch: RecyclerView? = null
     private var selectAll: Boolean = false
     private var quantity: Int = 1
     private lateinit var viewModel: RecipeDetailsViewModel
@@ -517,14 +518,14 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         dialogChooseDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val rcyChooseDaySch = dialogChooseDay.findViewById<RecyclerView>(R.id.rcyChooseDaySch)
+        rcyChooseDaySch = dialogChooseDay.findViewById<RecyclerView>(R.id.rcyChooseDaySch)
         tvWeekRange = dialogChooseDay.findViewById(R.id.tvWeekRange)
         val rlDoneBtn = dialogChooseDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         val btnPrevious = dialogChooseDay.findViewById<ImageView>(R.id.btnPrevious)
         val btnNext = dialogChooseDay.findViewById<ImageView>(R.id.btnNext)
         dialogChooseDay.show()
         dialogChooseDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        showWeekDates()
+
         dataList.clear()
         val daysOfWeek =
             listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
@@ -538,7 +539,8 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             dataList.add(data)
         }
 
-        rcyChooseDaySch!!.adapter = ChooseDayAdapter(dataList, requireActivity())
+        showWeekDates()
+
 
         rlDoneBtn.setOnClickListener {
             var status = false
@@ -558,13 +560,38 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         }
 
         btnPrevious.setOnClickListener {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val formattedCurrentDate = dateFormat.format(currentDate)
             val calendar = Calendar.getInstance()
             calendar.time = currentDate
             calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
-            currentDate = calendar.time
-            // Display next week dates
-            println("\nAfter clicking 'Next':")
-            showWeekDates()
+            val currentDate1 = calendar.time
+            val (startDate, endDate) = getWeekDates(currentDate1)
+            println("Week Start Date: ${formatDate(startDate)}")
+            println("Week End Date: ${formatDate(endDate)}")
+            // Get all dates between startDate and endDate
+            val daysBetween = getDaysBetween(startDate, endDate)
+            // Mark the current date as selected in the list
+            val updatedDaysBetween1 = daysBetween.map { dateModel ->
+                dateModel.apply {
+                    status = (date == formattedCurrentDate) // Compare formatted strings
+                }
+            }
+            var status=false
+            updatedDaysBetween1.forEach {
+                status = it.date >= BaseApplication.currentDateFormat().toString()
+            }
+            if (status){
+                val calendar = Calendar.getInstance()
+                calendar.time = currentDate
+                calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+                currentDate = calendar.time
+                // Display next week dates
+                println("\nAfter clicking 'Next':")
+                showWeekDates()
+            }else{
+                Toast.makeText(requireContext(),ErrorMessage.slideError,Toast.LENGTH_LONG).show()
+            }
         }
 
         btnNext.setOnClickListener {
@@ -641,6 +668,14 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
 
         // Get all dates between startDate and endDate
         val daysBetween = getDaysBetween(startDate, endDate)
+        // Mark the current date as selected in the list
+        daysBetween.zip(dataList).forEach { (dateModel, dataModel) ->
+            dataModel.date = dateModel.date
+            dataModel.isOpen = false
+        }
+
+        rcyChooseDaySch?.adapter = ChooseDayAdapter(dataList, requireActivity())
+
 
         // Print the dates
         println("Days between $startDate and ${endDate}:")

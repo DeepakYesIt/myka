@@ -13,9 +13,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.CalendarView
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -89,8 +91,10 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
     private var currentDateSelected: String = ""
 
     private lateinit var spinnerActivityLevel: PowerSpinnerView
-    private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
-        mutableListOf()
+    private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
+
+    var updatedDaysBetween: List<DateModel> = emptyList()
+    private var lastDateSelected: String = ""
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -108,6 +112,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         sessionManagement = SessionManagement(requireContext())
         commonWorkUtils = CommonWorkUtils(requireContext())
         currentDateSelected = BaseApplication.currentDateFormat().toString()
+        lastDateSelected=currentDateSelected
         fUllCookingScheduleViewModel = ViewModelProvider(requireActivity())[FullCookingScheduleViewModel::class.java]
 
         backButton()
@@ -128,6 +133,8 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         }
 
         onClickFalseEnabled()
+
+
         initialize()
         // Display current week dates
         showWeekDates()
@@ -147,11 +154,11 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
     @SuppressLint("SetTextI18n")
     fun showWeekDates() {
         Log.d("currentDate :- ", "******$currentDate")
+        Log.d("lastDateSelected :- ", "******$lastDateSelected")
 
         // Define the date format (update to match your `date` string format)
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val formattedCurrentDate =
-            dateFormat.format(currentDate) // Format currentDate to match the string format
+        val formattedCurrentDate = dateFormat.format(currentDate) // Format currentDate to match the string format
 
         // Get the start and end dates of the week
         val (startDate, endDate) = getWeekDates(currentDate)
@@ -162,12 +169,11 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         val daysBetween = getDaysBetween(startDate, endDate)
 
         // Mark the current date as selected in the list
-        val updatedDaysBetween = daysBetween.map { dateModel ->
+        updatedDaysBetween = daysBetween.map { dateModel ->
             dateModel.apply {
-                status = (date == formattedCurrentDate) // Compare formatted strings
+                status = (date == lastDateSelected) // Compare formatted strings
             }
         }
-
         // Print the dates for debugging
         println("Days between $startDate and $endDate:")
         updatedDaysBetween.forEach { println(it) }
@@ -179,12 +185,13 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         tvWeekRange?.text = "${formatDate(startDate)} - ${formatDate(endDate)}"
 
         // Initialize the adapter with the updated date list
-        calendarAdapter =
-            CalendarDayDateAdapter(updatedDaysBetween.toMutableList()) { selectedPosition ->
+        calendarAdapter = CalendarDayDateAdapter(updatedDaysBetween.toMutableList()) { selectedPosition ->
                 // Update the list to reflect the selected date
                 updatedDaysBetween.forEachIndexed { index, dateModel ->
                     dateModel.status = (index == selectedPosition)
+                    lastDateSelected=updatedDaysBetween[selectedPosition].date
                 }
+
                 Log.d("Date ", "*****$updatedDaysBetween")
 
                 // Notify the adapter to refresh the data
@@ -208,22 +215,18 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             when (dragEvent.action) {
                 DragEvent.ACTION_DRAG_STARTED -> {
                     // Accept the drag only if the MIME type matches
-
                     dragEvent.clipDescription?.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN) == true
                 }
 
                 DragEvent.ACTION_DRAG_ENTERED -> {
                     // Optional: Highlight the RecyclerView background
-//                    view.setBackgroundColor(Color.LTGRAY)
                     true
                 }
 
                 DragEvent.ACTION_DRAG_LOCATION -> {
                     val recyclerView = view as RecyclerView // Cast the view to RecyclerView
-                    val childView = recyclerView.findChildViewUnder(
-                        dragEvent.x,
-                        dragEvent.y
-                    ) // Call findChildViewUnder on RecyclerView
+                    val childView = recyclerView.findChildViewUnder(dragEvent.x, dragEvent.y) // Call findChildViewUnder on RecyclerView
+
                     val targetPosition = if (childView != null) {
                         recyclerView.getChildAdapterPosition(childView) // Get the position of the child
                     } else {
@@ -231,24 +234,19 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                     }
 
                     if (targetPosition != RecyclerView.NO_POSITION) {
-
-                        // Retrieve the list of dates
-                        val dateList = getDaysBetween(startDate, endDate)
-
-                        // Update the status of the item at the target position
-                        dateList.forEachIndexed { index, dateModel ->
-                            dateModel.status = index == targetPosition
-
+                        if (getDaysBetween(startDate, endDate)[targetPosition].date>=BaseApplication.currentDateFormat().toString()){
+                            updatedDaysBetween = daysBetween.mapIndexed { index, dateModel ->
+                                dateModel.apply {
+                                    status = (index == targetPosition) // Change status based on position
+                                    lastDateSelected=updatedDaysBetween[targetPosition].date
+                                }
+                            }
+                            Log.d("lastDateSelected","******"+lastDateSelected)
+                            // Notify the adapter to refresh the changed position
+                            calendarAdapter!!.updateList(updatedDaysBetween.toMutableList())
+                            calendarAdapter!!.notifyItemChanged(targetPosition)
+                            /*calendarAdapter!!.updateList(dateList)*/
                         }
-
-                        Log.d("Date ", "*****$dateList")
-
-                        // Notify the adapter to refresh the changed position
-                        calendarAdapter!!.updateList(dateList)
-                        calendarAdapter!!.notifyItemChanged(targetPosition)
-
-                        /*calendarAdapter!!.updateList(dateList)*/
-
                     } else {
                         Log.d("date position ", "No valid position under drag location")
                     }
@@ -277,41 +275,27 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
                         if (dropPosition != RecyclerView.NO_POSITION) {
                             Log.d("ACTION_DROP", "Item dropped at position: $dropPosition")
-
-                            dropDate = getDaysBetween(startDate, endDate)[dropPosition].date
-                            /*dropMealType*/
-                            dropDay = getDaysBetween(startDate, endDate)[dropPosition].day
-
-                            Log.d("ACTION_DROP", "*******$dropPosition")
-                            Log.d(
-                                "date position ",
-                                "******" + getDaysBetween(startDate, endDate)[dropPosition].date
-                            )
-
-                            Log.d(
-                                "drop date and days",
-                                "******" + getDaysBetween(startDate, endDate)[dropPosition].date +
-                                        "-" + getDaysBetween(startDate, endDate)[dropPosition].day
-                            )
-
-                            Log.d("ACTION_DROP", "Target position: $dropPosition")
-                            binding.rlChangeCookSchedule.isClickable = true
-                            binding.rlChangeCookSchedule.isEnabled = true
-                            binding.rlChangeCookSchedule.setBackgroundResource(R.drawable.gray_btn_select_background)
-
-                            // Retrieve the list of dates
-                            val dateList = getDaysBetween(startDate, endDate)
-
-                            // Update the status of the item at the target position
-                            dateList.forEachIndexed { index, dateModel ->
-                                dateModel.status = index == dropPosition
+                            if (getDaysBetween(startDate, endDate)[dropPosition].date>=BaseApplication.currentDateFormat().toString()){
+                                dropDate = getDaysBetween(startDate, endDate)[dropPosition].date
+                                /*dropMealType*/
+                                dropDay = getDaysBetween(startDate, endDate)[dropPosition].day
+                                Log.d("ACTION_DROP", "*******$dropPosition")
+                                Log.d("date position ", "******" + getDaysBetween(startDate, endDate)[dropPosition].date)
+                                Log.d("drop date and days", "******" + getDaysBetween(startDate, endDate)[dropPosition].date + "-" + getDaysBetween(startDate, endDate)[dropPosition].day)
+                                Log.d("ACTION_DROP", "Target position: $dropPosition")
+                                binding.rlChangeCookSchedule.isClickable = true
+                                binding.rlChangeCookSchedule.isEnabled = true
+                                binding.rlChangeCookSchedule.setBackgroundResource(R.drawable.gray_btn_select_background)
+                                updatedDaysBetween = daysBetween.mapIndexed { index, dateModel ->
+                                    dateModel.apply {
+                                        status = (index == dropPosition) // Change status based on position
+                                        lastDateSelected=updatedDaysBetween[dropPosition].date
+                                    }
+                                }
+                                // Notify the adapter to refresh the changed position
+                                calendarAdapter!!.updateList(updatedDaysBetween.toMutableList())
+                                // Optional: Notify the source RecyclerView to remove the dragged item
                             }
-
-                            Log.d("Date ", "*****$dateList")
-                            // Notify the adapter to refresh the changed position
-                            calendarAdapter!!.updateList(dateList)
-                            // Optional: Notify the source RecyclerView to remove the dragged item
-                            // notifyItemRemovedInSource(draggedItem)
                         } else {
                             Log.d("ACTION_DROP", "No valid drop position found")
                         }
@@ -330,6 +314,8 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                 else -> false
             }
         }
+
+
     }
 
     private fun dataFetchByDate(date: String, status: String) {
@@ -534,19 +520,11 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                     removeCurrentDayDialog()
                 }
             }
-
-//            chooseDayMealTypeDialog()
         }
 
 
         binding.imagePrevious.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            calendar.time = currentDate
-            calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
-            currentDate = calendar.time
-            // Display next week dates
-            println("\nAfter clicking 'Next':")
-            showWeekDates()
+            hidPastDate()
         }
 
         binding.imageNext.setOnClickListener {
@@ -573,6 +551,46 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             findNavController().navigateUp()
         }
     }
+
+    private fun hidPastDate(){
+        if (updatedDaysBetween.isNotEmpty()){
+            // Define the date format (update to match your `date` string format)
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val formattedCurrentDate = dateFormat.format(currentDate)
+            val calendar = Calendar.getInstance()
+            calendar.time = currentDate
+            calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+            val currentDate1 = calendar.time
+            val (startDate, endDate) = getWeekDates(currentDate1)
+            println("Week Start Date: ${formatDate(startDate)}")
+            println("Week End Date: ${formatDate(endDate)}")
+            // Get all dates between startDate and endDate
+            val daysBetween = getDaysBetween(startDate, endDate)
+            // Mark the current date as selected in the list
+            val updatedDaysBetween1 = daysBetween.map { dateModel ->
+                dateModel.apply {
+                    status = (date == formattedCurrentDate) // Compare formatted strings
+                }
+            }
+            var status=false
+            updatedDaysBetween1.forEach {
+                status = it.date >= BaseApplication.currentDateFormat().toString()
+            }
+            if (status){
+                val calendar = Calendar.getInstance()
+                calendar.time = currentDate
+                calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+                currentDate = calendar.time
+                // Display next week dates
+                println("\nAfter clicking 'Next':")
+                showWeekDates()
+            }else{
+                Toast.makeText(requireContext(),ErrorMessage.slideError, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+
 
     private fun removeCurrentDayDialog() {
         val dialogRemoveDay: Dialog = context?.let { Dialog(it) }!!
@@ -789,6 +807,26 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
 
         val calendarView = dialog.findViewById<CalendarView>(R.id.calendar)
+
+        // Disable previous dates
+        calendarView.minDate = System.currentTimeMillis()
+
+        // Hide navigation arrows
+        try {
+            val fields = CalendarView::class.java.declaredFields
+            for (field in fields) {
+                if (field.name == "mNextButton" || field.name == "mPrevButton") {
+                    field.isAccessible = true
+                    val button = field.get(calendarView) as ImageButton
+                    button.isEnabled = false
+                    button.visibility = View.INVISIBLE
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+
         calendarView.setOnDateChangeListener { _: CalendarView?, year: Int, month: Int, dayOfMonth: Int ->
             val calendar = Calendar.getInstance()
             calendar.set(year, month, dayOfMonth)
