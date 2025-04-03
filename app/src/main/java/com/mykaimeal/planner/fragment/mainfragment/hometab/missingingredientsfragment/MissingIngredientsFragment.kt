@@ -289,7 +289,7 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
             missingIngredientViewModel.addToCartUrlApi({
                 BaseApplication.dismissMe()
                 handleCartApiResponse(it)
-            }, foodIds, shcId,foodName,statusType)
+            }, foodIds, "1",foodName,statusType)
         }
     }
 

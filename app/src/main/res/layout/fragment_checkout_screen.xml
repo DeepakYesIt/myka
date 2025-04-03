@@ -121,13 +121,16 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/tvSetType"
                     android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_marginEnd="@dimen/_5sdp"
+                    android:layout_toStartOf="@+id/imgForward"
                     android:layout_toEndOf="@+id/imageHome"
                     android:fontFamily="@font/montserrat"
-                    android:text="123 Barn Crescent, 975478"
+                    android:text="188 King Street, San Francisco, CA 94107, USA"
                     android:textColor="@color/light_black"
                     android:textSize="@dimen/_11sdp" />
 
                 <ImageView
+                    android:id="@+id/imgForward"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -419,6 +422,7 @@
 
             </RelativeLayout>
 
+
             <RelativeLayout
                 android:id="@+id/relBillingDetailAmount"
                 android:layout_width="match_parent"
@@ -692,7 +696,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/relDebitCreditCard"
-                        android:layout_marginStart="@dimen/_15sdp"
                         android:layout_marginTop="@dimen/_10sdp"
                         android:visibility="gone">
 
@@ -718,26 +721,91 @@
                                 android:textSize="@dimen/_13sdp" />
 
                             <TextView
+                                android:id="@+id/tvPreferred"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/_20sdp"
+                                android:layout_marginTop="@dimen/_2sdp"
+                                android:layout_toEndOf="@+id/tvVisaName"
+                                android:text="Preferred"
+                                android:textColor="#FE9F45"
+                                android:textSize="@dimen/_10sdp" />
+
+                            <TextView
+                                android:id="@+id/tvCardNumber"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@+id/tvVisaName"
-                                android:text="**** **** **** 4242"
+                                android:hint="**** **** **** 4242"
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/_13sdp" />
 
                         </RelativeLayout>
 
-
                         <ImageView
                             android:id="@+id/imageCheckRadio"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="@dimen/_18sdp"
+                            android:layout_height="@dimen/_18sdp"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="@dimen/_10sdp"
                             android:src="@drawable/radio_uncheck_gray_icon" />
 
                     </RelativeLayout>
+
+                    <!--
+                                        <RelativeLayout
+                                            android:id="@+id/relCardDetails"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_below="@+id/relDebitCreditCard"
+                                            android:layout_marginStart="@dimen/_15sdp"
+                                            android:layout_marginTop="@dimen/_10sdp"
+                                            android:visibility="visible">
+
+                                            <ImageView
+                                                android:id="@+id/idVisaImages"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:src="@drawable/visa_rounded_image" />
+
+                                            <RelativeLayout
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_centerVertical="true"
+                                                android:layout_marginStart="@dimen/_10sdp"
+                                                android:layout_toEndOf="@+id/idVisaImages">
+
+                                                <TextView
+                                                    android:id="@+id/tvVisaName"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:text="visa"
+                                                    android:textColor="@color/black"
+                                                    android:textSize="@dimen/_13sdp" />
+
+                                                <TextView
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_below="@+id/tvVisaName"
+                                                    android:text="**** **** **** 4242"
+                                                    android:textColor="@color/black"
+                                                    android:textSize="@dimen/_13sdp" />
+
+                                            </RelativeLayout>
+
+
+                                            <ImageView
+                                                android:id="@+id/imageCheckRadio"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_alignParentEnd="true"
+                                                android:layout_centerVertical="true"
+                                                android:layout_marginEnd="@dimen/_10sdp"
+                                                android:src="@drawable/radio_uncheck_gray_icon" />
+
+                                        </RelativeLayout>
+                    -->
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rcyDebitCreditCard"
@@ -747,6 +815,7 @@
                         android:layout_marginStart="@dimen/_15sdp"
                         android:layout_marginTop="@dimen/_10sdp"
                         android:orientation="vertical"
+                        android:visibility="gone"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
                     <RelativeLayout
@@ -782,8 +851,8 @@
                             android:src="@drawable/logos_google_pay_icon" />
 
                         <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="@dimen/_18sdp"
+                            android:layout_height="@dimen/_18sdp"
                             android:layout_alignParentEnd="true"
                             android:layout_marginEnd="@dimen/_10sdp"
                             android:src="@drawable/radio_uncheck_gray_icon" />

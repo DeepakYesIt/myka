@@ -239,7 +239,8 @@ interface MainRepository {
     suspend fun getCheckoutScreenUrl(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getYourRecipeUrl(successCallback: (response: NetworkResult<String>) -> Unit)
 
-    suspend fun addAddressUrl(successCallback: (response: NetworkResult<String>) -> Unit,latitude: String?, longitude: String?,streetName:String?,streetNum:String?,apartNum:String?,city:String?,country:String?,
+    suspend fun addAddressUrl(successCallback: (response: NetworkResult<String>) -> Unit,latitude: String?, longitude: String?,streetName:String?,
+                              streetNum:String?,apartNum:String?,city:String?,state:String?,country:String?,
                               zipcode:String?,primary:String?,id:String?,type:String?)
 
     suspend fun sendOtpUrl(successCallback: (response: NetworkResult<String>) -> Unit,phone: String?)
@@ -251,7 +252,12 @@ interface MainRepository {
     suspend fun getStoreProductUrl(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun getAllIngredientsUrl(successCallback: (response: NetworkResult<String>) -> Unit,category:String?,search:String?,number:String?)
-    suspend fun addCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit,cardNumber:String?,expMonth:String?,expYear:String?,cvv:String?)
+    suspend fun addCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit,cardNumber:String?,
+                                 expMonth:String?,expYear:String?,cvv:String?,status:String?)
+
+
+    suspend fun deleteCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?)
+    suspend fun setPreferredCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?)
 
     suspend fun getProductsUrl(successCallback: (response: NetworkResult<String>) -> Unit,query:String?)
     suspend fun getProductsDetailsUrl(successCallback: (response: NetworkResult<String>) -> Unit,proId:String?)

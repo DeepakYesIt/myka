@@ -93,6 +93,8 @@ object ApiEndPoint {
     const val getStoreProductsUrl="store-products"
     const val getCardMealMeUrl="get-card-mealme"
     const val addCardMealMeUrl="add-card-mealme"
+    const val deleteCardMealMeUrl="delete-card-mealme"
+    const val setPreferredCardMealMeUrl="set-preferred-card"
 
     const val getProductsUrl="products"
     const val getProductsDetailsUrl="get-products"

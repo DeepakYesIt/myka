@@ -17,7 +17,6 @@ import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.AdapterPaymentCreditDebitItem
-import com.mykaimeal.planner.adapter.MyWalletAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
@@ -33,15 +32,16 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 
 @AndroidEntryPoint
-class PaymentCreditDebitFragment : Fragment(),CardBankListener {
+class PaymentCreditDebitFragment : Fragment(), CardBankListener {
 
     private lateinit var binding: FragmentPaymentCreditDebitBinding
-    private var checkUnchecked:Boolean?=false
+    private var checkUnchecked: Boolean? = false
     private lateinit var commonWorkUtils: CommonWorkUtils
     private lateinit var adapterPaymentCreditDebitItem: AdapterPaymentCreditDebitItem
     private var month: Int = 0
     private var year: Int = 0
-    private lateinit var paymentCreditDebitViewModel:PaymentCreditDebitViewModel
+    private var checkStatus: String = "0"
+    private lateinit var paymentCreditDebitViewModel: PaymentCreditDebitViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,7 +51,8 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
         binding = FragmentPaymentCreditDebitBinding.inflate(layoutInflater, container, false)
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
-        paymentCreditDebitViewModel = ViewModelProvider(requireActivity())[PaymentCreditDebitViewModel::class.java]
+        paymentCreditDebitViewModel =
+            ViewModelProvider(requireActivity())[PaymentCreditDebitViewModel::class.java]
 
         setupBackNavigation()
         initialize()
@@ -61,11 +62,13 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
     }
 
     private fun setupBackNavigation() {
-        requireActivity().onBackPressedDispatcher.addCallback(requireActivity(), object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(
+            requireActivity(),
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
     }
 
     private fun initialize() {
@@ -76,7 +79,7 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
-        binding.imgCreditDebit.setOnClickListener{
+        binding.imgCreditDebit.setOnClickListener {
             findNavController().navigateUp()
         }
 
@@ -88,16 +91,18 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
             openYearPickerBox()
         }
 
-        binding.imgCheckUncheck.setOnClickListener{
+        binding.imgCheckUncheck.setOnClickListener {
             checkUnchecked = !checkUnchecked!!
             if (checkUnchecked as Boolean) {
+                checkStatus = "1"
                 binding.imgCheckUncheck.setImageResource(R.drawable.tick_ckeckbox_images)
             } else {
+                checkStatus = "0"
                 binding.imgCheckUncheck.setImageResource(R.drawable.uncheck_box_images)
             }
         }
 
-        binding.tvSaveCreditDebitCard.setOnClickListener{
+        binding.tvSaveCreditDebitCard.setOnClickListener {
             if (isValidationCard()) {
                 if (BaseApplication.isOnline(requireActivity())) {
                     cardSaveApi()
@@ -107,9 +112,9 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
             }
         }
 
-        binding.textAddCardNumber.setOnClickListener{
-            binding.cvDebitCard3.visibility=View.VISIBLE
-            binding.textAddCardNumber.visibility=View.GONE
+        binding.textAddCardNumber.setOnClickListener {
+            binding.cvDebitCard3.visibility = View.VISIBLE
+            binding.textAddCardNumber.visibility = View.GONE
         }
     }
 
@@ -143,7 +148,7 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
         try {
             val apiModel = Gson().fromJson(response, GetCardMealMeModel::class.java)
             Log.d("@@@ Response cardBank ", "message :- $response")
-            if (apiModel.code == 200 && apiModel.success==true) {
+            if (apiModel.code == 200 && apiModel.success == true) {
                 showDataInUi(apiModel.data)
             } else {
                 if (apiModel.code == ErrorMessage.code) {
@@ -159,27 +164,31 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
 
     private fun showDataInUi(data: MutableList<GetCardMealMeModelData>?) {
 
-        if (data!=null && data.size>0){
-            binding.cvDebitCard3.visibility=View.GONE
-            binding.textAddCardNumber.visibility=View.GONE
-            adapterPaymentCreditDebitItem = AdapterPaymentCreditDebitItem(requireContext(), data,  this)
+        if (data != null && data.size > 0) {
+            binding.cvDebitCard3.visibility = View.GONE
+            binding.textAddCardNumber.visibility = View.VISIBLE
+            binding.relSavedCards.visibility = View.VISIBLE
+            adapterPaymentCreditDebitItem = AdapterPaymentCreditDebitItem(requireContext(), data, this)
             binding.rcvCardNumber.adapter = adapterPaymentCreditDebitItem
-        }else{
-            binding.cvDebitCard3.visibility=View.VISIBLE
-            binding.textAddCardNumber.visibility=View.GONE
+        } else {
+            binding.cvDebitCard3.visibility = View.VISIBLE
+            binding.textAddCardNumber.visibility = View.GONE
+            binding.relSavedCards.visibility = View.GONE
         }
     }
 
     private fun cardSaveApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            paymentCreditDebitViewModel.addCardMealMeUrl({
-                BaseApplication.dismissMe()
-                handleApiAddCardResponse(it)
-            }, binding.etCardNumber.text.toString().trim(),
+            paymentCreditDebitViewModel.addCardMealMeUrl(
+                {
+                    BaseApplication.dismissMe()
+                    handleApiAddCardResponse(it)
+                }, binding.etCardNumber.text.toString().trim(),
                 binding.etMonth.text.toString().trim(),
                 binding.etYear.text.toString().trim(),
-                binding.etCVVNumber.text.toString().trim())
+                binding.etCVVNumber.text.toString().trim(), checkStatus
+            )
         }
     }
 
@@ -324,23 +333,103 @@ class PaymentCreditDebitFragment : Fragment(),CardBankListener {
     }
 
     override fun itemSelect(position: Int?, status: String?, type: String?) {
-            /*if (type!!.equals("delete", true)) {
+        if (type!!.equals("delete", true)) {
+            if (BaseApplication.isOnline(requireActivity())) {
+                deleteApi(status)
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }else{
+            if (type.equals("preferred", true)) {
                 if (BaseApplication.isOnline(requireActivity())) {
-                    deleteApi(position, status)
+                    preferredApi(status)
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-            }*/
+            }
+        }
     }
 
-/*    private fun deleteApi(position: Int?,) {
+    private fun preferredApi(status: String?) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            viewModel.deleteCardRequest({
+            paymentCreditDebitViewModel.setPreferredCardMealMeUrl({
                 BaseApplication.dismissMe()
-                handleApiDeleteCardResponse(it, position)
-            }, dataLocal[position!!].card_id.toString(), dataLocal[position].customer_id.toString())
+                handleApiPreferredCardResponse(it)
+            }, status)
         }
-    }*/
+    }
+
+    private fun handleApiPreferredCardResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleUpdatePreferredResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleUpdatePreferredResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, AddCardMealMeModel::class.java)
+            Log.d("@@@ Add Card", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
+                // When screen load then api call
+                getCardMealMe()
+
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+
+    }
+
+    private fun deleteApi(status: String?) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            paymentCreditDebitViewModel.deleteCardMealMeUrl({
+                BaseApplication.dismissMe()
+                handleApiDeleteCardResponse(it)
+            }, status)
+        }
+    }
+
+    private fun handleApiDeleteCardResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleUpdateDeleteResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleUpdateDeleteResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, AddCardMealMeModel::class.java)
+            Log.d("@@@ Add Card", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
+                // When screen load then api call
+                getCardMealMe()
+
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+
+    }
 
 }

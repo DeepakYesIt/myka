@@ -18,5 +18,12 @@ class CheckoutScreenViewModel @Inject constructor(private val repository: MainRe
     }
 
 
+    suspend fun addAddressUrl(successCallback: (response: NetworkResult<String>) -> Unit, latitude: String?, longitude: String?,
+                              streetName:String?,streetNum:String?,apartNum:String?,city:String?,state:String?,country:String?,
+                              zipcode:String?,primary:String?,id:String?,type:String?) {
+        repository.addAddressUrl({ successCallback(it) }, latitude, longitude, streetName, streetNum, apartNum, city,state, country, zipcode, primary, id, type)
+    }
+
+
 
 }

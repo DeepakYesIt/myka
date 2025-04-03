@@ -4,6 +4,7 @@ import com.google.gson.JsonObject
 import com.mykaimeal.planner.messageclass.ApiEndPoint
 import com.mykaimeal.planner.repository.VisionRequest
 import com.mykaimeal.planner.repository.VisionResponse
+import dagger.Component.Factory
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -699,7 +700,22 @@ interface ApiInterface {
         @Field("card_number") card_number: String?,
         @Field("exp_month") exp_month: String?,
         @Field("exp_year") exp_year: String?,
-        @Field("cvv") cvv: String?
+        @Field("cvv") cvv: String?,
+        @Field("status") status:String?
+    ): Response<JsonObject>
+
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.deleteCardMealMeUrl)
+    suspend fun deleteCardMealMeUrl(
+        @Field("id") id: String?
+    ): Response<JsonObject>
+
+
+  @FormUrlEncoded
+    @POST(ApiEndPoint.setPreferredCardMealMeUrl)
+    suspend fun setPreferredCardMealMeUrl(
+        @Field("id") id: String?
     ): Response<JsonObject>
 
     @FormUrlEncoded
@@ -708,19 +724,21 @@ interface ApiInterface {
         @Field("date") date: String?
     ): Response<JsonObject>
 
-    @GET(ApiEndPoint.addAddressUrl)
+    @FormUrlEncoded
+    @POST(ApiEndPoint.addAddressUrl)
     suspend fun addAddressUrl(
-        @Query("latitude") latitude: String?,
-        @Query("longitude") longitude: String?,
-        @Query("street_name") streetName: String?,
-        @Query("street_num") streetNum: String?,
-        @Query("apart_num") apartNum: String?,
-        @Query("city") city: String?,
-        @Query("country") country: String?,
-        @Query("zipcode") zipcode: String?,
-        @Query("primary") primary: String?,
-        @Query("id") id: String?,
-        @Query("type") type: String?,
+        @Field("latitude") latitude: String?,
+        @Field("longitude") longitude: String?,
+        @Field("street_name") streetName: String?,
+        @Field("street_num") streetNum: String?,
+        @Field("apart_num") apartNum: String?,
+        @Field("city") city: String?,
+        @Field("state") state: String?,
+        @Field("country") country: String?,
+        @Field("zipcode") zipcode: String?,
+        @Field("primary") primary: String?,
+        @Field("id") id: String?,
+        @Field("type") type: String?,
     ): Response<JsonObject>
 
     /*   @POST("v1/images:annotate")

@@ -49,6 +49,7 @@ class IngredientsRecipeAdapter(var datalist: MutableList<IngredientsModel>?, var
                 }.joinToString("")
 
                 holder.binding.tvTitleName.text = result
+
             }
 
             if (data.status){

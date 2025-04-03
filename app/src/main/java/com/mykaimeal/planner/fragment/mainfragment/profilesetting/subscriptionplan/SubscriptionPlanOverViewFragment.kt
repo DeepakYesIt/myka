@@ -2,6 +2,8 @@ package com.mykaimeal.planner.fragment.mainfragment.profilesetting.subscriptionp
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -72,9 +74,13 @@ class SubscriptionPlanOverViewFragment : Fragment() {
         binding.viewpager.adapter = adapters
         binding.viewpager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
 
+        binding.crossImages.visibility = View.INVISIBLE // Initially hide the ImageView
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            binding.crossImages.visibility = View.VISIBLE // Show the ImageView after 5 seconds
+        }, 5000)
+
         initialize()
-
-
 
         return binding.root
     }
@@ -118,6 +124,19 @@ class SubscriptionPlanOverViewFragment : Fragment() {
     }
 
     private fun initialize() {
+
+        binding.rlNextBtn.setOnClickListener {
+            if (binding.viewpager.currentItem < adapters!!.itemCount - 1) {
+                // Move to the next item
+                binding.viewpager.currentItem += 1
+            } else {
+                findNavController().navigate(R.id.homeSubscriptionAllPlanFragment)
+            }
+        }
+
+        binding.crossImages.setOnClickListener{
+            findNavController().navigateUp()
+        }
 
         binding.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()

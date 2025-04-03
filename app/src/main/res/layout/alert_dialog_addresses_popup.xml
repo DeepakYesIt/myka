@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/_15sdp"
@@ -31,28 +32,26 @@
             android:layout_below="@+id/tvAddresses"
             android:layout_marginHorizontal="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_10sdp"
-            android:background="@drawable/search_rectangle_bg">
+            android:background="@drawable/gray_edittext_bg">
 
-            <ImageView
-                android:id="@+id/imgIngSearch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="@dimen/_8sdp"
-                android:src="@drawable/yellow_search_icon" />
-
-            <EditText
-                android:id="@+id/etIngDislikesSearchBar"
+            <AutoCompleteTextView
+                android:id="@+id/tvAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginHorizontal="@dimen/_10sdp"
-                android:layout_toEndOf="@+id/imgIngSearch"
+                android:layout_marginEnd="@dimen/_8sdp"
                 android:background="@null"
-                android:hint="Search for an address"
-                android:paddingVertical="@dimen/_8sdp"
-                android:singleLine="true"
-                android:textSize="@dimen/_12sdp" />
+                android:drawableStart="@drawable/yellow_search_icon"
+                android:drawablePadding="@dimen/_10sdp"
+                android:ellipsize="end"
+                android:gravity="center|start"
+                android:paddingVertical="@dimen/_10sdp"
+                android:hint="@string/enter_address"
+                android:inputType="textMultiLine"
+                android:maxLines="2"
+                android:paddingStart="@dimen/_10sdp"
+                android:textColor="#58585A"
+                android:textSize="@dimen/_13sdp"
+                tools:ignore="RtlSymmetry" />
 
         </RelativeLayout>
 
@@ -67,11 +66,12 @@
             android:weightSum="2">
 
             <LinearLayout
+                android:id="@+id/llSetHome"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@drawable/height_type_bg"
+                android:background="@drawable/outline_address_green_border_bg"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:padding="@dimen/_10sdp">
@@ -92,6 +92,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/llSetWork"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -150,10 +151,10 @@
                 android:id="@+id/tvUseCurrentLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:layout_marginStart="@dimen/_7sdp"
                 android:layout_toEndOf="@+id/imgLocation"
                 android:fontFamily="@font/poppins_bold"
-                android:layout_centerVertical="true"
                 android:text="Use current location"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_13sdp" />
@@ -185,8 +186,8 @@
             android:id="@+id/view1"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_1sdp"
-            android:layout_marginTop="@dimen/_10sdp"
             android:layout_below="@+id/relUseCurrentLocation"
+            android:layout_marginTop="@dimen/_10sdp"
             android:background="#F3F3F3" />
 
         <TextView
@@ -213,8 +214,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/_10sdp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:orientation="vertical"/>
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         </RelativeLayout>
 
@@ -222,18 +223,18 @@
             android:id="@+id/relDone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:layout_marginHorizontal="@dimen/_15sdp"
             android:layout_below="@+id/relUpdateAddress"
+            android:layout_marginHorizontal="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:background="@drawable/green_btn_background">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:fontFamily="@font/poppins"
                 android:paddingVertical="@dimen/_10sdp"
                 android:text="Done"
-                android:fontFamily="@font/poppins"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_13sdp" />
 

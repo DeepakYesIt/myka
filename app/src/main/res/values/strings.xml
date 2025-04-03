@@ -125,6 +125,8 @@
     <string name="rate_your_recipe">Rate your recipe</string>
     <string name="no_data_found">No Data Found</string>
     <string name="no_recipes_yet">No recipes yet</string>
+    <string name="confirm_your_address"><font color="#000000">Confirm your </font><font color="#06C169"> address</font></string>
+    <string name="enter_address">Enter Address</string>
 
 
 </resources>

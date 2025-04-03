@@ -40,6 +40,7 @@ class AddNumberVerifyFragment : Fragment() {
     private val START_TIME_IN_MILLIS: Long = 120000
     private var mTimeLeftInMillis = START_TIME_IN_MILLIS
     private var status: String = ""
+    private var lastFourDigits: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -99,8 +100,6 @@ class AddNumberVerifyFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-
         })
 
         binding.countryCodePicker.setOnCountryChangeListener {
@@ -112,6 +111,7 @@ class AddNumberVerifyFragment : Fragment() {
         binding.tvVerify.setOnClickListener {
             status = "verify"
             if (validate()) {
+                lastFourDigits = if (binding.etRegPhone.text.toString().length >= 4) binding.etRegPhone.text.toString().takeLast(3) else binding.etRegPhone.text.toString()
                 if (BaseApplication.isOnline(requireActivity())) {
                     getOtpUrl()
                 } else {
@@ -244,6 +244,7 @@ class AddNumberVerifyFragment : Fragment() {
                 binding.tvVerify.isEnabled = false
                 binding.tvVerify.setTextColor(R.color.grey5)
                 binding.relPhoneValidation.visibility = View.VISIBLE
+                binding.tvCodeSent.text= "we have sent the code to *******$lastFourDigits"
 
                 if (status == "resend") {
                     binding.otpView.setOTP("")

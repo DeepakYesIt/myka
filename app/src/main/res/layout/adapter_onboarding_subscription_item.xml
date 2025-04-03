@@ -55,12 +55,13 @@
                     android:id="@+id/tvTrialName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="7- days free trial"
+                    android:text="7- days free"
                     android:textSize="@dimen/_11sdp"
                     android:drawableStart="@drawable/gift_icon"
                     android:drawablePadding="@dimen/_10sdp"
                     android:fontFamily="@font/montserrat"
                     android:textColor="@color/black" />
+
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/relLifeTime"
