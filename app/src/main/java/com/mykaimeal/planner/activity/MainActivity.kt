@@ -3,8 +3,10 @@ package com.mykaimeal .planner.activity
 import PlanApiResponse
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -36,6 +38,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -96,10 +99,13 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
     private var mealType:String="Breakfast"
     private var rcyChooseDaySch: RecyclerView? = null
     private lateinit var spinnerActivityLevel: PowerSpinnerView
-    private val oneDayMillis = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
-
-
+    private val toastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            Toast.makeText(this@MainActivity, "24 hours passed! Calling API now.", Toast.LENGTH_LONG).show()
+            fetchDataOnLoad()
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -124,50 +130,25 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
 
         /// using function for find destination graph
         startDestination()
-
-        // Check if 24 hours have passed since the last dialog was shown
-//        if (shouldShowDialog()) {
-//            fetchDataOnLoad()
-//        }
-//        scheduleToastWorker()
-
-//        fetchDataOnLoad()
+        scheduleToastWorker()
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun scheduleToastWorker() {
-        val workRequest = PeriodicWorkRequestBuilder<ToastWorker>(3, TimeUnit.MILLISECONDS)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiresBatteryNotLow(true) // Optional: Runs only if battery is not low
-                    .build()
-            )
+        // Register BroadcastReceiver
+        registerReceiver(toastReceiver, IntentFilter("com.example.workmanagerdemo.TOAST_ACTION"), RECEIVER_NOT_EXPORTED)
+//        // Schedule WorkManager Task
+//        val workRequest = OneTimeWorkRequestBuilder<ToastWorker>()
+//            .setInitialDelay(24, TimeUnit.HOURS) // Delay 24 HOURS
+//            .build()
+//        WorkManager.getInstance(this).enqueue(workRequest)
+
+        // Schedule WorkManager to repeat every 24 hours
+        val workRequest = PeriodicWorkRequestBuilder<ToastWorker>(24, TimeUnit.HOURS)
             .build()
 
-        val workManager = WorkManager.getInstance(this)
+        WorkManager.getInstance(this).enqueue(workRequest)
 
-        // Enqueue unique work to avoid duplicate execution
-        workManager.enqueueUniquePeriodicWork("ToastWorker", ExistingPeriodicWorkPolicy.KEEP, workRequest)
-
-        // Observe Work Info
-        workManager.getWorkInfosForUniqueWorkLiveData("ToastWorker")
-            .observe(this, Observer { workInfos ->
-                if (workInfos.isNotEmpty()) {
-                    val workInfo = workInfos[0] // Get first work item
-
-                    if (workInfo.state == WorkInfo.State.SUCCEEDED) {
-                        val response = workInfo.outputData.getString("response")
-                        Log.d("MainActivity", "Worker Finished: $response")
-
-                        // Call API when work is completed
-                        callApi()
-                    }
-                }
-            })
     }
-    private fun callApi() {
-        Log.d("MainActivity", "API is being called now!")
-    }
-
-
 
     private fun setEvent(){
         binding.llHome.setOnClickListener(this)
@@ -387,15 +368,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
                     BaseApplication.alertError(this@MainActivity, ErrorMessage.networkError, false)
                 }
             }
-
-//            // Register Page Change Callback to Get Current Position
-//            viewPager.registerOnPageChangeCallback(object : OnPageChangeCallback() {
-//                override fun onPageSelected(position: Int) {
-//                    super.onPageSelected(position)
-//
-//                }
-//            })
-
             show()
         }
     }
@@ -1193,6 +1165,11 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(toastReceiver)
     }
 
 }

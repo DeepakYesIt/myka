@@ -1,6 +1,7 @@
 package com.mykaimeal.planner.listener
 
 import android.content.Context
+import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -11,7 +12,7 @@ import androidx.work.Data
 
 class ToastWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     override fun doWork(): Result {
-        Log.d("ToastWorker", "Worker started")
+        /*Log.d("ToastWorker", "Worker started")
 
         // Show Toast on Main Thread
         Handler(Looper.getMainLooper()).post {
@@ -24,7 +25,12 @@ class ToastWorker(context: Context, workerParams: WorkerParameters) : Worker(con
             .build()
 
         Log.d("ToastWorker", "Worker finished, returning data")
-        return Result.success(outputData)
+        return Result.success(outputData)*/
+        // Send broadcast to MainActivity
+        val intent = Intent("com.example.workmanagerdemo.TOAST_ACTION")
+        applicationContext.sendBroadcast(intent)
+
+        return Result.success()
     }
 
 }
