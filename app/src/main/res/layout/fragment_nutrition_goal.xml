@@ -152,7 +152,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:fontFamily="@font/poppins"
-                    android:text="0/500"
+                    android:text="0/10000"
                     android:textColor="#FE9F45" />
 
             </RelativeLayout>
@@ -162,7 +162,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_40sdp"
                 android:layout_marginTop="-10dp"
-                android:max="500"
+                android:max="10000"
                 android:progress="0"
                 android:progressBackgroundTint="#656564"
                 android:progressTint="#FE9F45"
@@ -197,7 +197,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:fontFamily="@font/poppins"
-                    android:text="0/500"
+                    android:text="0/300"
                     android:textColor="#FE9F45" />
 
             </RelativeLayout>
@@ -207,7 +207,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_40sdp"
                 android:layout_marginTop="-10dp"
-                android:max="500"
+                android:max="300"
                 android:progress="0"
                 android:progressBackgroundTint="#656564"
                 android:progressTint="#FE9F45"
@@ -242,7 +242,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:fontFamily="@font/poppins"
-                    android:text="0/500"
+                    android:text="0/1200"
                     android:textColor="#FE9F45" />
 
             </RelativeLayout>
@@ -252,7 +252,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_40sdp"
                 android:layout_marginTop="-10dp"
-                android:max="500"
+                android:max="1200"
                 android:progress="0"
                 android:progressBackgroundTint="#656564"
                 android:progressTint="#FE9F45"

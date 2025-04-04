@@ -261,6 +261,8 @@ interface MainRepository {
 
     suspend fun getProductsUrl(successCallback: (response: NetworkResult<String>) -> Unit,query:String?)
     suspend fun getProductsDetailsUrl(successCallback: (response: NetworkResult<String>) -> Unit,proId:String?)
+    suspend fun updateDietSuggestionUrl(successCallback: (response: NetworkResult<String>) -> Unit,gender: String?, dob: String?, height: String?,
+                                        heightType: String?, weight: String?, weightType: String?, activityLevel: String?)
     suspend fun getSelectProductsUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?,productId:String?)
     suspend fun recipeSwapUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?,uri:String?)
 

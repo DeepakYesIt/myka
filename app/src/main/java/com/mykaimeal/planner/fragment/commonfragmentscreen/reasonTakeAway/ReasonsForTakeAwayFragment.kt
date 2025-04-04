@@ -471,7 +471,7 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                     binding.tvNextBtn.isClickable = true
                     binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 }else{
-                    binding.edtext.hint="Enter Add Other"
+                    binding.edtext.text.clear()
                     status = ""
                     binding.tvNextBtn.isClickable = false
                     binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)

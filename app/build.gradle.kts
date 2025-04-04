@@ -155,39 +155,32 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
     kapt("androidx.lifecycle:lifecycle-compiler:2.3.1")
-
     // firebase crashlytics
     implementation("com.google.firebase:firebase-crashlytics:18.2.9")
     implementation("com.google.firebase:firebase-analytics:20.1.2")
-
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.0")
     implementation("androidx.activity:activity-ktx:1.3.1")
-
 //    // progress bar circle
 //    implementation("com.github.ybq:Android-SpinKit:1.4.0")
-
     //Stripe SDK
     implementation ("com.stripe:stripe-android:16.3.0")
     implementation ("com.github.dewinjm:monthyear-picker:1.0.2")
-
     implementation ("com.github.jaiselrahman:FilePicker:1.3.2")
-
-
     //cameraX
     implementation ("androidx.camera:camera-core:1.4.1")
     implementation ("androidx.camera:camera-camera2:1.4.1")
     implementation ("androidx.camera:camera-lifecycle:1.4.1")
     implementation ("androidx.camera:camera-video:1.4.1")
-
     implementation ("androidx.camera:camera-view:1.4.1")
     implementation ("androidx.camera:camera-extensions:1.4.1")
     implementation ("com.google.guava:guava:32.0.1-jre")
-
-
     implementation ("com.hbb20:ccp:2.6.0")
-
     implementation ("com.github.chthai64:SwipeRevealLayout:1.4.0")
+
+
+    implementation ("androidx.work:work-runtime-ktx:2.8.1")
+
 
 }

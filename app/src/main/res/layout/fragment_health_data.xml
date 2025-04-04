@@ -237,7 +237,7 @@
                     android:background="@null"
                     android:fontFamily="@font/poppins"
                     android:gravity="center_vertical"
-                    android:text="mm/dd/dddd"
+                    android:text="mm/dd/yyyy"
                     android:paddingVertical="@dimen/_10sdp"
                     android:paddingStart="@dimen/_15sdp"
                     android:paddingEnd="@dimen/_15sdp"

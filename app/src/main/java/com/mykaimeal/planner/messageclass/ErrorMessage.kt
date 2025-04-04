@@ -142,4 +142,13 @@ object ErrorMessage {
      const val checkListError="Please Select At Least One."
      const val checkError="Please Select At Least One."
 
+
+
+     // key type for meal type
+     const val Breakfast="Breakfast"
+     const val Lunch="Lunch"
+     const val Dinner="Dinner"
+     const val Snacks="Snacks"
+     const val Brunch="Brunch"
+
 }

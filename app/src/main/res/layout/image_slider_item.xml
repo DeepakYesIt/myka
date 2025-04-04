@@ -18,6 +18,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
+                android:singleLine="true"
+                android:maxLines="1"
                 android:textColor="#3C4541"
                 android:layout_centerInParent="true"
                 android:fontFamily="@font/poppins_semibold"
@@ -55,6 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="$350* per /s"
+                android:visibility="invisible"
                 android:layout_centerInParent="true"
                 android:textColor="#3C4541"
                 android:layout_alignParentEnd="true"
@@ -82,6 +85,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true" />
+        <ImageView
+            android:id="@+id/imgHeartRed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="@dimen/_10sdp"
+            android:src="@drawable/heart_red_icon" />
     </RelativeLayout>
 </LinearLayout>
 

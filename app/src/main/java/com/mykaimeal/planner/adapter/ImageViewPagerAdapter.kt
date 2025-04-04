@@ -11,11 +11,12 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.ImageSliderItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
 
-class ImageViewPagerAdapter(private val context: Context, private var imageList: MutableList<BreakfastModel>?) :
+class ImageViewPagerAdapter(private val context: Context, private var imageList: MutableList<BreakfastModel>?,var OnItemClickListener: OnItemClickListener) :
     RecyclerView.Adapter<ImageViewPagerAdapter.ImageViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         val binding = ImageSliderItemBinding.inflate(LayoutInflater.from(parent.context),parent,false)
@@ -40,6 +41,14 @@ class ImageViewPagerAdapter(private val context: Context, private var imageList:
             holder.binding.textMin.text = ""+ data.review +"("+ data.review_number +")"
         }
 
+        if (data?.is_like!=null){
+            if (data.is_like ==0 ){
+                holder.binding.imgHeartRed.setImageResource(R.drawable.heart_white_icon)
+            }else{
+                holder.binding.imgHeartRed.setImageResource(R.drawable.heart_red_icon)
+            }
+        }
+
         if (data?.recipe?.images?.SMALL?.url != null) {
             Glide.with(context)
                 .load(data.recipe.images.SMALL.url)
@@ -50,7 +59,6 @@ class ImageViewPagerAdapter(private val context: Context, private var imageList:
                         holder.binding.layProgess.root.visibility = View.GONE
                         return false
                     }
-
                     override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                         holder.binding.layProgess.root.visibility = View.GONE
                         return false
@@ -60,6 +68,16 @@ class ImageViewPagerAdapter(private val context: Context, private var imageList:
         } else {
             holder.binding.layProgess.root.visibility = View.GONE
         }
+
+
+
+        holder.binding.imgHeartRed.setOnClickListener {
+            OnItemClickListener.itemClick(position,"4", "")
+        }
+
+
+
+
 
     }
 

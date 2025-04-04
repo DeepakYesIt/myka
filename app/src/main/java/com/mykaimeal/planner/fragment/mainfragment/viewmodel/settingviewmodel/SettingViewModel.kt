@@ -82,4 +82,10 @@ class SettingViewModel @Inject constructor(private val repository: MainRepositor
         repository.updatePostCodeApi({ successCallback(it) },  postCode,longitude,latitude)
     }
 
+    suspend fun updateDietSuggestionUrl(successCallback: (response: NetworkResult<String>) -> Unit,
+                                        gender: String?, dob: String?, height: String?,
+                                        heightType: String?, weight: String?, weightType: String?, activityLevel: String?){
+        repository.updateDietSuggestionUrl({ successCallback(it) },gender,dob, height, heightType, weight, weightType, activityLevel)
+    }
+
 }

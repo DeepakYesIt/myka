@@ -3,6 +3,8 @@ package com.mykaimeal.planner.fragment.mainfragment.profilesetting
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,11 +20,15 @@ import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentHealthDataBinding
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.settingviewmodel.ApiModelBMR
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.settingviewmodel.SettingViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.Data
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.settingviewmodel.apiresponse.ProfileRootResponse
 import com.mykaimeal.planner.messageclass.ErrorMessage
+import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -33,6 +39,9 @@ class HealthDataFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: SettingViewModel
     private var genderType: String = ""
+    private lateinit var textListener: TextWatcher
+    private lateinit var textListener1: TextWatcher
+    private var textChangedJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,6 +82,19 @@ class HealthDataFragment : Fragment() {
 
         binding.spinnerHeight.setItems(listOf("Inch", "Centimeter", "Feet"))
 
+        fun setupSpinnerListener(spinner: PowerSpinnerView) {
+            spinner.setOnSpinnerItemSelectedListener<String> { _, _, _, _ ->
+                if (binding.rlAddMoreGoals.visibility == View.GONE) {
+                    logicBMR("2")
+                }
+            }
+        }
+
+       // Apply the listener to all relevant spinners
+        setupSpinnerListener(binding.spinnerHeight)
+        setupSpinnerListener(binding.spinnerweight)
+        setupSpinnerListener(binding.spinnerActivityLevel)
+
         binding.spinnerweight.setItems(listOf("Kilograms","Pounds","Stones"))
 
         binding.imgBackHealthData.setOnClickListener {
@@ -81,7 +103,14 @@ class HealthDataFragment : Fragment() {
         }
 
         binding.rlAddMoreGoals.setOnClickListener {
-            findNavController().navigate(R.id.nutritionGoalFragment)
+            if (BaseApplication.isOnline(requireActivity())) {
+                if (isValidation()) {
+                    logicBMR("1")
+                }
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+
         }
 
         binding.imageEditTargets.setOnClickListener {
@@ -96,7 +125,6 @@ class HealthDataFragment : Fragment() {
             openCalendarBox()
         }
 
-
         binding.layBottom.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
                 if (isValidation()) {
@@ -107,6 +135,75 @@ class HealthDataFragment : Fragment() {
             }
         }
 
+        textListener = object : TextWatcher {
+            private var searchFor = "" // Or view.editText.text.toString()
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (binding.rlAddMoreGoals.visibility == View.GONE) {
+                    val searchText = s.toString()
+                    if (searchText!= searchFor) {
+                        searchFor = searchText
+                        textChangedJob?.cancel()
+                        // Launch a new coroutine in the lifecycle scope
+                        textChangedJob = lifecycleScope.launch {
+                            delay(1000)  // Debounce time
+                            if (searchText == searchFor) {
+                                logicBMR("2")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        textListener1 = object : TextWatcher {
+            private var searchFor = "" // Or view.editText.text.toString()
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (binding.rlAddMoreGoals.visibility == View.GONE) {
+                    val searchText = s.toString()
+                    if (searchText!= searchFor) {
+                        searchFor = searchText
+                        textChangedJob?.cancel()
+                        // Launch a new coroutine in the lifecycle scope
+                        textChangedJob = lifecycleScope.launch {
+                            delay(1000)  // Debounce time
+                            if (searchText == searchFor) {
+                                logicBMR("2")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    private fun logicBMR(apiType: String) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.updateDietSuggestionUrl({
+                    BaseApplication.dismissMe()
+                if (apiType.equals("1",true)){
+                    handleApiUpdateResponse(it,"BMR")
+                }else{
+                    handleApiUpdateResponse(it,"BMRUPDATE")
+                } },
+                genderType,
+                binding.etDateOfBirth.text.toString() ,
+                binding.etHeight.text.toString(),
+                binding.spinnerHeight.text.toString().trim(),
+                binding.etweight.text.toString(),
+                binding.spinnerweight.text.toString().trim(),
+                binding.spinnerActivityLevel.text.toString().trim()
+            )
+        }
     }
 
     private fun upDateProfile() {
@@ -115,7 +212,7 @@ class HealthDataFragment : Fragment() {
             viewModel.upDateProfileRequest(
                 {
                     BaseApplication.dismissMe()
-                    handleApiUpdateResponse(it)
+                    handleApiUpdateResponse(it,"Main")
                 },
                 viewModel.getProfileData()?.name.toString(),
                 viewModel.getProfileData()?.bio.toString(),
@@ -135,9 +232,9 @@ class HealthDataFragment : Fragment() {
         }
     }
 
-    private fun handleApiUpdateResponse(result: NetworkResult<String>) {
+    private fun handleApiUpdateResponse(result: NetworkResult<String>,type:String) {
         when (result) {
-            is NetworkResult.Success -> handleUpdateSuccessResponse(result.data.toString())
+            is NetworkResult.Success -> handleUpdateSuccessResponse(result.data.toString(),type)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
@@ -176,13 +273,15 @@ class HealthDataFragment : Fragment() {
 
         // Create a DatePickerDialog with the current date and minimum date set to today
         val datePickerDialog = DatePickerDialog(
-            requireContext(),
-            { _, selectedYear, selectedMonth, selectedDay ->
+            requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
 
                 // Update the TextView with the selected date
                 val date = "${selectedMonth + 1}/$selectedDay/$selectedYear"
                 Log.d("******", "" + date)
                 binding.etDateOfBirth.text = date
+                if (binding.rlAddMoreGoals.visibility ==  View.GONE){
+                    logicBMR("2")
+                }
             },
             year,
             month,
@@ -228,23 +327,58 @@ class HealthDataFragment : Fragment() {
         }
     }
 
-    private fun handleUpdateSuccessResponse(data: String) {
+    private fun handleUpdateSuccessResponse(data: String, type: String) {
         try {
-            val apiModel = Gson().fromJson(data, ProfileRootResponse::class.java)
-            Log.d("@@@ Health profile", "message :- $data")
-            if (apiModel.code == 200 && apiModel.success) {
-                findNavController().navigateUp()
-            } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
+            if (type.equals("Main",true)){
+                val apiModel = Gson().fromJson(data, ProfileRootResponse::class.java)
+                Log.d("@@@ Health profile", "message :- $data")
+                if (apiModel.code == 200 && apiModel.success) {
+                    findNavController().navigateUp()
                 } else {
-                    showAlert(apiModel.message, false)
+                     handleError(apiModel.code,apiModel.message)
+                }
+            }
+            if (type.equals("BMR",true) || type.equals("BMRUPDATE",true)){
+                val apiModel = Gson().fromJson(data, ApiModelBMR::class.java)
+                Log.d("@@@ BMR profile", "message :- $data")
+                if (apiModel.code == 200 && apiModel.success) {
+                    apiModel.data?.let { dataModel->
+                        viewModel.getProfileData()?.let { data ->
+                            data.apply {
+                                dob = binding.etDateOfBirth.text.toString()
+                                height_type = binding.spinnerHeight.text.toString()
+                                height = binding.etHeight.text.toString()
+                                weight = binding.etweight.text.toString()
+                                weight_type = binding.spinnerweight.text.toString()
+                                activity_level = binding.spinnerActivityLevel.text.toString()
+                                fat = dataModel.fat
+                                carbs = dataModel.carbs
+                                calories = dataModel.kcal
+                                protien = dataModel.protein
+                            }
+                            viewModel.setProfileData(data)
+                            if (type.equals("BMR",true)){
+                                findNavController().navigate(R.id.nutritionGoalFragment)
+                            }else{
+                                showDataInUi(viewModel.getProfileData()!!)
+                            }
+                        }
+                    }
+                } else {
+                    handleError(apiModel.code,apiModel.message)
                 }
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
+    }
 
+    private fun handleError(code: Int, message: String) {
+        if (code == ErrorMessage.code) {
+            showAlert(message, true)
+        } else {
+            showAlert(message, false)
+        }
     }
 
     private fun handleSuccessResponse(data: String) {
@@ -255,11 +389,7 @@ class HealthDataFragment : Fragment() {
                 viewModel.setProfileData(apiModel.data)
                 showDataInUi(apiModel.data)
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -270,8 +400,8 @@ class HealthDataFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun showDataInUi(data: Data) {
 
-        if (data.gender!=null){
-            when (data.gender.lowercase()) {
+        data.gender?.let {
+            when (it.lowercase()) {
                 "male" -> selectGender(true)
                 "female" -> selectGender(false)
                 else -> resetGenderSelection()
@@ -285,7 +415,6 @@ class HealthDataFragment : Fragment() {
         if (data.weight != null && !data.weight.equals("null",true)) {
             binding.etweight.setText(data.weight)
         }
-
 
         if (data.height_type != null && !data.height_type.equals("null",true)) {
             binding.spinnerHeight.text = data.height_type
@@ -302,7 +431,6 @@ class HealthDataFragment : Fragment() {
         if (data.activity_level != null && !data.activity_level.equals("null",true)) {
             binding.spinnerActivityLevel.text = data.activity_level
         }
-
 
         if ((data.calories ?: 0) == 0 && (data.carbs ?: 0) == 0 && (data.fat ?: 0) == 0 && (data.protien ?: 0) == 0) {
             // Corrected "protien" to "protein" if needed
@@ -380,4 +508,19 @@ class HealthDataFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+
+    override fun onResume() {
+        super.onResume()
+        binding.etweight.addTextChangedListener(textListener)
+        binding.etHeight.addTextChangedListener(textListener1)
+    }
+
+    override fun onPause() {
+        binding.etweight.addTextChangedListener(textListener)
+        binding.etHeight.addTextChangedListener(textListener1)
+        super.onPause()
+    }
+
+
 }

@@ -27,39 +27,52 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.ChooseDayAdapter
 import com.mykaimeal.planner.adapter.ImageViewPagerAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
-import com.mykaimeal.planner.basedata.BaseApplication.formatDate
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.ActivityMainBinding
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykaimeal.planner.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModelData
 import com.mykaimeal.planner.fragment.commonfragmentscreen.mealRoutine.viewmodel.MealRoutineViewModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.Data
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.RecipesModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
+import com.mykaimeal.planner.listener.ToastWorker
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import com.mykaimeal.planner.model.DataModel
 import com.mykaimeal.planner.model.DateModel
+import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), OnClickListener {
+class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
 
     lateinit var  binding: ActivityMainBinding
     private lateinit var commonWorkUtils: CommonWorkUtils
@@ -67,8 +80,11 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     private var recipesModel: RecipesModel? = null
     private lateinit var layOnBoardingIndicator: LinearLayout
     val dataList = ArrayList<DataModel>()
-    private lateinit var  adapter: ImageViewPagerAdapter
+    private lateinit var adapter: ImageViewPagerAdapter
     private var tvWeekRange: TextView? = null
+    private var viewPager: ViewPager2? = null
+    private var dialog: Dialog? = null
+    private var laybuttonplabasket: LinearLayout? = null
     private var currentDate = Date() // Current date
 
     // Define global variables
@@ -77,9 +93,13 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     private lateinit var sharedPreferences: SharedPreferences
     private val PREF_NAME = "ToastPrefs"
     private val KEY_LAST_SHOWN_DATE = "last_shown_date"
-
-
+    private var mealType:String="Breakfast"
+    private var rcyChooseDaySch: RecyclerView? = null
+    private lateinit var spinnerActivityLevel: PowerSpinnerView
     private val oneDayMillis = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+    private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
+
+
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,23 +125,49 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         /// using function for find destination graph
         startDestination()
 
-
-//        // Check if 24 hours have passed since the last dialog was shown
-//        if (shouldShowDialog()) {
-////            dialogDailyInspiration()
-//        }
-
-//        // When screen load then api call
-//        fetchDataOnLoad()
-
-
+        // Check if 24 hours have passed since the last dialog was shown
 //        if (shouldShowDialog()) {
 //            fetchDataOnLoad()
 //        }
+//        scheduleToastWorker()
 
 //        fetchDataOnLoad()
-
     }
+    private fun scheduleToastWorker() {
+        val workRequest = PeriodicWorkRequestBuilder<ToastWorker>(3, TimeUnit.MILLISECONDS)
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiresBatteryNotLow(true) // Optional: Runs only if battery is not low
+                    .build()
+            )
+            .build()
+
+        val workManager = WorkManager.getInstance(this)
+
+        // Enqueue unique work to avoid duplicate execution
+        workManager.enqueueUniquePeriodicWork("ToastWorker", ExistingPeriodicWorkPolicy.KEEP, workRequest)
+
+        // Observe Work Info
+        workManager.getWorkInfosForUniqueWorkLiveData("ToastWorker")
+            .observe(this, Observer { workInfos ->
+                if (workInfos.isNotEmpty()) {
+                    val workInfo = workInfos[0] // Get first work item
+
+                    if (workInfo.state == WorkInfo.State.SUCCEEDED) {
+                        val response = workInfo.outputData.getString("response")
+                        Log.d("MainActivity", "Worker Finished: $response")
+
+                        // Call API when work is completed
+                        callApi()
+                    }
+                }
+            })
+    }
+    private fun callApi() {
+        Log.d("MainActivity", "API is being called now!")
+    }
+
+
 
     private fun setEvent(){
         binding.llHome.setOnClickListener(this)
@@ -139,7 +185,6 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val lastDate = sdf.parse(lastShownDate)
         val currentDate = sdf.parse(sdf.format(Date()))
-
         return lastDate == null || currentDate!!.after(lastDate)
 
     }
@@ -250,8 +295,8 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
     @SuppressLint("MissingInflatedId")
     private fun dialogDailyInspiration() {
-        val dialog = Dialog(this@MainActivity, R.style.BottomSheetDialog)
-        dialog.apply {
+        dialog = Dialog(this@MainActivity, R.style.BottomSheetDialog)
+        dialog?.apply {
             setCancelable(true)
             setContentView(R.layout.alert_dialog_daily_inspiration)
             window?.attributes = WindowManager.LayoutParams().apply { copyFrom(window?.attributes)
@@ -261,10 +306,11 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
             layOnBoardingIndicator = findViewById(R.id.layonboarding_indicator)
 
-            val viewPager = findViewById<ViewPager2>(R.id.viewPager)
+            viewPager = findViewById(R.id.viewPager)
             val tvnodata = findViewById<TextView>(R.id.tvnodata)
 
             // Top
+            laybuttonplabasket = findViewById(R.id.laybuttonplabasket)
             val llBreakfast = findViewById<LinearLayout>(R.id.llBreakfast)
             val llLunch = findViewById<LinearLayout>(R.id.llLunch)
             val llDinner = findViewById<LinearLayout>(R.id.llDinner)
@@ -301,111 +347,124 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 }
             }
 
-            setMealClickListener(llBreakfast, viewBreakfast, textBreakfast, "Breakfast")
-            setMealClickListener(llLunch, viewLunch, textLunch, "Lunch")
-            setMealClickListener(llDinner, viewDinner, textDinner, "Dinner")
-            setMealClickListener(llSnaks, viewSnaks, textSnaks, "Snacks")
-            setMealClickListener(llBrunch, viewBrunch, textBrunch, "Brunch")
+            setMealClickListener(llBreakfast, viewBreakfast, textBreakfast, ErrorMessage.Breakfast)
+            setMealClickListener(llLunch, viewLunch, textLunch, ErrorMessage.Lunch)
+            setMealClickListener(llDinner, viewDinner, textDinner, ErrorMessage.Dinner)
+            setMealClickListener(llSnaks, viewSnaks, textSnaks, ErrorMessage.Snacks)
+            setMealClickListener(llBrunch, viewBrunch, textBrunch, ErrorMessage.Brunch)
 
 
             recipesModel?.let { model ->
                 model.Breakfast?.let { breakfast ->
-                    adapter = ImageViewPagerAdapter(this@MainActivity, breakfast)
-                    viewPager.adapter = adapter
-//                    setUpOnBoardingIndicator()
-//                    currentOnBoardingIndicator(0)
-                    viewPager.visibility = View.VISIBLE
+                    adapter = ImageViewPagerAdapter(this@MainActivity, breakfast,this@MainActivity)
+                    viewPager?.adapter = adapter
+                    viewPager?.visibility = View.VISIBLE
+                    laybuttonplabasket?.visibility = View.VISIBLE
                     tvnodata.visibility = View.GONE
                 } ?: run {
-                    viewPager.visibility = View.GONE
+                    viewPager?.visibility = View.GONE
+                    laybuttonplabasket?.visibility = View.GONE
                     tvnodata.visibility = View.VISIBLE
                 }
             }
 
             rlAddPlanButton.setOnClickListener {
-                chooseDayDialog(0, "")
-                dismiss()
+                chooseDayDialog()
             }
 
             rlAddCartButton.setOnClickListener {
-                findNavController(R.id.frameContainerMain).navigate(R.id.basketScreenFragment)
-                dismiss()
+                if (BaseApplication.isOnline(this@MainActivity)) {
+                    Log.d("mealType", "********$mealType")
+                    val recipesMap = mapOf(
+                        ErrorMessage.Breakfast to recipesModel?.Breakfast,
+                        ErrorMessage.Lunch to recipesModel?.Lunch,
+                        ErrorMessage.Dinner to recipesModel?.Dinner,
+                        ErrorMessage.Snacks to recipesModel?.Snack,
+                        ErrorMessage.Brunch to recipesModel?.Teatime
+                    )
+                    addBasketData(viewPager?.currentItem?.let { it1 -> recipesMap[mealType]?.get(it1)?.recipe?.uri })
+                } else {
+                    BaseApplication.alertError(this@MainActivity, ErrorMessage.networkError, false)
+                }
             }
+
+//            // Register Page Change Callback to Get Current Position
+//            viewPager.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+//                override fun onPageSelected(position: Int) {
+//                    super.onPageSelected(position)
+//
+//                }
+//            })
+
             show()
         }
     }
 
-    private fun updateList(type: String, viewPager: ViewPager2, tvnodata: TextView){
-        if (type.equals("Breakfast",true)){
-            recipesModel?.Breakfast?.let {
-                viewPager.apply {
-                    adapter = ImageViewPagerAdapter(this@MainActivity, it)
-                    visibility = View.VISIBLE
-                    tvnodata.visibility = View.GONE
-//                    setUpOnBoardingIndicator()
-//                    currentOnBoardingIndicator(0)
-                }
-            } ?: run {
-                viewPager.visibility = View.GONE
-                tvnodata.visibility = View.VISIBLE
-            }
+
+    private fun addBasketData(uri:String?){
+        BaseApplication.showMe(this)
+        lifecycleScope.launch {
+            mealRoutineViewModel.addBasketRequest({
+                BaseApplication.dismissMe()
+                handleBasketApiResponse(it)
+            }, uri.toString(), "")
         }
-        if (type.equals("Lunch",true)){
-            recipesModel?.Lunch?.let {
-                viewPager.apply {
-                    adapter = ImageViewPagerAdapter(this@MainActivity, it)
-                    visibility = View.VISIBLE
-                    tvnodata.visibility = View.GONE
-//                    setUpOnBoardingIndicator()
-//                    currentOnBoardingIndicator(0)
-                }
-            } ?: run {
-                viewPager.visibility = View.GONE
-                tvnodata.visibility = View.VISIBLE
-            }
+    }
+
+    private fun handleBasketApiResponse(
+        result: NetworkResult<String>
+    ) {
+        when (result) {
+            is NetworkResult.Success -> handleBasketSuccessResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
         }
-        if (type.equals("Dinner",true)){
-            recipesModel?.Dinner?.let {
-                viewPager.apply {
-                    adapter = ImageViewPagerAdapter(this@MainActivity, it)
-                    visibility = View.VISIBLE
-                    tvnodata.visibility = View.GONE
-//                    setUpOnBoardingIndicator()
-//                    currentOnBoardingIndicator(0)
-                }
-            } ?: run {
-                viewPager.visibility = View.GONE
-                tvnodata.visibility = View.VISIBLE
+    }
+
+    private fun showAlert(message: String?, status: Boolean) {
+        BaseApplication.alertError(this, message, status)
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun handleBasketSuccessResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ Plan List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                dialog?.dismiss()
+                Toast.makeText(this, apiModel.message, Toast.LENGTH_LONG).show()
+            } else {
+                handleError(apiModel.code,apiModel.message)
             }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
         }
-        if (type.equals("Snacks",true)){
-            recipesModel?.Snack?.let {
-                viewPager.apply {
-                    adapter = ImageViewPagerAdapter(this@MainActivity, it)
-                    visibility = View.VISIBLE
-                    tvnodata.visibility = View.GONE
-//                    setUpOnBoardingIndicator()
-//                    currentOnBoardingIndicator(0)
-                }
-            } ?: run {
-                viewPager.visibility = View.GONE
-                tvnodata.visibility = View.VISIBLE
-            }
+    }
+
+    private fun updateList(type: String, viewPager: ViewPager2?, tvnodata: TextView){
+        mealType=type
+        val recipesMap = mapOf(
+            ErrorMessage.Breakfast to recipesModel?.Breakfast,
+            ErrorMessage.Lunch to recipesModel?.Lunch,
+            ErrorMessage.Dinner to recipesModel?.Dinner,
+            ErrorMessage.Snacks to recipesModel?.Snack,
+            ErrorMessage.Brunch to recipesModel?.Teatime
+        )
+
+        recipesMap[type]?.let { breakfast ->
+            adapter = ImageViewPagerAdapter(this@MainActivity, breakfast,this@MainActivity)
+            viewPager?.adapter = adapter
+            viewPager?.visibility = View.VISIBLE
+            laybuttonplabasket?.visibility = View.VISIBLE
+            tvnodata.visibility = View.GONE
+        } ?: run {
+            viewPager?.visibility = View.GONE
+            laybuttonplabasket?.visibility = View.GONE
+            tvnodata.visibility = View.VISIBLE
         }
-        if (type.equals("Brunch",true)){
-            recipesModel?.Teatime?.let {
-                viewPager.apply {
-                    adapter = ImageViewPagerAdapter(this@MainActivity, it)
-                    visibility = View.VISIBLE
-                    tvnodata.visibility = View.GONE
-//                    setUpOnBoardingIndicator()
-//                    currentOnBoardingIndicator(0)
-                }
-            } ?: run {
-                viewPager.visibility = View.GONE
-                tvnodata.visibility = View.VISIBLE
-            }
-        }
+
+
     }
 
     private fun fetchDataOnLoad() {
@@ -460,12 +519,12 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     private fun showData(data: Data) {
         recipesModel = data.recipes
         Log.d("24 hours api", "fffdfdf$recipesModel")
-//        saveCurrentDate()
+        saveCurrentDate()
         dialogDailyInspiration()
     }
 
     private fun setUpOnBoardingIndicator() {
-        val indicator = arrayOfNulls<ImageView>(adapter.itemCount)
+        val indicator = arrayOfNulls<ImageView>(adapter!!.itemCount)
         val layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -508,21 +567,24 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun chooseDayDialog(position: Int?, typeAdapter: String?) {
-        val dialogChooseDay = Dialog(this@MainActivity)
+    private fun chooseDayDialog() {
+        val dialogChooseDay = Dialog(this)
         dialogChooseDay.setContentView(R.layout.alert_dialog_choose_day)
-        dialogChooseDay.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialogChooseDay.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
         dialogChooseDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val rcyChooseDaySch = dialogChooseDay.findViewById<RecyclerView>(R.id.rcyChooseDaySch)
+        rcyChooseDaySch = dialogChooseDay.findViewById(R.id.rcyChooseDaySch)
         tvWeekRange = dialogChooseDay.findViewById(R.id.tvWeekRange)
         val rlDoneBtn = dialogChooseDay.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         val btnPrevious = dialogChooseDay.findViewById<ImageView>(R.id.btnPrevious)
         val btnNext = dialogChooseDay.findViewById<ImageView>(R.id.btnNext)
         dialogChooseDay.show()
         dialogChooseDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        showWeekDates()
         dataList.clear()
-        val daysOfWeek = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        val daysOfWeek =
+            listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
         for (day in daysOfWeek) {
             val data = DataModel().apply {
                 title = day
@@ -533,10 +595,9 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             dataList.add(data)
         }
 
-        rcyChooseDaySch!!.adapter = ChooseDayAdapter(dataList, this@MainActivity)
+        showWeekDates()
 
         rlDoneBtn.setOnClickListener {
-
             var status = false
             for (it in dataList) {
                 if (it.isOpen) {
@@ -544,22 +605,47 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                     break // Exit the loop early
                 }
             }
-            if (status){
-                chooseDayMealTypeDialog(position,typeAdapter)
+            if (status) {
+                chooseDayMealTypeDialog()
                 dialogChooseDay.dismiss()
-            }else{
-                BaseApplication.alertError(this@MainActivity, ErrorMessage.weekNameError, false)
+            } else {
+                BaseApplication.alertError(this, ErrorMessage.weekNameError, false)
             }
         }
 
         btnPrevious.setOnClickListener {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val formattedCurrentDate = dateFormat.format(currentDate)
             val calendar = Calendar.getInstance()
             calendar.time = currentDate
             calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
-            currentDate = calendar.time
-            // Display next week dates
-            println("\nAfter clicking 'Next':")
-            showWeekDates()
+            val currentDate1 = calendar.time
+            val (startDate, endDate) = getWeekDates(currentDate1)
+            println("Week Start Date: ${formatDate(startDate)}")
+            println("Week End Date: ${formatDate(endDate)}")
+            // Get all dates between startDate and endDate
+            val daysBetween = getDaysBetween(startDate, endDate)
+            // Mark the current date as selected in the list
+            val updatedDaysBetween1 = daysBetween.map { dateModel ->
+                dateModel.apply {
+                    status = (date == formattedCurrentDate) // Compare formatted strings
+                }
+            }
+            var status=false
+            updatedDaysBetween1.forEach {
+                status = it.date >= BaseApplication.currentDateFormat().toString()
+            }
+            if (status){
+                val calendar = Calendar.getInstance()
+                calendar.time = currentDate
+                calendar.add(Calendar.WEEK_OF_YEAR, -1) // Move to next week
+                currentDate = calendar.time
+                // Display next week dates
+                println("\nAfter clicking 'Next':")
+                showWeekDates()
+            }else{
+                Toast.makeText(this,ErrorMessage.slideError,Toast.LENGTH_LONG).show()
+            }
         }
 
         btnNext.setOnClickListener {
@@ -574,8 +660,9 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         }
     }
 
-    private fun chooseDayMealTypeDialog(position: Int?, typeAdapter: String?) {
-        val dialogChooseMealDay: Dialog = Dialog(this@MainActivity)
+
+    private fun chooseDayMealTypeDialog() {
+        val dialogChooseMealDay: Dialog = Dialog(this)
         dialogChooseMealDay.setContentView(R.layout.alert_dialog_choose_day_meal_type)
         dialogChooseMealDay.window!!.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -594,10 +681,15 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
         var type = ""
 
-        fun updateSelection(selectedType: String, selectedView: TextView, allViews: List<TextView>) {
+        fun updateSelection(
+            selectedType: String,
+            selectedView: TextView,
+            allViews: List<TextView>
+        ) {
             type = selectedType
             allViews.forEach { view ->
-                val drawable = if (view == selectedView) R.drawable.radio_select_icon else R.drawable.radio_unselect_icon
+                val drawable =
+                    if (view == selectedView) R.drawable.radio_select_icon else R.drawable.radio_unselect_icon
                 view.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0)
             }
         }
@@ -605,67 +697,66 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         val allViews = listOf(tvBreakfast, tvLunch, tvDinner, tvSnacks, tvTeatime)
 
         tvBreakfast.setOnClickListener {
-            updateSelection("Breakfast", tvBreakfast, allViews)
+            updateSelection(ErrorMessage.Breakfast, tvBreakfast, allViews)
         }
 
         tvLunch.setOnClickListener {
-            updateSelection("Lunch", tvLunch, allViews)
+            updateSelection(ErrorMessage.Lunch, tvLunch, allViews)
         }
 
         tvDinner.setOnClickListener {
-            updateSelection("Dinner", tvDinner, allViews)
+            updateSelection(ErrorMessage.Dinner, tvDinner, allViews)
         }
 
         tvSnacks.setOnClickListener {
-            updateSelection("Snack", tvSnacks, allViews)
+            updateSelection(ErrorMessage.Snacks, tvSnacks, allViews)
         }
 
         tvTeatime.setOnClickListener {
-            updateSelection("Teatime", tvTeatime, allViews)
+            updateSelection(ErrorMessage.Brunch, tvTeatime, allViews)
         }
 
 
         rlDoneBtn.setOnClickListener {
-            if (BaseApplication.isOnline(this@MainActivity)) {
-                if (type.equals("",true)){
-                    BaseApplication.alertError(this@MainActivity, ErrorMessage.mealTypeError, false)
-                }else{
-                    addToPlan(dialogChooseMealDay,type,position,typeAdapter)
+            if (BaseApplication.isOnline(this)) {
+                if (type.equals("", true)) {
+                    BaseApplication.alertError(this, ErrorMessage.mealTypeError, false)
+                } else {
+                    addToPlan(dialogChooseMealDay, type)
                 }
             } else {
-                BaseApplication.alertError(this@MainActivity, ErrorMessage.networkError, false)
+                BaseApplication.alertError(this, ErrorMessage.networkError, false)
             }
         }
+
     }
 
-    private fun addToPlan(dialogChooseMealDay: Dialog, selectType: String, position: Int?, typeAdapter: String?) {
-        // Map the type to the corresponding list and adapter
-      /*  val (mealList, adapter) = when (typeAdapter) {
-            "BreakFast" -> recipesModel?.Breakfast to breakfastAdapter
-            "Lunch" -> recipesModel?.Lunch to lunchAdapter
-            "Dinner" -> recipesModel?.Dinner to dinnerAdapter
-            "Snack" -> recipesModel?.Dinner to snackesAdapter
-            "TeaTime" -> recipesModel?.Dinner to teaTimeAdapter
-            else -> null to null
-        }
-
+    private fun addToPlan(dialogChooseMealDay: Dialog, selectType: String) {
+        Log.d("mealType", "********$mealType")
+        val recipesMap = mapOf(
+            ErrorMessage.Breakfast to recipesModel?.Breakfast,
+            ErrorMessage.Lunch to recipesModel?.Lunch,
+            ErrorMessage.Dinner to recipesModel?.Dinner,
+            ErrorMessage.Snacks to recipesModel?.Snack,
+            ErrorMessage.Brunch to recipesModel?.Teatime
+        )
         // Create a JsonObject for the main JSON structure
         val jsonObject = JsonObject()
 
         // Safely get the item and position
-        val item = mealList?.get(position!!)
+        val item = viewPager?.let { recipesMap[mealType]?.get(it.currentItem) }
         if (item != null) {
-            if (item.recipe?.uri!=null){
+            if (item.recipe?.uri != null) {
                 jsonObject.addProperty("type", selectType)
                 jsonObject.addProperty("uri", item.recipe.uri)
                 // Create a JsonArray for ingredients
                 val jsonArray = JsonArray()
-                val latestList=getDaysBetween(startDate, endDate)
+                val latestList = getDaysBetween(startDate, endDate)
                 for (i in dataList.indices) {
-                    val data=DataModel()
-                    data.isOpen=dataList[i].isOpen
-                    data.title=dataList[i].title
-                    data.date=latestList[i].date
+                    val data = DataModel()
+                    data.isOpen = dataList[i].isOpen
+                    data.title = dataList[i].title
+                    data.date = latestList[i].date
                     dataList[i] = data
                 }
                 // Iterate through the ingredients and add them to the array if status is true
@@ -686,23 +777,24 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             }
         }
 
-        BaseApplication.showMe(this@MainActivity)
+        BaseApplication.showMe(this)
         lifecycleScope.launch {
             mealRoutineViewModel.recipeAddToPlanRequest({
                 BaseApplication.dismissMe()
-                handleApiAddToPlanResponse(it,dialogChooseMealDay)
+                handleApiAddToPlanResponse(it, dialogChooseMealDay)
             }, jsonObject)
-        }*/
+        }
     }
+
 
     private fun handleApiAddToPlanResponse(
         result: NetworkResult<String>,
         dialogChooseMealDay: Dialog
     ) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessAddToPlanResponse(result.data.toString(),dialogChooseMealDay)
-            is NetworkResult.Error -> showAlertFunction(result.message, false)
-            else -> showAlertFunction(result.message, false)
+            is NetworkResult.Success -> handleSuccessAddToPlanResponse(result.data.toString(), dialogChooseMealDay)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
         }
     }
 
@@ -714,19 +806,17 @@ class MainActivity : AppCompatActivity(), OnClickListener {
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 dataList.clear()
+                dialog?.dismiss()
                 dialogChooseMealDay.dismiss()
-                Toast.makeText(this@MainActivity,apiModel.message, Toast.LENGTH_LONG).show()
+                Toast.makeText(this, apiModel.message, Toast.LENGTH_LONG).show()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlertFunction(apiModel.message, true)
-                } else {
-                    showAlertFunction(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
-            showAlertFunction(e.message, false)
+            showAlert(e.message, false)
         }
     }
+
 
     @SuppressLint("SetTextI18n")
     fun showWeekDates() {
@@ -735,18 +825,32 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         this.startDate = startDate
         this.endDate = endDate
 
-        println("Week Start Date: ${formatDate(startDate.toString())}")
-        println("Week End Date: ${formatDate(endDate.toString())}")
+        println("Week Start Date: ${formatDate(startDate)}")
+        println("Week End Date: ${formatDate(endDate)}")
 
         // Get all dates between startDate and endDate
         val daysBetween = getDaysBetween(startDate, endDate)
+        // Mark the current date as selected in the list
+        daysBetween.zip(dataList).forEach { (dateModel, dataModel) ->
+            dataModel.date = dateModel.date
+            dataModel.isOpen = false
+        }
+
+        rcyChooseDaySch?.adapter = ChooseDayAdapter(dataList, this)
+
 
         // Print the dates
-        println("Days between ${startDate} and ${endDate}:")
+        println("Days between $startDate and ${endDate}:")
         daysBetween.forEach { println(it) }
-        tvWeekRange?.text = "" + formatDate(startDate.toString()) + "-" + formatDate(endDate.toString())
+        tvWeekRange?.text = "" + formatDate(startDate) + "-" + formatDate(endDate)
 
     }
+
+    private fun formatDate(date: Date): String {
+        val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+        return dateFormat.format(date)
+    }
+
 
 
     private fun getDaysBetween(startDate: Date, endDate: Date): MutableList<DateModel> {
@@ -861,11 +965,7 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                                 mealRoutineList.addAll(bodyModel.data.mealroutine)
                             } else {
                                 // Handle specific error cases
-                                if (bodyModel.code == ErrorMessage.code) {
-                                    showAlertFunction(bodyModel.message, true)
-                                } else {
-                                    showAlertFunction(bodyModel.message, false)
-                                }
+                                handleError(bodyModel.code,bodyModel.message)
                             }
                         } catch (e: Exception) {
                             Log.d("MealRoutine@@", "message:---" + e.message)
@@ -900,10 +1000,199 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     fun saveCurrentDate() {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val currentDate = sdf.format(Date())
-        sharedPreferences.edit()
-            .putString(KEY_LAST_SHOWN_DATE, currentDate)
-            .apply()
+        sharedPreferences.edit().putString(KEY_LAST_SHOWN_DATE, currentDate).apply()
     }
 
+    override fun itemClick(position: Int?, status: String?, type: String?) {
+        when (status) {
+            "4" -> {
+                if (BaseApplication.isOnline(this)) {
+                    toggleIsLike()
+                } else {
+                    BaseApplication.alertError(this, ErrorMessage.networkError, false)
+                }
+            }
+        }
+    }
+
+
+    private fun toggleIsLike() {
+        // Map the type to the corresponding list and adapter
+        Log.d("mealType", "********$mealType")
+        val recipesMap = mapOf(
+            ErrorMessage.Breakfast to recipesModel?.Breakfast,
+            ErrorMessage.Lunch to recipesModel?.Lunch,
+            ErrorMessage.Dinner to recipesModel?.Dinner,
+            ErrorMessage.Snacks to recipesModel?.Snack,
+            ErrorMessage.Brunch to recipesModel?.Teatime
+        )
+        // Safely get the item and position
+        val item = viewPager?.let { recipesMap[mealType]?.get(it.currentItem) }
+        if (item != null) {
+            if (item.recipe?.uri != null) {
+                val newLikeStatus = if (item.is_like == 0) "1" else "0"
+                if (newLikeStatus.equals("0", true)) {
+                    recipeLikeAndUnlikeData(item, newLikeStatus,"",null,recipesMap[mealType])
+                } else {
+                    addFavTypeDialog(item, recipesMap[mealType], newLikeStatus)
+                }
+            }
+        }
+    }
+
+    private fun addFavTypeDialog(
+        item: BreakfastModel,
+        breakfastModels: MutableList<BreakfastModel>?,
+        newLikeStatus: String
+    ) {
+        val dialogAddRecipe: Dialog = Dialog(this)
+        dialogAddRecipe.setContentView(R.layout.alert_dialog_add_recipe)
+        dialogAddRecipe.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        dialogAddRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val rlDoneBtn = dialogAddRecipe.findViewById<RelativeLayout>(R.id.rlDoneBtn)
+        spinnerActivityLevel = dialogAddRecipe.findViewById(R.id.spinnerActivityLevel)
+        val relCreateNewCookBook =
+            dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
+        val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
+        cookbookList.clear()
+        val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
+                "",
+                "",
+                0,
+                "",
+                "Favorites",
+                0,
+                "",
+                0
+            )
+        cookbookList.add(0, data)
+        spinnerActivityLevel.setItems(cookbookList.map { it.name })
+
+        dialogAddRecipe.show()
+        dialogAddRecipe.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        getCookBookList()
+
+        relCreateNewCookBook.setOnClickListener {
+            relCreateNewCookBook.setBackgroundResource(R.drawable.light_green_rectangular_bg)
+            imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
+            dialog?.dismiss()
+            dialogAddRecipe.dismiss()
+            val bundle = Bundle()
+            bundle.putString("value", "New")
+            bundle.putString("uri", item.recipe?.uri)
+            findNavController(R.id.frameContainerMain).navigate(R.id.createCookBookFragment, bundle)
+        }
+
+
+        rlDoneBtn.setOnClickListener {
+            if (spinnerActivityLevel.text.toString()
+                    .equals(ErrorMessage.cookBookSelectError, true)
+            ) {
+                BaseApplication.alertError(
+                    this,
+                    ErrorMessage.selectCookBookError,
+                    false
+                )
+            } else {
+                val cookbooktype = cookbookList[spinnerActivityLevel.selectedIndex].id
+                recipeLikeAndUnlikeData(item, newLikeStatus,cookbooktype.toString(),dialogAddRecipe,breakfastModels)
+            }
+        }
+
+    }
+
+    private fun getCookBookList() {
+        BaseApplication.showMe(this)
+        lifecycleScope.launch {
+            mealRoutineViewModel.getCookBookRequest {
+                BaseApplication.dismissMe()
+                handleApiCookBookResponse(it)
+            }
+        }
+    }
+    private fun handleApiCookBookResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessCookBookResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessCookBookResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, CookBookListResponse::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data != null && apiModel.data.size > 0) {
+                    cookbookList.retainAll { it == cookbookList[0] }
+                    cookbookList.addAll(apiModel.data)
+                    // OR directly modify the original list
+                    spinnerActivityLevel.setItems(cookbookList.map { it.name })
+                }
+            } else {
+               handleError(apiModel.code,apiModel.message)
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun recipeLikeAndUnlikeData(
+        item: BreakfastModel,
+        likeType: String,
+        cookbooktype: String,
+        dialogAddRecipe: Dialog?,
+        breakfastModels: MutableList<BreakfastModel>?
+    ) {
+        BaseApplication.showMe(this)
+        lifecycleScope.launch {
+            mealRoutineViewModel.likeUnlikeRequest({
+                BaseApplication.dismissMe()
+                handleLikeAndUnlikeApiResponse(it, item,dialogAddRecipe,breakfastModels)
+            }, item.recipe?.uri!!, likeType, cookbooktype)
+        }
+    }
+
+    private fun handleLikeAndUnlikeApiResponse(
+        result: NetworkResult<String>,
+        item: BreakfastModel,
+        dialogAddRecipe: Dialog?,
+        breakfastModels: MutableList<BreakfastModel>?
+    ) {
+        when (result) {
+            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponse(result.data.toString(), item, dialogAddRecipe,breakfastModels)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleLikeAndUnlikeSuccessResponse(
+        data: String,
+        item: BreakfastModel,
+        dialogAddRecipe: Dialog?,
+        breakfastModels: MutableList<BreakfastModel>?
+    ) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ Plan List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                dialogAddRecipe?.dismiss()
+                // Toggle the is_like value
+                item.is_like = if (item.is_like == 0) 1 else 0
+                viewPager?.currentItem?.let { breakfastModels?.set(it, item) }
+                adapter.updateItem(breakfastModels!!)
+            } else {
+                handleError(apiModel.code,apiModel.message)
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
 
 }

@@ -2199,7 +2199,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
-   /* override suspend fun updateDietSuggestionUrl(
+    override suspend fun updateDietSuggestionUrl(
         successCallback: (response: NetworkResult<String>) -> Unit, gender: String?, dob: String?, height: String?,
         heightType: String?, weight: String?, weightType: String?, activityLevel: String?
     ) {
@@ -2216,7 +2216,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         } catch (e: Exception) {
             successCallback(NetworkResult.Error(e.message.toString()))
         }
-    }*/
+    }
 
     override suspend fun getProductsUrl(
         successCallback: (response: NetworkResult<String>) -> Unit,query:String?

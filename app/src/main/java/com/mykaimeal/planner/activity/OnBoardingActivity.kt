@@ -76,12 +76,12 @@ class OnBoardingActivity : AppCompatActivity() {
                 }else if (position==1){
                     binding!!.rlNextBtn.visibility= View.VISIBLE
                     binding!!.relLetsGetStarted.visibility= View.GONE
-                    binding!!.tvHeading1.text="Track Food Expenses"
+                    binding!!.tvHeading1.text="Compare Store Prices"
                     binding!!.tvTextDescriptions.text=getString(R.string.tvDescriptions2)
                 }else{
                     binding!!.rlNextBtn.visibility= View.GONE
                     binding!!.relLetsGetStarted.visibility= View.VISIBLE
-                    binding!!.tvHeading1.text="Smart Meal Shopping"
+                    binding!!.tvHeading1.text="10-Min Weekly Grocery Run"
                     binding!!.tvTextDescriptions.text=getString(R.string.tvDescription3)
                 }
 

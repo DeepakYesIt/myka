@@ -12,9 +12,9 @@ data class DataPlayByDate(
     val Teatime: MutableList<BreakfastModelPlanByDate>?,
     val fridge:Int?,
     val freezer:Int?,
-    val fat:Double?,
-    val protein:Double?,
-    val kcal:Double?,
-    val carbs:Double?,
+    val fat:Int?,
+    val protein:Int?,
+    val kcal:Int?,
+    val carbs:Int?,
     var show:Int
 )

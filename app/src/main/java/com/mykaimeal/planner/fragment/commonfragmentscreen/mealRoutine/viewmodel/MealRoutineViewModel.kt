@@ -17,12 +17,6 @@ class MealRoutineViewModel @Inject constructor(private val repository: MainRepos
     }
 
 
-    suspend fun recipeAddToPlanRequest(successCallback: (response: NetworkResult<String>) -> Unit, jsonObject: JsonObject
-    ){
-        repository.recipeAddToPlanRequestApi({ successCallback(it) },jsonObject)
-    }
-
-
     fun setMealRoutineData(data: MutableList<MealRoutineModelData>) {
         mealRoutineLocalData=data
     }
@@ -48,6 +42,25 @@ class MealRoutineViewModel @Inject constructor(private val repository: MainRepos
     suspend fun planRequest(successCallback: (response: NetworkResult<String>) -> Unit,
                             q: String){
         repository.planRequestApi({ successCallback(it) },q)
+    }
+
+    suspend fun addBasketRequest(successCallback: (response: NetworkResult<String>) -> Unit,
+                                 uri: String,quantity: String){
+        repository.addBasketRequestApi({ successCallback(it) },uri,quantity)
+    }
+
+    suspend fun recipeAddToPlanRequest(successCallback: (response: NetworkResult<String>) -> Unit, jsonObject: JsonObject
+    ){
+        repository.recipeAddToPlanRequestApi({ successCallback(it) },jsonObject)
+    }
+
+    suspend fun likeUnlikeRequest(successCallback: (response: NetworkResult<String>) -> Unit,
+                                  uri: String,likeType: String,type:String){
+        repository.likeUnlikeRequestApi({ successCallback(it) },uri,likeType,type)
+    }
+
+    suspend fun getCookBookRequest(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.getCookBookRequestApi { successCallback(it) }
     }
 
 }
