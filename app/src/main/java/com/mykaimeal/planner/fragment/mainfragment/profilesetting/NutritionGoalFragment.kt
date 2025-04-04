@@ -115,21 +115,21 @@ class NutritionGoalFragment : Fragment() {
         if (data.calories!=null){
             calories=data.calories?.toInt() ?: 0
             binding.seekbarcalories.progress = data.calories?.toInt() ?: 0
-            binding.textCalorisTotal.text=""+data.calories?.toInt()+"/500"
+            binding.textCalorisTotal.text=""+data.calories?.toInt()+"/10000"
         }else{
             calories= 0
             binding.seekbarcalories.progress =  0
-            binding.textCalorisTotal.text="0/500"
+            binding.textCalorisTotal.text="0/10000"
         }
 
         if (data.fat!=null){
             fat=data.fat?.toInt() ?: 0
             binding.seekbarFats.progress = data.fat?.toInt() ?: 0
-            binding.textFatTotal.text=""+data.fat?.toInt()+"/500"
+            binding.textFatTotal.text=""+data.fat?.toInt()+"/300"
         }else{
             fat= 0
             binding.seekbarFats.progress =  0
-            binding.textFatTotal.text="0/500"
+            binding.textFatTotal.text="0/300"
         }
 
         if (data.protien!=null){
@@ -145,11 +145,11 @@ class NutritionGoalFragment : Fragment() {
         if (data.carbs!=null){
             carbs=data.carbs?.toInt() ?: 0
             binding.seekbarCarbs.progress = data.carbs?.toInt() ?: 0
-            binding.textCarbsTotal.text=""+data.carbs?.toInt()+"/500"
+            binding.textCarbsTotal.text=""+data.carbs?.toInt()+"/1200"
         }else{
             carbs=0
             binding.seekbarCarbs.progress =  0
-            binding.textCarbsTotal.text="0/500"
+            binding.textCarbsTotal.text="0/1200"
         }
 
 
@@ -182,7 +182,7 @@ class NutritionGoalFragment : Fragment() {
             @SuppressLint("SetTextI18n")
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 // Update TextView with SeekBar's current value
-                binding.textCalorisTotal.text = "$progress/500"
+                binding.textCalorisTotal.text = "$progress/10000"
                 // Enforce the minimum value constraint
                 if (progress <= calories) {
                     seekBar?.progress = calories
@@ -199,11 +199,12 @@ class NutritionGoalFragment : Fragment() {
                 // Optional: Do something when touch stops
             }
         })
+
         binding.seekbarFats.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             @SuppressLint("SetTextI18n")
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 // Update TextView with SeekBar's current value
-                binding.textFatTotal.text = "$progress/500"
+                binding.textFatTotal.text = "$progress/300"
                 // Enforce the minimum value constraint
                 if (progress <= fat) {
                     seekBar?.progress = fat
@@ -224,7 +225,7 @@ class NutritionGoalFragment : Fragment() {
             @SuppressLint("SetTextI18n")
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 // Update TextView with SeekBar's current value
-                binding.textCarbsTotal.text = "$progress/500"
+                binding.textCarbsTotal.text = "$progress/1200"
                 // Enforce the minimum value constraint
                 if (progress <= carbs) {
                     seekBar?.progress = carbs

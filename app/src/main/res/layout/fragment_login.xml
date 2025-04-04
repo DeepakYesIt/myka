@@ -273,7 +273,7 @@
                         android:id="@+id/tvAlreadyAccount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Don't have an account"
+                        android:text="Don't have an account ?"
                         android:textSize="@dimen/_13sdp"
                         android:fontFamily="@font/poppins"/>
 
@@ -286,7 +286,7 @@
                         android:layout_marginStart="@dimen/_5sdp"
                         android:layout_toEndOf="@+id/tvAlreadyAccount"
                         android:textSize="@dimen/_13sdp"
-                        android:fontFamily="@font/poppins"/>
+                        android:fontFamily="@font/poppins_semibold"/>
 
                 </RelativeLayout>
 

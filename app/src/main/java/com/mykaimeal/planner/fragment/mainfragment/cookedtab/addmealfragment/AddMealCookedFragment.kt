@@ -137,41 +137,6 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
 
         }
 
-//        binding.textFridge.setOnClickListener {
-//            binding.textFridge.setBackgroundResource(R.drawable.selected_button_bg)
-//            binding.textFreezer.setBackgroundResource(R.drawable.unselected_button_bg)
-//            binding.textFridge.setTextColor(Color.WHITE)
-//            binding.textFreezer.setTextColor(Color.BLACK)
-//            planType="1"
-//
-//            if (status=="2"){
-//                binding.textFridge.text="Fridge (1)"
-//                binding.textFreezer.text="Freezer (0)"
-//            }else{
-//                binding.textFridge.text="Fridge (0)"
-//                binding.textFreezer.text="Freezer (0)"
-//            }
-//
-//        }
-//
-//        binding.textFreezer.setOnClickListener {
-//            binding.textFridge.setBackgroundResource(R.drawable.unselected_button_bg)
-//            binding.textFreezer.setBackgroundResource(R.drawable.selected_button_bg)
-//            binding.textFridge.setTextColor(Color.BLACK)
-//            binding.textFreezer.setTextColor(Color.WHITE)
-//            planType="2"
-//
-//            if (status=="2"){
-//                binding.textFridge.text="Fridge (0)"
-//                binding.textFreezer.text="Freezer (1)"
-//            }else{
-//                binding.textFridge.text="Fridge (0)"
-//                binding.textFreezer.text="Freezer (0)"
-//            }
-//
-//        }
-
-
         binding.textFridge.setOnClickListener {
             updateButtonState(isFridgeSelected = true)
         }
@@ -197,15 +162,6 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
             }
         }
 
-//        binding.relSearch.setOnClickListener{
-//            binding.cardViewSearchRecipe.visibility=View.VISIBLE
-//            if (BaseApplication.isOnline(requireActivity())) {
-////                searchRecipeApi(searchText)
-//            } else {
-//                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-//            }
-//        }
-
         binding.testAddMeals.setOnClickListener{
             if (clickable=="2"){
                 if (BaseApplication.isOnline(requireActivity())) {
@@ -226,17 +182,14 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val searchText = s.toString().trim()
-                if (searchText.trim() != searchFor) {
+                val searchText = s.toString()
+                if (searchText!= searchFor) {
                     searchFor = searchText
-
                     textChangedJob?.cancel()
                     // Launch a new coroutine in the lifecycle scope
                     textChangedJob = lifecycleScope.launch {
                         delay(1000)  // Debounce time
                         if (searchText == searchFor) {
-//                            loadList(searchText)
-//                            loadSearchApi(searchText)
                             if (BaseApplication.isOnline(requireActivity())) {
                                 searchRecipeApi(searchText)
                             } else {
@@ -247,7 +200,6 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
                 }
             }
         }
-
     }
 
     @SuppressLint("SetTextI18n")
@@ -357,7 +309,7 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
         }
     }
 
-    @SuppressLint("DefaultLocale")
+    @SuppressLint("DefaultLocale", "SetTextI18n")
     private fun updateValue() {
         binding.tvServing.text = "serves"+String.format("%02d", quantity)
     }
@@ -418,10 +370,12 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
     }
 
     private fun searchRecipeApi(searchText: String) {
-        binding.layProgress.visibility=View.VISIBLE
+//        binding.layProgress.visibility=View.VISIBLE
+        BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             addMealCookedViewModel.recipeSearchApi({
                 binding.layProgress.visibility=View.GONE
+                BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
                         try {
