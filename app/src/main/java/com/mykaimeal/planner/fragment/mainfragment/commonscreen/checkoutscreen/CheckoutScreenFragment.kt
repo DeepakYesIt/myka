@@ -112,7 +112,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     private var states: String? = ""
     private var zipcode: String? = ""
     private var country: String? = ""
-
     private lateinit var commonWorkUtils: CommonWorkUtils
 
     override fun onCreateView(
