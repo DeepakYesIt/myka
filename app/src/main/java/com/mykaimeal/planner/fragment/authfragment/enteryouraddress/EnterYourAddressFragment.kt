@@ -66,7 +66,6 @@ import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentEnterYourAddressBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addressmapfullscreen.model.AddAddressModel
-import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.viewmodel.CheckoutScreenViewModel
 import com.mykaimeal.planner.listener.OnPlacesDetailsListener
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import com.mykaimeal.planner.model.Place
