@@ -97,7 +97,6 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
     private lateinit var edtStates: EditText
     private lateinit var edtPostalCode: EditText
     private lateinit var edtAddress: EditText
-    private var userAddress: String? = ""
     private var address: String? = ""
     private var setStatus: String? = "Home"
     private var latitude: String? = ""
@@ -109,8 +108,6 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
     private var states: String? = ""
     private var country: String? = ""
     private var zipcode: String? = ""
-    private var primary: String? = "1"
-
 
 
     override fun onCreateView(
@@ -125,7 +122,8 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
         commonWorkUtils = CommonWorkUtils(requireActivity())
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        locationManager = requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
+        locationManager =
+            requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
 
         mapView = binding.mapView
         mapView.onCreate(savedInstanceState)
@@ -138,21 +136,32 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
 
     private fun initialize() {
 
-        binding.llHome.setOnClickListener{
+        binding.llHome.setOnClickListener {
             setStatus = "Home"
             binding.llHome.setBackgroundResource(R.drawable.outline_green_border_bg)
             binding.llWork.setBackgroundResource(R.drawable.height_type_bg)
         }
 
-        binding.llWork.setOnClickListener{
+        binding.llWork.setOnClickListener {
             setStatus = "Work"
             binding.llHome.setBackgroundResource(R.drawable.height_type_bg)
             binding.llWork.setBackgroundResource(R.drawable.outline_address_green_border_bg)
         }
 
-
         binding.layEdit.setOnClickListener {
-            findNavController().navigate(R.id.addressMapFullScreenFragment)
+            if (latitude != "" || longitude != "") {
+                val bundle = Bundle().apply {
+                    putString("latitude", latitude.toString())
+                    putString("longitude", longitude.toString())
+                    putString("address", address.toString())
+                    putString("addressId", "")
+                    putString("type", "EnterYourAddress")
+                }
+                findNavController().navigate(R.id.addressMapFullScreenFragment, bundle)
+            } else {
+                showAlert("Please add your address", false)
+            }
+
         }
 
         val apiKey = getString(R.string.api_key)
@@ -170,7 +179,11 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
 
         binding.relTrialBtn.setOnClickListener {
             if (BaseApplication.isOnline(requireContext())) {
-                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
                     getCurrentLocation()
                 } else {
                     requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100)
@@ -180,11 +193,13 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-
-        binding.relDone.setOnClickListener{
-            fullAddressDialog()
+        binding.relDone.setOnClickListener {
+            if (latitude != "" || longitude != "") {
+                fullAddressDialog()
+            } else {
+                showAlert("Please add your address", false)
+            }
         }
-
     }
 
 
@@ -238,20 +253,20 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
 
         dialogMiles.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         relConfirm.setOnClickListener {
-                  if (BaseApplication.isOnline(requireContext())) {
-                      if (validate()) {
-                          streetName=edtStreetName.text.toString().trim()
-                          streetNum=edtStreetNumber.text.toString().trim()
-                          apartNum=edtApartNumber.text.toString().trim()
-                          city=edtCity.text.toString().trim()
-                          states=edtStates.text.toString().trim()
-                          address=edtAddress.text.toString().trim()
-                          zipcode=edtPostalCode.text.toString().trim()
-                          addFullAddressApi()
-                      }
-                  } else {
-                      BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                  }
+            if (BaseApplication.isOnline(requireContext())) {
+                if (validate()) {
+                    streetName = edtStreetName.text.toString().trim()
+                    streetNum = edtStreetNumber.text.toString().trim()
+                    apartNum = edtApartNumber.text.toString().trim()
+                    city = edtCity.text.toString().trim()
+                    states = edtStates.text.toString().trim()
+                    address = edtAddress.text.toString().trim()
+                    zipcode = edtPostalCode.text.toString().trim()
+                    addFullAddressApi()
+                }
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
             dialogMiles.dismiss()
         }
 
@@ -369,15 +384,19 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
 
         mMap = googleMap
-        updateMarker(0.0,-0.0,"1")
+        updateMarker(0.0, -0.0, "1")
     }
 
     private fun updateMarker(lat: Double, longi: Double, type: String) {
         Log.d("Location", "****** $lat, $longi")
         val newYork = LatLng(lat, longi)
-        if (!type.equals("1",true)){
+        if (!type.equals("1", true)) {
             mMap.clear()
-            val customMarker = bitmapDescriptorFromVector(R.drawable.marker_icon,50,50) // Change with your drawable
+            val customMarker = bitmapDescriptorFromVector(
+                R.drawable.marker_icon,
+                50,
+                50
+            ) // Change with your drawable
             mMap.addMarker(
                 MarkerOptions()
                     .position(newYork)
@@ -437,7 +456,11 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun bitmapDescriptorFromVector(vectorResId: Int, width: Int, height: Int): BitmapDescriptor? {
+    private fun bitmapDescriptorFromVector(
+        vectorResId: Int,
+        width: Int,
+        height: Int
+    ): BitmapDescriptor? {
         val vectorDrawable: Drawable? = ContextCompat.getDrawable(requireContext(), vectorResId)
         if (vectorDrawable == null) {
             return null
@@ -455,9 +478,13 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
 
     private fun getCurrentLocation() {
         // Initialize Location manager
-        val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         // Check condition
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+                LocationManager.NETWORK_PROVIDER
+            )
+        ) {
             // When location service is enabled
             // Get last location
             if (ActivityCompat.checkSelfPermission(
@@ -486,11 +513,11 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
                     longitude = location.longitude.toString()
                     binding.tvAddress.text.clear()
                     requireActivity().runOnUiThread {
-                        updateMarker(location.latitude,location.longitude, "2")
+                        updateMarker(location.latitude, location.longitude, "2")
                     }
 
                 } else {
-                  // When location result is null
+                    // When location result is null
                     val locationRequest =
                         LocationRequest().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                             .setInterval(10000)
@@ -506,11 +533,11 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
                             longitude = location1.longitude.toString()
                             binding.tvAddress.text.clear()
                             requireActivity().runOnUiThread {
-                                updateMarker(location1.latitude,location1.longitude, "2")
+                                updateMarker(location1.latitude, location1.longitude, "2")
                             }
                         }
                     }
-                  // Request location updates
+                    // Request location updates
                     mFusedLocationClient.requestLocationUpdates(
                         locationRequest,
                         locationCallback,
@@ -530,7 +557,11 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
 
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 100 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             displayLocationSettingsRequest(requireContext())
@@ -559,8 +590,12 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
                     Log.i(TAG, "All location settings are satisfied.")
                     getCurrentLocation()
                 }
+
                 LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
-                    Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ")
+                    Log.i(
+                        TAG,
+                        "Location settings are not satisfied. Show the user a dialog to upgrade location settings "
+                    )
                     try {
                         // Show the dialog by calling startResolutionForResult(), and check the result
                         // in onActivityResult().
@@ -572,7 +607,11 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
                         Log.i(TAG, "PendingIntent unable to execute request.")
                     }
                 }
-                LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.")
+
+                LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> Log.i(
+                    TAG,
+                    "Location settings are inadequate, and cannot be fixed here. Dialog not created."
+                )
 
             }
         }
@@ -586,13 +625,21 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
             if (Activity.RESULT_OK == resultCode) {
                 getCurrentLocation()
             } else {
-                Toast.makeText(requireContext(), "Please turn on location", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please turn on location", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 
-        if (requestCode==200){
+        if (requestCode == 200) {
             // This condition for check location run time permission
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
                 getCurrentLocation()
             } else {
                 showLocationError(requireContext(), ErrorMessage.locationError)

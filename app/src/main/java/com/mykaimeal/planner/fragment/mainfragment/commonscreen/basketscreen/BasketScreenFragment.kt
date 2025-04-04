@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.OnItemClickedListener
+import com.mykaimeal.planner.OnItemLongClickListener
 import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.SuperMarketListAdapter
@@ -46,8 +47,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 
 @AndroidEntryPoint
-class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListener,
-    OnItemClickedListener {
+class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectListener{
     private lateinit var binding: FragmentBasketScreenBinding
     private var adapter: SuperMarketListAdapter? = null
     private var adapterGetAddressItem: AdapterGetAddressItem? = null
@@ -55,9 +55,10 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private lateinit var adapterIngredients: IngredientsAdapter
     private lateinit var basketScreenViewModel: BasketScreenViewModel
     private var rcySavedAddress: RecyclerView? = null
-    private var recipe: MutableList<Recipes>?=null
-    private var ingredientList: MutableList<Ingredient>?=null
-    private var storeUid:String?=""
+    private var recipe: MutableList<Recipes>? = null
+    private var ingredientList: MutableList<Ingredient>? = null
+    private var storeUid: String? = ""
+    private var clickStatus: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -71,7 +72,8 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             llBottomNavigation.visibility = View.GONE
         }
 
-        basketScreenViewModel = ViewModelProvider(requireActivity())[BasketScreenViewModel::class.java]
+        basketScreenViewModel =
+            ViewModelProvider(requireActivity())[BasketScreenViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -81,9 +83,9 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 }
             })
 
-        if (BaseApplication.isOnline(requireActivity())){
+        if (BaseApplication.isOnline(requireActivity())) {
             getBasketList()
-        }else{
+        } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
@@ -111,10 +113,15 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         binding.textConfirmOrder.setOnClickListener {
-            val bundle = Bundle().apply {
-                putString("storeUId",storeUid)
+            if (clickStatus) {
+                findNavController().navigate(R.id.basketDetailSuperMarketFragment)
+            } else {
+                showAlert(R.string.available_products.toString(), false)
             }
-            findNavController().navigate(R.id.basketDetailSuperMarketFragment,bundle)
+            /*val bundle = Bundle().apply {
+                putString("storeUId",storeUid)
+            }*/
+
         }
 
     }
@@ -136,7 +143,7 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             basketScreenViewModel.getBasketUrl({
                 BaseApplication.dismissMe()
                 handleApiBasketResponse(it)
-            },"014d3d2e-ad5d-4b00-9198-af07acce2f3a")
+            }, "014d3d2e-ad5d-4b00-9198-af07acce2f3a")
         }
     }
 
@@ -184,10 +191,8 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             val apiModel = Gson().fromJson(data, GetAddressListModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                if (apiModel.data != null) {
-                    if (apiModel.data != null && apiModel.data.size > 0) {
-                        showDataInAddressUI(apiModel.data)
-                    }
+                if (apiModel.data != null && apiModel.data.size > 0) {
+                    showDataInAddressUI(apiModel.data)
                 }
             } else {
                 if (apiModel.code == ErrorMessage.code) {
@@ -211,50 +216,54 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     @SuppressLint("SetTextI18n")
     private fun showDataInUI(data: BasketScreenModelData) {
 
-        if (data.billing!=null){
-            if (data.billing.recipes!=null){
-                binding.textRecipeCount.text=data.billing.recipes.toString()
+        if (data.billing != null) {
+            if (data.billing.recipes != null) {
+                binding.textRecipeCount.text = data.billing.recipes.toString()
             }
 
-            if (data.billing.net_total!=null){
+            if (data.billing.net_total != null) {
                 val roundedNetTotal = data.billing.net_total.let {
                     BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
                 }
-                binding.textNetTotalProduct.text=roundedNetTotal.toString()
+                binding.textNetTotalProduct.text = roundedNetTotal.toString()
             }
 
-            if (data.billing.net_total!=null){
+            if (data.billing.net_total == null || data.billing.net_total == 0.0) {
+                clickStatus = false
+            } else {
+                clickStatus = true
                 val roundedTotal = data.billing.net_total.let {
                     BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
                 }
-                binding.textTotalAmount.text= "$$roundedTotal*"
+                binding.textTotalAmount.text = "$$roundedTotal*"
+
             }
         }
 
         if (data.stores != null && data.stores.size > 0) {
-            binding.rlSuperMarket.visibility=View.VISIBLE
-            adapter = SuperMarketListAdapter(data.stores, requireActivity(), this,0)
+            binding.rlSuperMarket.visibility = View.VISIBLE
+            adapter = SuperMarketListAdapter(data.stores, requireActivity(), this, 0)
             binding.rcvSuperMarket.adapter = adapter
-        }else{
-            binding.rlSuperMarket.visibility=View.GONE
+        } else {
+            binding.rlSuperMarket.visibility = View.GONE
         }
 
         if (data.recipe != null && data.recipe.size > 0) {
-            binding.rlYourRecipes.visibility=View.VISIBLE
-            recipe=data.recipe
+            binding.rlYourRecipes.visibility = View.VISIBLE
+            recipe = data.recipe
             adapterRecipe = BasketYourRecipeAdapter(data.recipe, requireActivity(), this)
             binding.rcvYourRecipes.adapter = adapterRecipe
-        }else{
-            binding.rlYourRecipes.visibility=View.GONE
+        } else {
+            binding.rlYourRecipes.visibility = View.GONE
         }
 
         if (data.ingredient != null && data.ingredient.size > 0) {
-            ingredientList=data.ingredient
-            binding.rlIngredients.visibility=View.VISIBLE
+            ingredientList = data.ingredient
+            binding.rlIngredients.visibility = View.VISIBLE
             adapterIngredients = IngredientsAdapter(data.ingredient, requireActivity(), this)
             binding.rcvIngredients.adapter = adapterIngredients
-        }else{
-            binding.rlIngredients.visibility=View.GONE
+        } else {
+            binding.rlIngredients.visibility = View.GONE
         }
     }
 
@@ -284,18 +293,16 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
     }
 
-    override fun itemClick(position: Int?, status: String?, type: String?) {
-      /*  if (status == "2") {
-            removeRecipeBasketDialog(status)
-        }*/
-    }
 
 
-    private fun removeRecipeBasketDialog(recipeId: String?,position:Int?) {
+    private fun removeRecipeBasketDialog(recipeId: String?, position: Int?) {
         val dialogAddItem: Dialog = context?.let { Dialog(it) }!!
         dialogAddItem.setContentView(R.layout.alert_dialog_remove_recipe_basket)
         dialogAddItem.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialogAddItem.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialogAddItem.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
 
         val tvDialogCancelBtn = dialogAddItem.findViewById<TextView>(R.id.tvDialogCancelBtn)
         val tvDialogRemoveBtn = dialogAddItem.findViewById<TextView>(R.id.tvDialogRemoveBtn)
@@ -308,39 +315,52 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
         tvDialogRemoveBtn.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
-                removeBasketRecipeApi(recipeId.toString(), dialogAddItem,position)
+                removeBasketRecipeApi(recipeId.toString(), dialogAddItem, position)
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
     }
 
-    private fun removeBasketRecipeApi(recipeId: String, dialogRemoveDay: Dialog,position:Int?) {
+    private fun removeBasketRecipeApi(recipeId: String, dialogRemoveDay: Dialog, position: Int?) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             basketScreenViewModel.removeBasketUrlApi({
                 BaseApplication.dismissMe()
-                handleApiRemoveBasketResponse(it,position,dialogRemoveDay)
-            },recipeId)
+                handleApiRemoveBasketResponse(it, position, dialogRemoveDay)
+            }, recipeId)
         }
     }
 
-    private fun handleApiRemoveBasketResponse(result: NetworkResult<String>,position:Int?,dialogRemoveDay: Dialog) {
+    private fun handleApiRemoveBasketResponse(
+        result: NetworkResult<String>,
+        position: Int?,
+        dialogRemoveDay: Dialog
+    ) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessRemoveBasketResponse(result.data.toString(),position,dialogRemoveDay)
+            is NetworkResult.Success -> handleSuccessRemoveBasketResponse(
+                result.data.toString(),
+                position,
+                dialogRemoveDay
+            )
+
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessRemoveBasketResponse(data: String,position:Int?,dialogRemoveDay: Dialog) {
+    private fun handleSuccessRemoveBasketResponse(
+        data: String,
+        position: Int?,
+        dialogRemoveDay: Dialog
+    ) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 dialogRemoveDay.dismiss()
-                if (recipe!=null){
+                if (recipe != null) {
                     recipe!!.removeAt(position!!)
                 }
 
@@ -364,40 +384,40 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
     override fun itemSelect(position: Int?, recipeId: String?, type: String?) {
 
-        if (type=="YourRecipe"){
-            if (recipeId=="Minus"){
+        if (type == "YourRecipe") {
+            if (recipeId == "Minus") {
                 if (BaseApplication.isOnline(requireActivity())) {
                     removeAddRecipeServing(position, "minus")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-            }else if (recipeId=="Plus"){
+            } else if (recipeId == "Plus") {
                 if (BaseApplication.isOnline(requireActivity())) {
                     removeAddRecipeServing(position, "plus")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-            }else{
-                removeRecipeBasketDialog(recipeId,position)
+            } else {
+                removeRecipeBasketDialog(recipeId, position)
             }
-        }else if (type=="SuperMarket"){
-            storeUid=recipeId
-        }else {
-            if (recipeId=="Minus"){
+        } else if (type == "SuperMarket") {
+            storeUid = recipeId
+        } else {
+            if (recipeId == "Minus") {
                 if (BaseApplication.isOnline(requireActivity())) {
                     removeAddIngServing(position, "minus")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-            }else if (recipeId=="Plus"){
+            } else if (recipeId == "Plus") {
                 if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing( position, "plus")
+                    removeAddIngServing(position, "plus")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-            }else if (recipeId=="Delete"){
+            } else if (recipeId == "Delete") {
                 if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing( position, "Delete")
+                    removeAddIngServing(position, "Delete")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
@@ -407,65 +427,86 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     }
 
     private fun removeAddRecipeServing(position: Int?, type: String) {
-        val item= position?.let { recipe?.get(it) }
-        if (type.equals("plus",true) || type.equals("minus",true)) {
+        val item = position?.let { recipe?.get(it) }
+        if (type.equals("plus", true) || type.equals("minus", true)) {
             var count = item?.serving?.toInt()
-            val uri= item?.uri
+            val uri = item?.uri
             count = when (type.lowercase()) {
                 "plus" -> count!! + 1
                 "minus" -> count!! - 1
                 else -> count // No change if `apiType` doesn't match
             }
-            increaseQuantityRecipe(uri,count.toString(),item,position)
+            increaseQuantityRecipe(uri, count.toString(), item, position)
         }
     }
 
 
     private fun removeAddIngServing(position: Int?, type: String) {
-        val item= position?.let { ingredientList?.get(it) }
-        if (type.equals("plus",true) || type.equals("minus",true)) {
+        val item = position?.let { ingredientList?.get(it) }
+        if (type.equals("plus", true) || type.equals("minus", true)) {
             var count = item?.sch_id
-            val foodId= item?.food_id
+            val foodId = item?.food_id
             count = when (type.lowercase()) {
                 "plus" -> count!! + 1
                 "minus" -> count!! - 1
                 else -> count // No change if `apiType` doesn't match
             }
-            increaseIngRecipe(foodId,count.toString(),item,position)
-        }else{
-            val foodId= item?.food_id
-            increaseIngRecipe(foodId,"0",item,position)
+            increaseIngRecipe(foodId, count.toString(), item, position)
+        } else {
+            val foodId = item?.food_id
+            increaseIngRecipe(foodId, "0", item, position)
         }
     }
 
-    private fun increaseIngRecipe(foodId: String?, quantity: String, item: Ingredient?, position: Int?) {
+    private fun increaseIngRecipe(
+        foodId: String?,
+        quantity: String,
+        item: Ingredient?,
+        position: Int?
+    ) {
         lifecycleScope.launch {
             basketScreenViewModel.basketIngIncDescUrl({
                 BaseApplication.dismissMe()
-                handleApiIngResponse(it,item,quantity,position)
-            },foodId,quantity)
+                handleApiIngResponse(it, item, quantity, position)
+            }, foodId, quantity)
         }
     }
 
-    private fun handleApiIngResponse(result: NetworkResult<String>, item: Ingredient?, quantity: String, position: Int?) {
+    private fun handleApiIngResponse(
+        result: NetworkResult<String>,
+        item: Ingredient?,
+        quantity: String,
+        position: Int?
+    ) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessIngResponse(result.data.toString(),item,quantity,position)
+            is NetworkResult.Success -> handleSuccessIngResponse(
+                result.data.toString(),
+                item,
+                quantity,
+                position
+            )
+
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessIngResponse(data: String, item: Ingredient?, quantity: String, position: Int?) {
+    private fun handleSuccessIngResponse(
+        data: String,
+        item: Ingredient?,
+        quantity: String,
+        position: Int?
+    ) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
 
-                if (quantity!="0"){
+                if (quantity != "0") {
                     // Toggle the is_like value
                     item?.sch_id = quantity.toInt()
-                    if (item!= null) {
+                    if (item != null) {
                         ingredientList?.set(position!!, item)
                     }
                     // Update the adapter
@@ -487,26 +528,47 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
     }
 
-    private fun increaseQuantityRecipe(uri: String?, quantity: String, item: Recipes?, position: Int?) {
+    private fun increaseQuantityRecipe(
+        uri: String?,
+        quantity: String,
+        item: Recipes?,
+        position: Int?
+    ) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             basketScreenViewModel.basketYourRecipeIncDescUrl({
                 BaseApplication.dismissMe()
-                handleApiQuantityResponse(it,item,quantity,position)
-            },uri,quantity)
+                handleApiQuantityResponse(it, item, quantity, position)
+            }, uri, quantity)
         }
     }
 
-    private fun handleApiQuantityResponse(result: NetworkResult<String>, item: Recipes?, quantity: String, position: Int?) {
+    private fun handleApiQuantityResponse(
+        result: NetworkResult<String>,
+        item: Recipes?,
+        quantity: String,
+        position: Int?
+    ) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessQuantityResponse(result.data.toString(),item,quantity,position)
+            is NetworkResult.Success -> handleSuccessQuantityResponse(
+                result.data.toString(),
+                item,
+                quantity,
+                position
+            )
+
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessQuantityResponse(data: String, item: Recipes?, quantity: String, position: Int?) {
+    private fun handleSuccessQuantityResponse(
+        data: String,
+        item: Recipes?,
+        quantity: String,
+        position: Int?
+    ) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
@@ -533,7 +595,7 @@ class BasketScreenFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     }
 
 
-    override fun itemClicked(position: Int?, list: MutableList<String>?, status: String?, type: String?) {
+    override fun itemLongClick(position: Int?, status: String?, type: String?, isZiggleEnabled: String) {
 
     }
 

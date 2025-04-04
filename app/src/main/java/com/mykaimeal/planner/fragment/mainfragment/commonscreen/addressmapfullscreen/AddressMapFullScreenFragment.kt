@@ -2,7 +2,6 @@ package com.mykaimeal.planner.fragment.mainfragment.commonscreen.addressmapfulls
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -20,6 +19,7 @@ import android.view.WindowManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -41,7 +41,6 @@ import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentAddressMapFullScreenBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addressmapfullscreen.model.AddAddressModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addressmapfullscreen.viewmodel.AddressMapFullScreenViewModel
-import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -75,9 +74,11 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
     private var states: String? = ""
     private var country: String? = ""
     private var zipcode: String? = ""
-    private var primary: String? = "1"
-    private lateinit var commonWorkUtils: CommonWorkUtils
 
+    private var screenType: String? = ""
+    private var addressId: String? = ""
+
+    private lateinit var commonWorkUtils: CommonWorkUtils
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -97,57 +98,36 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
 
         sessionManagement = SessionManagement(requireContext())
 
-
-        /*  if (sessionManagement.getLatitude() != "") {
-              latitude = sessionManagement.getLatitude().toString()
-          } else {
-              latitude = "37.7786155"
-          }
-
-          if (sessionManagement.getLongitude() != "") {
-              longitude = sessionManagement.getLongitude().toString()
-          } else {
-              longitude = "-122.3940943"
-          }
-  */
-
-        if (sessionManagement.getUserAddress() != "") {
-            binding!!.tvAddress.text = sessionManagement.getUserAddress().toString()
-            userAddress=sessionManagement.getUserAddress().toString()
-        } else {
-            userAddress="188 King Street, San Francisco, CA 94107, USA"
-            binding!!.tvAddress.text = "188 King Street, San Francisco, CA 94107, USA"
-        }
-
-        getLatLongFromAddress(requireActivity(), userAddress.toString())
+        screenType = arguments?.getString("type", "") ?: ""
+        userAddress = arguments?.getString("address", "") ?: ""
+        latitude = arguments?.getString("latitude", "") ?: ""
+        longitude = arguments?.getString("longitude", "") ?: ""
+        addressId = arguments?.getString("addressId", "") ?: ""
 
         initialize()
 
         return binding!!.root
     }
 
-
-    private fun getLatLongFromAddress(context: Context, address: String): Pair<Double, Double>? {
-        val geocoder = Geocoder(context, Locale.getDefault()) // Create Geocoder instance
-        return try {
-            val addressList: List<Address>? =
-                geocoder.getFromLocationName(address, 1) // Fetch location
-            if (!addressList.isNullOrEmpty()) {
-                val location = addressList[0]
-                latitude = location.latitude.toString()
-                longitude = location.longitude.toString()
-                Pair(location.latitude, location.longitude) // Return Latitude & Longitude
-            } else {
-                null
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-            null
-        }
-    }
-
-
     private fun initialize() {
+
+
+        binding?.tvAddress?.text=userAddress.toString()
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (screenType=="EnterYourAddress"){
+                        findNavController().navigate(R.id.enterYourAddressFragment)
+                    }else if (screenType=="Basket"){
+                        findNavController().navigate(R.id.basketScreenFragment)
+                    }else{
+                        findNavController().navigateUp()
+                    }
+
+                }
+            })
 
         binding?.llSetHome?.setOnClickListener {
             setStatus = "Home"
@@ -167,16 +147,7 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
         }
 
         binding!!.tvConfirmBtn.setOnClickListener {
-//            fullAddressDialog()
-            sessionManagement.setLatitude(latitude.toString())
-            sessionManagement.setLongitude(longitude.toString())
-            sessionManagement.setAddress(address.toString())
-            findNavController().navigateUp()
-            /*if (BaseApplication.isOnline(requireContext())){
-                addFullAddressApi()
-            }else{
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }*/
+            fullAddressDialog()
         }
     }
 
@@ -231,32 +202,24 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
 
         dialogMiles.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         relConfirm.setOnClickListener {
-            /*      if (BaseApplication.isOnline(requireContext())) {
-                      if (validate()) {
-                          streetName=edtStreetName.text.toString().trim()
-                          streetNum=edtStreetNumber.text.toString().trim()
-                          apartNum=edtApartNumber.text.toString().trim()
-                          city=edtCity.text.toString().trim()
-                          states=edtStates.text.toString().trim()
-                          address=edtAddress.text.toString().trim()
-                          zipcode=edtPostalCode.text.toString().trim()
-                          addFullAddressApi()
-                      }
-                  } else {
-                      BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                  }*/
-            sessionManagement.setLatitude(latitude.toString())
-            sessionManagement.setLongitude(longitude.toString())
-            sessionManagement.setAddress(address.toString())
-            findNavController().navigateUp()
-            dialogMiles.dismiss()
+            if (BaseApplication.isOnline(requireContext())) {
+                if (validate()) {
+                    streetName = edtStreetName.text.toString().trim()
+                    streetNum = edtStreetNumber.text.toString().trim()
+                    apartNum = edtApartNumber.text.toString().trim()
+                    city = edtCity.text.toString().trim()
+                    states = edtStates.text.toString().trim()
+                    address = edtAddress.text.toString().trim()
+                    zipcode = edtPostalCode.text.toString().trim()
+                    addFullAddressApi(dialogMiles)
+                }
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+
         }
 
         imageCross.setOnClickListener {
-            sessionManagement.setLatitude(latitude.toString())
-            sessionManagement.setLongitude(longitude.toString())
-            sessionManagement.setAddress(address.toString())
-            findNavController().navigateUp()
             dialogMiles.dismiss()
         }
     }
@@ -288,13 +251,13 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
         return true
     }
 
-    private fun addFullAddressApi() {
+    private fun addFullAddressApi(dialogMiles: Dialog) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             addressMapFullScreenViewModel.addAddressUrl(
                 {
                     BaseApplication.dismissMe()
-                    handleApiAddAddressResponse(it)
+                    handleApiAddAddressResponse(it,dialogMiles)
                 },
                 latitude,
                 longitude,
@@ -306,27 +269,35 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
                 country,
                 zipcode,
                 "1",
-                "",
+                addressId,
                 setStatus
             )
         }
     }
 
-    private fun handleApiAddAddressResponse(result: NetworkResult<String>) {
+    private fun handleApiAddAddressResponse(result: NetworkResult<String>, dialogMiles: Dialog) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessAddAddressResponse(result.data.toString())
+            is NetworkResult.Success -> handleSuccessAddAddressResponse(result.data.toString(),dialogMiles)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessAddAddressResponse(data: String) {
+    private fun handleSuccessAddAddressResponse(data: String,dialogMiles: Dialog) {
         try {
             val apiModel = Gson().fromJson(data, AddAddressModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success == true) {
-                findNavController().navigateUp()
+                if (screenType=="EnterYourAddress"){
+                    findNavController().navigate(R.id.notificationFragment)
+                }else {
+                    findNavController().navigateUp()
+                }
+
+                dialogMiles.dismiss()
+
+
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -371,8 +342,7 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        val lat =
-            latitude?.toDoubleOrNull() ?: 0.0  // Convert String to Double, default to 0.0 if null
+        val lat = latitude?.toDoubleOrNull() ?: 0.0  // Convert String to Double, default to 0.0 if null
         val lng = longitude?.toDoubleOrNull() ?: 0.0
         mMap = googleMap
         // 🔹 Clear all markers (if any exist)

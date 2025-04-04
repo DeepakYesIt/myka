@@ -17,6 +17,10 @@ class CheckoutScreenViewModel @Inject constructor(private val repository: MainRe
         repository.getCardMealMeUrl{ successCallback(it) }
     }
 
+    suspend fun getAddressUrl(successCallback: (response: NetworkResult<String>) -> Unit){
+        repository.getAddressUrl{ successCallback(it) }
+    }
+
     suspend fun addAddressUrl(successCallback: (response: NetworkResult<String>) -> Unit, latitude: String?, longitude: String?,
                               streetName:String?,streetNum:String?,apartNum:String?,city:String?,state:String?,country:String?,
                               zipcode:String?,primary:String?,id:String?,type:String?) {

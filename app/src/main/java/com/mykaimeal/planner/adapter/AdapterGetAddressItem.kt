@@ -4,13 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.mykaimeal.planner.OnItemClickedListener
+import com.mykaimeal.planner.OnItemLongClickListener
 import com.mykaimeal.planner.databinding.AdapterAddressItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.GetAddressListModelData
 
 class AdapterGetAddressItem(private var addressList: MutableList<GetAddressListModelData>?,
                             private var requireActivity: FragmentActivity,
-                            private var onItemClickedListener: OnItemClickedListener
+                            private var onItemClickedListener: OnItemLongClickListener
 ):
     RecyclerView.Adapter<AdapterGetAddressItem.ViewHolder>() {
 
@@ -29,20 +29,31 @@ class AdapterGetAddressItem(private var addressList: MutableList<GetAddressListM
             holder.binding.tvSetName.text=itemList.type.toString()
         }
 
-        if (itemList.apart_num!=null){
-            if (itemList.street_name!=null){
-                if (itemList.city!=null){
-                    if (itemList.state!=null){
-                        if (itemList.country!=null){
-                            if (itemList.zipcode!=null){
-                                holder.binding.tvFullAddress.text=itemList.apart_num+" "+itemList.street_name+" "+itemList.city+" "+
-                                        itemList.state+" "+itemList.country+" "+itemList.zipcode
-                            }
-                        }
-                    }
+        val addressParts = listOf(
+            itemList.apart_num,
+            itemList.street_name,
+            itemList.city,
+            itemList.state,
+            itemList.country,
+            itemList.zipcode
+        )
+
+        val isAddressComplete = addressParts.all { !it.isNullOrBlank() }
+        val latitude = itemList.latitude
+        val longitude = itemList.longitude
+
+        if (isAddressComplete) {
+            val fullAddress = addressParts.joinToString(" ")
+            holder.binding.tvFullAddress.text = fullAddress
+
+            if (latitude != null && longitude != null && fullAddress.isNotBlank()) {
+                holder.binding.imagePencilIcon.setOnClickListener {
+                    onItemClickedListener.itemLongClick(itemList.id, latitude.toString(), longitude.toString(), fullAddress)
                 }
             }
         }
+
+
 
     }
 

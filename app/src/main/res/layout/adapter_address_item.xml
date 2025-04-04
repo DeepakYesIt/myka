@@ -57,6 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
+            android:padding="@dimen/_5sdp"
             android:src="@drawable/edit_pencil_icon" />
 
     </RelativeLayout>

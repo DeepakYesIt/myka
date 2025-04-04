@@ -34,6 +34,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -54,9 +55,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.gson.Gson
+import com.mykaimeal.planner.OnItemLongClickListener
 import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.AdapterCardPreferredItem
+import com.mykaimeal.planner.adapter.AdapterGetAddressItem
 import com.mykaimeal.planner.adapter.PlacesAutoCompleteAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
@@ -64,6 +67,8 @@ import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentCheckoutScreenBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addressmapfullscreen.model.AddAddressModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.GetAddressListModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.GetAddressListModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.model.CheckoutScreenModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.model.CheckoutScreenModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.viewmodel.CheckoutScreenViewModel
@@ -80,16 +85,17 @@ import java.math.RoundingMode
 import java.util.Locale
 
 @AndroidEntryPoint
-class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListener {
+class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickListener {
     private var binding: FragmentCheckoutScreenBinding? = null
     private lateinit var mapView: MapView
     private var mMap: GoogleMap? = null
     private var status: Boolean = false
     private lateinit var checkoutScreenViewModel: CheckoutScreenViewModel
-    private lateinit var adapterPaymentCreditDebitItem: AdapterCardPreferredItem
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var locationManager: LocationManager? = null
     private lateinit var sessionManagement: SessionManagement
+    private var rcySavedAddress: RecyclerView? = null
+    private var dialogMiles:Dialog? = null
 
     private var latitude: String? = ""
     private var longitude: String? = ""
@@ -104,7 +110,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     private lateinit var edtPostalCode: EditText
     private lateinit var edtAddress: EditText
     private lateinit var tvAddress: AutoCompleteTextView
-    private var address: String? = ""
+    private var userAddress: String? = ""
     private var streetName: String? = ""
     private var streetNum: String? = ""
     private var apartNum: String? = ""
@@ -113,6 +119,8 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
     private var zipcode: String? = ""
     private var country: String? = ""
     private lateinit var commonWorkUtils: CommonWorkUtils
+    private var adapterGetAddressItem: AdapterGetAddressItem? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -130,24 +138,12 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
         sessionManagement = SessionManagement(requireContext())
         commonWorkUtils = CommonWorkUtils(requireActivity())
 
-        if (sessionManagement.getLatitude()!=""){
-            latitude=sessionManagement.getLatitude().toString()
-        }else{
-            latitude="37.7767081"
-        }
-
-        if (sessionManagement.getLongitude()!=""){
-            longitude=sessionManagement.getLongitude().toString()
-        }else{
-            longitude="-122.3947791"
-        }
-
         mapView = binding!!.mapView
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+           viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
@@ -161,10 +157,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
 
     private fun initialize() {
 
-        if (sessionManagement.getUserAddress()!=""){
-            binding!!.tvAddressNames.text=sessionManagement.getUserAddress().toString()
-        }
-
         if (BaseApplication.isOnline(requireContext())) {
             getCheckoutApi()
         } else {
@@ -177,7 +169,14 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
 
 
         binding!!.layEdit.setOnClickListener {
-            findNavController().navigate(R.id.addressMapFullScreenFragment)
+            val bundle = Bundle().apply {
+                putString("latitude",latitude.toString())
+                putString("longitude",longitude.toString())
+                putString("address",userAddress.toString())
+                putString("addressId","")
+                putString("type","Checkout")
+            }
+            findNavController().navigate(R.id.addressMapFullScreenFragment,bundle)
         }
 
 
@@ -215,9 +214,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
             }
         }
 
-        /* binding!!.mapView.setOnClickListener{
-             findNavController().navigate(R.id.addressMapFullScreenFragment)
-         }*/
     }
 
     private fun getCheckoutApi() {
@@ -273,7 +269,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
             binding!!.tvAddNumber.setTextColor(Color.parseColor("#000000"))
         }
 
-/*        data.address?.let { address ->
+        data.address?.let { address ->
             if (!address.type.isNullOrEmpty() &&
                 !address.apart_num.isNullOrEmpty() &&
                 !address.street_name.isNullOrEmpty() &&
@@ -284,22 +280,25 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
                 !address.latitude.isNullOrEmpty() &&
                 !address.longitude.isNullOrEmpty()
             ) {
-                val fullAddress = listOf(
-                    address.apart_num, address.street_name, address.city,
-                    address.state, address.country, address.zipcode
-                ).joinToString(" ")
+                // Build full address string
+                val fullAddress = listOf(address.apart_num, address.street_name,
+                    address.city, address.state, address.country, address.zipcode).joinToString(" ")
 
-                // Store in a String variable
-                val storedAddress: String = fullAddress
-                sessionManagement.setAddress(storedAddress.toString())
-                sessionManagement.setLatitude(address.latitude.toString())
-                sessionManagement.setLongitude(address.longitude.toString())
+                // Store in variable if needed
+                userAddress = fullAddress
+                // Set full address to TextView
+                binding?.tvAddressNames?.text = fullAddress
 
-                // Set text in TextView
-                binding?.tvAddressNames?.text = storedAddress
+                if (address.latitude!=null && address.longitude!=null) {
+                    latitude = address.latitude
+                    longitude = address.longitude
+                    val lat = latitude?.toDoubleOrNull() ?: 0.0  // Convert String to Double, default to 0.0 if null
+                    val lng = longitude?.toDoubleOrNull() ?: 0.0
+
+                    updateMarker(lat,lng)
+                }
             }
-        }*/
-
+        }
 
 
         if (data.Store!=null){
@@ -399,11 +398,33 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
         }
     }
 
+
+    private fun updateMarker(lat: Double, longi: Double) {
+        Log.d("Location", "****** $lat, $longi")
+        val newYork = LatLng(lat, longi)
+
+            mMap?.clear()
+            val customMarker = bitmapDescriptorFromVector(R.drawable.marker_icon, 50, 50
+            ) // Change with your drawable
+            mMap?.addMarker(MarkerOptions().position(newYork).icon(customMarker))
+
+        // 🔹 Disable map movement
+        mMap?.uiSettings?.apply {
+            isScrollGesturesEnabled = false  // ❌ Disable scrolling
+            isZoomGesturesEnabled = false    // ❌ Disable zooming
+            isTiltGesturesEnabled = false    // ❌ Disable tilt
+            isRotateGesturesEnabled = false  // ❌ Disable rotation
+        }
+        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(newYork, 20f))
+
+
+    }
+
     private fun addressDialog() {
-        val dialogMiles: Dialog = context?.let { Dialog(it) }!!
-        dialogMiles.setContentView(R.layout.alert_dialog_addresses_popup)
-        dialogMiles.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialogMiles.window!!.setLayout(
+        dialogMiles = context?.let { Dialog(it) }!!
+        dialogMiles?.setContentView(R.layout.alert_dialog_addresses_popup)
+        dialogMiles?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialogMiles?.window!!.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT
         )
@@ -415,29 +436,34 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
 
         val placesApi = PlaceAPI.Builder().apiKey(apiKey).build(requireContext())
 
-        val relDone = dialogMiles.findViewById<RelativeLayout>(R.id.relDone)
-        val llSetWork = dialogMiles.findViewById<LinearLayout>(R.id.llSetWork)
-        val llSetHome = dialogMiles.findViewById<LinearLayout>(R.id.llSetHome)
-        val relTrialBtn = dialogMiles.findViewById<RelativeLayout>(R.id.relTrialBtn)
-        tvAddress = dialogMiles.findViewById<AutoCompleteTextView>(R.id.tvAddress)
-        dialogMiles.show()
-        dialogMiles.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        val relDone = dialogMiles?.findViewById<RelativeLayout>(R.id.relDone)
+        val llSetWork = dialogMiles?.findViewById<LinearLayout>(R.id.llSetWork)
+        val llSetHome = dialogMiles?.findViewById<LinearLayout>(R.id.llSetHome)
+        val relTrialBtn = dialogMiles?.findViewById<RelativeLayout>(R.id.relTrialBtn)
+        tvAddress = dialogMiles?.findViewById<AutoCompleteTextView>(R.id.tvAddress)!!
+        rcySavedAddress = dialogMiles?.findViewById(R.id.rcySavedAddress)
 
-        llSetHome.setOnClickListener{
+        dialogMiles?.show()
+
+        getAddressList()
+
+        dialogMiles?.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        llSetHome?.setOnClickListener{
             statusTypes="Home"
             llSetHome.setBackgroundResource(R.drawable.outline_address_green_border_bg)
-            llSetWork.setBackgroundResource(R.drawable.height_type_bg)
+            llSetWork?.setBackgroundResource(R.drawable.height_type_bg)
         }
 
-        llSetWork.setOnClickListener{
+        llSetWork?.setOnClickListener{
             statusTypes="Work"
-            llSetHome.setBackgroundResource(R.drawable.height_type_bg)
+            llSetHome?.setBackgroundResource(R.drawable.height_type_bg)
             llSetWork.setBackgroundResource(R.drawable.outline_address_green_border_bg)
         }
 
-        relTrialBtn.setOnClickListener{
-            dialogMiles.dismiss()
-           /* if (BaseApplication.isOnline(requireContext())) {
+        relTrialBtn?.setOnClickListener{
+            dialogMiles?.dismiss()
+            if (BaseApplication.isOnline(requireContext())) {
                 if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     getCurrentLocation()
                 } else {
@@ -445,21 +471,68 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
                 }
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }*/
+            }
         }
 
-    /*    tvAddress.setAdapter(PlacesAutoCompleteAdapter(requireContext(), placesApi))
+        tvAddress.setAdapter(PlacesAutoCompleteAdapter(requireContext(), placesApi))
         tvAddress.setOnItemClickListener { parent, _, position, _ ->
             val place = parent.getItemAtPosition(position) as Place
             tvAddress.setText(place.description)
-            address=place.description
-            getPlaceDetails(place.id, placesApi)*/
-
-
-        relDone.setOnClickListener {
-//            fullAddressDialog()
-            dialogMiles.dismiss()
+            userAddress = place.description
+            getPlaceDetails(place.id, placesApi)
         }
+
+
+        relDone?.setOnClickListener {
+            fullAddressDialog()
+            dialogMiles?.dismiss()
+        }
+    }
+
+    private fun getAddressList() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            checkoutScreenViewModel.getAddressUrl {
+                BaseApplication.dismissMe()
+                handleApiGetAddressResponse(it)
+            }
+        }
+    }
+
+    private fun handleApiGetAddressResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessGetAddressResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessGetAddressResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, GetAddressListModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data != null && apiModel.data.size > 0) {
+                    showDataInAddressUI(apiModel.data)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun showDataInAddressUI(data: MutableList<GetAddressListModelData>?) {
+
+        adapterGetAddressItem = AdapterGetAddressItem(data, requireActivity(), this)
+        rcySavedAddress!!.adapter = adapterGetAddressItem
+
     }
 
     private fun getCurrentLocation() {
@@ -631,8 +704,8 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
             edtStates.setText(states.toString())
         }
 
-        if (address != "") {
-            edtAddress.setText(address.toString())
+        if (userAddress != "") {
+            edtAddress.setText(userAddress.toString())
         }
 
         if (zipcode != "") {
@@ -648,7 +721,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
                     apartNum=edtApartNumber.text.toString().trim()
                     city=edtCity.text.toString().trim()
                     states=edtStates.text.toString().trim()
-                    address=edtAddress.text.toString().trim()
+                    userAddress=edtAddress.text.toString().trim()
                     zipcode=edtPostalCode.text.toString().trim()
                     addFullAddressApi()
                 }
@@ -760,7 +833,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
             isRotateGesturesEnabled = false  // ❌ Disable rotation
         }
 
-
         mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(newYork, 20f))
     }
 
@@ -812,8 +884,16 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback,OnItemSelectListen
         mapView.onLowMemory()
     }
 
-    override fun itemSelect(position: Int?, status: String?, type: String?) {
-
+    override fun itemLongClick(id: Int?, latitudeValue: String?, longitudeValue: String?, isZiggleEnabled: String) {
+        val bundle = Bundle().apply {
+            putString("latitude",latitudeValue)
+            putString("longitude",longitudeValue)
+            putString("address",isZiggleEnabled)
+            putString("addressId",id.toString())
+            putString("type","Checkout")
+        }
+        findNavController().navigate(R.id.addressMapFullScreenFragment,bundle)
+        dialogMiles?.dismiss()
     }
 
 }
