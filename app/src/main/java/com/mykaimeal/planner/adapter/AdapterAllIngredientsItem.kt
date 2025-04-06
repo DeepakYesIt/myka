@@ -5,10 +5,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.mykaimeal.planner.databinding.AdapterAllIngredientsItemBinding
+import com.mykaimeal.planner.fragment.mainfragment.searchtab.allingredient.model.IngredientList
 import com.mykaimeal.planner.model.DataModel
 
 class AdapterAllIngredientsItem(
-    private var datalist: List<DataModel>,
+    private var datalist: MutableList<IngredientList>?,
     private var requireActivity: FragmentActivity
 ) : RecyclerView.Adapter<AdapterAllIngredientsItem.ViewHolder>() {
 
@@ -21,16 +22,20 @@ class AdapterAllIngredientsItem(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.textTittles.text = datalist[position].title
+        holder.binding.textTittles.text = datalist!![position].name
+
+
+/*
         holder.binding.imageShapeable.setImageResource(datalist[position].image)
+*/
 
     }
 
     override fun getItemCount(): Int {
-        return datalist.size
+        return datalist!!.size
     }
 
-    fun filterList(filteredList: MutableList<DataModel>) {
+    fun filterList(filteredList: MutableList<IngredientList>) {
         this.datalist = filteredList
         notifyDataSetChanged()
     }

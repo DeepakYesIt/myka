@@ -21,7 +21,7 @@ class AdapterFilterMealItem(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding: AdapterSearchFilterItemBinding =
-            AdapterSearchFilterItemBinding.inflate(inflater, parent, false);
+            AdapterSearchFilterItemBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 
@@ -29,27 +29,42 @@ class AdapterFilterMealItem(
 
         holder.binding.tvItem.text = datalist!![position].name
 
-    /*    // Highlight the "More" button differently
-        if (datalist[position].isOpen) {
-            holder.binding.tvItem.setTextColor(Color.parseColor("#00A86B")) // Green
-        } else {
-            holder.binding.tvItem.setTextColor(Color.BLACK)
+        if (datalist!![position].selected==true){
+            holder.binding.tvItem.setTextColor(android.graphics.Color.parseColor("#06C169"))
+            holder.binding.relMainLayouts.background=null
+        }else{
+            holder.binding.tvItem.setTextColor(android.graphics.Color.parseColor("#000000"))
+            holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
         }
-*/
+
         holder.binding.relMainLayouts.setOnClickListener {
-            if (selected) {
-                selected = false
-                holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
-            } else {
-                selected = true
-                holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
+            if (datalist!![position].selected==true){
+                onItemClickListener.itemClick(position,datalist!![position].name,"MealType")
+            }else{
+                if (selected) {
+                    selected = false
+                    holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
+                } else {
+                    selected = true
+                    holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
+                    onItemClickListener.itemClick(position,datalist!![position].name,"MealType")
+                }
             }
         }
     }
 
     override fun getItemCount(): Int {
-        return datalist!!.size
+        return if (isExpanded) datalist!!.size else 5.coerceAtMost(datalist!!.size)
+
+
+      /*  return datalist!!.size*/
 //        return if (isExpanded) datalist!!.size else datalist!!.take(5).size + 1
+    }
+
+    fun updateList(newList: MutableList<MealType>?) {
+        datalist!!.clear()
+        newList?.let { datalist!!.addAll(it) }
+        notifyDataSetChanged()
     }
 
     class ViewHolder(var binding: AdapterSearchFilterItemBinding) :

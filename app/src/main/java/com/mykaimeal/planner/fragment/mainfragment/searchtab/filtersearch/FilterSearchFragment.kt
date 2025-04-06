@@ -25,34 +25,39 @@ import com.mykaimeal.planner.adapter.AdapterFilterMealItem
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentFilterSearchBinding
+import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.CookTime
+import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.Diet
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.FilterSearchModel
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.FilterSearchModelData
+import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.MealType
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.viewmodel.FilterSearchViewModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class FilterSearchFragment : Fragment(),OnItemClickListener {
+class FilterSearchFragment : Fragment(), OnItemClickListener {
 
     private lateinit var binding: FragmentFilterSearchBinding
     private var adapterFilterMealItem: AdapterFilterMealItem? = null
     private var adapterFilterDietItem: AdapterFilterDietItem? = null
     private var adapterFilterCookBookItem: AdapterFilterCookTimeItem? = null
     private lateinit var filterSearchViewModel: FilterSearchViewModel
+    private var fullListMealType:MutableList<MealType>?=null
+    private var originalFullList:MutableList<Diet>?=null
+    private var fullListCookTime:MutableList<CookTime>?=null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        binding= FragmentFilterSearchBinding.inflate(inflater, container, false)
+        binding = FragmentFilterSearchBinding.inflate(inflater, container, false)
 
         (activity as? MainActivity)?.binding?.apply {
             llIndicator.visibility = View.GONE
             llBottomNavigation.visibility = View.GONE
         }
-
 
         filterSearchViewModel = ViewModelProvider(this)[FilterSearchViewModel::class.java]
 
@@ -60,17 +65,21 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
 
         initialize()
         // This Api call when the screen in loaded
-        launchApi()
+        if (BaseApplication.isOnline(requireActivity())){
+            launchApi()
+        }else{
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
 
         return binding.root
     }
-    
-    private fun backButton(){
+
+    private fun backButton() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
     }
 
     private fun launchApi() {
@@ -97,7 +106,7 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
             val apiModel = Gson().fromJson(data, FilterSearchModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success == true) {
-                if (apiModel.data!=null ){
+                if (apiModel.data != null) {
                     showDataInUi(apiModel.data)
                 }
             } else {
@@ -114,52 +123,75 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
 
     private fun showDataInUi(data: FilterSearchModelData) {
         try {
-            if (data.mealType!=null && data.mealType.size>0){
-                if (data.mealType.size>5){
-
-                }else{
-                    val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
-                        flexDirection = FlexDirection.ROW
-                        flexWrap = FlexWrap.WRAP
-                        justifyContent = JustifyContent.FLEX_START
+            if (data.mealType != null && data.mealType.size > 0) {
+                fullListMealType=data.mealType
+                val mealTypeList = data.mealType ?: return
+                val mealTypeDisplayList = if (mealTypeList.size > 5) {
+                    mealTypeList.take(5).toMutableList().apply {
+                        add(MealType(id=-1,image="",name = "More",selected = true))
                     }
-                    adapterFilterMealItem = AdapterFilterMealItem(data.mealType, requireActivity(),this)
-                    binding.rcyMealType.layoutManager = flexboxLayoutManager
-                    binding.rcyMealType.adapter = adapterFilterMealItem
+                } else {
+                    mealTypeList
                 }
+
+                val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+                    flexDirection = FlexDirection.ROW
+                    flexWrap = FlexWrap.WRAP
+                    justifyContent = JustifyContent.FLEX_START
+                }
+
+                adapterFilterMealItem = AdapterFilterMealItem(mealTypeDisplayList, requireActivity(), this)
+                binding.rcyMealType.layoutManager = flexboxLayoutManager
+                binding.rcyMealType.adapter = adapterFilterMealItem
             }
 
-            if (data.Diet!=null && data.Diet.size>0){
-                if (data.Diet.size>5){
-
-                }else{
-                    val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
-                        flexDirection = FlexDirection.ROW
-                        flexWrap = FlexWrap.WRAP
-                        justifyContent = JustifyContent.FLEX_START
+            if (data.Diet != null && data.Diet.size > 0) {
+                originalFullList=data.Diet
+                val dietList = data.Diet ?: return
+                val dietDisplayList = if (dietList.size > 5) {
+                    dietList.take(5).toMutableList().apply {
+                        add(Diet(name = "More",selected = true))
                     }
-                    adapterFilterDietItem = AdapterFilterDietItem(data.Diet, requireActivity(),this)
-                    binding.rcyDiet.layoutManager = flexboxLayoutManager
-                    binding.rcyDiet.adapter = adapterFilterDietItem
+                } else {
+                    dietList
                 }
-            }
-            if (data.cook_time!=null && data.cook_time.size>0){
-                if (data.cook_time.size>5){
 
-                }else{
-                    val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
-                        flexDirection = FlexDirection.ROW
-                        flexWrap = FlexWrap.WRAP
-                        justifyContent = JustifyContent.FLEX_START
+                val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+                    flexDirection = FlexDirection.ROW
+                    flexWrap = FlexWrap.WRAP
+                    justifyContent = JustifyContent.FLEX_START
+                }
+
+                adapterFilterDietItem = AdapterFilterDietItem(dietDisplayList, requireActivity(), this)
+                binding.rcyDiet.layoutManager = flexboxLayoutManager
+                binding.rcyDiet.adapter = adapterFilterDietItem
+            }
+            if (data.cook_time != null && data.cook_time.size > 0) {
+
+                fullListCookTime=data.cook_time
+                val cookTimeList = data.cook_time ?: return
+
+                val displayList = if (cookTimeList.size > 5) {
+                    cookTimeList.take(5).toMutableList().apply {
+                        add(CookTime(name = "More", value = "", selected = true))
                     }
-                    //        adjustSpanCount(gridLayoutManager)// Default: 2 items per row
-                    adapterFilterCookBookItem = AdapterFilterCookTimeItem(data.cook_time, requireActivity(),this)
-                    binding.rcyCookTime.layoutManager = flexboxLayoutManager
-                    binding.rcyCookTime.adapter = adapterFilterCookBookItem
+                } else {
+                    cookTimeList
                 }
+
+                val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+                    flexDirection = FlexDirection.ROW
+                    flexWrap = FlexWrap.WRAP
+                    justifyContent = JustifyContent.FLEX_START
+                }
+
+                adapterFilterCookBookItem = AdapterFilterCookTimeItem(displayList.toMutableList(), requireActivity(), this)
+                binding.rcyCookTime.layoutManager = flexboxLayoutManager
+                binding.rcyCookTime.adapter = adapterFilterCookBookItem
+
             }
 
-        }catch (e:Exception){
+        } catch (e: Exception) {
             showAlert(e.message, false)
         }
     }
@@ -169,15 +201,30 @@ class FilterSearchFragment : Fragment(),OnItemClickListener {
     }
 
     private fun initialize() {
-        binding.relBackFiltered.setOnClickListener{
+        binding.relBackFiltered.setOnClickListener {
             findNavController().navigateUp()
         }
-        binding.relApplyBtn.setOnClickListener{
+        binding.relApplyBtn.setOnClickListener {
             findNavController().navigate(R.id.searchedRecipeBreakfastFragment)
         }
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
+
+        if (type=="MealType"){
+            if (status == "More") {
+                adapterFilterMealItem!!.updateList(fullListMealType)    // refresh adapter with full list
+            }
+        } else if (type=="Diet"){
+            if (status == "More") {
+                adapterFilterDietItem!!.updateList(originalFullList)    // refresh adapter with full list
+            }
+        }else{
+            if (status == "More") {
+                adapterFilterCookBookItem!!.updateList(fullListCookTime)    // refresh adapter with full list
+            }
+
+        }
 
     }
 

@@ -97,7 +97,6 @@ class DietaryRestrictionsAdapter(
 
     override fun getItemCount(): Int {
         return if (isExpanded) datalist.size else 5.coerceAtMost(datalist.size)
-//        return datalist.size
     }
 
     fun setExpanded(expanded: Boolean) {
