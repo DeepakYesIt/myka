@@ -143,8 +143,8 @@ class HealthDataFragment : Fragment() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (binding.rlAddMoreGoals.visibility == View.GONE) {
-                    val searchText = s.toString()
-                    if (searchText!= searchFor) {
+                    val searchText = s.toString().trim()
+                    if (searchText.trim()!= searchFor) {
                         searchFor = searchText
                         textChangedJob?.cancel()
                         // Launch a new coroutine in the lifecycle scope
@@ -167,8 +167,8 @@ class HealthDataFragment : Fragment() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (binding.rlAddMoreGoals.visibility == View.GONE) {
-                    val searchText = s.toString()
-                    if (searchText!= searchFor) {
+                    val searchText = s.toString().trim()
+                    if (searchText.trim()!= searchFor) {
                         searchFor = searchText
                         textChangedJob?.cancel()
                         // Launch a new coroutine in the lifecycle scope
