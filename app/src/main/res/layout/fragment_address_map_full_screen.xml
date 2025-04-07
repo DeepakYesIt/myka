@@ -109,7 +109,7 @@
             android:layout_above="@+id/tvConfirmBtn"
             android:layout_below="@+id/llSetHomeWork"
             android:layout_marginHorizontal="@dimen/_30sdp"
-            android:layout_marginTop="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_15sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:fontFamily="@font/poppins_semibold"
             android:maxLines="3"

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragment.authfragment.enteryouraddress.EnterYourAddressFragment">
 
     <ScrollView
@@ -32,11 +32,11 @@
                 android:id="@+id/tvAddressDesc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="We need your location to find grocery stores nearby for you."
-                android:textSize="@dimen/_12sdp"
-                android:layout_marginTop="@dimen/_10sdp"
                 android:layout_below="@+id/tvAddresses"
-                android:textColor="@color/black"/>
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="We need your location to find grocery stores nearby for you."
+                android:textColor="@color/black"
+                android:textSize="@dimen/_12sdp" />
 
             <RelativeLayout
                 android:id="@+id/relIngSearchBar"
@@ -50,15 +50,15 @@
                     android:id="@+id/tv_address"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:drawableStart="@drawable/yellow_search_icon"
                     android:layout_marginEnd="@dimen/_8sdp"
-                    android:drawablePadding="@dimen/_10sdp"
-                    android:paddingStart="@dimen/_10sdp"
                     android:background="@null"
-                    android:textColor="#58585A"
+                    android:drawableStart="@drawable/yellow_search_icon"
+                    android:drawablePadding="@dimen/_10sdp"
                     android:gravity="center|start"
-                    android:singleLine="true"
                     android:hint="Enter Address"
+                    android:paddingStart="@dimen/_10sdp"
+                    android:singleLine="true"
+                    android:textColor="#58585A"
                     android:textSize="@dimen/_13sdp" />
             </RelativeLayout>
 
@@ -157,10 +157,10 @@
                     android:id="@+id/tvUseCurrentLocation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:layout_marginStart="@dimen/_7sdp"
                     android:layout_toEndOf="@+id/imgLocation"
                     android:fontFamily="@font/poppins_semibold"
-                    android:layout_centerVertical="true"
                     android:text="Use current location"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_13sdp" />
@@ -189,11 +189,11 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_150sdp"
-                android:layout_marginTop="@dimen/_15sdp"
-                app:cardCornerRadius="@dimen/_10sdp"
-                android:background="@color/grey3"
+                android:layout_below="@+id/relUseCurrentLocation"
                 android:layout_marginHorizontal="@dimen/_5sdp"
-                android:layout_below="@+id/relUseCurrentLocation">
+                android:layout_marginTop="@dimen/_15sdp"
+                android:background="@color/grey3"
+                app:cardCornerRadius="@dimen/_10sdp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -205,23 +205,30 @@
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true" />
 
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/layEdit"
+                    <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
-                        android:layout_centerInParent="true"
-                        android:layout_margin="@dimen/_15sdp"
-                        app:cardCornerRadius="@dimen/_30sdp">
+                        android:layout_centerHorizontal="true">
 
-                        <TextView
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/layEdit"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/montserrat_semibold"
-                            android:padding="@dimen/_8sdp"
-                            android:text="Edit Pin"
-                            android:textSize="@dimen/_13sdp" />
-                    </androidx.cardview.widget.CardView>
+                            android:layout_marginBottom="@dimen/_35sdp"
+                            app:cardCornerRadius="@dimen/_30sdp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/montserrat_semibold"
+                                android:padding="@dimen/_8sdp"
+                                android:text="Edit Pin"
+                                android:textSize="@dimen/_13sdp" />
+
+                        </androidx.cardview.widget.CardView>
+
+                    </RelativeLayout>
 
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
@@ -230,9 +237,9 @@
                 android:id="@+id/relDone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_10sdp"
-                android:layout_marginHorizontal="@dimen/_15sdp"
                 android:layout_alignParentBottom="true"
+                android:layout_marginHorizontal="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:background="@drawable/green_btn_background">
 
                 <TextView

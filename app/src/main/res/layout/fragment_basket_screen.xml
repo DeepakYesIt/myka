@@ -411,7 +411,7 @@
                         android:textAlignment="textEnd"
                         android:layout_gravity="end"
                         android:fontFamily="@font/poppins"
-                        android:text=""
+                        android:text="0"
                         android:textColor="#FFFFFF" />
 
                 </LinearLayout>

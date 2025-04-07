@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
@@ -16,7 +17,7 @@ class AdapterFilterDietItem(
 ) : RecyclerView.Adapter<AdapterFilterDietItem.ViewHolder>() {
 
     private var selected: Boolean = false
-    private var isExpanded = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding: AdapterSearchFilterItemBinding =
@@ -24,31 +25,46 @@ class AdapterFilterDietItem(
         return ViewHolder(binding)
     }
 
+    @SuppressLint("ResourceAsColor")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         holder.binding.tvItem.text = datalist!![position].name
 
-        /*    // Highlight the "More" button differently
-            if (datalist[position].isOpen) {
-                holder.binding.tvItem.setTextColor(Color.parseColor("#00A86B")) // Green
-            } else {
-                holder.binding.tvItem.setTextColor(Color.BLACK)
-            }
-    */
+        if (datalist!![position].selected==true){
+            holder.binding.tvItem.setTextColor(android.graphics.Color.parseColor("#06C169"))
+            holder.binding.relMainLayouts.background=null
+        }else{
+            holder.binding.tvItem.setTextColor(android.graphics.Color.parseColor("#000000"))
+            holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
+        }
+
         holder.binding.relMainLayouts.setOnClickListener {
-            if (selected) {
-                selected = false
-                holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
-            } else {
-                selected = true
-                holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
+            if (datalist!![position].selected==true){
+                onItemClickListener.itemClick(position,datalist!![position].name,"Diet")
+            }else{
+                if (selected) {
+                    selected = false
+                    holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
+                } else {
+                    selected = true
+                    holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
+                    onItemClickListener.itemClick(position,datalist!![position].name,"Diet")
+                }
             }
         }
     }
 
     override fun getItemCount(): Int {
+
         return datalist!!.size
+
 //        return if (isExpanded) datalist!!.size else datalist!!.take(5).size + 1
+    }
+
+    fun updateList(newList: MutableList<Diet>?) {
+        datalist!!.clear()
+        newList?.let { datalist!!.addAll(it) }
+        notifyDataSetChanged()
     }
 
     class ViewHolder(var binding: AdapterSearchFilterItemBinding) :

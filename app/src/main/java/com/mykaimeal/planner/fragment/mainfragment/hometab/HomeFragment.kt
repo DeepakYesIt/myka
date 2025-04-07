@@ -343,7 +343,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 } else {
                     binding.layTeatime.visibility = View.GONE
                 }
-
             }
 
             if (userDataLocal.fridge != null) {
@@ -375,12 +374,10 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                     binding.layTeatime.visibility = View.GONE
                 }
             }
-
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
     }
-
 
     private fun showAlert(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)
@@ -532,6 +529,11 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             R.id.rlPlanAMealBtn -> {
                 findNavController().navigate(R.id.planFragment)
             }
+
+            R.id.imgFreeTrial->{
+                findNavController().navigate(R.id.subscriptionPlanOverViewFragment)
+            }
+
           /*  R.id.imgFreeTrial -> {
                 findNavController().navigate(R.id.homeSubscriptionFragment)
             }*/

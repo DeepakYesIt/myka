@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
 
         /// using function for find destination graph
         startDestination()
-        scheduleToastWorker()
+//        scheduleToastWorker()
     }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun scheduleToastWorker() {

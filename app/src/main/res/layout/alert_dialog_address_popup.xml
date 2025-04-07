@@ -191,7 +191,7 @@
                         android:layout_below="@+id/relCity"
                         android:layout_marginTop="@dimen/_15sdp"
                         android:fontFamily="@font/poppins"
-                        android:text="States"
+                        android:text="State"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_15sdp" />
 
@@ -211,7 +211,7 @@
                             android:layout_marginTop="@dimen/_15sdp"
                             android:background="@null"
                             android:fontFamily="@font/poppins"
-                            android:hint="States"
+                            android:hint="State"
                             android:paddingHorizontal="@dimen/_15sdp"
                             android:singleLine="true"
                             android:textColor="@color/black"

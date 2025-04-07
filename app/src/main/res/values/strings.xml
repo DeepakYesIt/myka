@@ -59,6 +59,7 @@
 
     <string name="meal_routine"><font color="#3C4541">Meal</font><font color="#06C169"> Routine</font></string>
     <string name="meal_routine_desc">What meals do you typically cook at home?</string>
+    <string name="available_products">Please select available product</string>
 
     <string name="cooking_frequency"><font color="#3C4541">Cooking</font><font color="#06C169"> Frequency</font></string>
     <string name="cooking_schedule"><font color="#3C4541">Cooking</font><font color="#06C169"> Schedule</font></string>
