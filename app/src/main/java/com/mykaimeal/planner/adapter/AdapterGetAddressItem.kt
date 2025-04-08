@@ -52,15 +52,11 @@ class AdapterGetAddressItem(private var addressList: MutableList<GetAddressListM
                 }
             }
         }
-
-
-
     }
 
     override fun getItemCount(): Int {
         return addressList!!.size
     }
-
 
     class ViewHolder(var binding: AdapterAddressItemBinding) : RecyclerView.ViewHolder(binding.root){
     }
