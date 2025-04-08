@@ -139,11 +139,12 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
 
         addressDialog()
 
-        if (BaseApplication.isOnline(requireActivity())) {
+   /*     if (BaseApplication.isOnline(requireActivity())) {
             getBasketList()
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
+        }*/
+
 
         initialize()
 
@@ -232,7 +233,6 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
         }
     }
 
-
     private fun handleApiGetAddressResponse(result: NetworkResult<String>) {
         when (result) {
             is NetworkResult.Success -> handleSuccessGetAddressResponse(result.data.toString())
@@ -259,6 +259,12 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
+        }
+
+        if (BaseApplication.isOnline(requireActivity())) {
+            getBasketList()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
     }
 
