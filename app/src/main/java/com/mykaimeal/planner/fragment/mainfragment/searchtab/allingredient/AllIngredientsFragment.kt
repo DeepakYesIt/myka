@@ -65,10 +65,6 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
 
         initialize()
 
-/*
-        allIngredientsModel()
-*/
-
         return binding.root
     }
 

@@ -1,26 +1,45 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.location.Address
+import android.location.Geocoder
+import android.location.LocationManager
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.AutoCompleteTextView
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.libraries.places.api.Places
 import com.google.gson.Gson
-import com.mykaimeal.planner.OnItemClickListener
-import com.mykaimeal.planner.OnItemClickedListener
 import com.mykaimeal.planner.OnItemLongClickListener
 import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
@@ -29,9 +48,12 @@ import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.AdapterGetAddressItem
 import com.mykaimeal.planner.adapter.IngredientsAdapter
 import com.mykaimeal.planner.adapter.BasketYourRecipeAdapter
+import com.mykaimeal.planner.adapter.PlacesAutoCompleteAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentBasketScreenBinding
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addressmapfullscreen.model.AddAddressModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.BasketScreenModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.BasketScreenModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.GetAddressListModel
@@ -40,14 +62,20 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.mod
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Recipes
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.viewmodel.BasketScreenViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
+import com.mykaimeal.planner.listener.OnPlacesDetailsListener
 import com.mykaimeal.planner.messageclass.ErrorMessage
+import com.mykaimeal.planner.model.Place
+import com.mykaimeal.planner.model.PlaceAPI
+import com.mykaimeal.planner.model.PlaceDetails
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.io.IOException
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.util.Locale
 
 @AndroidEntryPoint
-class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectListener{
+class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectListener {
     private lateinit var binding: FragmentBasketScreenBinding
     private var adapter: SuperMarketListAdapter? = null
     private var adapterGetAddressItem: AdapterGetAddressItem? = null
@@ -59,6 +87,29 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     private var ingredientList: MutableList<Ingredient>? = null
     private var storeUid: String? = ""
     private var clickStatus: Boolean = false
+    private var dialogMiles: Dialog? = null
+    private lateinit var tvAddress: AutoCompleteTextView
+    private var statusTypes: String? = "Home"
+    private var latitude: String? = ""
+    private var longitude: String? = ""
+    private lateinit var edtStreetName: EditText
+    private lateinit var edtStreetNumber: EditText
+    private lateinit var edtApartNumber: EditText
+    private lateinit var edtCity: EditText
+    private lateinit var edtStates: EditText
+    private lateinit var edtPostalCode: EditText
+    private lateinit var edtAddress: EditText
+    private var userAddress: String? = ""
+    private var streetName: String? = ""
+    private var streetNum: String? = ""
+    private var apartNum: String? = ""
+    private var city: String? = ""
+    private var states: String? = ""
+    private var zipcode: String? = ""
+    private var country: String? = ""
+    private lateinit var mFusedLocationClient: FusedLocationProviderClient
+    private var locationManager: LocationManager? = null
+    private lateinit var commonWorkUtils: CommonWorkUtils
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,8 +123,11 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             llBottomNavigation.visibility = View.GONE
         }
 
-        basketScreenViewModel =
-            ViewModelProvider(requireActivity())[BasketScreenViewModel::class.java]
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        locationManager = requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
+
+        basketScreenViewModel = ViewModelProvider(requireActivity())[BasketScreenViewModel::class.java]
+        commonWorkUtils = CommonWorkUtils(requireActivity())
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -82,6 +136,8 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                     findNavController().navigateUp()
                 }
             })
+
+        addressDialog()
 
         if (BaseApplication.isOnline(requireActivity())) {
             getBasketList()
@@ -272,27 +328,361 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     }
 
     private fun addressDialog() {
+        dialogMiles = context?.let { Dialog(it) }!!
+        dialogMiles?.setContentView(R.layout.alert_dialog_addresses_popup)
+        dialogMiles?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialogMiles?.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+
+        val apiKey = getString(R.string.api_key)
+        if (!Places.isInitialized()) {
+            Places.initialize(requireActivity(), apiKey)
+        }
+
+        val placesApi = PlaceAPI.Builder().apiKey(apiKey).build(requireContext())
+
+        val relDone = dialogMiles?.findViewById<RelativeLayout>(R.id.relDone)
+        val llSetWork = dialogMiles?.findViewById<LinearLayout>(R.id.llSetWork)
+        val llSetHome = dialogMiles?.findViewById<LinearLayout>(R.id.llSetHome)
+        val relTrialBtn = dialogMiles?.findViewById<RelativeLayout>(R.id.relTrialBtn)
+        tvAddress = dialogMiles?.findViewById(R.id.tvAddress)!!
+        rcySavedAddress = dialogMiles?.findViewById(R.id.rcySavedAddress)
+
+        dialogMiles?.show()
+
+        getAddressList()
+
+        dialogMiles?.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        llSetHome?.setOnClickListener {
+            statusTypes = "Home"
+            llSetHome.setBackgroundResource(R.drawable.outline_address_green_border_bg)
+            llSetWork?.setBackgroundResource(R.drawable.height_type_bg)
+        }
+
+        llSetWork?.setOnClickListener {
+            statusTypes = "Work"
+            llSetHome?.setBackgroundResource(R.drawable.height_type_bg)
+            llSetWork.setBackgroundResource(R.drawable.outline_address_green_border_bg)
+        }
+
+        relTrialBtn?.setOnClickListener {
+            dialogMiles?.dismiss()
+            if (BaseApplication.isOnline(requireContext())) {
+                if (ContextCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    getCurrentLocation()
+                } else {
+                    requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100)
+                }
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+
+        tvAddress.setAdapter(PlacesAutoCompleteAdapter(requireContext(), placesApi))
+        tvAddress.setOnItemClickListener { parent, _, position, _ ->
+            val place = parent.getItemAtPosition(position) as Place
+            tvAddress.setText(place.description)
+            userAddress = place.description
+            getPlaceDetails(place.id, placesApi)
+        }
+
+
+        relDone?.setOnClickListener {
+            fullAddressDialog()
+            dialogMiles?.dismiss()
+        }
+    }
+
+    private fun fullAddressDialog() {
         val dialogMiles: Dialog = context?.let { Dialog(it) }!!
-        dialogMiles.setContentView(R.layout.alert_dialog_addresses_popup)
+        dialogMiles.setContentView(R.layout.alert_dialog_address_popup)
         dialogMiles.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialogMiles.setCancelable(false)
         dialogMiles.window!!.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT
         )
-        val relDone = dialogMiles.findViewById<RelativeLayout>(R.id.relDone)
-        rcySavedAddress = dialogMiles.findViewById(R.id.rcySavedAddress)
+        val relConfirm = dialogMiles.findViewById<RelativeLayout>(R.id.relConfirm)
+        val imageCross = dialogMiles.findViewById<ImageView>(R.id.imageCross)
+        edtStreetName = dialogMiles.findViewById(R.id.edtStreetName)
+        edtStreetNumber = dialogMiles.findViewById(R.id.edtStreetNumber)
+        edtApartNumber = dialogMiles.findViewById(R.id.edtApartNumber)
+        edtCity = dialogMiles.findViewById(R.id.edtCity)
+        edtStates = dialogMiles.findViewById(R.id.edtStates)
+        edtPostalCode = dialogMiles.findViewById(R.id.edtPostalCode)
+        edtAddress = dialogMiles.findViewById(R.id.edtAddress)
         dialogMiles.show()
 
-        getAddressList()
+        if (streetName != "") {
+            edtStreetName.setText(streetName.toString())
+        }
+
+        if (streetNum != "") {
+            edtStreetNumber.setText(streetNum.toString())
+        }
+
+        if (apartNum != "") {
+            edtApartNumber.setText(apartNum.toString())
+        }
+
+        if (city != "") {
+            edtCity.setText(city.toString())
+        }
+
+        if (states != "") {
+            edtStates.setText(states.toString())
+        }
+
+        if (userAddress != "") {
+            edtAddress.setText(userAddress.toString())
+        }
+
+        if (zipcode != "") {
+            edtPostalCode.setText(zipcode.toString())
+        }
 
         dialogMiles.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        relDone.setOnClickListener {
-            getBasketList()
+        relConfirm.setOnClickListener {
+            if (BaseApplication.isOnline(requireContext())) {
+                if (validate()) {
+                    streetName = edtStreetName.text.toString().trim()
+                    streetNum = edtStreetNumber.text.toString().trim()
+                    apartNum = edtApartNumber.text.toString().trim()
+                    city = edtCity.text.toString().trim()
+                    states = edtStates.text.toString().trim()
+                    userAddress = edtAddress.text.toString().trim()
+                    zipcode = edtPostalCode.text.toString().trim()
+                    addFullAddressApi()
+                }
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+            dialogMiles.dismiss()
+        }
+
+        imageCross.setOnClickListener {
             dialogMiles.dismiss()
         }
     }
 
+
+    private fun validate(): Boolean {
+        // Check if email/phone is empty
+        if (edtStreetName.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.streetNameError, false)
+            return false
+        } else if (edtStreetNumber.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.streetNumberError, false)
+            return false
+        } else if (edtApartNumber.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.apartNumberError, false)
+            return false
+        } else if (edtCity.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.cityEnterError, false)
+            return false
+        } else if (edtStates.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.statesEnterError, false)
+            return false
+        } else if (edtAddress.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.addressError, false)
+            return false
+        } else if (edtPostalCode.text.toString().trim().isEmpty()) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.postalCodeError, false)
+            return false
+        }
+        return true
+    }
+
+    private fun addFullAddressApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            basketScreenViewModel.addAddressUrl(
+                {
+                    BaseApplication.dismissMe()
+                    handleApiAddAddressResponse(it)
+                },
+                latitude,
+                longitude,
+                streetName,
+                streetNum,
+                apartNum,
+                city,
+                states,
+                country,
+                zipcode,
+                "1",
+                "",
+                statusTypes
+            )
+        }
+    }
+
+    private fun handleApiAddAddressResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessAddAddressResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessAddAddressResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, AddAddressModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success == true) {
+               getBasketList()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+
+    private fun getPlaceDetails(placeId: String, placesApi: PlaceAPI) {
+        placesApi.fetchPlaceDetails(placeId, object : OnPlacesDetailsListener {
+            override fun onError(errorMessage: String) {
+                requireActivity().runOnUiThread {
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+                }
+
+            }
+
+            override fun onPlaceDetailsFetched(placeDetails: PlaceDetails) {
+                try {
+                    latitude = placeDetails.lat.toString()
+                    longitude = placeDetails.lng.toString()
+                    requireActivity().runOnUiThread {
+                        getAddressFromLocation(placeDetails.lat, placeDetails.lng)
+                    }
+
+                } catch (e: Exception) {
+                    BaseApplication.alertError(requireContext(), e.message, false)
+                }
+            }
+        })
+    }
+
+    private fun getAddressFromLocation(latitude: Double, longitude: Double) {
+        val geocoder = Geocoder(requireActivity(), Locale.getDefault())
+        try {
+            val addresses: List<Address> = geocoder.getFromLocation(latitude, longitude, 1)!!
+            if (addresses.isNotEmpty()) {
+                val address = addresses[0]
+                streetName = address.thoroughfare ?: "" // Street Name
+                streetNum = address.subThoroughfare ?: "" // Street Number
+                apartNum = address.premises ?: "" // Apartment Number
+                city = address.subLocality ?: "" // City
+                states = address.adminArea ?: "" // State/Province
+                country = address.countryName ?: "" // Country
+                zipcode = address.postalCode ?: "" // Zip Code
+
+                Log.d("Address", "Street Name: $streetName")
+                Log.d("Address", "Street Number: $streetNum")
+                Log.d("Address", "Apartment Number: $apartNum")
+                Log.d("Address", "City: $city")
+                Log.d("Address", "Country: $country")
+                Log.d("Address", "ZIP Code: $zipcode")
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun getCurrentLocation() {
+        // Initialize Location manager
+        val locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        // Check condition
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+                LocationManager.NETWORK_PROVIDER
+            )
+        ) {
+            // When location service is enabled
+            // Get last location
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return
+            }
+            mFusedLocationClient.lastLocation.addOnCompleteListener { task ->
+                // Initialize location
+                val location = task.result
+                // Check condition
+                if (location != null) {
+                    latitude = location.latitude.toString()
+                    longitude = location.longitude.toString()
+                    tvAddress.text.clear()
+                    requireActivity().runOnUiThread {
+                        getAddressFromLocation(location.latitude, location.longitude)
+
+                    }
+
+                } else {
+                    // When location result is null
+                    val locationRequest =
+                        LocationRequest().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                            .setInterval(10000)
+                            .setFastestInterval(1000)
+                            .setNumUpdates(1)
+
+                    val locationCallback: LocationCallback = object : LocationCallback() {
+                        override fun onLocationResult(locationResult: LocationResult) {
+                            // Initialize
+                            // location
+                            val location1 = locationResult.lastLocation
+                            latitude = location1!!.latitude.toString()
+                            longitude = location1.longitude.toString()
+                            tvAddress.text.clear()
+                            requireActivity().runOnUiThread {
+                                getAddressFromLocation(location1.latitude, location1.longitude)
+                            }
+                        }
+                    }
+                    // Request location updates
+                    mFusedLocationClient.requestLocationUpdates(
+                        locationRequest,
+                        locationCallback,
+                        Looper.myLooper()!!
+                    )
+
+                }
+            }
+        } else {
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ), 100
+            )
+        }
+    }
 
 
     private fun removeRecipeBasketDialog(recipeId: String?, position: Int?) {
@@ -595,7 +985,12 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     }
 
 
-    override fun itemLongClick(position: Int?, status: String?, type: String?, isZiggleEnabled: String) {
+    override fun itemLongClick(
+        position: Int?,
+        status: String?,
+        type: String?,
+        isZiggleEnabled: String
+    ) {
 
     }
 

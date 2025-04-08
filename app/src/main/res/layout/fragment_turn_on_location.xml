@@ -41,6 +41,8 @@
                     android:id="@+id/relMainImage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    android:layout_marginHorizontal="@dimen/_20sdp"
                     android:background="@drawable/my_kai_main_location">
 
                     <TextView
@@ -85,7 +87,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/tvTurnOnLocations"
-                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginTop="@dimen/_8sdp"
                     android:fontFamily="@font/poppins"
                     android:text="We need your location to find grocery stores nearby for you."
                     android:textSize="@dimen/_11sdp" />
@@ -96,7 +98,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/tvTurnOnLocationDesc"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginTop="@dimen/_8sdp"
                     android:fontFamily="@font/poppins"
                     android:text="“This will help me give you more accurate\n pricing information”"
                     android:textAlignment="center"

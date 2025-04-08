@@ -8,28 +8,44 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class SearchedRecipeViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
+class SearchedRecipeViewModel @Inject constructor(private val repository: MainRepository) :
+    ViewModel() {
 
-    suspend fun recipeSearchedApi(successCallback: (response: NetworkResult<String>) -> Unit, itemSearch: String?){
-        repository.recipeSearchApi ({ successCallback(it) },itemSearch)
+    suspend fun recipeSearchedApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        itemSearch: String?
+    ) {
+        repository.recipeSearchApi({ successCallback(it) }, itemSearch)
     }
 
-    suspend fun recipeAddToPlanRequest(successCallback: (response: NetworkResult<String>) -> Unit, jsonObject: JsonObject
-    ){
-        repository.recipeAddToPlanRequestApi({ successCallback(it) },jsonObject)
+    suspend fun recipeFilterSearchApi(
+        successCallback: (response: NetworkResult<String>) -> Unit, mealType: MutableList<String>?,
+        health: MutableList<String>?, time: MutableList<String>?
+    ) {
+        repository.recipeFilterSearchApi({ successCallback(it) }, mealType, health, time)
     }
 
-    suspend fun addBasketRequest(successCallback: (response: NetworkResult<String>) -> Unit,
-                                 uri: String,quantity: String){
-        repository.addBasketRequestApi({ successCallback(it) },uri,quantity)
+    suspend fun recipeAddToPlanRequest(
+        successCallback: (response: NetworkResult<String>) -> Unit, jsonObject: JsonObject
+    ) {
+        repository.recipeAddToPlanRequestApi({ successCallback(it) }, jsonObject)
     }
 
-    suspend fun likeUnlikeRequest(successCallback: (response: NetworkResult<String>) -> Unit,
-                                  uri: String,likeType: String,type:String){
-        repository.likeUnlikeRequestApi({ successCallback(it) },uri,likeType,type)
+    suspend fun addBasketRequest(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        uri: String, quantity: String
+    ) {
+        repository.addBasketRequestApi({ successCallback(it) }, uri, quantity)
     }
 
-    suspend fun getCookBookRequest(successCallback: (response: NetworkResult<String>) -> Unit){
+    suspend fun likeUnlikeRequest(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        uri: String, likeType: String, type: String
+    ) {
+        repository.likeUnlikeRequestApi({ successCallback(it) }, uri, likeType, type)
+    }
+
+    suspend fun getCookBookRequest(successCallback: (response: NetworkResult<String>) -> Unit) {
         repository.getCookBookRequestApi { successCallback(it) }
     }
 

@@ -1640,6 +1640,25 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
+
+    override suspend fun recipeFilterSearchApi(
+        successCallback: (response: NetworkResult<String>) -> Unit, mealType: MutableList<String>?,health: MutableList<String>?,time: MutableList<String>?
+    ) {
+        try {
+            api.recipeFilterSearchApi(mealType, health, time).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
     override suspend fun recipeforSearchApi(successCallback: (response: NetworkResult<String>) -> Unit) {
         try {
             api.recipeForSearchApi().apply {

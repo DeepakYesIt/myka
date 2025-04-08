@@ -57,10 +57,8 @@
                 android:autoVerify="true"
                 android:label="Deep link">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data
                     android:host="mykaimealplanner.onelink.me"
                     android:pathPrefix="/mPqu"
@@ -120,8 +118,6 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-
-
         <service
             android:name=".fcm.MyFirebaseMessagingService"
             android:enabled="true"
@@ -130,7 +126,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
 
         <service
             android:name=".listener.ToastWorker"

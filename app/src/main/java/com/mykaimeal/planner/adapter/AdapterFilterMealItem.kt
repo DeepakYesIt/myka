@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
@@ -16,8 +17,9 @@ class AdapterFilterMealItem(
     private var onItemClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<AdapterFilterMealItem.ViewHolder>() {
 
-    private var selected: Boolean = false
+    private val selectedItems = mutableListOf<String>() // Declare this in your adapter or pass it from outside
     private var isExpanded = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding: AdapterSearchFilterItemBinding =
@@ -26,32 +28,39 @@ class AdapterFilterMealItem(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = datalist!![position]
 
         holder.binding.tvItem.text = datalist!![position].name
 
-        if (datalist!![position].selected==true){
-            holder.binding.tvItem.setTextColor(android.graphics.Color.parseColor("#06C169"))
-            holder.binding.relMainLayouts.background=null
-        }else{
-            holder.binding.tvItem.setTextColor(android.graphics.Color.parseColor("#000000"))
+        // Update UI based on selection state
+        if (item.selected == true) {
+            holder.binding.tvItem.setTextColor(Color.parseColor("#06C169"))
+            holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
+        } else {
+            holder.binding.tvItem.setTextColor(Color.parseColor("#000000"))
             holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
         }
 
         holder.binding.relMainLayouts.setOnClickListener {
-            if (datalist!![position].selected==true){
-                onItemClickListener.itemClick(position,datalist!![position].name,"MealType")
-            }else{
-                if (selected) {
-                    selected = false
-                    holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
-                } else {
-                    selected = true
-                    holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
-                    onItemClickListener.itemClick(position,datalist!![position].name,"MealType")
+            item.selected = !item.selected!! // Toggle selection
+
+            if (item.selected!!) {
+                holder.binding.tvItem.setTextColor(Color.parseColor("#06C169"))
+                holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
+                if (!selectedItems.contains(item.name)) {
+                    selectedItems.add(item.name.toString())
                 }
+            } else {
+                holder.binding.tvItem.setTextColor(Color.parseColor("#000000"))
+                holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
+                selectedItems.remove(item.name)
             }
+
+            // Notify listener (if needed)
+            onItemClickListener.itemClick(position, item.name, "MealType")
         }
     }
+
 
     override fun getItemCount(): Int {
         return if (isExpanded) datalist!!.size else 5.coerceAtMost(datalist!!.size)
