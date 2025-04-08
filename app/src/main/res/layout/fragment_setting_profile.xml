@@ -142,7 +142,6 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
                     android:layout_marginHorizontal="@dimen/_15sdp"
                     android:layout_toEndOf="@+id/imageProfile">
 

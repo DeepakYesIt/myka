@@ -66,9 +66,7 @@ class SubscriptionPlanOverViewFragment : Fragment() {
                 }
             })
 
-        adapters = AdapterOnBoardingSubscriptionItem(datalist)
-        binding.viewpager.adapter = adapters
-        binding.viewpager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+
 
         binding.crossImages.visibility = View.INVISIBLE // Initially hide the ImageView
 
@@ -139,6 +137,8 @@ class SubscriptionPlanOverViewFragment : Fragment() {
             findNavController().navigateUp()
         }
 
+        datalist.clear()
+
         // List of onboarding items
         datalist.add(OnSubscriptionModel(R.drawable.image_1, true))
 
@@ -149,6 +149,10 @@ class SubscriptionPlanOverViewFragment : Fragment() {
         datalist.add(OnSubscriptionModel(R.drawable.image_4, false))
 
         datalist.add(OnSubscriptionModel(R.drawable.image_5, false))
+
+        adapters = AdapterOnBoardingSubscriptionItem(datalist)
+        binding.viewpager.adapter = adapters
+        binding.viewpager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
 
         /// set indicator for onboarding
         setUpOnBoardingIndicator()
@@ -176,6 +180,7 @@ class SubscriptionPlanOverViewFragment : Fragment() {
             })
             binding.llSubPlans.startAnimation(slideUp)
         }
+
     }
 
     private fun viewPagerFunctionImpl() {
