@@ -144,17 +144,20 @@ class HealthDataFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (binding.rlAddMoreGoals.visibility == View.GONE) {
                     val searchText = s.toString().trim()
-                    if (searchText.trim()!= searchFor) {
-                        searchFor = searchText
-                        textChangedJob?.cancel()
-                        // Launch a new coroutine in the lifecycle scope
-                        textChangedJob = lifecycleScope.launch {
-                            delay(1000)  // Debounce time
-                            if (searchText == searchFor) {
-                                logicBMR("2")
+                    if (searchText.isNotEmpty()){
+                        if (searchText.trim()!= searchFor) {
+                            searchFor = searchText
+                            textChangedJob?.cancel()
+                            // Launch a new coroutine in the lifecycle scope
+                            textChangedJob = lifecycleScope.launch {
+                                delay(1000)  // Debounce time
+                                if (searchText == searchFor) {
+                                    logicBMR("2")
+                                }
                             }
                         }
                     }
+
                 }
             }
         }
@@ -168,21 +171,22 @@ class HealthDataFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (binding.rlAddMoreGoals.visibility == View.GONE) {
                     val searchText = s.toString().trim()
-                    if (searchText.trim()!= searchFor) {
-                        searchFor = searchText
-                        textChangedJob?.cancel()
-                        // Launch a new coroutine in the lifecycle scope
-                        textChangedJob = lifecycleScope.launch {
-                            delay(1000)  // Debounce time
-                            if (searchText == searchFor) {
-                                logicBMR("2")
+                    if (searchText.isNotEmpty()){
+                        if (searchText.trim()!= searchFor) {
+                            searchFor = searchText
+                            textChangedJob?.cancel()
+                            // Launch a new coroutine in the lifecycle scope
+                            textChangedJob = lifecycleScope.launch {
+                                delay(1000)  // Debounce time
+                                if (searchText == searchFor) {
+                                    logicBMR("2")
+                                }
                             }
                         }
                     }
                 }
             }
         }
-
     }
 
     private fun logicBMR(apiType: String) {

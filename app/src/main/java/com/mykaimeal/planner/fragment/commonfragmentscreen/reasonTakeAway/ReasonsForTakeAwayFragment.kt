@@ -165,13 +165,15 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
     private fun initialize() {
 
         /// value get for social login
-        if (sessionManagement.getCookingFor() == "Myself") {
-            cookingFor = "1"
-        } else if (sessionManagement.getCookingFor() == "MyPartner") {
-            cookingFor = "2"
+        cookingFor = if (sessionManagement.getCookingFor().equals("Myself",true)) {
+            "1"
+        } else if (sessionManagement.getCookingFor().equals("MyPartner",true)) {
+            "2"
         } else {
-            cookingFor = "3"
+            "3"
         }
+
+
         if (sessionManagement.getUserName() != "") {
             userName = sessionManagement.getUserName()
         }
@@ -270,9 +272,11 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s!!.isNotEmpty()){
                     reasonTakeAway = s.toString()
+                    status="2"
                     binding.tvNextBtn.isClickable = true
                     binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_select_background)
                 }else{
+                    status=""
                     reasonTakeAway = ""
                     binding.tvNextBtn.isClickable = false
                     binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
@@ -285,15 +289,19 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         })
 
         binding.tvNextBtn.setOnClickListener {
-            if (status == "2") {
-                if (sessionManagement.getPreferences()){
-                    updatePreferencesApi()
-                }else{
-                    reasonTakeAwayViewModel.setReasonTakeData(reasonTakeModelData!!.toMutableList())
-                    sessionManagement.setReasonTakeAway(reasonSelect.toString())
-                    sessionManagement.setReasonTakeAwayDesc(reasonTakeAway.toString())
-                    navigateToAuthActivity("login")
+            if (isOnline(requireContext())) {
+                if (status.equals("2")) {
+                    if (sessionManagement.getPreferences()){
+                        updatePreferencesApi()
+                    }else{
+                        reasonTakeAwayViewModel.setReasonTakeData(reasonTakeModelData!!.toMutableList())
+                        sessionManagement.setReasonTakeAway(reasonSelect.toString())
+                        sessionManagement.setReasonTakeAwayDesc(reasonTakeAway.toString())
+                        navigateToAuthActivity("login")
+                    }
                 }
+            } else {
+                alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
 

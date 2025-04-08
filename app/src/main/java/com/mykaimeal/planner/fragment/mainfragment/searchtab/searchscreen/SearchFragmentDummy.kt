@@ -462,7 +462,6 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
             }
             findNavController().navigate(R.id.createRecipeFragment,bundle)
         }
-
         binding.relRecipeImage.setOnClickListener {
             findNavController().navigate(R.id.createRecipeImageFragment)
         }

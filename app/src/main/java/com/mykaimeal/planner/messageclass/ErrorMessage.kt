@@ -4,6 +4,7 @@ object ErrorMessage {
 
 
      const val networkError:String="Please check your internet connection"
+     const val planError:String="Please select subscription plan"
      const val servingError:String="The minimum serving count at least one."
      const val ingredientError:String="Selected at least one ingredient."
      const val mealTypetError:String="Selected at least one meal Type."

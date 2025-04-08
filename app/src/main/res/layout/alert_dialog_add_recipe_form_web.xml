@@ -71,6 +71,8 @@
                     android:paddingVertical="@dimen/_10sdp"
                     android:paddingHorizontal="@dimen/_20sdp"
                     android:hint="Paste Url"
+                    android:singleLine="true"
+                    android:maxLines="1"
                     android:textSize="@dimen/_12sdp"
                     android:fontFamily="@font/poppins_bold"
                     android:background="@null"/>

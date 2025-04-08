@@ -3,21 +3,20 @@ package com.mykaimeal .planner.activity
 import PlanApiResponse
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.ImageView
@@ -29,19 +28,13 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -49,6 +42,7 @@ import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.ChooseDayAdapter
 import com.mykaimeal.planner.adapter.ImageViewPagerAdapter
+import com.mykaimeal.planner.adapter.IndicatorAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
@@ -61,7 +55,6 @@ import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apire
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.RecipesModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
-import com.mykaimeal.planner.listener.ToastWorker
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import com.mykaimeal.planner.model.DataModel
 import com.mykaimeal.planner.model.DateModel
@@ -72,7 +65,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
@@ -81,7 +73,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
     private lateinit var commonWorkUtils: CommonWorkUtils
     private lateinit var mealRoutineViewModel: MealRoutineViewModel
     private var recipesModel: RecipesModel? = null
-    private lateinit var layOnBoardingIndicator: LinearLayout
+    private lateinit var layOnBoardingIndicator: RecyclerView
     val dataList = ArrayList<DataModel>()
     private lateinit var adapter: ImageViewPagerAdapter
     private var tvWeekRange: TextView? = null
@@ -93,19 +85,20 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
     // Define global variables
     private lateinit var startDate: Date
     private lateinit var endDate: Date
-    private lateinit var sharedPreferences: SharedPreferences
-    private val PREF_NAME = "ToastPrefs"
-    private val KEY_LAST_SHOWN_DATE = "last_shown_date"
     private var mealType:String="Breakfast"
     private var rcyChooseDaySch: RecyclerView? = null
     private lateinit var spinnerActivityLevel: PowerSpinnerView
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
-    private val toastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Toast.makeText(this@MainActivity, "24 hours passed! Calling API now.", Toast.LENGTH_LONG).show()
-            fetchDataOnLoad()
-        }
-    }
+    private  val LAST_SHOWN_KEY = "lastShownDailyInspirations"
+    private  val INTERVAL_MS: Long = 60 * 1000L // 60 seconds
+    private var handler: Handler? = null
+    private var runnable: Runnable? = null
+    private var isRunning = false
+
+    private lateinit var indicatorAdapter: IndicatorAdapter
+
+
+
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,9 +107,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         setContentView(binding.root)
         mealRoutineViewModel = ViewModelProvider(this@MainActivity)[MealRoutineViewModel::class.java]
         commonWorkUtils = CommonWorkUtils(this)
-
-        // Initialize SharedPreferences
-        sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
         handleDeepLink(intent)
 
@@ -128,25 +118,11 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
         }
 
-        /// using function for find destination graph
+        //using function for find destination graph
         startDestination()
-//        scheduleToastWorker()
-    }
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun scheduleToastWorker() {
-        // Register BroadcastReceiver
-        registerReceiver(toastReceiver, IntentFilter("com.example.workmanagerdemo.TOAST_ACTION"), RECEIVER_NOT_EXPORTED)
-//        // Schedule WorkManager Task
-//        val workRequest = OneTimeWorkRequestBuilder<ToastWorker>()
-//            .setInitialDelay(24, TimeUnit.HOURS) // Delay 24 HOURS
-//            .build()
-//        WorkManager.getInstance(this).enqueue(workRequest)
+//        fetchDataOnLoad()
+        startTimer(this@MainActivity)
 
-        // Schedule WorkManager to repeat every 24 hours
-        val workRequest = PeriodicWorkRequestBuilder<ToastWorker>(24, TimeUnit.HOURS)
-            .build()
-
-        WorkManager.getInstance(this).enqueue(workRequest)
 
     }
 
@@ -159,15 +135,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         binding.relAddRecipeWeb.setOnClickListener(this)
         binding.relCreateNewRecipe.setOnClickListener(this)
         binding.relRecipeImage.setOnClickListener(this)
-    }
-
-    fun shouldShowDialog(): Boolean {
-        val lastShownDate = sharedPreferences.getString(KEY_LAST_SHOWN_DATE, null) ?: return true
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val lastDate = sdf.parse(lastShownDate)
-        val currentDate = sdf.parse(sdf.format(Date()))
-        return lastDate == null || currentDate!!.after(lastDate)
-
     }
 
     private fun handleDeepLink(intent: Intent?) {
@@ -341,13 +308,25 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
                     viewPager?.adapter = adapter
                     viewPager?.visibility = View.VISIBLE
                     laybuttonplabasket?.visibility = View.VISIBLE
+                    layOnBoardingIndicator.visibility = View.VISIBLE
                     tvnodata.visibility = View.GONE
+                    indicatorAdapter = IndicatorAdapter(breakfast.size)
+                    layOnBoardingIndicator.adapter = indicatorAdapter
                 } ?: run {
                     viewPager?.visibility = View.GONE
                     laybuttonplabasket?.visibility = View.GONE
+                    layOnBoardingIndicator.visibility = View.GONE
                     tvnodata.visibility = View.VISIBLE
                 }
             }
+
+            viewPager?.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    indicatorAdapter.updateSelectedPosition(position)
+                    smoothScrollIndicator(position)
+                }
+            })
 
             rlAddPlanButton.setOnClickListener {
                 chooseDayDialog()
@@ -369,6 +348,16 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
                 }
             }
             show()
+        }
+    }
+
+    private fun smoothScrollIndicator(position: Int) {
+        val layoutManager = layOnBoardingIndicator.layoutManager as LinearLayoutManager
+        val visibleRange = layoutManager.findLastVisibleItemPosition() - layoutManager.findFirstVisibleItemPosition()
+
+        // Optional: center when there are more than 5
+        if (visibleRange >= 4) {
+            layOnBoardingIndicator.smoothScrollToPosition(position)
         }
     }
 
@@ -429,12 +418,25 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             viewPager?.adapter = adapter
             viewPager?.visibility = View.VISIBLE
             laybuttonplabasket?.visibility = View.VISIBLE
+            layOnBoardingIndicator.visibility = View.VISIBLE
             tvnodata.visibility = View.GONE
+            indicatorAdapter = IndicatorAdapter(breakfast.size)
+            layOnBoardingIndicator.adapter = indicatorAdapter
         } ?: run {
             viewPager?.visibility = View.GONE
             laybuttonplabasket?.visibility = View.GONE
+            layOnBoardingIndicator.visibility = View.GONE
             tvnodata.visibility = View.VISIBLE
         }
+
+        viewPager?.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                indicatorAdapter.updateSelectedPosition(position)
+                smoothScrollIndicator(position)
+            }
+        })
+
 
 
     }
@@ -490,52 +492,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
 
     private fun showData(data: Data) {
         recipesModel = data.recipes
-        Log.d("24 hours api", "fffdfdf$recipesModel")
-        saveCurrentDate()
         dialogDailyInspiration()
-    }
-
-    private fun setUpOnBoardingIndicator() {
-        val indicator = arrayOfNulls<ImageView>(adapter!!.itemCount)
-        val layoutParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-
-        layoutParams.setMargins(10, 0, 10, 0)
-        for (i in indicator.indices) {
-            indicator[i] = ImageView(this@MainActivity)
-            indicator[i]!!.setImageDrawable(
-                ContextCompat.getDrawable(
-                    this@MainActivity,
-                    R.drawable.default_dot
-                )
-            )
-            indicator[i]!!.layoutParams = layoutParams
-            layOnBoardingIndicator.addView(indicator[i])
-        }
-    }
-
-    private fun currentOnBoardingIndicator(index: Int) {
-        val childCount: Int = layOnBoardingIndicator.childCount
-        for (i in 0 until childCount) {
-            val imageView = layOnBoardingIndicator.getChildAt(i) as ImageView
-            if (i == index) {
-                imageView.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        this@MainActivity,
-                        R.drawable.selected_dot
-                    )
-                )
-            } else {
-                imageView.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        this@MainActivity,
-                        R.drawable.default_dot
-                    )
-                )
-            }
-        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -632,9 +589,8 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         }
     }
 
-
     private fun chooseDayMealTypeDialog() {
-        val dialogChooseMealDay: Dialog = Dialog(this)
+        val dialogChooseMealDay = Dialog(this)
         dialogChooseMealDay.setContentView(R.layout.alert_dialog_choose_day_meal_type)
         dialogChooseMealDay.window!!.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -758,7 +714,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         }
     }
 
-
     private fun handleApiAddToPlanResponse(
         result: NetworkResult<String>,
         dialogChooseMealDay: Dialog
@@ -788,7 +743,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             showAlert(e.message, false)
         }
     }
-
 
     @SuppressLint("SetTextI18n")
     fun showWeekDates() {
@@ -822,8 +776,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
         return dateFormat.format(date)
     }
-
-
 
     private fun getDaysBetween(startDate: Date, endDate: Date): MutableList<DateModel> {
         val dateList = mutableListOf<DateModel>()
@@ -967,12 +919,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         lifecycleScope.launch {
             Log.d("Token ","******"+BaseApplication.fetchFcmToken())
         }
-    }
-
-    fun saveCurrentDate() {
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val currentDate = sdf.format(Date())
-        sharedPreferences.edit().putString(KEY_LAST_SHOWN_DATE, currentDate).apply()
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
@@ -1167,9 +1113,48 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         }
     }
 
+
+    private fun startTimer(context: Context) {
+        if (isRunning) return
+        handler = Handler(Looper.getMainLooper())
+        runnable = object : Runnable {
+            override fun run() {
+                Log.d("timer working","*****")
+                checkAndShowDailyInspirations(context)
+                handler?.postDelayed(this, INTERVAL_MS)
+            }
+        }
+        handler?.post(runnable!!)
+        isRunning = true
+    }
+
+    private fun stopTimer() {
+        handler?.removeCallbacks(runnable!!)
+        handler = null
+        runnable = null
+        isRunning = false
+    }
+
+    private fun checkAndShowDailyInspirations(context: Context) {
+        val prefs: SharedPreferences = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val lastShownMillis = prefs.getLong(LAST_SHOWN_KEY, 0)
+        val currentMillis = System.currentTimeMillis()
+        Log.d("timer working","***** every time ")
+        if (lastShownMillis != 0L) {
+            val hoursPassed = (currentMillis - lastShownMillis).toDouble() / (1000 * 60 * 60)
+            if (hoursPassed < 24) return
+        }
+        Log.d("timer working","***** 24 hours passed! Calling API now.")
+        Toast.makeText(this@MainActivity, "24 hours passed! Calling API now.", Toast.LENGTH_LONG).show()
+        // Save current time
+        prefs.edit().putLong(LAST_SHOWN_KEY, currentMillis).apply()
+        fetchDataOnLoad()
+    }
+
+
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(toastReceiver)
+        stopTimer()
     }
 
 }

@@ -30,41 +30,44 @@ class SessionManagement(var context: Context) {
         editorFirstTime = prefFirstTime?.edit()
     }
 
-    companion object {
-        private const val KEY_ONBOARDING_COMPLETED = "onboardingCompleted"
-        private const val isLocationAllowed = "isLocationAllowed"
-        private const val isNotificationAllowed = "isNotificationAllowed"
-        private const val isLastScreen = "isLastScreen"
-        private const val isPersonalInformation = "isPersonalInformation"
-        private const val isProfessionalInformation = "isProfessionalInformation"
-        private const val phoneNumber = "phoneNumber"
-        private const val isIdVerification = "isIdVerification"
-    }
-
-    /*    fun setRememberMe(remember: MutableList<String>?) {
-            val json = gson.toJson(remember)
-            editor2!!.putString(AppConstant.rememberMe, json)
-            editor2!!.commit()
-        }
-
-        fun getRememberMe(): MutableList<String>? {
-            val json = pref2?.getString(AppConstant.rememberMe, null)
-            return if (json != null) {
-                val type = object : TypeToken<List<String>>() {}.type
-                gson.fromJson(json, type)
-            } else {
-                null
-            }
-        }*/
 
     fun getPreferences(): Boolean {
         return pref!!.getBoolean(AppConstant.Preferences, false)
     }
 
+    fun getSubscriptionId(): String? {
+        return pref!!.getString(AppConstant.SubscriptionId, "")
+    }
+
+    fun getPurchaseToken(): String? {
+        return pref!!.getString(AppConstant.PurchaseToken, "")
+    }
+
+    fun getPlanType(): String? {
+        return pref!!.getString(AppConstant.planType, "")
+    }
+
+
     fun setPreferences(session: Boolean?) {
         editor!!.putBoolean(AppConstant.Preferences, session!!)
         editor!!.commit()
     }
+
+    fun setSubscriptionId(session: String?) {
+        editor!!.putString(AppConstant.SubscriptionId, session!!)
+        editor!!.commit()
+    }
+
+    fun setPurchaseToken(session: String?) {
+        editor!!.putString(AppConstant.PurchaseToken, session!!)
+        editor!!.commit()
+    }
+
+    fun setPlanType(session: String?) {
+        editor!!.putString(AppConstant.planType, session!!)
+        editor!!.commit()
+    }
+
 
     fun setRememberMe(value: List<RememberMe>) {
         editor2!!.putString(AppConstant.rememberMe, Gson().toJson(value))
