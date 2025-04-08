@@ -69,14 +69,14 @@ class SessionManagement(var context: Context) {
     }
 
 
-    fun setRememberMe(value: List<RememberMe>) {
+    fun setRememberMe(value: RememberMe) {
         editor2!!.putString(AppConstant.rememberMe, Gson().toJson(value))
         editor2!!.apply()
     }
 
 
-    fun getRememberMe(): String {
-        return pref2!!.getString(AppConstant.rememberMe, "")!!
+    fun getRememberMe(): String? {
+        return pref2!!.getString(AppConstant.rememberMe, "")
     }
 
     fun getLoginSession(): Boolean {

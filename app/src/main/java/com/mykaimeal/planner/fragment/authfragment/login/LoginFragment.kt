@@ -133,16 +133,14 @@ class LoginFragment : Fragment() {
 
         logOutGoogle()
 
-        binding.etSignEmailPhone.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && isFirstTimeTouched) { // Only trigger on first touch
-                val data: String = sessionManagement.getRememberMe()
-                if (data.isNotEmpty()) {
-                    showRememberDialog()
-                }
-                isFirstTimeTouched = false // Set flag to false so it doesn't trigger again
+        sessionManagement.getRememberMe()?.let {
+            if (!it.equals("",true)){
+                val data: String = it
+                val rememberMe = Gson().fromJson(data, RememberMe::class.java)
+                binding.etSignEmailPhone.setText(rememberMe.email)
+                binding.etSignPassword.setText(rememberMe.pass)
             }
         }
-
 
         binding.googleImages.setOnClickListener {
             if (BaseApplication.isOnline(requireActivity())) {
@@ -169,10 +167,6 @@ class LoginFragment : Fragment() {
             findNavController().navigate(R.id.signUpFragment)
         }
 
-       /* binding.tvTitle.setOnClickListener{
-            findNavController().navigate(R.id.turnOnLocationFragment)
-        }
-*/
         binding.imgEye.setOnClickListener {
             if (binding.etSignPassword.transformationMethod === PasswordTransformationMethod.getInstance()) {
                 binding.etSignPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
@@ -295,46 +289,8 @@ class LoginFragment : Fragment() {
         if (sessionManagement.getReasonTakeAwayDesc() != "") {
             reasonTakeAwayDesc = sessionManagement.getReasonTakeAwayDesc()
         }
+
     }
-
-    private fun showRememberDialog() {
-        val filterList: MutableList<RememberMe> = ArrayList()
-        var value: RememberMe? = null
-
-        val dialogRemember: Dialog = context?.let { Dialog(it) }!!
-        dialogRemember.setContentView(R.layout.dialog_remember)
-        dialogRemember.window!!.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
-        dialogRemember.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val rvRememberData = dialogRemember.findViewById<RecyclerView>(R.id.rvRememberData)
-        val rlOkayBtn = dialogRemember.findViewById<RelativeLayout>(R.id.rlOkayBtn)
-        dialogRemember.show()
-        dialogRemember.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        val data: String = sessionManagement.getRememberMe()
-
-        if (data.isNotEmpty()) {
-            val objectList = Gson().fromJson(data, Array<RememberMe>::class.java).asList()
-            // Populate the filterList with the entire objectList (since type is not used anymore)
-            filterList.addAll(objectList)
-            val adapter = RememberMeAdapter(filterList, requireContext(), object : RememberSelect {
-                override fun selectRemember(remember: RememberMe) {
-                    value = remember
-                }
-            })
-            rvRememberData.adapter = adapter
-        }
-        rlOkayBtn.setOnClickListener {
-            if (value != null) {
-                dialogRemember.dismiss()
-                binding.etSignEmailPhone.setText(value?.email)
-                binding.etSignPassword.setText(value?.pass)
-                checkStatus = true
-            }
-        }
-    }
-
 
     private fun logOutGoogle() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -388,26 +344,32 @@ class LoginFragment : Fragment() {
     }
 
     private fun saveRemember() {
-        val data: String = sessionManagement.getRememberMe()
-        var mutableList: MutableList<RememberMe> = ArrayList()
-        if (!data.isNullOrEmpty()) {
-            val objectList: List<RememberMe> = Gson().fromJson(data, Array<RememberMe>::class.java).asList()
-            mutableList = objectList.toMutableList()
-        }
+//        val data: String = sessionManagement.getRememberMe()
+//        var mutableList: MutableList<RememberMe> = ArrayList()
+//        if (!data.isNullOrEmpty()) {
+//            val objectList: List<RememberMe> = Gson().fromJson(data, Array<RememberMe>::class.java).asList()
+//            mutableList = objectList.toMutableList()
+//        }
+//        val emailOrPhone = binding.etSignEmailPhone.text.toString().trim()
+//        val password = binding.etSignPassword.text.toString().trim()
+//
+//        val dataRemember=RememberMe(emailOrPhone,password)
+//        var found = false
+//        for (item in mutableList) {
+//            if (item.email.equals(emailOrPhone,true)) {
+//                item.pass = password  // Update password if email exists
+//                found = true
+//                break
+//            }
+//        }
+//        if (!found) {
+//            mutableList.add(RememberMe(emailOrPhone, password)) // Add new entry if not found
+//        }
+
+//        sessionManagement.setRememberMe(mutableList)
         val emailOrPhone = binding.etSignEmailPhone.text.toString().trim()
         val password = binding.etSignPassword.text.toString().trim()
-        var found = false
-        for (item in mutableList) {
-            if (item.email.equals(emailOrPhone,true)) {
-                item.pass = password  // Update password if email exists
-                found = true
-                break
-            }
-        }
-        if (!found) {
-            mutableList.add(RememberMe(emailOrPhone, password)) // Add new entry if not found
-        }
-        sessionManagement.setRememberMe(mutableList)
+        sessionManagement.setRememberMe(RememberMe(emailOrPhone,password))
     }
 
     /// handle set session and redirection implement

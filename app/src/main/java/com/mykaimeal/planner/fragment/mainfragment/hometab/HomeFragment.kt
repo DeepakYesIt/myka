@@ -597,7 +597,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             dialogAddRecipe.dismiss()
             val bundle = Bundle()
             bundle.putString("value", "New")
-            bundle.putString("uri", userDataLocal.userData?.get(position!!)?.recipe?.url)
+            bundle.putString("uri", userDataLocal.userData?.get(position!!)?.recipe?.uri)
             findNavController().navigate(R.id.createCookBookFragment, bundle)
         }
         rlDoneBtn.setOnClickListener {
@@ -672,7 +672,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 BaseApplication.dismissMe()
 
                 handleLikeAndUnlikeApiResponse(it, position, dialogAddRecipe)
-            }, userDataLocal.userData?.get(position!!)?.recipe?.uri!!, likeType, cookbooktype)
+            }, userDataLocal.userData?.get(position!!)?.recipe?.uri.toString(), likeType, cookbooktype)
         }
     }
 

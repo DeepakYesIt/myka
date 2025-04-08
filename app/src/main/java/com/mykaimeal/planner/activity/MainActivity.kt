@@ -1072,7 +1072,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             mealRoutineViewModel.likeUnlikeRequest({
                 BaseApplication.dismissMe()
                 handleLikeAndUnlikeApiResponse(it, item,dialogAddRecipe,breakfastModels)
-            }, item.recipe?.uri!!, likeType, cookbooktype)
+            }, item.recipe?.uri.toString(), likeType, cookbooktype)
         }
     }
 
@@ -1145,7 +1145,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             if (hoursPassed < 24) return
         }
         Log.d("timer working","***** 24 hours passed! Calling API now.")
-        Toast.makeText(this@MainActivity, "24 hours passed! Calling API now.", Toast.LENGTH_LONG).show()
+//        Toast.makeText(this@MainActivity, "24 hours passed! Calling API now.", Toast.LENGTH_LONG).show()
         // Save current time
         prefs.edit().putLong(LAST_SHOWN_KEY, currentMillis).apply()
         fetchDataOnLoad()

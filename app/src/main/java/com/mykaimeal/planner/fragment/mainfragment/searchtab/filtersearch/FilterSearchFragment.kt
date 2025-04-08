@@ -34,12 +34,12 @@ import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.viewmo
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.io.Serializable
 
 @AndroidEntryPoint
 class FilterSearchFragment : Fragment(), OnItemClickListener {
 
-    private lateinit var binding: FragmentFilterSearchBinding
+    private var _binding: FragmentFilterSearchBinding? = null
+    private val binding get() = _binding!!
     private var adapterFilterMealItem: AdapterFilterMealItem? = null
     private var adapterFilterDietItem: AdapterFilterDietItem? = null
     private var adapterFilterCookBookItem: AdapterFilterCookTimeItem? = null
@@ -53,7 +53,7 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        binding = FragmentFilterSearchBinding.inflate(inflater, container, false)
+        _binding = FragmentFilterSearchBinding.inflate(inflater, container, false)
 
         (activity as? MainActivity)?.binding?.apply {
             llIndicator.visibility = View.GONE
@@ -114,14 +114,19 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
                     showDataInUi(apiModel.data)
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
+        }
+    }
+
+
+    private fun handleError(code: Int?, message: String?) {
+        if (code == ErrorMessage.code) {
+            showAlert(message, true)
+        } else {
+            showAlert(message, false)
         }
     }
 
@@ -190,8 +195,7 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
                     justifyContent = JustifyContent.FLEX_START
                 }
 
-                adapterFilterCookBookItem =
-                    AdapterFilterCookTimeItem(displayList.toMutableList(), requireActivity(), this)
+                adapterFilterCookBookItem = AdapterFilterCookTimeItem(displayList.toMutableList(), requireActivity(), this)
                 binding.rcyCookTime.layoutManager = flexboxLayoutManager
                 binding.rcyCookTime.adapter = adapterFilterCookBookItem
 
@@ -235,6 +239,11 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
 
         }
 
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }
