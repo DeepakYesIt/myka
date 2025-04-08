@@ -169,6 +169,10 @@ class LoginFragment : Fragment() {
             findNavController().navigate(R.id.signUpFragment)
         }
 
+       /* binding.tvTitle.setOnClickListener{
+            findNavController().navigate(R.id.turnOnLocationFragment)
+        }
+*/
         binding.imgEye.setOnClickListener {
             if (binding.etSignPassword.transformationMethod === PasswordTransformationMethod.getInstance()) {
                 binding.etSignPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()

@@ -1,6 +1,5 @@
 package com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen
 
-
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
@@ -50,6 +49,7 @@ import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.apires
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.model.SearchMealUrlModel
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.model.SearchMealUrlModelData
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.viewmodel.SearchRecipeViewModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.HomeApiResponse
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
@@ -57,7 +57,6 @@ import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Locale
-
 
 @AndroidEntryPoint
 class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
@@ -124,20 +123,20 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
     }
 
     private fun lunchApi() {
-        if (BaseApplication.isOnline(requireActivity())) {
-            BaseApplication.showMe(requireContext())
-            lifecycleScope.launch {
-                searchRecipeViewModel.recipeforSearchApi {
-                    BaseApplication.dismissMe()
-                    when (it) {
-                        is NetworkResult.Success -> handleSuccessResponse(it.data.toString())
-                        is NetworkResult.Error -> showAlert(it.message, false)
-                        else -> showAlert(it.message, false)
-                    }
-                }
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            searchRecipeViewModel.recipeforSearchApi {
+                BaseApplication.dismissMe()
+                handleApiSearchResponse(it)
             }
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
+    private fun handleApiSearchResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessSearchPreferences(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
         }
     }
 
@@ -146,7 +145,7 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessResponse(data: String) {
+    private fun handleSuccessSearchPreferences(data: String) {
         try {
             val apiModel = Gson().fromJson(data, SearchApiResponse::class.java)
             Log.d("@@@ Recipe Details ", "message :- $data")
@@ -165,21 +164,6 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
             showAlert(message, true)
         } else {
             showAlert(message, false)
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun handleSuccessPreferences(data: String) {
-        try {
-            val gson = Gson()
-            val updateModel = gson.fromJson(data, UpdatePreferenceSuccessfully::class.java)
-            if (updateModel.code == 200 && updateModel.success) {
-                lunchApi()
-            } else {
-                handleError(updateModel.code,updateModel.message)
-            }
-        }catch (e:Exception){
-            Log.d("bodyGoal@@@","message"+e.message)
         }
     }
 
@@ -279,8 +263,6 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
                 }
             }
         })
-
-
     }
 
     private fun resetLists() {
@@ -494,32 +476,51 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
                 findNavController().navigate(R.id.filterSearchFragment)
             }
             R.id.imgPreferences->{
-                upDatePreferences()
+                if (BaseApplication.isOnline(requireActivity())){
+                    upDatePreferences()
+                }else{
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
     }
 
     private fun upDatePreferences() {
-        if (BaseApplication.isOnline(requireActivity())) {
-//            BaseApplication.showMe(requireContext())
-            lifecycleScope.launch {
-                searchRecipeViewModel.recipePreferencesApi {
-                    BaseApplication.dismissMe()
-                    when (it) {
-                        is NetworkResult.Success -> handleSuccessPreferences(it.data.toString())
-                        is NetworkResult.Error -> showAlert(it.message, false)
-                        else -> showAlert(it.message, false)
-                    }
-                }
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            searchRecipeViewModel.recipePreferencesApi{
+                BaseApplication.dismissMe()
+                handleApiResponse(it)
             }
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
+    private fun handleApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessPreferences(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessPreferences(data: String) {
+        try {
+            val updateModel = Gson().fromJson(data, UpdatePreferenceSuccessfully::class.java)
+            if (updateModel.code == 200 && updateModel.success) {
+                lunchApi()
+            } else {
+                handleError(updateModel.code,updateModel.message)
+            }
+        }catch (e:Exception){
+            Log.d("bodyGoal@@@","message"+e.message)
         }
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
             val bundle = Bundle().apply {
                 putString("recipeName",status)
+                putString("screenType","Search")
             }
             findNavController().navigate(R.id.searchedRecipeBreakfastFragment,bundle)
     }

@@ -34,6 +34,7 @@ import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.viewmo
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.io.Serializable
 
 @AndroidEntryPoint
 class FilterSearchFragment : Fragment(), OnItemClickListener {
@@ -43,9 +44,9 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
     private var adapterFilterDietItem: AdapterFilterDietItem? = null
     private var adapterFilterCookBookItem: AdapterFilterCookTimeItem? = null
     private lateinit var filterSearchViewModel: FilterSearchViewModel
-    private var fullListMealType:MutableList<MealType>?=null
-    private var originalFullList:MutableList<Diet>?=null
-    private var fullListCookTime:MutableList<CookTime>?=null
+    private var fullListMealType: MutableList<MealType>? = null
+    private var originalFullList: MutableList<Diet>? = null
+    private var fullListCookTime: MutableList<CookTime>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,10 +65,11 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
         backButton()
 
         initialize()
+
         // This Api call when the screen in loaded
-        if (BaseApplication.isOnline(requireActivity())){
+        if (BaseApplication.isOnline(requireActivity())) {
             launchApi()
-        }else{
+        } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
@@ -75,7 +77,9 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
     }
 
     private fun backButton() {
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
                 }
@@ -124,11 +128,11 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
     private fun showDataInUi(data: FilterSearchModelData) {
         try {
             if (data.mealType != null && data.mealType.size > 0) {
-                fullListMealType=data.mealType
+                fullListMealType = data.mealType
                 val mealTypeList = data.mealType ?: return
                 val mealTypeDisplayList = if (mealTypeList.size > 5) {
                     mealTypeList.take(5).toMutableList().apply {
-                        add(MealType(id=-1,image="",name = "More",selected = true))
+                        add(MealType(id = -1, image = "", name = "More", selected = true))
                     }
                 } else {
                     mealTypeList
@@ -140,17 +144,18 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
                     justifyContent = JustifyContent.FLEX_START
                 }
 
-                adapterFilterMealItem = AdapterFilterMealItem(mealTypeDisplayList, requireActivity(), this)
+                adapterFilterMealItem =
+                    AdapterFilterMealItem(mealTypeDisplayList, requireActivity(), this)
                 binding.rcyMealType.layoutManager = flexboxLayoutManager
                 binding.rcyMealType.adapter = adapterFilterMealItem
             }
 
             if (data.Diet != null && data.Diet.size > 0) {
-                originalFullList=data.Diet
+                originalFullList = data.Diet
                 val dietList = data.Diet ?: return
                 val dietDisplayList = if (dietList.size > 5) {
                     dietList.take(5).toMutableList().apply {
-                        add(Diet(name = "More",selected = true))
+                        add(Diet(name = "More", selected = true))
                     }
                 } else {
                     dietList
@@ -168,7 +173,7 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
             }
             if (data.cook_time != null && data.cook_time.size > 0) {
 
-                fullListCookTime=data.cook_time
+                fullListCookTime = data.cook_time
                 val cookTimeList = data.cook_time ?: return
 
                 val displayList = if (cookTimeList.size > 5) {
@@ -185,7 +190,8 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
                     justifyContent = JustifyContent.FLEX_START
                 }
 
-                adapterFilterCookBookItem = AdapterFilterCookTimeItem(displayList.toMutableList(), requireActivity(), this)
+                adapterFilterCookBookItem =
+                    AdapterFilterCookTimeItem(displayList.toMutableList(), requireActivity(), this)
                 binding.rcyCookTime.layoutManager = flexboxLayoutManager
                 binding.rcyCookTime.adapter = adapterFilterCookBookItem
 
@@ -201,25 +207,28 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
     }
 
     private fun initialize() {
+
         binding.relBackFiltered.setOnClickListener {
             findNavController().navigateUp()
         }
+
         binding.relApplyBtn.setOnClickListener {
+          /*  val bundle = Bundle()
+            bundle.putSerializable("recently", recentlyPostData as Serializable?)*/
             findNavController().navigate(R.id.searchedRecipeBreakfastFragment)
         }
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
-
-        if (type=="MealType"){
+        if (type == "MealType") {
             if (status == "More") {
                 adapterFilterMealItem!!.updateList(fullListMealType)    // refresh adapter with full list
             }
-        } else if (type=="Diet"){
+        } else if (type == "Diet") {
             if (status == "More") {
                 adapterFilterDietItem!!.updateList(originalFullList)    // refresh adapter with full list
             }
-        }else{
+        } else {
             if (status == "More") {
                 adapterFilterCookBookItem!!.updateList(fullListCookTime)    // refresh adapter with full list
             }

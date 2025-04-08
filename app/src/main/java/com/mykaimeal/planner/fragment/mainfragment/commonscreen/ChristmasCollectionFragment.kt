@@ -270,7 +270,7 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         val currentReferrerId = sessionManagement.getId().toString()
 
         // Base OneLink URL (Replace this with your actual OneLink domain)
-        val baseOneLink = "https://mykaimealplanner.onelink.me/LQhk/"
+        val baseOneLink = "https://mykaimealplanner.onelink.me/mPqu/"
 
         // Manually append query parameters to ensure they appear in the final link
         val deepLinkUrl = Uri.parse(baseOneLink).buildUpon()

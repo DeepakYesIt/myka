@@ -28,5 +28,5 @@ data class MealType(
     val id: Int?,
     val image: String?,
     val name: String?,
-    val selected:Boolean?=false
+    var selected:Boolean?=false
 )

@@ -87,11 +87,8 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private var longitude: String = "0"
     private var cookstatus = false
     private var tAG: String = "Location"
-
-
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
         mutableListOf()
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -132,7 +129,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
         // When screen load then api call
         fetchDataOnLoad()
-
 
         return binding.root
     }

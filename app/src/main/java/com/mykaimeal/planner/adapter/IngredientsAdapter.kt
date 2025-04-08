@@ -37,7 +37,6 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
         val data= ingredientsData?.get(position)
 
         if (data != null) {
-
             if (data.sch_id!=null){
                 holder.binding.textCount.text=data.sch_id.toString()
             }
@@ -89,7 +88,6 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
             }else{
                 holder.binding.layProgess.root.visibility= View.GONE
             }
-
         }
 
 
@@ -110,8 +108,6 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
 
         holder.binding.swipeLayout.setSwipeListener(object : SwipeRevealLayout.SwipeListener {
             override fun onClosed(view: SwipeRevealLayout) {
-
-
             }
 
             override fun onOpened(view: SwipeRevealLayout) {

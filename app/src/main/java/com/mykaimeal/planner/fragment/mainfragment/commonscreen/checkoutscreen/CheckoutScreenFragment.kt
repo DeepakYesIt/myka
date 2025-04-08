@@ -95,7 +95,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
     private var locationManager: LocationManager? = null
     private lateinit var sessionManagement: SessionManagement
     private var rcySavedAddress: RecyclerView? = null
-    private var dialogMiles:Dialog? = null
+    private var dialogMiles: Dialog? = null
 
     private var latitude: String? = ""
     private var longitude: String? = ""
@@ -130,7 +130,8 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         // Inflate the layout for this fragment
         binding = FragmentCheckoutScreenBinding.inflate(layoutInflater, container, false)
 
-        checkoutScreenViewModel = ViewModelProvider(requireActivity())[CheckoutScreenViewModel::class.java]
+        checkoutScreenViewModel =
+            ViewModelProvider(requireActivity())[CheckoutScreenViewModel::class.java]
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         locationManager = requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
@@ -143,7 +144,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         mapView.getMapAsync(this)
 
         requireActivity().onBackPressedDispatcher.addCallback(
-           viewLifecycleOwner,
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
@@ -170,13 +171,13 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
 
         binding!!.layEdit.setOnClickListener {
             val bundle = Bundle().apply {
-                putString("latitude",latitude.toString())
-                putString("longitude",longitude.toString())
-                putString("address",userAddress.toString())
-                putString("addressId","")
-                putString("type","Checkout")
+                putString("latitude", latitude.toString())
+                putString("longitude", longitude.toString())
+                putString("address", userAddress.toString())
+                putString("addressId", "")
+                putString("type", "Checkout")
             }
-            findNavController().navigate(R.id.addressMapFullScreenFragment,bundle)
+            findNavController().navigate(R.id.addressMapFullScreenFragment, bundle)
         }
 
 
@@ -186,9 +187,9 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
 
         binding!!.textPayBtn.setOnClickListener {
             val bundle = Bundle().apply {
-                putString("totalPrices",totalPrices)
+                putString("totalPrices", totalPrices)
             }
-            findNavController().navigate(R.id.addTipScreenFragment,bundle)
+            findNavController().navigate(R.id.addTipScreenFragment, bundle)
         }
 
         binding!!.relSetMeetAtDoor.setOnClickListener {
@@ -264,8 +265,8 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
     @SuppressLint("SetTextI18n")
     private fun showDataInUI(data: CheckoutScreenModelData?) {
 
-        if (data!!.phone != null || data.country_code!=null) {
-            binding!!.tvAddNumber.text = "("+data.country_code+")"+data.phone.toString()
+        if (data!!.phone != null || data.country_code != null) {
+            binding!!.tvAddNumber.text = "(" + data.country_code + ")" + data.phone.toString()
             binding!!.tvAddNumber.setTextColor(Color.parseColor("#000000"))
         }
 
@@ -281,28 +282,31 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
                 !address.longitude.isNullOrEmpty()
             ) {
                 // Build full address string
-                val fullAddress = listOf(address.apart_num, address.street_name,
-                    address.city, address.state, address.country, address.zipcode).joinToString(" ")
+                val fullAddress = listOf(
+                    address.apart_num, address.street_name,
+                    address.city, address.state, address.country, address.zipcode
+                ).joinToString(" ")
 
                 // Store in variable if needed
                 userAddress = fullAddress
                 // Set full address to TextView
                 binding?.tvAddressNames?.text = fullAddress
 
-                if (address.latitude!=null && address.longitude!=null) {
+                if (address.latitude != null && address.longitude != null) {
                     latitude = address.latitude
                     longitude = address.longitude
-                    val lat = latitude?.toDoubleOrNull() ?: 0.0  // Convert String to Double, default to 0.0 if null
+                    val lat = latitude?.toDoubleOrNull()
+                        ?: 0.0  // Convert String to Double, default to 0.0 if null
                     val lng = longitude?.toDoubleOrNull() ?: 0.0
 
-                    updateMarker(lat,lng)
+                    updateMarker(lat, lng)
                 }
             }
         }
 
 
-        if (data.Store!=null){
-            binding!!.tvSuperMarketName.text=data.Store.toString()
+        if (data.Store != null) {
+            binding!!.tvSuperMarketName.text = data.Store.toString()
         }
 
         if (data.note != null) {
@@ -316,25 +320,25 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
             }
         }
 
-        if (data.net_total!=null){
+        if (data.net_total != null) {
             val roundedSubTotal = data.net_total.let {
                 BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
             }
-            binding!!.textSubTotalPrices.text= "$$roundedSubTotal"
+            binding!!.textSubTotalPrices.text = "$$roundedSubTotal"
         }
 
         if (data.tax != null) {
             val roundedBagFees = data.tax.let {
                 BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
             }
-            binding!!.textBagFees.text="$$roundedBagFees"
+            binding!!.textBagFees.text = "$$roundedBagFees"
         }
 
-        if (data.processing!=null){
+        if (data.processing != null) {
             val roundedServices = data.processing.let {
                 BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
             }
-            binding!!.textServicesPrice.text= "$$roundedServices"
+            binding!!.textServicesPrice.text = "$$roundedServices"
         }
 
         if (data.delivery != null) {
@@ -344,25 +348,25 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
             binding!!.textDeliveryPrice.text = "$$roundedDelivery"
         }
 
-        if (data.card!=null){
-            binding!!.relCardDetails.visibility=View.VISIBLE
-            if (data.card.card_num!=null){
-                binding!!.tvCardNumber.text="**** **** **** "+data.card.card_num.toString()
+        if (data.card != null) {
+            binding!!.relCardDetails.visibility = View.VISIBLE
+            if (data.card.card_num != null) {
+                binding!!.tvCardNumber.text = "**** **** **** " + data.card.card_num.toString()
             }
-        }else{
-            binding!!.relCardDetails.visibility=View.GONE
+        } else {
+            binding!!.relCardDetails.visibility = View.GONE
         }
 
         if (data.total != null) {
             val roundedTotal = data.total.let {
                 BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
             }
-            totalPrices=roundedTotal.toString()
+            totalPrices = roundedTotal.toString()
             binding!!.textTotalAmounts.text = "$$roundedTotal"
         }
 
-        if (data.ingredient_count!=null){
-            binding!!.tvItemsCount.text=data.ingredient_count.toString()+" Items"
+        if (data.ingredient_count != null) {
+            binding!!.tvItemsCount.text = data.ingredient_count.toString() + " Items"
         }
 
 
@@ -403,10 +407,11 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         Log.d("Location", "****** $lat, $longi")
         val newYork = LatLng(lat, longi)
 
-            mMap?.clear()
-            val customMarker = bitmapDescriptorFromVector(R.drawable.marker_icon, 50, 50
-            ) // Change with your drawable
-            mMap?.addMarker(MarkerOptions().position(newYork).icon(customMarker))
+        mMap?.clear()
+        val customMarker = bitmapDescriptorFromVector(
+            R.drawable.marker_icon, 50, 50
+        ) // Change with your drawable
+        mMap?.addMarker(MarkerOptions().position(newYork).icon(customMarker))
 
         // 🔹 Disable map movement
         mMap?.uiSettings?.apply {
@@ -449,22 +454,26 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
 
         dialogMiles?.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
-        llSetHome?.setOnClickListener{
-            statusTypes="Home"
+        llSetHome?.setOnClickListener {
+            statusTypes = "Home"
             llSetHome.setBackgroundResource(R.drawable.outline_address_green_border_bg)
             llSetWork?.setBackgroundResource(R.drawable.height_type_bg)
         }
 
-        llSetWork?.setOnClickListener{
-            statusTypes="Work"
+        llSetWork?.setOnClickListener {
+            statusTypes = "Work"
             llSetHome?.setBackgroundResource(R.drawable.height_type_bg)
             llSetWork.setBackgroundResource(R.drawable.outline_address_green_border_bg)
         }
 
-        relTrialBtn?.setOnClickListener{
+        relTrialBtn?.setOnClickListener {
             dialogMiles?.dismiss()
             if (BaseApplication.isOnline(requireContext())) {
-                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
                     getCurrentLocation()
                 } else {
                     requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100)
@@ -537,10 +546,13 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
 
     private fun getCurrentLocation() {
         // Initialize Location manager
-        val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         // Check condition
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-                LocationManager.NETWORK_PROVIDER)) {
+                LocationManager.NETWORK_PROVIDER
+            )
+        ) {
             // When location service is enabled
             // Get last location
             if (ActivityCompat.checkSelfPermission(
@@ -700,7 +712,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
             edtCity.setText(city.toString())
         }
 
-        if (states!=""){
+        if (states != "") {
             edtStates.setText(states.toString())
         }
 
@@ -716,13 +728,13 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         relConfirm.setOnClickListener {
             if (BaseApplication.isOnline(requireContext())) {
                 if (validate()) {
-                    streetName=edtStreetName.text.toString().trim()
-                    streetNum=edtStreetNumber.text.toString().trim()
-                    apartNum=edtApartNumber.text.toString().trim()
-                    city=edtCity.text.toString().trim()
-                    states=edtStates.text.toString().trim()
-                    userAddress=edtAddress.text.toString().trim()
-                    zipcode=edtPostalCode.text.toString().trim()
+                    streetName = edtStreetName.text.toString().trim()
+                    streetNum = edtStreetNumber.text.toString().trim()
+                    apartNum = edtApartNumber.text.toString().trim()
+                    city = edtCity.text.toString().trim()
+                    states = edtStates.text.toString().trim()
+                    userAddress = edtAddress.text.toString().trim()
+                    zipcode = edtPostalCode.text.toString().trim()
                     addFullAddressApi()
                 }
             } else {
@@ -744,7 +756,19 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
                 {
                     BaseApplication.dismissMe()
                     handleApiAddAddressResponse(it)
-                }, latitude, longitude, streetName, streetNum, apartNum, city,states, country, zipcode, "1", "", statusTypes
+                },
+                latitude,
+                longitude,
+                streetName,
+                streetNum,
+                apartNum,
+                city,
+                states,
+                country,
+                zipcode,
+                "1",
+                "",
+                statusTypes
             )
         }
     }
@@ -794,7 +818,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         } else if (edtStates.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.statesEnterError, false)
             return false
-        }else if (edtAddress.text.toString().trim().isEmpty()) {
+        } else if (edtAddress.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.addressError, false)
             return false
         } else if (edtPostalCode.text.toString().trim().isEmpty()) {
@@ -811,13 +835,18 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         Log.d("Location longitude", "********$longitude")
         mMap = gmap
 
-        val lat = latitude?.toDoubleOrNull() ?: 0.0  // Convert String to Double, default to 0.0 if null
+        val lat =
+            latitude?.toDoubleOrNull() ?: 0.0  // Convert String to Double, default to 0.0 if null
         val lng = longitude?.toDoubleOrNull() ?: 0.0
         val newYork = LatLng(lat, lng)
-        val customMarker = bitmapDescriptorFromVector(R.drawable.map_marker_icon,45,60) // Change with your drawable
+        val customMarker = bitmapDescriptorFromVector(
+            R.drawable.map_marker_icon,
+            45,
+            60
+        ) // Change with your drawable
 
-/*        val newYork = LatLng(40.7128, -74.0060)
-        val customMarker = bitmapDescriptorFromVector(R.drawable.current_location_marker,50,50) // Change with your drawable*/
+        /*        val newYork = LatLng(40.7128, -74.0060)
+                val customMarker = bitmapDescriptorFromVector(R.drawable.current_location_marker,50,50) // Change with your drawable*/
 //        val customMarker = bitmapDescriptorFromVector(R.drawable.marker_icon,50,50) // Change with your drawable
         mMap?.addMarker(
             MarkerOptions()
@@ -836,7 +865,11 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(newYork, 20f))
     }
 
-    private fun bitmapDescriptorFromVector(vectorResId: Int, width: Int, height: Int): BitmapDescriptor? {
+    private fun bitmapDescriptorFromVector(
+        vectorResId: Int,
+        width: Int,
+        height: Int
+    ): BitmapDescriptor? {
         val vectorDrawable: Drawable? = ContextCompat.getDrawable(requireContext(), vectorResId)
         if (vectorDrawable == null) {
             return null
@@ -884,15 +917,20 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         mapView.onLowMemory()
     }
 
-    override fun itemLongClick(id: Int?, latitudeValue: String?, longitudeValue: String?, isZiggleEnabled: String) {
+    override fun itemLongClick(
+        id: Int?,
+        latitudeValue: String?,
+        longitudeValue: String?,
+        isZiggleEnabled: String
+    ) {
         val bundle = Bundle().apply {
-            putString("latitude",latitudeValue)
-            putString("longitude",longitudeValue)
-            putString("address",isZiggleEnabled)
-            putString("addressId",id.toString())
-            putString("type","Checkout")
+            putString("latitude", latitudeValue)
+            putString("longitude", longitudeValue)
+            putString("address", isZiggleEnabled)
+            putString("addressId", id.toString())
+            putString("type", "Checkout")
         }
-        findNavController().navigate(R.id.addressMapFullScreenFragment,bundle)
+        findNavController().navigate(R.id.addressMapFullScreenFragment, bundle)
         dialogMiles?.dismiss()
     }
 

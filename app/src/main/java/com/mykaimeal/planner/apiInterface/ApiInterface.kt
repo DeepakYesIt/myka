@@ -540,6 +540,14 @@ interface ApiInterface {
         @Field("q") q: String?
     ): Response<JsonObject>
 
+    @FormUrlEncoded
+    @POST(ApiEndPoint.recipeSearch)
+    suspend fun recipeFilterSearchApi(
+        @Field("mealType[]") mealType: MutableList<String>?,
+        @Field("health[]") health: MutableList<String>?,
+        @Field("time[]") time: MutableList<String>?
+    ): Response<JsonObject>
+
 
     @POST(ApiEndPoint.forSearchUrl)
     suspend fun recipeForSearchApi(): Response<JsonObject>
