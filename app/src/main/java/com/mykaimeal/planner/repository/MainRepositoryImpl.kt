@@ -1054,6 +1054,25 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
+    override suspend fun superMarketSaveRequest(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        store: String
+    ) {
+        try {
+            api.superMarketSaveRequestApi(store).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
     override suspend fun moveRecipeRequestApi(
         successCallback: (response: NetworkResult<String>) -> Unit,
         id: String,

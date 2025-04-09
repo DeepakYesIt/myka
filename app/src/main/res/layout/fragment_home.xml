@@ -562,9 +562,8 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                android:paddingHorizontal="@dimen/_8sdp"
-                                android:paddingVertical="@dimen/_6sdp"
+                                android:paddingHorizontal="@dimen/_10sdp"
+                                android:paddingVertical="@dimen/_8sdp"
                                 android:text="Plan a meal"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/_12sdp" />
@@ -604,7 +603,7 @@
                             android:fontFamily="@font/poppins"
                             android:layout_marginTop="@dimen/_5sdp"
                             android:layout_below="@+id/tvMonthlySavings"
-                            android:text="Good job Danny, you are on track to save £0 this month"
+                            android:text="Good job , you are on track to save £0 this month"
                             android:textColor="@color/black"
                             android:textSize="@dimen/_11sdp" />
 
@@ -617,7 +616,6 @@
                             android:layout_marginTop="@dimen/_6sdp"
                             android:background="@drawable/green_fill_corner_bg"
                             android:clickable="false">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

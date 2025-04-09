@@ -331,6 +331,11 @@ interface ApiInterface {
     ): Response<JsonObject>
 
     @FormUrlEncoded
+    @POST(ApiEndPoint.storeUUIDUrl)
+    suspend fun superMarketSaveRequestApi(
+        @Field("store") store: String): Response<JsonObject>
+
+    @FormUrlEncoded
     @POST(ApiEndPoint.moveRecipeUrl)
     suspend fun moveRecipeRequestApi(
         @Field("id") id: String,

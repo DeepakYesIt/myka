@@ -45,15 +45,20 @@ android {
     android {
         buildTypes {
             all {
-                ///old URl 
+                ///old URl
                 /*buildConfigField("String", "BASE_URL", "\"https://myka.tgastaging.com/api/\"")
                 buildConfigField("String", "IMAGE_BASE_URL", "\"https://myka.tgastaging.com\"")*/
 
+                val url="\"https://admin.getmykai.com/api/\""
+
                 //NewURl
-                buildConfigField("String", "BASE_URL", "\"https://admin.getmykai.com/api/\"")
-                buildConfigField("String", "IMAGE_BASE_URL", "\"https://admin.getmykai.com\"")
+                buildConfigField("String", "BASE_URL", url)
+                buildConfigField("String", "IMAGE_BASE_URL", url)
+
             }
         }
+
+
     }
 
 

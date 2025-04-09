@@ -18,7 +18,7 @@
 
     <string name="api_key">AIzaSyC9NuN_f-wESHh3kihTvpbvdrmKlTQurxw</string>
     <string name="tvDescriptions1">Get meal plans tailored to your\n preferences and goals</string>
-    <string name="tvDescriptions2">My Kai adds your meal plan ingredients to your cart and compares prices across nearby stores, giving you the best deals</string>
+    <string name="tvDescriptions2">My Kai adds your meal plan ingredients to\n your cart and compares prices across\n nearby stores, giving you the best deals</string>
     <string name="tvDescription3">Finalize your grocery items and get them delivered straight to your door</string>
     <string name="bit_about_you"><font color="#3C4541"> I’ll need to know a bit </font><font color="#06C169">about you ?</font></string>
     <string name="enter_your_name">Enter your Name</string>
@@ -26,7 +26,7 @@
     <string name="partner_name">Partner\'s name</string>
     <string name="partner_age">Partner\'s age</string>
     <string name="select_gender">Select Gender</string>
-    <string name="myka_meal_planner"> <font color="#06C169">My-Kai</font><font color="#FE9F45"> Meal Planner</font></string>
+    <string name="myka_meal_planner"> <font color="#06C169">My Kai</font><font color="#FE9F45"> Meal Planner</font></string>
     <string name="myka_kitchen_ai"> <font color="#06C169">My Kitchen\'s</font><font color="#FE9F45"> AI</font></string>
     <string name="sept_meal_planner"> <font color="#3C4541">Next meal to be cooked on </font><font color="#06C169">20 Sept.</font></string>
     <string name="login_to_your_account"><font color="#000000">Login to Your</font><font color="#06C169"> Account</font></string>
