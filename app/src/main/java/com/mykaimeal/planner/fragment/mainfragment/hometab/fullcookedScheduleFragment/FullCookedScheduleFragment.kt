@@ -591,8 +591,6 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         }
     }
 
-
-
     private fun removeCurrentDayDialog() {
         val dialogRemoveDay: Dialog = context?.let { Dialog(it) }!!
         dialogRemoveDay.setContentView(R.layout.alert_dialog_current_day)

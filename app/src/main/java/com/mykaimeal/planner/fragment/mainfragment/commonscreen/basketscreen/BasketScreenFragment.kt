@@ -92,6 +92,9 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     private var statusTypes: String? = "Home"
     private var latitude: String? = ""
     private var longitude: String? = ""
+
+    private var userLatitude: String? = ""
+    private var userLongitude: String? = ""
     private lateinit var edtStreetName: EditText
     private lateinit var edtStreetNumber: EditText
     private lateinit var edtApartNumber: EditText
@@ -200,7 +203,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             basketScreenViewModel.getBasketUrl({
                 BaseApplication.dismissMe()
                 handleApiBasketResponse(it)
-            }, "014d3d2e-ad5d-4b00-9198-af07acce2f3a")
+            }, "014d3d2e-ad5d-4b00-9198-af07acce2f3a",userLatitude,userLongitude)
         }
     }
 
@@ -259,12 +262,6 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
-        }
-
-        if (BaseApplication.isOnline(requireActivity())) {
-            getBasketList()
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
     }
 
@@ -991,12 +988,27 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     }
 
 
-    override fun itemLongClick(
-        position: Int?,
-        status: String?,
-        type: String?,
-        isZiggleEnabled: String
-    ) {
+    override fun itemLongClick(position: Int?, status: String?, type: String?, isZiggleEnabled: String) {
+        if (isZiggleEnabled=="Click"){
+            userLatitude=status.toString()
+            userLongitude=type.toString()
+
+            if (BaseApplication.isOnline(requireActivity())) {
+                getBasketList()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }else{
+            val bundle = Bundle().apply {
+                putString("latitude", status)
+                putString("longitude", type)
+                putString("address", isZiggleEnabled)
+                putString("addressId", position.toString())
+                putString("type", "Checkout")
+            }
+            findNavController().navigate(R.id.addressMapFullScreenFragment, bundle)
+            dialogMiles?.dismiss()
+        }
 
     }
 

@@ -128,6 +128,7 @@
     <string name="confirm_your_address"><font color="#000000">Confirm your </font><font color="#06C169"> address</font></string>
     <string name="enter_address">Enter Address</string>
     <string name="snacks">Snacks</string>
+    <string name="select_supermarkets_to_compare">Select Supermarkets to compare</string>
 
 
 </resources>

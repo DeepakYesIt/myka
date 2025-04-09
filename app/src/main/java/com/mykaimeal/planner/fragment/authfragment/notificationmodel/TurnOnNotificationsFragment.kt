@@ -40,7 +40,7 @@ class TurnOnNotificationsFragment : Fragment() {
 
         ///handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()

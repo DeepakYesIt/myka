@@ -160,7 +160,6 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         }
     }
 
-
     private fun handleError(code: Int, message: String) {
         if (code == ErrorMessage.code) {
             showAlert(message, true)
@@ -254,7 +253,6 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
                 removeRecipeDialog(position)
             }
         }
-
     }
 
     private fun addBasketData(uri: String) {

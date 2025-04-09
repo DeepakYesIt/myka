@@ -9,8 +9,8 @@ import javax.inject.Inject
 @HiltViewModel
 class BasketScreenViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
-    suspend fun getBasketUrl(successCallback: (response: NetworkResult<String>) -> Unit,storeId:String?){
-        repository.getBasketUrl({ successCallback(it) },storeId)
+    suspend fun getBasketUrl(successCallback: (response: NetworkResult<String>) -> Unit,storeId:String?,latitude:String?,longitude:String?){
+        repository.getBasketUrl({ successCallback(it) },storeId,latitude, longitude)
     }
 
     suspend fun getAddressUrl(successCallback: (response: NetworkResult<String>) -> Unit){

@@ -1908,9 +1908,9 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
 
 
     override suspend fun getBasketUrl(
-        successCallback: (response: NetworkResult<String>) -> Unit,storeId:String?) {
+        successCallback: (response: NetworkResult<String>) -> Unit,storeId:String?,latitude:String?,longitude:String?) {
         try {
-            api.getBasketListUrl(storeId).apply {
+            api.getBasketListUrl(storeId,latitude, longitude).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

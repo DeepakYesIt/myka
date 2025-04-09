@@ -45,8 +45,13 @@ android {
     android {
         buildTypes {
             all {
-                buildConfigField("String", "BASE_URL", "\"https://myka.tgastaging.com/api/\"")
-                buildConfigField("String", "IMAGE_BASE_URL", "\"https://myka.tgastaging.com\"")
+                ///old URl 
+                /*buildConfigField("String", "BASE_URL", "\"https://myka.tgastaging.com/api/\"")
+                buildConfigField("String", "IMAGE_BASE_URL", "\"https://myka.tgastaging.com\"")*/
+
+                //NewURl
+                buildConfigField("String", "BASE_URL", "\"https://admin.getmykai.com/api/\"")
+                buildConfigField("String", "IMAGE_BASE_URL", "\"https://admin.getmykai.com\"")
             }
         }
     }
@@ -124,7 +129,6 @@ dependencies {
     //image picker
     implementation("com.github.Dhaval2404:ImagePicker:v2.1")
 
-
     // Glide
     implementation ("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
@@ -178,7 +182,6 @@ dependencies {
     implementation ("com.google.guava:guava:32.0.1-jre")
     implementation ("com.hbb20:ccp:2.6.0")
     implementation ("com.github.chthai64:SwipeRevealLayout:1.4.0")
-
 
     implementation ("androidx.work:work-runtime-ktx:2.8.1")
 

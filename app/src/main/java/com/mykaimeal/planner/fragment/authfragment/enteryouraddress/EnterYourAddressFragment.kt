@@ -196,7 +196,7 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
             if (latitude != "" || longitude != "") {
                 fullAddressDialog()
             } else {
-                showAlert("Please add your address", false)
+                commonWorkUtils.alertDialog(requireActivity(),ErrorMessage.addAddressError,false)
             }
         }
     }
@@ -270,7 +270,6 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
         }
 
         imageCross.setOnClickListener {
-
             dialogMiles.dismiss()
         }
     }
@@ -314,7 +313,7 @@ class EnterYourAddressFragment : Fragment(), OnMapReadyCallback {
             val apiModel = Gson().fromJson(data, AddAddressModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success == true) {
-                findNavController().navigate(R.id.notificationFragment)
+                findNavController().navigate(R.id.turnOnNotificationsFragment)
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
