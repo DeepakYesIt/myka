@@ -40,67 +40,6 @@ data class Breakfast(
     val user_id: Int?
 )
 
-data class Teatime(
-    val created_at: String?,
-    val date: String?,
-    val day: Any?,
-    val deleted_at: Any?,
-    val id: Int?,
-    val plan_type: Int?,
-    val recipe: Recipe?,
-    val status: Int?,
-    val type: String?,
-    val updated_at: String?,
-    val uri: String?,
-    val user_id: Int?
-)
-
-data class Snacks(
-    val created_at: String?,
-    val date: String?,
-    val day: Any?,
-    val deleted_at: Any?,
-    val id: Int?,
-    val plan_type: Int?,
-    val recipe: Recipe?,
-    val status: Int?,
-    val type: String?,
-    val updated_at: String?,
-    val uri: String?,
-    val user_id: Int?
-)
-
-
-data class Dinner(
-    val created_at: String?,
-    val date: String?,
-    val day: Any?,
-    val deleted_at: Any?,
-    val id: Int?,
-    val plan_type: Int?,
-    val recipe: Recipe?,
-    val status: Int?,
-    val type: String?,
-    val updated_at: String?,
-    val uri: String?,
-    val user_id: Int?
-)
-
-data class Lunch(
-    val created_at: String?,
-    val date: String?,
-    val day: Any?,
-    val deleted_at: Any?,
-    val id: Int?,
-    val plan_type: Int?,
-    val recipe: Recipe?,
-    val status: Int?,
-    val type: String?,
-    val updated_at: String?,
-    val uri: String?,
-    val user_id: Int?
-)
-
 data class Recipe(
     val calories: Double?,
     val cautions: MutableList<Any?>,
@@ -123,38 +62,9 @@ data class Recipe(
     val totalTime: Int?,
     val totalWeight: Double?,
     val uri: String?,
-    val url: String?,
-    val yield: Int?
+    val url: String?
 )
 
-
-/*data class RecipeX(
-    val calories: Double,
-    val cautions: List<String>,
-    val co2EmissionsClass: String,
-    val cuisineType: List<String>,
-    val dietLabels: List<String>,
-    val digest: List<Digest>,
-    val dishType: List<String>,
-    val glycemicIndex: Double,
-    val healthLabels: List<String>,
-    val image: String,
-    val images: Images,
-    val ingredientLines: List<String>,
-    val ingredients: List<Ingredient>,
-    val label: String,
-    val mealType: List<String>,
-    val shareAs: String,
-    val source: String,
-    val tags: List<String>,
-    val totalDaily: Any,
-    val totalNutrients: Any,
-    val totalTime: Int,
-    val totalWeight: Double,
-    val uri: String,
-    val url: String,
-    val yield: Int
-)*/
 
 data class Digest(
     val daily: Double?,

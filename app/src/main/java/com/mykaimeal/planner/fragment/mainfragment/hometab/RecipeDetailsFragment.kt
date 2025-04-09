@@ -147,14 +147,18 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                 Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
                 findNavController().navigateUp()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
+        }
+    }
+
+    private fun handleError(code: Int, message: String) {
+        if (code == ErrorMessage.code) {
+            showAlert(message, true)
+        } else {
+            showAlert(message, false)
         }
     }
 
@@ -172,11 +176,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                     binding.webView.visibility = View.GONE
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -322,7 +322,6 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             binding.textCookWare.setTextColor(Color.parseColor("#3C4541"))
             binding.textRecipe.setTextColor(Color.parseColor("#3C4541"))
 
-
             binding.relRecipe.visibility = View.GONE
             binding.textStepInstructions.visibility = View.GONE
             binding.relTittleList.visibility = View.VISIBLE
@@ -330,6 +329,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
             binding.layBottomPlanBasket.visibility = View.VISIBLE
             binding.relIngSelectAll.visibility = View.VISIBLE
             binding.webView.visibility = View.GONE
+
             if (viewModel.getRecipeData()?.size!! > 0) {
                 // Update the drawable based on the selectAll state
                 val drawableRes =
@@ -826,11 +826,7 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
                 dialogChooseMealDay.dismiss()
                 Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)

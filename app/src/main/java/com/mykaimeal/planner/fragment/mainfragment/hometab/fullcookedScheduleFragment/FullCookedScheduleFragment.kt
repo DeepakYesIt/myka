@@ -290,6 +290,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                                     dateModel.apply {
                                         status = (index == dropPosition) // Change status based on position
                                         lastDateSelected=updatedDaysBetween[dropPosition].date
+                                        dropDate=updatedDaysBetween[dropPosition].date
                                     }
                                 }
                                 // Notify the adapter to refresh the changed position
@@ -516,7 +517,7 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
         ///relCookChangeSchedule
         binding.rlChangeCookSchedule.setOnClickListener {
             if (validate()) {
-                if (dropDate==""){
+                if (!dropDate.equals("",true)){
                     removeCurrentDayDialog()
                 }
             }

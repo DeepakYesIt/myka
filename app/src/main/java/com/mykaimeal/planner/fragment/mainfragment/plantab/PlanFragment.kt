@@ -170,6 +170,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         // When screen load then api call
         fetchDataOnLoad()
+
         lastDateSelected = currentDateSelected
         // Display current week dates
         showWeekDates()
@@ -393,7 +394,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-
             } else {
                 handleError(apiModel.code,apiModel.message)
             }
@@ -589,15 +589,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                     recipesDateModel!!.kcal != 0 || recipesDateModel!!.carbs != 0
                 ) {
                     if (recipesDateModel!!.show == 1) {
-//                        binding.tvCalories.text = String.format("%.2f", recipesDateModel!!.kcal)
-//                        binding.tvCalories.text = binding.tvCalories.text.toString().take(6) // Allows only the first 5 characters
-//                        binding.tvFats.text = String.format("%.2f", recipesDateModel!!.fat)
-//                        binding.tvFats.text = binding.tvFats.text.toString().take(6) // Allows only the first 5 characters
-//                        binding.tvCarbohydrates.text = String.format("%.2f", recipesDateModel!!.carbs)
-//                        binding.tvCarbohydrates.text = binding.tvCarbohydrates.text.toString().take(6) // Allows only the first 5 characters
-//                        binding.tvProteins.text = String.format("%.2f", recipesDateModel!!.protein)
-//                        binding.tvProteins.text = binding.tvProteins.text.toString().take(6) // Allows only the first 5 characters
-
                         binding.tvCalories.text = ""+recipesDateModel!!.kcal
                         binding.tvFats.text = ""+recipesDateModel!!.fat
                         binding.tvCarbohydrates.text = ""+recipesDateModel!!.carbs
@@ -1248,11 +1239,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                                 // When screen load then api call
                                 fetchDataOnLoad()
                             } else {
-                                if (updateModel.code == ErrorMessage.code) {
-                                    showAlert(updateModel.message, true)
-                                } else {
-                                    showAlert(updateModel.message, false)
-                                }
+                                handleError(updateModel.code,updateModel.message)
                             }
                         } catch (e: Exception) {
                             Log.d("MealRoutine@@@", "message:---" + e.message)
@@ -1262,8 +1249,6 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                     is NetworkResult.Error -> {
                         showAlert(it.message, false)
                     }
-
-
                     else -> {
                         showAlert(it.message, false)
                     }
@@ -1363,11 +1348,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -1509,7 +1490,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                     position,
                     dialogAddRecipe
                 )
-            }, item.recipe?.uri!!, likeType, cookbooktype)
+            }, item.recipe?.uri.toString(), likeType, cookbooktype)
         }
     }
 
@@ -1711,11 +1692,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 }
 
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)

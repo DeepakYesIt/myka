@@ -452,7 +452,7 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
             viewModel.likeUnlikeRequest({
                 BaseApplication.dismissMe()
                 handleLikeAndUnlikeApiResponse(it,position,dialogRemoveRecipe)
-            }, localData[position!!].data?.recipe!!.uri!!,"0","")
+            }, localData[position!!].data?.recipe?.uri.toString(),"0","")
         }
     }
 
