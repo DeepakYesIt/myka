@@ -303,7 +303,8 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
 
             // Extract required fields dynamically
             ingredientList?.forEach { item ->
-                val ingredientString = "${item.ingredientName},${item.quantity},${item.measurement}"
+               /* val ingredientString = "${item.ingredientName},${item.quantity},${item.measurement}"*/
+                val ingredientString = item.ingredientName
                 ingArray.add(ingredientString)
             }
 
@@ -327,7 +328,7 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
             jsonObject.addProperty("totalTime", binding.edtTotalTime.text.toString().trim())
             jsonObject.add("prep", prepArray)
             jsonObject.addProperty("img", recipeMainImageUri ?: "")  // Ensure it's not null
-            jsonObject.addProperty("tags", binding.etRecipeName.text.toString().trim())
+//            jsonObject.addProperty("tags", binding.etRecipeName.text.toString().trim())
 
             Log.d("json object", "******$jsonObject")
 

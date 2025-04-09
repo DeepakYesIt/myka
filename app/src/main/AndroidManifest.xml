@@ -61,7 +61,6 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:host="mykaimealplanner.onelink.me"
-                    android:pathPrefix="/mPqu"
                     android:scheme="https" />
             </intent-filter>
 

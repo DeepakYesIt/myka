@@ -1,6 +1,7 @@
 package com.mykaimeal.planner.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -27,6 +28,13 @@ class AdapterGetAddressItem(private var addressList: MutableList<GetAddressListM
 
         if (itemList!!.type!=null){
             holder.binding.tvSetName.text=itemList.type.toString()
+        }
+
+        if (itemList.primary!=null){
+            if (itemList.primary==1){
+                holder.binding.imgPrimary.visibility=View.VISIBLE
+                onItemClickedListener.itemLongClick(position,itemList.latitude.toString(),itemList.longitude.toString(),"Click")
+            }
         }
 
         val addressParts = listOf(

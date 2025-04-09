@@ -2,8 +2,14 @@ package com.mykaimeal.planner.fragment.mainfragment.commonscreen
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
@@ -18,6 +24,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -47,6 +54,8 @@ import com.mykaimeal.planner.model.DateModel
 import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -302,6 +311,56 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
             ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
         }
     }
+
+
+
+
+
+    private fun generateProductImage(title: String, image: Bitmap, desc: String): Bitmap {
+        val width = 800
+        val height = 400
+        val outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(outputBitmap)
+        canvas.drawColor(Color.WHITE) // Background
+
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+        // Draw product image
+        val imageRect = Rect(20, 50, 170, 200)
+        canvas.drawBitmap(image, null, imageRect, null)
+
+        // Draw title
+        paint.color = Color.BLACK
+        paint.textSize = 48f
+        paint.typeface = Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD)
+        canvas.drawText(title, 200f, 100f, paint)
+
+        // Draw description
+        paint.color = Color.DKGRAY
+        paint.textSize = 36f
+        paint.typeface = Typeface.DEFAULT
+        val lines = breakTextToLines(desc, paint, 580f)
+        var y = 160f
+        for (line in lines) {
+            canvas.drawText(line, 200f, y, paint)
+            y += 42f
+        }
+
+        return outputBitmap
+    }
+
+    private fun breakTextToLines(text: String, paint: Paint, maxWidth: Float): List<String> {
+        val lines = mutableListOf<String>()
+        var remainingText = text
+        while (remainingText.isNotEmpty()) {
+            val count = paint.breakText(remainingText, true, maxWidth, null)
+            lines.add(remainingText.substring(0, count))
+            remainingText = remainingText.substring(count)
+        }
+        return lines
+    }
+
+
 
 
     private fun removeCookBookDialog() {

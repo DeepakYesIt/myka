@@ -69,7 +69,6 @@ suspend fun imageUrlToBase64(imageUrl: String): String? {
 }
 
 
-
 /*fun imageUrlToBase64(imageUrl: String): String? {
     return try {
         val url = URL(imageUrl)

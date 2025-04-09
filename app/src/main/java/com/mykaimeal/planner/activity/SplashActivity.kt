@@ -8,10 +8,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.appsflyer.AppsFlyerConversionListener
 import com.appsflyer.AppsFlyerLib
 import com.appsflyer.deeplink.DeepLinkResult
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.basedata.SessionManagement
+import com.mykaimeal.planner.commonworkutils.AppsFlyerConstants
 import com.mykaimeal.planner.databinding.ActivitySplashBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -37,20 +39,57 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun initialize() {
+
+        val afDevKey: String = AppsFlyerConstants.afDevKey
+
+        // Initialize AppsFlyer
+        AppsFlyerLib.getInstance().init(afDevKey, object : AppsFlyerConversionListener {
+            override fun onConversionDataSuccess(data: Map<String, Any>) {
+                Log.d("AppsFlyer", "Conversion Data: $data")
+            }
+
+            override fun onConversionDataFail(error: String) {
+                Log.e("AppsFlyer", "Conversion Data Error: $error")
+            }
+
+            override fun onAppOpenAttribution(data: Map<String, String>) {
+                Log.d("AppsFlyer", "App Open Attribution: $data")
+            }
+
+            override fun onAttributionFailure(error: String) {
+                Log.e("AppsFlyer", "Attribution Error: $error")
+            }
+        }, this)
+
+        // Enable debugging during development (disable in production)
+        AppsFlyerLib.getInstance().setDebugLog(true)
+
+        // Start AppsFlyer
+        AppsFlyerLib.getInstance().start(this)
+        AppsFlyerLib.getInstance().setAppInviteOneLink("mPqu")
+
+        // Listen for deep links
+        AppsFlyerLib.getInstance().subscribeForDeepLink { deepLinkResult ->
+            when (deepLinkResult.status) {
+                DeepLinkResult.Status.FOUND -> {
+                    val deepLink = deepLinkResult.deepLink
+                    Log.d("AppsFlyer", "Deep link: ${deepLink?.deepLinkValue}")
+                }
+
+                DeepLinkResult.Status.NOT_FOUND -> {
+                    Log.d("AppsFlyer", "Deep link not found.")
+                }
+
+                DeepLinkResult.Status.ERROR -> {
+                    Log.e("AppsFlyer", "Deep link error: ${deepLinkResult.error}")
+                }
+            }
+        }
+
         navigateNext()
 
-        /*lifecycleScope.launch {
-            delay(SPLASH_DELAY)
-            // Check login session and navigate accordingly
-            val targetActivity = if (sessionManagement.getLoginSession()) {
-                MainActivity::class.java
-            } else {
-                IntroPageActivity::class.java
-            }
-            val intent = Intent(this@SplashActivity, targetActivity)
-            startActivity(intent)
-            finish()
-        }*/
+
+
     }
 
     private fun redirectToPlayStore() {

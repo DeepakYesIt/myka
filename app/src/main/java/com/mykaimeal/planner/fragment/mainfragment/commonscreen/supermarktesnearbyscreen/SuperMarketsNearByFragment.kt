@@ -64,17 +64,20 @@ class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener, OnM
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        binding=FragmentSuperMarketsNearByBinding.inflate(layoutInflater, container, false)
+        binding = FragmentSuperMarketsNearByBinding.inflate(layoutInflater, container, false)
 
-        basketDetailsSuperMarketViewModel = ViewModelProvider(requireActivity())[BasketDetailsSuperMarketViewModel::class.java]
+        basketDetailsSuperMarketViewModel =
+            ViewModelProvider(requireActivity())[BasketDetailsSuperMarketViewModel::class.java]
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
 
         mapView = binding.mapView
         mapView.onCreate(savedInstanceState)
@@ -99,29 +102,11 @@ class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener, OnM
             updateButtonStyles(binding.textCollect, binding.textDelivery)
         }
 
-        if (BaseApplication.isOnline(requireActivity())){
-            // This condition for check location run time permission
-            if (ContextCompat.checkSelfPermission(
-                    requireActivity(),
-                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-                    requireActivity(),
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                getCurrentLocation()
-            } else {
-                requestPermissions(
-                    arrayOf(
-                        android.Manifest.permission.ACCESS_FINE_LOCATION,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION
-                    ), 100
-                )
-            }
-        }else{
+        if (BaseApplication.isOnline(requireActivity())) {
+            getSuperMarketsList()
+        } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
-
     }
 
 
@@ -132,74 +117,13 @@ class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener, OnM
         (unselected as TextView).setTextColor(Color.BLACK)
     }
 
-    @SuppressLint("MissingPermission")
-    private fun getCurrentLocation() {
-        // Initialize Location manager
-        val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        // Check condition
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-                LocationManager.NETWORK_PROVIDER
-            )
-        ) {
-            // When location service is enabled
-            // Get last location
-            fusedLocationClient!!.lastLocation.addOnCompleteListener { task ->
-                // Initialize location
-                // Check condition
-                if (task.isSuccessful && task.result != null) {
-                    val location = task.result
-                    // When location result is not
-                    // null set latitude
-                    latitude = location.latitude.toString()
-                    longitude = location.longitude.toString()
-
-                    getSuperMarketsList()
-
-                } else {
-                    // When location result is null
-                    // initialize location request
-                    val locationRequest = LocationRequest()
-                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                        .setInterval(10000)
-                        .setFastestInterval(1000)
-                    // Initialize location call back
-                    val locationCallback: LocationCallback = object : LocationCallback() {
-                        override fun onLocationResult(locationResult: LocationResult) {
-                            // location
-                            val location1 = locationResult.lastLocation
-                            latitude = location1!!.latitude.toString()
-                            longitude = location1.longitude.toString()
-
-                            getSuperMarketsList()
-
-                        }
-                    }
-                    fusedLocationClient!!.requestLocationUpdates(
-                        locationRequest,
-                        locationCallback,
-                        Looper.myLooper()
-                    )
-                }
-            }
-        } else {
-            requestPermissions(
-                arrayOf(
-                    android.Manifest.permission.ACCESS_FINE_LOCATION,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION
-                ), 100
-            )
-        }
-    }
-
-
-
     private fun getSuperMarketsList() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             basketDetailsSuperMarketViewModel.getSuperMarket({
                 BaseApplication.dismissMe()
                 handleMarketApiResponse(it)
-            },latitude, longitude)
+            }, latitude, longitude)
         }
     }
 
@@ -216,13 +140,12 @@ class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener, OnM
     }
 
 
-
     @SuppressLint("SetTextI18n")
     private fun handleMarketSuccessResponse(data: String) {
         try {
             val apiModel = Gson().fromJson(data, SuperMarketModel::class.java)
-            Log.d("@@@ Recipe Details ", "message :- $data")
-            if (apiModel.code == 200 && apiModel.success==true) {
+            Log.d("@@@ Recipe Detailsssss", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success == true) {
                 showUIData(apiModel.data)
             } else {
                 if (apiModel.code == ErrorMessage.code) {
@@ -249,7 +172,6 @@ class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener, OnM
                     val address = store.address
                     val latitude = address?.lat ?: 0.0  // Default to 0.0 if null
                     val longitude = address?.lon ?: 0.0 // Default to 0.0 if null
-
                     storeLocations.add(LatLng(latitude, longitude))
                 }
 

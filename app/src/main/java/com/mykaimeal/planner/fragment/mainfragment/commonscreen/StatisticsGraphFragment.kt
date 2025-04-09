@@ -168,6 +168,47 @@ class StatisticsGraphFragment : Fragment() {
 
     @SuppressLint("RestrictedApi")
     private fun copyShareInviteLink() {
+
+        val currentCampaign = "user_invite"
+        val currentChannel = "mobile_share"
+        val currentReferrerId = sessionManagement.getId().toString()
+        val providerName = sessionManagement.getUserName().toString()
+        val providerImage = sessionManagement.getImage().toString()
+        val userReferralCode = sessionManagement.getReferralCode().toString()
+
+        // Base OneLink URL (Replace this with your actual OneLink domain)
+        val baseOneLink = "https://mykaimealplanner.onelink.me/mPqu/"
+
+        // Manually append query parameters to ensure they appear in the final link
+        val deepLinkUrl = Uri.parse(baseOneLink).buildUpon()
+            .appendQueryParameter("af_user_id", currentReferrerId)
+            .appendQueryParameter("Referrer", userReferralCode)
+            .appendQueryParameter("providerName", providerName)
+            .appendQueryParameter("providerImage", providerImage)
+            .build()
+            .toString()
+
+        Log.d("AppsFlyer", "Generated Deep Link: $deepLinkUrl")
+
+        // Prepare share message
+        val message = "Hi, I am inviting you to download My-Kai app!\n\nClick on the link below:\n$deepLinkUrl"
+
+        // Open share dialog
+        requireActivity().runOnUiThread {
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, message)
+            }
+            requireActivity().startActivity(Intent.createChooser(shareIntent, "Share invite link via"))
+
+            // Log invite event to AppsFlyer
+            val logInviteMap = hashMapOf("referrerId" to currentReferrerId, "campaign" to currentCampaign)
+            ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
+        }
+    }
+
+/*    @SuppressLint("RestrictedApi")
+    private fun copyShareInviteLink() {
         val currentCampaign = "user_invite"
         val currentChannel = "mobile_share"
         val currentReferrerId = sessionManagement.getId().toString()
@@ -215,6 +256,6 @@ class StatisticsGraphFragment : Fragment() {
 
         // Generate the deep link URL
         linkGenerator.generateLink(requireActivity(), listener)
-    }
+    }*/
 
 }

@@ -918,11 +918,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
     }
 
     override fun itemLongClick(
-        id: Int?,
-        latitudeValue: String?,
-        longitudeValue: String?,
-        isZiggleEnabled: String
-    ) {
+        id: Int?, latitudeValue: String?, longitudeValue: String?, isZiggleEnabled: String) {
         val bundle = Bundle().apply {
             putString("latitude", latitudeValue)
             putString("longitude", longitudeValue)

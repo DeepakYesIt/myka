@@ -26,6 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_10sdp"
+            android:layout_toStartOf="@+id/imagePencilIcon"
             android:layout_toEndOf="@+id/imageHome">
 
             <TextView
@@ -38,6 +39,15 @@
                 android:textColor="@color/black"
                 android:textSize="@dimen/_13sdp" />
 
+            <ImageView
+                android:id="@+id/imgPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/tvSetName"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:visibility="gone"
+                android:src="@drawable/circle_fill_tick_icon"/>
+
             <TextView
                 android:id="@+id/tvFullAddress"
                 android:layout_width="wrap_content"
@@ -45,7 +55,7 @@
                 android:layout_below="@+id/tvSetName"
                 android:layout_marginStart="@dimen/_5sdp"
                 android:fontFamily="@font/montserrat_medium"
-                android:text="123 barn cre,  stanmore"
+                android:text="123 barn cre"
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/_10sdp" />
 

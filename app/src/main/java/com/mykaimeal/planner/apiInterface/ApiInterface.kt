@@ -623,7 +623,7 @@ interface ApiInterface {
 
     @FormUrlEncoded
     @POST(ApiEndPoint.getBasketListUrl)
-    suspend fun getBasketListUrl(@Field("store_id") storeId: String?): Response<JsonObject>
+    suspend fun getBasketListUrl(@Field("store_id") storeId: String?,@Field("latitude") latitude:String?,@Field("longitude") longitude:String?): Response<JsonObject>
 
     @POST(ApiEndPoint.getYourRecipeUrl)
     suspend fun getYourRecipeUrl(): Response<JsonObject>
