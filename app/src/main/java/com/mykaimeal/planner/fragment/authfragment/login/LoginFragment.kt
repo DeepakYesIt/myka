@@ -1,10 +1,7 @@
 package com.mykaimeal.planner.fragment.authfragment.login
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
@@ -12,14 +9,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.RelativeLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -31,8 +25,6 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.AuthActivity
 import com.mykaimeal.planner.activity.EnterYourNameActivity
 import com.mykaimeal.planner.activity.MainActivity
-import com.mykaimeal.planner.adapter.RememberMeAdapter
-import com.mykaimeal.planner.adapter.RememberSelect
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
@@ -80,7 +72,8 @@ class LoginFragment : Fragment() {
     private var reasonTakeAway: String? = ""
     private var reasonTakeAwayDesc: String? = ""
     private var token: String = ""
-    private var isFirstTimeTouched = true
+    private var backType: String = ""
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -91,6 +84,7 @@ class LoginFragment : Fragment() {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
 
         (activity as AuthActivity).type
+        backType=(activity as AuthActivity).backType
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
         sessionManagement = SessionManagement(requireContext())
@@ -99,18 +93,28 @@ class LoginFragment : Fragment() {
 
         /// handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    requireActivity().finish()
-                }
+                    moveToNextScreen()
+                 }
             })
 
+        if (backType.equals("yes",true)){
+            binding.imagesBackLogin.visibility=View.VISIBLE
+        }else{
+            binding.imagesBackLogin.visibility=View.GONE
+        }
 
         ///main function using all triggered of this screen
         initialize()
 
         return binding.root
+    }
+
+    private fun moveToNextScreen(){
+        requireActivity().finish()
+
     }
 
     private fun getFcmToken() {
@@ -182,7 +186,7 @@ class LoginFragment : Fragment() {
 
         /// handle on back pressed
         binding.imagesBackLogin.setOnClickListener {
-            requireActivity().finish()
+            moveToNextScreen()
         }
 
         /// handle click event on forgot password & redirection
@@ -207,7 +211,6 @@ class LoginFragment : Fragment() {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
-
     }
 
     private fun getValueFromSession() {
@@ -409,6 +412,7 @@ class LoginFragment : Fragment() {
                 } else {
                     sessionManagement.setLoginSession(true)
                     val intent = Intent(requireActivity(), MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     startActivity(intent)
                     requireActivity().finish()
                 }

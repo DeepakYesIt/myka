@@ -280,6 +280,7 @@ class SettingProfileFragment : Fragment(), View.OnClickListener {
                 sessionManagement.sessionClear()
                 startActivity(Intent(requireActivity(), AuthActivity::class.java).apply {
                     putExtra("type", "login")
+                    putExtra("backType", "no")
                 })
                 requireActivity().finish()
             } else {

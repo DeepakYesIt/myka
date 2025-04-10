@@ -16,7 +16,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/_15sdp">
+            android:layout_marginVertical="@dimen/_10sdp">
 
             <TextView
                 android:id="@+id/tvSuperMarket"
@@ -32,7 +32,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recySuperMarket"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_200sdp"
+                android:layout_height="@dimen/_230sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_marginHorizontal="@dimen/_10sdp"
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
@@ -46,8 +46,7 @@
                 android:layout_below="@+id/recySuperMarket"
                 android:layout_centerHorizontal="true"
                 android:layout_marginHorizontal="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_20sdp"
-                android:layout_marginBottom="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_6sdp"
                 android:background="@drawable/green_btn_background">
 
                 <TextView
@@ -55,16 +54,13 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:fontFamily="@font/poppins"
-                    android:paddingHorizontal="@dimen/_50sdp"
-                    android:paddingVertical="@dimen/_12sdp"
+                    android:paddingHorizontal="@dimen/_40sdp"
+                    android:paddingVertical="@dimen/_8sdp"
                     android:text="Done"
                     android:textColor="@color/white"
                     android:textSize="@dimen/_13sdp" />
-
             </RelativeLayout>
-
         </RelativeLayout>
-
     </androidx.cardview.widget.CardView>
 </RelativeLayout>
 

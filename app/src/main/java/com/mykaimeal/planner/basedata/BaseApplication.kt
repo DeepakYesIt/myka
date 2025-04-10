@@ -64,6 +64,7 @@ object BaseApplication {
                 val intent = Intent(context, AuthActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 }
+                intent.putExtra("backType", "no")
                 context.startActivity(intent)
             }else{
                 dialog.dismiss()
@@ -180,17 +181,18 @@ object BaseApplication {
 
 
     fun showMe(context: Context?) {
+        dialog?.dismiss()
         dialog = Dialog(context!!,R.style.CustomDialog)
-        dialog!!.setContentView(R.layout.my_progess)
-        dialog!!.setCancelable(false)
-        dialog!!.window!!.setDimAmount(0f)
-        dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog!!.show()
+        dialog?.setContentView(R.layout.my_progess)
+        dialog?.setCancelable(false)
+        dialog?.window!!.setDimAmount(0f)
+        dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog?.show()
     }
 
     fun dismissMe() {
         if (dialog != null) {
-            dialog!!.dismiss()
+            dialog?.dismiss()
         }
     }
 

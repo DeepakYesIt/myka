@@ -109,12 +109,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         val main= (activity as MainActivity?)
 
         if (main != null) {
-            // Check if 24 hours have passed since the last dialog was shown
-//            if (main.shouldShowDialog()) {
-//                main.saveCurrentDate()
-//                // fetch location form the user
-//                getLatLong()
-//            }
             main.changeBottom("home")
             main.binding.apply {
                 llIndicator.visibility = View.VISIBLE
@@ -413,6 +407,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         BaseApplication.alertError(requireContext(), message, status)
     }
     
+    @SuppressLint("SetTextI18n")
     private fun initialize() {
 
         if (sessionManagement.getImage() != null) {
@@ -424,12 +419,8 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         }
 
         if (sessionManagement.getUserName() != null) {
-            val name = BaseApplication.getColoredSpanned(
-                "Hello",
-                "#06C169"
-            ) + BaseApplication.getColoredSpanned(", " + sessionManagement.getUserName(), "#000000")
+            val name = BaseApplication.getColoredSpanned("Hello", "#06C169") + BaseApplication.getColoredSpanned(", " + sessionManagement.getUserName(), "#000000")
             binding.tvName.text = Html.fromHtml(name)
-
             binding.tvMonthlySavingsDesc.text="Good job ${sessionManagement.getUserName()}, you are on track to save £0 this month"
         }
 

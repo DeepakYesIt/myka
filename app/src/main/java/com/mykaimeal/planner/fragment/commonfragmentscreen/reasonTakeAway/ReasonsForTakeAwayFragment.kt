@@ -358,7 +358,8 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
     private fun navigateToAuthActivity(type: String) {
         val intent = Intent(requireActivity(), AuthActivity::class.java).apply {
             putExtra("type", type)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            putExtra("backType", "yes")
+//            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
         startActivity(intent)
     }
