@@ -65,11 +65,8 @@ class SuperMarketListAdapter(
                 }
                 holder.binding.tvSuperMarketRupees.text= "$$roundedNetTotal"
             }
-
-
 /*
             holder.binding.tvSuperMarketItems.text = it.store_name ?: ""*/
-
             // ✅ Load image with Glide
             Glide.with(requireActivity)
                 .load(it.image)

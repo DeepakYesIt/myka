@@ -275,7 +275,7 @@
         tools:layout="@layout/fragment_christmas_collection" />
     <fragment
         android:id="@+id/statisticsGraphFragment"
-        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.StatisticsGraphFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.statistics.StatisticsGraphFragment"
         android:label="fragment_statistics_graph"
         tools:layout="@layout/fragment_statistics_graph" />
     <fragment

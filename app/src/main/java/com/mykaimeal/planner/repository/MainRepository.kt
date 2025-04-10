@@ -117,12 +117,7 @@ interface MainRepository {
  suspend fun planDateRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, date: String,planType:String)
  suspend fun getScheduleApi(successCallback: (response: NetworkResult<String>) -> Unit, date: String,planType:String)
  suspend fun createCookBookApi(
-     successCallback: (response: NetworkResult<String>) -> Unit,
-     name: RequestBody?,
-     image: MultipartBody.Part?,
-     status: RequestBody?,
-     id: RequestBody?
- )
+     successCallback: (response: NetworkResult<String>) -> Unit, name: RequestBody?, image: MultipartBody.Part?, status: RequestBody?, id: RequestBody?)
 
  suspend fun likeUnlikeRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,  uri: String,likeType: String,type: String)
 
@@ -223,6 +218,7 @@ interface MainRepository {
     suspend fun removeBasketUrlApi(successCallback: (response: NetworkResult<String>) -> Unit, recipeId:String?)
     suspend fun basketYourRecipeIncDescUrl(successCallback: (response: NetworkResult<String>) -> Unit, uri:String?,quantity:String?)
     suspend fun basketIngIncDescUrl(successCallback: (response: NetworkResult<String>) -> Unit, foodId:String?,quantity:String?)
+    suspend fun makeAddressPrimaryUrl(successCallback: (response: NetworkResult<String>) -> Unit, id:String?)
     suspend fun getMealByUrl(successCallback: (response: NetworkResult<String>) -> Unit, q:String?)
     suspend fun updatePreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit, userName: String?,cookingForType: String?,
                                      userGender:String?,bodyGoal:String?,partnerName:String?,partnerAge:String?,partnerGender:String?,familyMemberName:String?,
@@ -266,5 +262,8 @@ interface MainRepository {
                                         heightType: String?, weight: String?, weightType: String?, activityLevel: String?)
     suspend fun getSelectProductsUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?,productId:String?)
     suspend fun recipeSwapUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?,uri:String?)
+
+    suspend fun generateLinkUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit, link: RequestBody?, image: MultipartBody.Part?)
 
 }

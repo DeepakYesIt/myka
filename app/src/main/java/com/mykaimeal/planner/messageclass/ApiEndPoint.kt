@@ -80,6 +80,7 @@ object ApiEndPoint {
     const val subscriptionGoogleUrl="subscription/google"
     const val getAddressUrl="get-address"
     const val addAddressUrl="add-address"
+    const val makeAddressPrimaryUrl="make-address-primary"
     const val getBasketListUrl="get-basketlist"
     const val getYourRecipeUrl="your-recipe"
     const val getSendSmsUrl="send-sms"
@@ -109,6 +110,8 @@ object ApiEndPoint {
 
     const val addToBasketAllUrl="add-to-basket-all"
     const val userDietSuggestionUrl="user-diet-suggetion"
+
+    const val generateLinkUrl="generate-link"
 
 
 }

@@ -31,7 +31,6 @@ class AdapterCookBookItem(var datalist: MutableList<Data>, private var requireAc
 
     @SuppressLint("DiscouragedApi")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
         try {
             holder.binding.textTittles.text = datalist[position].name
 

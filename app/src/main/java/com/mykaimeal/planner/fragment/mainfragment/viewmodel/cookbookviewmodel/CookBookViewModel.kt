@@ -5,6 +5,8 @@ import com.google.gson.JsonObject
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import javax.inject.Inject
 @HiltViewModel
 class CookBookViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
@@ -41,6 +43,10 @@ class CookBookViewModel @Inject constructor(private val repository: MainReposito
 
     suspend fun deleteCookBookRequest(successCallback: (response: NetworkResult<String>) -> Unit, id: String){
         repository.deleteCookBookRequestApi({ successCallback(it) },id)
+    }
+
+    suspend fun generateLinkUrl(successCallback: (response: NetworkResult<String>) -> Unit, link: RequestBody?, image: MultipartBody.Part?){
+        repository.generateLinkUrl({ successCallback(it) },link,image)
     }
 
 

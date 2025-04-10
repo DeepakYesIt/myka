@@ -166,7 +166,7 @@ class LoginFragment : Fragment() {
         binding.tvSignUp.setOnClickListener {
             findNavController().navigate(R.id.signUpFragment)
         }
-        
+
       /*  binding.tvTitle.setOnClickListener{
 //            findNavController().navigate(R.id.turnOnLocationFragment)
             findNavController().navigate(R.id.turnOnNotificationsFragment)

@@ -207,9 +207,27 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
         }
     }
 
+    private fun addressPrimaryApi(id: String) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            basketScreenViewModel.makeAddressPrimaryUrl({
+                BaseApplication.dismissMe()
+                handleApiPrimaryResponse(it)
+            }, id)
+        }
+    }
+
     private fun handleApiBasketResponse(result: NetworkResult<String>) {
         when (result) {
             is NetworkResult.Success -> handleSuccessBasketResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    private fun handleApiPrimaryResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleApiAddressPrimaryResponse(result.data.toString())
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
@@ -223,6 +241,28 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             if (apiModel.code == 200 && apiModel.success == true) {
                 if (apiModel.data != null) {
                     showDataInUI(apiModel.data)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun handleApiAddressPrimaryResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, GetAddressListModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data != null && apiModel.data.size > 0) {
+                    showDataInAddressUI(apiModel.data)
                 }
             } else {
                 if (apiModel.code == ErrorMessage.code) {
@@ -989,6 +1029,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
 
 
     override fun itemLongClick(position: Int?, status: String?, type: String?, isZiggleEnabled: String) {
+
         if (isZiggleEnabled=="Click"){
             userLatitude=status.toString()
             userLongitude=type.toString()
@@ -998,7 +1039,13 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        }else{
+        }else if (isZiggleEnabled=="SelectPrimary"){
+            if (BaseApplication.isOnline(requireActivity())) {
+                addressPrimaryApi(position.toString())
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        } else{
             val bundle = Bundle().apply {
                 putString("latitude", status)
                 putString("longitude", type)

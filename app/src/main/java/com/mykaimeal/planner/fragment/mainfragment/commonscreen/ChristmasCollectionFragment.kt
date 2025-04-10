@@ -13,6 +13,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -29,6 +30,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.appsflyer.share.LinkGenerator
 import com.appsflyer.share.ShareInviteHelper
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -43,6 +45,7 @@ import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentChristmasCollectionBinding
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.statistics.model.LinkGenerateModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.cookbookviewmodel.CookBookViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.cookbookviewmodel.apiresponse.CookBookDataModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.cookbookviewmodel.apiresponse.CookBookListApiResponse
@@ -54,6 +57,10 @@ import com.mykaimeal.planner.model.DateModel
 import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -83,6 +90,9 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
     private lateinit var spinnerActivityLevel: PowerSpinnerView
     var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
     private lateinit var sessionManagement: SessionManagement
+
+    private var savedfile: File? = null
+    private var generateLinkApp: String? =""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
@@ -255,7 +265,8 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         binding.relShareCookBook.setOnClickListener{
             if (type=="1"){
                 binding.cardViewMenuPopUp.visibility = View.GONE
-                copyShareInviteLink()
+          /*      copyShareInviteLink()*/
+                dynamicValueUpdate()
             }else{
                 commonWorkUtils.alertDialog(requireContext(),ErrorMessage.shareCookBookError,false)
             }
@@ -270,6 +281,132 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
             findNavController().navigate(R.id.createRecipeFragment)
         }
     }
+
+    private fun dynamicValueUpdate(){
+
+        // Step 1: Inflate the layout without adding it to the screen
+        val inflater = LayoutInflater.from(context)
+        val view = inflater.inflate(
+            R.layout.layout_screen_share_content,
+            null
+        )  // replace with your layout name
+
+        // Step 2: Set the values programmatically
+        val titleText = view.findViewById<TextView>(R.id.tvTittles)
+        titleText.text =
+            "Hey! I put together this cookbook in My Kai, and I think you’ll love it! It’s packed with delicious meals, check it out and let me know what you think!"
+
+        val imageView = view.findViewById<ImageView>(R.id.imageMain)
+        imageView.setImageResource(R.mipmap.app_icon) // or use Glide/Picasso to load from URL
+
+        val tvName = view.findViewById<TextView>(R.id.tvName)
+        tvName.text = "My-kai"
+
+        // Step 3 (Optional): Convert view to bitmap if needed for sharing
+        val specWidth = View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY)
+        val specHeight = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        view.measure(specWidth, specHeight)
+        view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+
+        val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        view.draw(canvas)
+
+        val filename = "shared_layout_${System.currentTimeMillis()}.jpg"
+        val file = File(requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename)
+        val outputStream = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream) // use PNG if transparency needed
+        outputStream.flush()
+        outputStream.close()
+
+        // Save file reference
+        savedfile = file
+        copyShareInviteLink()
+
+        Log.d("ImageSave", "Image saved at: ${file.absolutePath}")
+
+        if (BaseApplication.isOnline(requireActivity())) {
+            generateLinkApi()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
+    private fun generateLinkApi() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            val cookBookName = generateLinkApp?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val filePart: MultipartBody.Part? = if (savedfile != null) {
+                val requestBody = savedfile?.asRequestBody(savedfile!!.extension.toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("image", savedfile?.name, requestBody!!)
+            } else {
+                null
+            }
+
+            viewModel.generateLinkUrl({
+                BaseApplication.dismissMe()
+                handleGenerateLinkApiResponse(it)
+            }, cookBookName, filePart)
+        }
+    }
+
+    private fun handleGenerateLinkApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleLinkGenerateSuccessResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleLinkGenerateSuccessResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, LinkGenerateModel::class.java)
+            Log.d("@@@ Plan List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success == true) {
+                if (apiModel.data!=null){
+                    shareLinkApi(apiModel.data)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun shareLinkApi(data: String) {
+        Log.d("dfdfdfdf", "dfdd:----- $data")
+        val dataLink = data.toString()
+
+        // Generate the link using AppsFlyer
+        val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity())
+        // Add only the dataLink as a deep link parameter
+        linkGenerator.addParameter("dataLink", dataLink)
+        val listener: LinkGenerator.ResponseListener = object : LinkGenerator.ResponseListener {
+            override fun onResponse(generatedLink: String) {
+                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, generatedLink)
+                }
+
+                val chooser = Intent.createChooser(shareIntent, "Share invite link via")
+                requireActivity().startActivity(chooser)
+            }
+
+            override fun onResponseError(error: String) {
+                Log.d("LinkGen", "Error generating link: $error")
+            }
+        }
+// Generate the link
+        linkGenerator.generateLink(requireActivity(), listener)
+    }
+
+
 
     @SuppressLint("RestrictedApi")
     private fun copyShareInviteLink() {
@@ -304,62 +441,10 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
             requireActivity().startActivity(Intent.createChooser(shareIntent, "Share invite link via"))
 
             // Log invite event to AppsFlyer
-            val logInviteMap = hashMapOf(
-                "referrerId" to currentReferrerId,
-                "campaign" to currentCampaign
-            )
+            val logInviteMap = hashMapOf("referrerId" to currentReferrerId, "campaign" to currentCampaign)
             ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
         }
     }
-
-
-
-
-
-    private fun generateProductImage(title: String, image: Bitmap, desc: String): Bitmap {
-        val width = 800
-        val height = 400
-        val outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(outputBitmap)
-        canvas.drawColor(Color.WHITE) // Background
-
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-
-        // Draw product image
-        val imageRect = Rect(20, 50, 170, 200)
-        canvas.drawBitmap(image, null, imageRect, null)
-
-        // Draw title
-        paint.color = Color.BLACK
-        paint.textSize = 48f
-        paint.typeface = Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD)
-        canvas.drawText(title, 200f, 100f, paint)
-
-        // Draw description
-        paint.color = Color.DKGRAY
-        paint.textSize = 36f
-        paint.typeface = Typeface.DEFAULT
-        val lines = breakTextToLines(desc, paint, 580f)
-        var y = 160f
-        for (line in lines) {
-            canvas.drawText(line, 200f, y, paint)
-            y += 42f
-        }
-
-        return outputBitmap
-    }
-
-    private fun breakTextToLines(text: String, paint: Paint, maxWidth: Float): List<String> {
-        val lines = mutableListOf<String>()
-        var remainingText = text
-        while (remainingText.isNotEmpty()) {
-            val count = paint.breakText(remainingText, true, maxWidth, null)
-            lines.add(remainingText.substring(0, count))
-            remainingText = remainingText.substring(count)
-        }
-        return lines
-    }
-
 
 
 
@@ -513,7 +598,6 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         }
     }
 
-
     private fun moveRecipeDialog(position: Int?) {
         val dialogMoveRecipe: Dialog = context?.let { Dialog(it) }!!
         dialogMoveRecipe.setContentView(R.layout.alert_dialog_move_dialog)
@@ -579,7 +663,6 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
             }
         }
     }
-
 
     private fun addBasketData(uri: String) {
         BaseApplication.showMe(requireContext())
