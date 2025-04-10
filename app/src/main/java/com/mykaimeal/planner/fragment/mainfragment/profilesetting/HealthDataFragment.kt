@@ -145,13 +145,13 @@ class HealthDataFragment : Fragment() {
                 if (binding.rlAddMoreGoals.visibility == View.GONE) {
                     val searchText = s.toString().trim()
                     if (searchText.isNotEmpty()){
-                        if (searchText.trim()!= searchFor) {
+                        if (!searchText.trim().equals(searchFor,true)) {
                             searchFor = searchText
                             textChangedJob?.cancel()
                             // Launch a new coroutine in the lifecycle scope
                             textChangedJob = lifecycleScope.launch {
                                 delay(1000)  // Debounce time
-                                if (searchText == searchFor) {
+                                if (searchText.equals(searchFor,true)) {
                                     logicBMR("2")
                                 }
                             }
@@ -172,13 +172,13 @@ class HealthDataFragment : Fragment() {
                 if (binding.rlAddMoreGoals.visibility == View.GONE) {
                     val searchText = s.toString().trim()
                     if (searchText.isNotEmpty()){
-                        if (searchText.trim()!= searchFor) {
+                        if (!searchText.trim().equals(searchFor,true)) {
                             searchFor = searchText
                             textChangedJob?.cancel()
                             // Launch a new coroutine in the lifecycle scope
                             textChangedJob = lifecycleScope.launch {
                                 delay(1000)  // Debounce time
-                                if (searchText == searchFor) {
+                                if (searchText.equals(searchFor,true)) {
                                     logicBMR("2")
                                 }
                             }

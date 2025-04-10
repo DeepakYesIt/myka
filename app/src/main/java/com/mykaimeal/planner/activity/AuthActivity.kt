@@ -13,7 +13,8 @@ class AuthActivity : AppCompatActivity() {
 
     private var binding: ActivityAuthBinding?=null
     var type:String=""
-    var REQUEST_CODE:Int=101
+    var backType:String=""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +23,7 @@ class AuthActivity : AppCompatActivity() {
 
         if (intent!=null){
             type=intent.getStringExtra("type").toString()
+            backType=intent.getStringExtra("backType").toString()
         }
 
         //handle destination for using this function
@@ -31,19 +33,15 @@ class AuthActivity : AppCompatActivity() {
 
     //handle destinations for Login or Signup
     private fun startDestination(){
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.frameContainerAuth) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.frameContainerAuth) as NavHostFragment
         val navController = navHostFragment.navController
-
         // Inflate the navigation graph
         val navGraph = navController.navInflater.inflate(R.navigation.main_graph)
-
         if (type == "signup"){
             navGraph.setStartDestination(R.id.signUpFragment)
         }else{
             navGraph.setStartDestination(R.id.loginFragment)
         }
-
         // Set the modified graph to the NavController
         navController.graph = navGraph
 

@@ -35,9 +35,9 @@ class LetsStartOptionActivity : AppCompatActivity() {
     private fun navigateToAuthActivity(type: String) {
         val intent = Intent(this, AuthActivity::class.java).apply {
             putExtra("type", type)
+            putExtra("backType", "yes")
         }
         startActivity(intent)
-        finish()
     }
 
 }

@@ -478,23 +478,23 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         val allViews = listOf(tvBreakfast, tvLunch, tvDinner, tvSnacks, tvTeatime)
 
         tvBreakfast.setOnClickListener {
-            updateSelection("Breakfast", tvBreakfast, allViews)
+            updateSelection(ErrorMessage.Breakfast, tvBreakfast, allViews)
         }
 
         tvLunch.setOnClickListener {
-            updateSelection("Lunch", tvLunch, allViews)
+            updateSelection(ErrorMessage.Lunch, tvLunch, allViews)
         }
 
         tvDinner.setOnClickListener {
-            updateSelection("Dinner", tvDinner, allViews)
+            updateSelection(ErrorMessage.Dinner, tvDinner, allViews)
         }
 
         tvSnacks.setOnClickListener {
-            updateSelection("Snacks", tvSnacks, allViews)
+            updateSelection(ErrorMessage.Snacks, tvSnacks, allViews)
         }
 
         tvTeatime.setOnClickListener {
-            updateSelection("Brunch", tvTeatime, allViews)
+            updateSelection(ErrorMessage.Brunch, tvTeatime, allViews)
         }
 
 

@@ -80,7 +80,8 @@ class LoginFragment : Fragment() {
     private var reasonTakeAway: String? = ""
     private var reasonTakeAwayDesc: String? = ""
     private var token: String = ""
-    private var isFirstTimeTouched = true
+    private var backType: String = ""
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -91,6 +92,7 @@ class LoginFragment : Fragment() {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
 
         (activity as AuthActivity).type
+        backType=(activity as AuthActivity).backType
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
         sessionManagement = SessionManagement(requireContext())
@@ -99,18 +101,28 @@ class LoginFragment : Fragment() {
 
         /// handle on back pressed
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    requireActivity().finish()
-                }
+                    moveToNextScreen()
+                 }
             })
 
+        if (backType.equals("yes",true)){
+            binding.imagesBackLogin.visibility=View.VISIBLE
+        }else{
+            binding.imagesBackLogin.visibility=View.GONE
+        }
 
         ///main function using all triggered of this screen
         initialize()
 
         return binding.root
+    }
+
+    private fun moveToNextScreen(){
+        requireActivity().finish()
+
     }
 
     private fun getFcmToken() {
@@ -166,11 +178,6 @@ class LoginFragment : Fragment() {
         binding.tvSignUp.setOnClickListener {
             findNavController().navigate(R.id.signUpFragment)
         }
-        
-      /*  binding.tvTitle.setOnClickListener{
-//            findNavController().navigate(R.id.turnOnLocationFragment)
-            findNavController().navigate(R.id.turnOnNotificationsFragment)
-        }*/
 
         binding.imgEye.setOnClickListener {
             if (binding.etSignPassword.transformationMethod === PasswordTransformationMethod.getInstance()) {
@@ -186,7 +193,7 @@ class LoginFragment : Fragment() {
 
         /// handle on back pressed
         binding.imagesBackLogin.setOnClickListener {
-            requireActivity().finish()
+            moveToNextScreen()
         }
 
         /// handle click event on forgot password & redirection
@@ -211,7 +218,6 @@ class LoginFragment : Fragment() {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
-
     }
 
     private fun getValueFromSession() {
@@ -413,6 +419,7 @@ class LoginFragment : Fragment() {
                 } else {
                     sessionManagement.setLoginSession(true)
                     val intent = Intent(requireActivity(), MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     startActivity(intent)
                     requireActivity().finish()
                 }

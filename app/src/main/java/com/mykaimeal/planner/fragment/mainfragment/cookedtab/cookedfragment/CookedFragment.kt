@@ -392,7 +392,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
                 // Breakfast
                 if (cookedTabModelData.Breakfast != null && cookedTabModelData.Breakfast.size >0) {
-                    foodListBreakFastAdapter = setupMealAdapter(cookedTabModelData.Breakfast, binding.rcvBreakfast, "BreakFast")
+                    foodListBreakFastAdapter = setupMealAdapter(cookedTabModelData.Breakfast, binding.rcvBreakfast, ErrorMessage.Breakfast)
                     binding.rlBreakfast.visibility = View.VISIBLE
                 } else {
                     binding.rlBreakfast.visibility = View.GONE
@@ -400,7 +400,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
                 // Lunch
                 if (cookedTabModelData.Lunch != null && cookedTabModelData.Lunch.size >0) {
-                    foodListLunchAdapter = setupMealAdapter(cookedTabModelData.Lunch, binding.rcvLunch, "Lunch")
+                    foodListLunchAdapter = setupMealAdapter(cookedTabModelData.Lunch, binding.rcvLunch, ErrorMessage.Lunch)
                     binding.rlLunch.visibility = View.VISIBLE
                 } else {
                     binding.rlLunch.visibility = View.GONE
@@ -408,7 +408,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
                 // Dinner
                 if (cookedTabModelData.Dinner != null && cookedTabModelData.Dinner.size >0) {
-                    foodListDinnerAdapter = setupMealAdapter(cookedTabModelData.Dinner, binding.rcvDinner, "Dinner")
+                    foodListDinnerAdapter = setupMealAdapter(cookedTabModelData.Dinner, binding.rcvDinner, ErrorMessage.Dinner)
                     binding.relDinner.visibility = View.VISIBLE
                 } else {
                     binding.relDinner.visibility = View.GONE
@@ -416,7 +416,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
                 // Snacks
                 if (cookedTabModelData.Snacks != null && cookedTabModelData.Snacks.size >0) {
-                    foodListSnacksAdapter = setupMealAdapter(cookedTabModelData.Snacks, binding.rcvSnacks, "Snacks")
+                    foodListSnacksAdapter = setupMealAdapter(cookedTabModelData.Snacks, binding.rcvSnacks, ErrorMessage.Snacks)
                     binding.relSnacks.visibility = View.VISIBLE
                 } else {
                     binding.relSnacks.visibility = View.GONE
@@ -424,7 +424,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
                 // Teatime
                 if (cookedTabModelData.Teatime != null && cookedTabModelData.Teatime.size >0) {
-                    foodListTeaTimeAdapter = setupMealAdapter(cookedTabModelData.Teatime, binding.rcvTeaTime, "Brunch")
+                    foodListTeaTimeAdapter = setupMealAdapter(cookedTabModelData.Teatime, binding.rcvTeaTime, ErrorMessage.Brunch)
                     binding.relTeaTime.visibility = View.VISIBLE
                 } else {
                     binding.relTeaTime.visibility = View.GONE
@@ -492,11 +492,11 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private fun removeAddServing(type: String, position: Int?, apiType: String) {
         // Map the type to the corresponding list and adapter
         val (mealList, adapter) = when (type) {
-            "BreakFast" -> recipesModel?.Breakfast to foodListBreakFastAdapter
-            "Lunch" -> recipesModel?.Lunch to foodListLunchAdapter
-            "Dinner" -> recipesModel?.Dinner to foodListDinnerAdapter
-            "Snacks" -> recipesModel?.Snacks to foodListSnacksAdapter
-            "Brunch" -> recipesModel?.Teatime to foodListTeaTimeAdapter
+            ErrorMessage.Breakfast -> recipesModel?.Breakfast to foodListBreakFastAdapter
+            ErrorMessage.Lunch -> recipesModel?.Lunch to foodListLunchAdapter
+            ErrorMessage.Dinner -> recipesModel?.Dinner to foodListDinnerAdapter
+            ErrorMessage.Snacks -> recipesModel?.Snacks to foodListSnacksAdapter
+            ErrorMessage.Brunch -> recipesModel?.Teatime to foodListTeaTimeAdapter
             else -> null to null
         }
 
@@ -834,11 +834,11 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
                                 // Define meal types and corresponding UI elements
                                 val mealVisibilityMap = mapOf(
-                                    "BreakFast" to binding.rlBreakfast,
-                                    "Lunch" to binding.rlLunch,
-                                    "Dinner" to binding.relDinner,
-                                    "Snacks" to binding.relSnacks,
-                                    "Teatime" to binding.relTeaTime
+                                    ErrorMessage.Breakfast to binding.rlBreakfast,
+                                    ErrorMessage.Lunch to binding.rlLunch,
+                                    ErrorMessage.Dinner to binding.relDinner,
+                                    ErrorMessage.Snacks to binding.relSnacks,
+                                    ErrorMessage.Brunch to binding.relTeaTime
                                 )
 
                                 // Update adapter and visibility

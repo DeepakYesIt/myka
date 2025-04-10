@@ -150,7 +150,12 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
     private fun handleApiCookBookResponse(result: NetworkResult<String>) {
         when (result) {
             is NetworkResult.Success -> handleSuccessCookBookResponse(result.data.toString())
-            is NetworkResult.Error -> showAlert(result.message, false)
+            is NetworkResult.Error -> {
+                binding.rcyChristmasCollection.visibility=View.GONE
+                binding.tvnoData.visibility=View.VISIBLE
+                showAlert(result.message, false)
+            }
+
             else -> showAlert(result.message, false)
         }
     }
@@ -208,6 +213,8 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
                 handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
+            binding.rcyChristmasCollection.visibility=View.GONE
+            binding.tvnoData.visibility=View.VISIBLE
             showAlert(e.message, false)
         }
     }
