@@ -39,4 +39,9 @@ class BasketScreenViewModel @Inject constructor(private val repository: MainRepo
         repository.addAddressUrl({ successCallback(it) }, latitude, longitude, streetName, streetNum, apartNum, city,state, country, zipcode, primary, id, type)
     }
 
+
+    suspend fun makeAddressPrimaryUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?) {
+        repository.makeAddressPrimaryUrl({ successCallback(it) },id)
+    }
+
 }

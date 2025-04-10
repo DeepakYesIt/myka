@@ -10,7 +10,6 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-
 class CreateCookBookViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
 

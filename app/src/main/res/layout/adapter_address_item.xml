@@ -23,6 +23,7 @@
             app:tint="@color/orange" />
 
         <RelativeLayout
+            android:id="@+id/relSelectHome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_10sdp"

@@ -1,10 +1,7 @@
 package com.mykaimeal.planner.fragment.authfragment.login
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
@@ -12,14 +9,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.RelativeLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -31,8 +25,6 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.AuthActivity
 import com.mykaimeal.planner.activity.EnterYourNameActivity
 import com.mykaimeal.planner.activity.MainActivity
-import com.mykaimeal.planner.adapter.RememberMeAdapter
-import com.mykaimeal.planner.adapter.RememberSelect
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
@@ -178,6 +170,7 @@ class LoginFragment : Fragment() {
         binding.tvSignUp.setOnClickListener {
             findNavController().navigate(R.id.signUpFragment)
         }
+
 
         binding.imgEye.setOnClickListener {
             if (binding.etSignPassword.transformationMethod === PasswordTransformationMethod.getInstance()) {

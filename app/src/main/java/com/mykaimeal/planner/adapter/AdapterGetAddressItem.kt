@@ -60,6 +60,13 @@ class AdapterGetAddressItem(private var addressList: MutableList<GetAddressListM
                 }
             }
         }
+
+        holder.binding.relSelectHome.setOnClickListener{
+            if (itemList.id!=null && itemList.latitude!=null && itemList.longitude!=null){
+                onItemClickedListener.itemLongClick(itemList.id, latitude.toString(), longitude.toString(),"SelectPrimary")
+            }
+        }
+
     }
 
     override fun getItemCount(): Int {

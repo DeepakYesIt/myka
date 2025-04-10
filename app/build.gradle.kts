@@ -101,6 +101,13 @@ dependencies {
 
     implementation ("com.google.mlkit:image-labeling:17.0.7")
 
+
+    ////hfhffhf
+    implementation ("org.jsoup:jsoup:1.16.1")
+
+ /*   ////for app link creating
+    implementation ("com.leocardz:link-preview:1.3.3@aar")*/
+
     ///appsflyer sdk for deeplinking
     implementation("com.appsflyer:af-android-sdk:6.12.1")  // Check for the latest version on AppsFlyer's documentation.
     implementation("com.appsflyer:adrevenue:6.9.0")

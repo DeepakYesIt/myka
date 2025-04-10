@@ -828,6 +828,45 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         return true
     }
 
+    private fun addressPrimaryApi(id: String) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            checkoutScreenViewModel.makeAddressPrimaryUrl({
+                BaseApplication.dismissMe()
+                handleApiPrimaryResponse(it)
+            }, id)
+        }
+    }
+
+    private fun handleApiPrimaryResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleApiAddressPrimaryResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleApiAddressPrimaryResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, GetAddressListModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data != null && apiModel.data.size > 0) {
+                    showDataInAddressUI(apiModel.data)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
 
     override fun onMapReady(gmap: GoogleMap) {
 
@@ -917,17 +956,34 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         mapView.onLowMemory()
     }
 
-    override fun itemLongClick(
-        id: Int?, latitudeValue: String?, longitudeValue: String?, isZiggleEnabled: String) {
-        val bundle = Bundle().apply {
-            putString("latitude", latitudeValue)
-            putString("longitude", longitudeValue)
-            putString("address", isZiggleEnabled)
-            putString("addressId", id.toString())
-            putString("type", "Checkout")
+    override fun itemLongClick(id: Int?, latitudeValue: String?, longitudeValue: String?, isZiggleEnabled: String) {
+        if (isZiggleEnabled=="Click"){
+   /*         latitudeValue=status.toString()
+            longitudeValue=type.toString()*/
+
+            if (BaseApplication.isOnline(requireActivity())) {
+                getCheckoutApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }else if (isZiggleEnabled=="SelectPrimary"){
+            if (BaseApplication.isOnline(requireActivity())) {
+                addressPrimaryApi(id.toString())
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        } else{
+            val bundle = Bundle().apply {
+                putString("latitude", latitudeValue)
+                putString("longitude", longitudeValue)
+                putString("address", isZiggleEnabled)
+                putString("addressId", id.toString())
+                putString("type", "Checkout")
+            }
+            findNavController().navigate(R.id.addressMapFullScreenFragment, bundle)
+            dialogMiles?.dismiss()
         }
-        findNavController().navigate(R.id.addressMapFullScreenFragment, bundle)
-        dialogMiles?.dismiss()
+
     }
 
 }

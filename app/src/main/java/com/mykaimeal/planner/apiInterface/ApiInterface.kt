@@ -767,6 +767,20 @@ interface ApiInterface {
         @Field("type") type: String?,
     ): Response<JsonObject>
 
+    @FormUrlEncoded
+    @POST(ApiEndPoint.makeAddressPrimaryUrl)
+    suspend fun makeAddressPrimaryUrl(
+        @Field("id") id: String?
+    ): Response<JsonObject>
+
+
+    @Multipart
+    @POST(ApiEndPoint.generateLinkUrl)
+    suspend fun generateLinkUrl(
+        @Part("link") name: RequestBody?,
+        @Part image: MultipartBody.Part?
+    ): Response<JsonObject>
+
     /*   @POST("v1/images:annotate")
        fun annotateImage(@Body request: VisionRequest): Call<VisionResponse>*/
 
