@@ -40,6 +40,7 @@ class AdapterCookBookItem(var datalist: MutableList<Data>, private var requireAc
                 holder.binding.cardViews.setBackgroundResource(R.drawable.cardview_border)
             }
 
+
             if (datalist[position].id==0){
                 Glide.with(requireActivity)
                     .load(datalist[position].user_id)

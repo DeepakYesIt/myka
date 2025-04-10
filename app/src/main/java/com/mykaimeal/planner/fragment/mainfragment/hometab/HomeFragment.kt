@@ -85,6 +85,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private var locationManager: LocationManager? = null
     private var latitude: String = "0"
     private var longitude: String = "0"
+    private var storeUuid: String = ""
     private var cookstatus = false
     private var tAG: String = "Location"
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
@@ -163,7 +164,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         lifecycleScope.launch {
             viewModel.homeDetailsRequest {
                 BaseApplication.dismissMe()
-                handleApiResponse(it)
+                handleApiResponse(it,"HomeData")
             }
         }
     }
@@ -176,9 +177,9 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         }
     }
 
-    private fun handleApiResponse(result: NetworkResult<String>) {
+    private fun handleApiResponse(result: NetworkResult<String>,type:String) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessResponse(result.data.toString())
+            is NetworkResult.Success -> handleSuccessResponse(result.data.toString(),type)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
@@ -225,7 +226,20 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 recySuperMarket!!.adapter = adapterSuperMarket
 
                 rlDoneBtn.setOnClickListener {
-                    dialogAddItem.dismiss()
+                    if (!storeUuid.equals("",true)){
+                        if (BaseApplication.isOnline(requireActivity())) {
+                            BaseApplication.showMe(requireContext())
+                            lifecycleScope.launch {
+                                viewModel.superMarketSaveRequest( {
+                                    BaseApplication.dismissMe()
+                                    dialogAddItem.dismiss()
+                                    handleApiResponse(it,"storeData")
+                                },storeUuid)
+                            }
+                        } else {
+                            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                        }
+                    }
                 }
 
             }
@@ -236,15 +250,20 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessResponse(data: String) {
+    private fun handleSuccessResponse(data: String, type: String) {
         try {
             val apiModel = Gson().fromJson(data, HomeApiResponse::class.java)
             Log.d("@@@ Recipe Details ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                showData(apiModel.data)
+                if (type.equals("HomeData",true)){
+                    showData(apiModel.data)
+                }else{
+                    Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_SHORT).show()
+                }
             } else {
                 handleError(apiModel.code,apiModel.message)
             }
+
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
@@ -370,6 +389,21 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                     binding.layTeatime.visibility = View.GONE
                 }
             }
+
+            userDataLocal.monthly_savings?.let {
+                if (sessionManagement.getUserName() != null) {
+                    binding.tvMonthlySavingsDesc.text="Good job ${sessionManagement.getUserName()}, you are on track to save ${it} this month"
+                }
+            }
+
+            userDataLocal.is_supermarket?.let {
+                if (it==1){
+                // fetch location form the user
+                getLatLong()
+                }
+            }
+
+
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
@@ -395,7 +429,10 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 "#06C169"
             ) + BaseApplication.getColoredSpanned(", " + sessionManagement.getUserName(), "#000000")
             binding.tvName.text = Html.fromHtml(name)
+
+            binding.tvMonthlySavingsDesc.text="Good job ${sessionManagement.getUserName()}, you are on track to save £0 this month"
         }
+
 
         binding.rlSeeAllBtn.setOnClickListener(this)
         binding.textSeeAll.setOnClickListener(this)
@@ -722,7 +759,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
     
     override fun itemSelect(position: Int?, status: String?, type: String?) {
-
+        storeUuid=status.toString()
     }
 
     @Deprecated("Deprecated in Java")

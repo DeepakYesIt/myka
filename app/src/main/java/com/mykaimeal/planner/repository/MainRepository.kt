@@ -120,6 +120,7 @@ interface MainRepository {
      successCallback: (response: NetworkResult<String>) -> Unit, name: RequestBody?, image: MultipartBody.Part?, status: RequestBody?, id: RequestBody?)
 
  suspend fun likeUnlikeRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,  uri: String,likeType: String,type: String)
+ suspend fun superMarketSaveRequest(successCallback: (response: NetworkResult<String>) -> Unit,  uuid: String)
 
  suspend fun moveRecipeRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, id: String, cook_book: String)
 

@@ -43,6 +43,8 @@ class SuperMarketListAdapter(
 
         // ✅ Correctly update the background based on selection
         if (selectedPosition == position) {
+            // ✅ Notify selection change
+            onItemSelectListener.itemSelect(position, data!!.store_uuid.toString(), "SuperMarket")
             holder.binding.relativeLayoutMain.setBackgroundResource(R.drawable.supermarket_selection_bg) // Default
         } else {
             holder.binding.relativeLayoutMain.background=null // Selected
@@ -106,9 +108,6 @@ class SuperMarketListAdapter(
             // Refresh the UI for both previously selected and newly selected item
             notifyItemChanged(previousPosition)
             notifyItemChanged(selectedPosition)
-
-            // ✅ Notify selection change
-            onItemSelectListener.itemSelect(position, data!!.store_uuid.toString(), "SuperMarket")
         }
     }
 

@@ -40,6 +40,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
+import com.mykaimeal.planner.activity.AuthActivity
 import com.mykaimeal.planner.adapter.ChooseDayAdapter
 import com.mykaimeal.planner.adapter.ImageViewPagerAdapter
 import com.mykaimeal.planner.adapter.IndicatorAdapter
@@ -120,6 +121,8 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
 
         //using function for find destination graph
         startDestination()
+
+
 //        fetchDataOnLoad()
         startTimer(this@MainActivity)
 
