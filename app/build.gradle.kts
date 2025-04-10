@@ -51,9 +51,11 @@ android {
 
                 val url="\"https://admin.getmykai.com/api/\""
 
+                val imageUrl="\"https://admin.getmykai.com\""
+
                 //NewURl
                 buildConfigField("String", "BASE_URL", url)
-                buildConfigField("String", "IMAGE_BASE_URL", url)
+                buildConfigField("String", "IMAGE_BASE_URL", imageUrl)
 
             }
         }
