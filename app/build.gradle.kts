@@ -57,6 +57,9 @@ android {
                 buildConfigField("String", "BASE_URL", url)
                 buildConfigField("String", "IMAGE_BASE_URL", imageUrl)
 
+
+                
+
             }
         }
 
