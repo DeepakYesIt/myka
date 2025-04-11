@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -12,6 +13,7 @@
         app:cardBackgroundColor="@color/white"
         android:layout_marginHorizontal="@dimen/_15sdp"
         android:elevation="@dimen/_10sdp">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -647,7 +647,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
 
         rlDoneBtn.setOnClickListener {
             if (spinnerActivityLevel.text.toString()
-                    .equals(ErrorMessage.cookBookSelectError, true)
+                    .equals("", true)
             ) {
                 BaseApplication.alertError(
                     requireContext(),

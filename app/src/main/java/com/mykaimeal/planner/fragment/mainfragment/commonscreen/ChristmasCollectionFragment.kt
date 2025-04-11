@@ -229,7 +229,6 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         }
     }
 
-
     private fun handleError(code: Int, message: String) {
         if (code == ErrorMessage.code) {
             showAlert(message, true)
@@ -237,8 +236,6 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
             showAlert(message, false)
         }
     }
-
-
 
     private fun initialize() {
 
@@ -623,7 +620,7 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         getCookBookList()
 
         rlMove.setOnClickListener {
-            if (spinnerActivityLevel.text.toString().equals(ErrorMessage.cookBookSelectError,true)){
+            if (spinnerActivityLevel.text.toString().equals("",true)){
                 BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
             }else {
                 if (BaseApplication.isOnline(requireActivity())) {
