@@ -51,9 +51,11 @@ android {
 
                 val url="\"https://admin.getmykai.com/api/\""
 
+                val imageUrl="\"https://admin.getmykai.com\""
+
                 //NewURl
                 buildConfigField("String", "BASE_URL", url)
-                buildConfigField("String", "IMAGE_BASE_URL", url)
+                buildConfigField("String", "IMAGE_BASE_URL", imageUrl)
 
             }
         }
@@ -99,11 +101,11 @@ dependencies {
     //viewpager
     implementation("androidx.viewpager2:viewpager2:1.1.0")
 
-    implementation ("com.google.mlkit:image-labeling:17.0.7")
+//    implementation ("com.google.mlkit:image-labeling:17.0.7")
 
 
-    ////hfhffhf
-    implementation ("org.jsoup:jsoup:1.16.1")
+//    ////hfhffhf
+//    implementation ("org.jsoup:jsoup:1.16.1")
 
  /*   ////for app link creating
     implementation ("com.leocardz:link-preview:1.3.3@aar")*/
