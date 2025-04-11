@@ -43,6 +43,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
     private var proId: String = ""
     private var proName: String = ""
     private var id: String = ""
+    private var basketProductsDetailsModelData: MutableList<BasketProductsDetailsModelData>?=null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -58,7 +59,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
             ViewModelProvider(requireActivity())[BasketProductsDetailsViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
@@ -79,6 +80,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
         binding.tvDetails.setOnClickListener{
             val bundle = Bundle().apply {
                 putString("SwapProId",proId)
+                putString("SwapProName",proName)
             }
             findNavController().navigate(R.id.basketIngredientsDetailsFragment,bundle)
         }
@@ -97,7 +99,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
             basketProductsDetailsViewModel.getProductsDetailsUrl({
                 BaseApplication.dismissMe()
                 handleApiProductsDetailsApiResponse(it)
-            }, proId)
+            }, proId,proName)
         }
     }
 
@@ -140,7 +142,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
                 binding.tvProductName.text = data.name.toString()
             }
 
-            if (data.price != null) {
+            if (data.formatted_price != null) {
                 binding.tvProductsprices.text = data.formatted_price.toString()
             }
 
@@ -224,8 +226,8 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
     }
 
     private fun showDataInUI(data: MutableList<BasketProductsDetailsModelData>) {
-
         if (data.size > 0) {
+            basketProductsDetailsModelData=data
             binding.relNoProductsFound.visibility = View.GONE
             adapterProductsDetailsSelectItem = AdapterProductsDetailsSelectItem(data, requireActivity(), this)
             binding.rcyProductItems.adapter = adapterProductsDetailsSelectItem
@@ -245,6 +247,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
         }else if (type=="swap"){
             val bundle = Bundle().apply {
                 putString("SwapProId",productId)
+                putString("SwapProName", position?.let { basketProductsDetailsModelData?.get(it)?.name })
             }
             findNavController().navigate(R.id.basketIngredientsDetailsFragment,bundle)
         }

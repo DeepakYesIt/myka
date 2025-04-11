@@ -288,10 +288,12 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
         }
 
         binding.rlUpdateDietRest.setOnClickListener {
-            if (BaseApplication.isOnline(requireContext())) {
-                updateDietaryRestApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            if (status=="2"){
+                if (BaseApplication.isOnline(requireContext())) {
+                    updateDietaryRestApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
 
@@ -381,6 +383,8 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
             status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlUpdateDietRest.isClickable = true
+            binding.rlUpdateDietRest.setBackgroundResource(R.drawable.green_fill_corner_bg)
             return
         }
 
@@ -388,10 +392,13 @@ class DietaryRestrictionsFragment : Fragment(), OnItemClickedListener {
             status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlUpdateDietRest.isClickable = true
+            binding.rlUpdateDietRest.setBackgroundResource(R.drawable.green_fill_corner_bg)
             dietarySelectedId = list!!
         } else {
             status = ""
             binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.rlUpdateDietRest.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
 

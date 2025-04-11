@@ -14,8 +14,8 @@ class BasketProductsDetailsViewModel @Inject constructor(private val repository:
     }
 
 
-    suspend fun getProductsDetailsUrl(successCallback: (response: NetworkResult<String>) -> Unit,proId:String?){
-        repository.getProductsDetailsUrl({ successCallback(it) },proId)
+    suspend fun getProductsDetailsUrl(successCallback: (response: NetworkResult<String>) -> Unit,proId:String?,query:String?){
+        repository.getProductsDetailsUrl({ successCallback(it) },proId,query)
     }
 
     suspend fun getSelectProductsUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?,productId:String?){

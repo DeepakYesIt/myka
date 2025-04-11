@@ -167,11 +167,13 @@ class CookingFrequencyFragment : Fragment(), OnItemClickListener {
         }
 
         binding.rlUpdateCookingFrequency.setOnClickListener {
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireActivity())) {
-                updateCookFrequencyApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            if (status=="2"){
+                ///checking the device of mobile data in online and offline(show network error message)
+                if (BaseApplication.isOnline(requireActivity())) {
+                    updateCookFrequencyApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
     }
@@ -334,6 +336,8 @@ class CookingFrequencyFragment : Fragment(), OnItemClickListener {
             status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlUpdateCookingFrequency.isClickable = true
+            binding.rlUpdateCookingFrequency.setBackgroundResource(R.drawable.green_fill_corner_bg)
             cookingSelect = selectItem.toString()
             return
         }
@@ -342,10 +346,13 @@ class CookingFrequencyFragment : Fragment(), OnItemClickListener {
             status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlUpdateCookingFrequency.isClickable = true
+            binding.rlUpdateCookingFrequency.setBackgroundResource(R.drawable.green_fill_corner_bg)
             cookingSelect = selectItem.toString()
         } else {
             status = ""
             binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.rlUpdateCookingFrequency.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
 

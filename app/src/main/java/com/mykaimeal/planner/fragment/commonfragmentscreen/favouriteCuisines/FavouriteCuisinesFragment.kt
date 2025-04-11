@@ -140,10 +140,12 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
         }
 
         binding.rlUpdateFavCuisine.setOnClickListener {
-            if (BaseApplication.isOnline(requireContext())) {
-                updateFavCuisineApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            if (status=="2"){
+                if (BaseApplication.isOnline(requireContext())) {
+                    updateFavCuisineApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
 
@@ -359,6 +361,8 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
             status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlUpdateFavCuisine.isClickable = true
+            binding.rlUpdateFavCuisine.setBackgroundResource(R.drawable.green_fill_corner_bg)
             favouriteSelectId = list!!
             return
         }
@@ -367,10 +371,13 @@ class FavouriteCuisinesFragment : Fragment(), OnItemClickedListener {
             status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlUpdateFavCuisine.isClickable = true
+            binding.rlUpdateFavCuisine.setBackgroundResource(R.drawable.green_fill_corner_bg)
             favouriteSelectId = list!!
         } else {
             status = ""
             binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.rlUpdateFavCuisine.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
 

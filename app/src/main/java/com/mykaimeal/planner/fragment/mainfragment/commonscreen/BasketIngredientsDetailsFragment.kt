@@ -34,6 +34,7 @@ class BasketIngredientsDetailsFragment : Fragment() {
     private lateinit var binding: FragmentBaseketIngredientsDetailsBinding
     private lateinit var basketProductsDetailsViewModel: BasketProductsDetailsViewModel
     private var proId: String = ""
+    private var proName: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,6 +44,7 @@ class BasketIngredientsDetailsFragment : Fragment() {
         binding = FragmentBaseketIngredientsDetailsBinding.inflate(inflater, container, false)
 
         proId = arguments?.getString("SwapProId", "")?:""
+        proName = arguments?.getString("SwapProName", "")?:""
 
         basketProductsDetailsViewModel = ViewModelProvider(requireActivity())[BasketProductsDetailsViewModel::class.java]
 
@@ -84,7 +86,7 @@ class BasketIngredientsDetailsFragment : Fragment() {
             basketProductsDetailsViewModel.getProductsDetailsUrl({
                 BaseApplication.dismissMe()
                 handleApiProductsDetailsApiResponse(it)
-            }, proId)
+            }, proId,proName)
         }
     }
 
@@ -128,7 +130,7 @@ class BasketIngredientsDetailsFragment : Fragment() {
                 binding.tvIngredientsName.text = data.name.toString()
             }
 
-            if (data.price != null) {
+            if (data.formatted_price != null) {
                 binding.tvActualPrices.text = data.formatted_price.toString()
             }
 

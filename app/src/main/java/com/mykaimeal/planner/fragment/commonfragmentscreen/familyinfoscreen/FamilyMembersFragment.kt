@@ -228,10 +228,12 @@ class FamilyMembersFragment : Fragment() {
             }
         }
         binding.rlUpdateFamMem.setOnClickListener{
-            if (isOnline(requireContext())) {
-                updateFamilyMemInfoApi()
-            } else {
-                alertError(requireContext(), ErrorMessage.networkError, false)
+            if (status=="2"){
+                if (isOnline(requireContext())) {
+                    updateFamilyMemInfoApi()
+                } else {
+                    alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
     }
@@ -277,20 +279,28 @@ class FamilyMembersFragment : Fragment() {
                     status = "2"
                     binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
                     binding.tvNextBtn.isClickable=true
+                    binding.rlUpdateFamMem.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                    binding.rlUpdateFamMem.isClickable=true
                 } else {
                     status = "1"
                     binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
                     binding.tvNextBtn.isClickable=false
+                    binding.rlUpdateFamMem.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                    binding.rlUpdateFamMem.isClickable=false
                 }
             } else {
                 status = "1"
                 binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
                 binding.tvNextBtn.isClickable=false
+                binding.rlUpdateFamMem.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                binding.rlUpdateFamMem.isClickable=false
             }
         } else {
             status = "1"
             binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             binding.tvNextBtn.isClickable=false
+            binding.rlUpdateFamMem.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.rlUpdateFamMem.isClickable=false
         }
     }
     private fun stillSkipDialog() {

@@ -232,10 +232,12 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
             }
 
             R.id.rlUpdateEatingOut->{
-                if (BaseApplication.isOnline(requireActivity())) {
-                    updateEatingOutApi()
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                if (status=="2"){
+                    if (BaseApplication.isOnline(requireActivity())) {
+                        updateEatingOutApi()
+                    } else {
+                        BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                    }
                 }
             }
 
@@ -291,6 +293,8 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
             status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlUpdateEatingOut.isClickable = true
+            binding.rlUpdateEatingOut.setBackgroundResource(R.drawable.green_fill_corner_bg)
             eatingOutSelect = selectItem.toString()
             return
         }
@@ -299,10 +303,13 @@ class EatingOutFragment : Fragment(),View.OnClickListener,OnItemClickListener {
             status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlUpdateEatingOut.isClickable = true
+            binding.rlUpdateEatingOut.setBackgroundResource(R.drawable.green_fill_corner_bg)
             eatingOutSelect = selectItem.toString()
         } else {
             status = ""
             binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.rlUpdateEatingOut.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
 }

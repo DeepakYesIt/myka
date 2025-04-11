@@ -281,10 +281,12 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
           }*/
 
         binding.rlUpdateIngDislike.setOnClickListener {
-            if (BaseApplication.isOnline(requireContext())) {
-                updateIngDislikeApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            if (status=="2"){
+                if (BaseApplication.isOnline(requireContext())) {
+                    updateIngDislikeApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
 
@@ -556,6 +558,8 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
             status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlUpdateIngDislike.isClickable = true
+            binding.rlUpdateIngDislike.setBackgroundResource(R.drawable.green_fill_corner_bg)
             return
         }
 
@@ -563,10 +567,13 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
             status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlUpdateIngDislike.isClickable = true
+            binding.rlUpdateIngDislike.setBackgroundResource(R.drawable.green_fill_corner_bg)
             dislikeSelectedId = list!!
         } else {
             status = ""
             binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.rlUpdateIngDislike.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
 

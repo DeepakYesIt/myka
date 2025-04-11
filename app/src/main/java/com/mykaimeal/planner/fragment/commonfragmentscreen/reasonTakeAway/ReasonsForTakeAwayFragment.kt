@@ -306,10 +306,12 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         }
 
         binding.rlUpdateReasonTakeAway.setOnClickListener{
-            if (isOnline(requireContext())) {
-                updateReasonTakeAwayApi()
-            } else {
-                alertError(requireContext(), ErrorMessage.networkError, false)
+            if (status=="2"){
+                if (isOnline(requireContext())) {
+                    updateReasonTakeAwayApi()
+                } else {
+                    alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
     }
@@ -479,11 +481,15 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                     status = "2"
                     binding.tvNextBtn.isClickable = true
                     binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                    binding.rlUpdateReasonTakeAway.isClickable = true
+                    binding.rlUpdateReasonTakeAway.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 }else{
                     binding.edtext.text.clear()
                     status = ""
                     binding.tvNextBtn.isClickable = false
                     binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                    binding.rlUpdateReasonTakeAway.isClickable = false
+                    binding.rlUpdateReasonTakeAway.setBackgroundResource(R.drawable.gray_btn_unselect_background)
                 }
             }else{
                 reasonSelect = reasonTakeModelData?.get(type!!.toInt())!!.id.toString()
@@ -492,6 +498,8 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 status = "2"
                 binding.tvNextBtn.isClickable = true
                 binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                binding.rlUpdateReasonTakeAway.isClickable = true
+                binding.rlUpdateReasonTakeAway.setBackgroundResource(R.drawable.green_fill_corner_bg)
             }
             return
         }
@@ -501,12 +509,16 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
                 status = ""
                 binding.tvNextBtn.isClickable = false
                 binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                binding.rlUpdateReasonTakeAway.isClickable = false
+                binding.rlUpdateReasonTakeAway.setBackgroundResource(R.drawable.gray_btn_unselect_background)
                 binding.relMainLayout.visibility=View.VISIBLE
                 binding.edtext.text.clear()
             }else{
                 status = "2"
                 binding.tvNextBtn.isClickable = true
                 binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                binding.rlUpdateReasonTakeAway.isClickable = true
+                binding.rlUpdateReasonTakeAway.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 reasonSelect = reasonTakeModelData?.get(type!!.toInt())!!.id.toString()
                 reasonTakeAway = selectItem.toString()
                 reasonTakeAway = ""
@@ -516,11 +528,13 @@ class ReasonsForTakeAwayFragment : Fragment(), OnItemClickListener {
         } else {
             if (reasonTakeModelData?.get(type!!.toInt())!!.name.toString().equals("Add other",true)){
                 binding.tvNextBtn.isClickable = false
+                binding.rlUpdateReasonTakeAway.isClickable = false
                 binding.relMainLayout.visibility=View.GONE
                 binding.edtext.text.clear()
             }
             status = ""
             binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.rlUpdateReasonTakeAway.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
 

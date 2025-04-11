@@ -47,7 +47,6 @@ class StatisticsGraphFragment : Fragment() {
     private lateinit var sessionManagement: SessionManagement
     private lateinit var statisticsViewModel: StatisticsViewModel
     private var referLink: String =""
-    private var myImage: String =""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,7 +62,6 @@ class StatisticsGraphFragment : Fragment() {
 
         statisticsViewModel = ViewModelProvider(this)[StatisticsViewModel::class.java]
         sessionManagement = SessionManagement(requireActivity())
-        myImage= R.string.drawableimage.toString()
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -147,7 +145,7 @@ class StatisticsGraphFragment : Fragment() {
 
         binding.textInviteFriends.setOnClickListener {
 
-            shareImageWithText(myImage,"Hey! I put together this cookbook in My" +
+            shareImageWithText("Hey! I put together this cookbook in My" +
                     "Kai, and I think you’ll love it! It’s packed with delicious meals, check it out and let me know what you think!" +
                     "\nclick on the link below:\n\n",
                 referLink)
@@ -171,21 +169,16 @@ class StatisticsGraphFragment : Fragment() {
         startActivity(playStoreIntent)
     }
 
-    private fun shareImageWithText(imageUrl: String, description: String,  link: String) {
+    private fun shareImageWithText(description: String,  link: String) {
         // Download image using Glide
         Glide.with(requireContext())
             .asBitmap() // Request a Bitmap image
-            .load(imageUrl) // Provide the URL to load the image from
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(
-                    resource: Bitmap,
-                    transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?
-                ) {
+            .load(R.mipmap.app_icon) // Provide the URL to load the image from
+            .into(object : CustomTarget<Bitmap>() { override fun onResourceReady(resource: Bitmap,
+                    transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
                     try {
                         // Save the image to a file in the app's external storage
-                        val file = File(
-                            requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                            "shared_image.png"
+                        val file = File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "shared_image.png"
                         )
                         val fos = FileOutputStream(file)
                         resource.compress(Bitmap.CompressFormat.PNG, 100, fos)
@@ -228,27 +221,23 @@ class StatisticsGraphFragment : Fragment() {
     private fun copyShareInviteLink() {
         val currentCampaign = "user_invite"
         val currentChannel = "mobile_share"
-        val afUserId = sessionManagement.getId().toString()        // af_user_id=277
-        val referrerCode = sessionManagement.getReferralCode().toString() // Referrer=2105917
 
-        // Dummy values for example
-        val providerName = sessionManagement.getUserName().toString()
-        val providerImage = sessionManagement.getImage().toString() // or pass an actual URL if available
+        val afUserId = sessionManagement.getId()?.toString().orEmpty()
+        val referrerCode = sessionManagement.getReferralCode()?.toString().orEmpty()
+        val providerName = sessionManagement.getUserName()?.toString().orEmpty()
+        val providerImage = sessionManagement.getImage()?.toString().orEmpty()
 
         val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity())
+            .setBaseDeeplink("https://mykaimealplanner.onelink.me/mPqu")
 
-        // Add your custom parameters here
+        linkGenerator.campaign = currentCampaign
+        linkGenerator.channel = currentChannel
+
         linkGenerator.addParameter("af_user_id", afUserId)
         linkGenerator.addParameter("Referrer", referrerCode)
         linkGenerator.addParameter("providerName", providerName)
         linkGenerator.addParameter("providerImage", providerImage)
-
-        // Set campaign and channel if required by your AppsFlyer setup
-        linkGenerator.campaign = currentCampaign
-        linkGenerator.channel = currentChannel
-
         Log.d(LOG_TAG, "Link params: ${linkGenerator.userParams}")
-
         val listener = object : LinkGenerator.ResponseListener {
             override fun onResponse(s: String) {
                 referLink = s
@@ -262,6 +251,4 @@ class StatisticsGraphFragment : Fragment() {
 
         linkGenerator.generateLink(requireActivity(), listener)
     }
-
-
 }
