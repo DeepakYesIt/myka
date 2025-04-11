@@ -1066,22 +1066,10 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
         rlDoneBtn.setOnClickListener {
             if (spinnerActivityLevel.text.toString().equals("", true)) {
-                BaseApplication.alertError(
-                    requireContext(),
-                    ErrorMessage.selectCookBookError,
-                    false
-                )
+                BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
             } else {
                 val cookBookType = cookbookList[spinnerActivityLevel.selectedIndex].id
-                recipeLikeAndUnlikeData(
-                    item,
-                    type,
-                    mealList,
-                    position,
-                    likeType,
-                    cookBookType.toString(),
-                    dialogAddRecipe
-                )
+                recipeLikeAndUnlikeData(item, type, mealList, position, likeType, cookBookType.toString(), dialogAddRecipe)
             }
         }
     }

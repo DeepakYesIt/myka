@@ -712,7 +712,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
 
         rlDoneBtn.setOnClickListener{
-            if (spinnerActivityLevel.text.toString().equals(ErrorMessage.cookBookSelectError,true)){
+            if (spinnerActivityLevel.text.toString().equals("",true)){
                 BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
             }else {
                 val cookbooktype = cookbookList[spinnerActivityLevel.selectedIndex].id

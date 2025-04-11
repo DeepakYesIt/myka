@@ -47,6 +47,7 @@ class StatisticsGraphFragment : Fragment() {
     private lateinit var sessionManagement: SessionManagement
     private lateinit var statisticsViewModel: StatisticsViewModel
     private var referLink: String =""
+    private var myImage: String =""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,8 +62,8 @@ class StatisticsGraphFragment : Fragment() {
         }
 
         statisticsViewModel = ViewModelProvider(this)[StatisticsViewModel::class.java]
-
         sessionManagement = SessionManagement(requireActivity())
+        myImage= R.string.drawableimage.toString()
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -80,7 +81,6 @@ class StatisticsGraphFragment : Fragment() {
             SpendingChartView.BarData(200f, "03", "Jun", Color.parseColor("#FF4040")),)
 
         binding.spendingChart.setData(data, 1566f, 60f)
-
 
         initialize()
 
@@ -147,10 +147,10 @@ class StatisticsGraphFragment : Fragment() {
 
         binding.textInviteFriends.setOnClickListener {
 
-            shareImageWithText("https://admin.getmykai.com/admin/image/67f768176d1b7.jpg","Hi, I am inviting you to download My-Kai app! Click on the link below:",referLink)
-            /*shareImageWithText("https://admin.getmykai.com/admin/image/67f768176d1b7.jpg","Hey! I put together this cookbook in My\n" +
-                    "Kai, and I think you’ll love it! It’s packed with delicious meals, check it out and let me know what you think!",
-                referLink)*/
+            shareImageWithText(myImage,"Hey! I put together this cookbook in My" +
+                    "Kai, and I think you’ll love it! It’s packed with delicious meals, check it out and let me know what you think!" +
+                    "\nclick on the link below:\n\n",
+                referLink)
 
 //            dynamicValueUpdate()
             /* copyShareInviteLink()*/
@@ -224,59 +224,44 @@ class StatisticsGraphFragment : Fragment() {
             })
     }
 
+    @SuppressLint("RestrictedApi")
+    private fun copyShareInviteLink() {
+        val currentCampaign = "user_invite"
+        val currentChannel = "mobile_share"
+        val afUserId = sessionManagement.getId().toString()        // af_user_id=277
+        val referrerCode = sessionManagement.getReferralCode().toString() // Referrer=2105917
 
+        // Dummy values for example
+        val providerName = sessionManagement.getUserName().toString()
+        val providerImage = sessionManagement.getImage().toString() // or pass an actual URL if available
 
-        @SuppressLint("RestrictedApi")
-        private fun copyShareInviteLink() {
-            val currentCampaign = "user_invite"
-            val currentChannel = "mobile_share"
-            val currentReferrerId = sessionManagement.getId().toString()
-            val userReferralCode = sessionManagement.getReferralCode().toString()
+        val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity())
 
-            // Ensure the generated URL has the right structure
-            val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity())
-            linkGenerator.addParameter("deep_link_sub2", currentReferrerId)
-            linkGenerator.addParameter("deep_link_sub3", userReferralCode)
-            linkGenerator.campaign = currentCampaign
-            linkGenerator.channel = currentChannel
+        // Add your custom parameters here
+        linkGenerator.addParameter("af_user_id", afUserId)
+        linkGenerator.addParameter("Referrer", referrerCode)
+        linkGenerator.addParameter("providerName", providerName)
+        linkGenerator.addParameter("providerImage", providerImage)
 
-            Log.d(LOG_TAG, "Link params: ${linkGenerator.userParams}")
+        // Set campaign and channel if required by your AppsFlyer setup
+        linkGenerator.campaign = currentCampaign
+        linkGenerator.channel = currentChannel
 
-            val listener: LinkGenerator.ResponseListener = object : LinkGenerator.ResponseListener {
-                override fun onResponse(s: String) {
-                    Log.d(
-                        LOG_TAG,
-                        "Hey! I put together this cookbook in My Kai, and I think you’ll love it! It’s packed with delicious meals, check it out and let me know what you think!\n\nclick on the link below:$s"
-                    )
+        Log.d(LOG_TAG, "Link params: ${linkGenerator.userParams}")
 
-                    referLink = s
-                    /*    // Ensure the URL has the correct deep link format
-                    requireActivity().runOnUiThread {
-                        // Create an intent for sharing the deep link
-                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                            putExtra(Intent.EXTRA_TEXT, message) // Add the invite link
-                        }
-
-                        // Show the chooser dialog
-                        val chooser = Intent.createChooser(shareIntent, "Share invite link via")
-                        requireActivity().startActivity(chooser)
-
-                        // Log the invite data
-                        val logInviteMap = HashMap<String, String>()
-                        logInviteMap["referrerId"] = currentReferrerId
-                        logInviteMap["campaign"] = currentCampaign
-                        ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
-                    }*/
-                }
-
-                override fun onResponseError(s: String) {
-                    Log.d(LOG_TAG, "onResponseError called")
-                }
+        val listener = object : LinkGenerator.ResponseListener {
+            override fun onResponse(s: String) {
+                referLink = s
+                Log.d(LOG_TAG, "Generated Link: $referLink")
             }
 
-            // Generate the deep link URL
-            linkGenerator.generateLink(requireActivity(), listener)
+            override fun onResponseError(s: String) {
+                Log.d(LOG_TAG, "onResponseError called: $s")
+            }
         }
+
+        linkGenerator.generateLink(requireActivity(), listener)
+    }
+
 
 }

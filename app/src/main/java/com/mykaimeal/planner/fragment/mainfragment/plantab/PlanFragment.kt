@@ -1431,14 +1431,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
 
         rlDoneBtn.setOnClickListener {
-            if (spinnerActivityLevel.text.toString()
-                    .equals(ErrorMessage.cookBookSelectError, true)
-            ) {
-                BaseApplication.alertError(
-                    requireContext(),
-                    ErrorMessage.selectCookBookError,
-                    false
-                )
+            if (spinnerActivityLevel.text.toString().equals("", true)) {
+                BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
             } else {
                 val cookbooktype = cookbookList[spinnerActivityLevel.selectedIndex].id
                 recipeLikeAndUnlikeData(

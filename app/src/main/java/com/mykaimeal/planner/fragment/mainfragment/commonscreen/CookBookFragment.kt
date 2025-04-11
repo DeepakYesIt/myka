@@ -670,7 +670,7 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         dialogMoveRecipe.show()
         dialogMoveRecipe.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         rlMove.setOnClickListener {
-            if (spinnerActivityLevel.text.toString().equals(ErrorMessage.cookBookSelectError,true)){
+            if (spinnerActivityLevel.text.toString().equals("",true)){
                 BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
             }else {
                 if (BaseApplication.isOnline(requireActivity())) {

@@ -335,7 +335,6 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                     BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
                 }
                 binding.textTotalAmount.text = "$$roundedTotal*"
-
             }
         }
 

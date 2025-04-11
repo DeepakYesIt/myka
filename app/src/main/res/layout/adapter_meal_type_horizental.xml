@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/_8sdp"
     android:background="@drawable/calendar_events_bg">
+
     <RelativeLayout
         android:id="@+id/relNameSwap"
         android:layout_width="match_parent"
@@ -16,12 +17,12 @@
         <TextView
             android:id="@+id/tvBread"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/_30sdp"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/tvSwap"
-            android:singleLine="true"
             android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_toStartOf="@id/tvSwap"
             android:fontFamily="@font/montserrat_bold"
+            android:maxLines="2"
             android:text=""
             android:textSize="@dimen/_13sdp" />
 
@@ -42,6 +43,7 @@
             android:textSize="@dimen/_13sdp" />
 
     </RelativeLayout>
+
     <RelativeLayout
         android:id="@+id/relImages"
         android:layout_width="match_parent"
@@ -49,10 +51,12 @@
         android:layout_below="@+id/relNameSwap"
         android:layout_marginHorizontal="@dimen/_5sdp"
         android:layout_marginTop="@dimen/_10sdp">
+
         <RelativeLayout
             android:id="@+id/imageBread"
             android:layout_width="@dimen/_130sdp"
             android:layout_height="@dimen/_120sdp">
+
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imageData"
                 android:layout_width="match_parent"
@@ -61,13 +65,15 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/no_image"
                 app:shapeAppearanceOverlay="@style/CornerCut" />
+
             <include
                 android:id="@+id/lay_progess"
                 layout="@layout/progess_loader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"/>
+                android:layout_centerInParent="true" />
         </RelativeLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -76,6 +82,7 @@
             android:layout_toEndOf="@id/imageBread"
             android:gravity="center"
             android:orientation="vertical">
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_30sdp"
@@ -84,6 +91,7 @@
                 android:gravity="center|start"
                 android:orientation="horizontal"
                 android:paddingHorizontal="@dimen/_3sdp">
+
                 <ImageView
                     android:id="@+id/minus"
                     android:layout_width="@dimen/_20sdp"
@@ -91,15 +99,17 @@
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="@dimen/_3sdp"
                     android:src="@drawable/ic_minus_square_icon" />
+
                 <TextView
                     android:id="@+id/tv_serving"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/minus"
-                    android:layout_toStartOf="@id/plus"
                     android:layout_marginStart="@dimen/_8sdp"
+                    android:layout_toStartOf="@id/plus"
+                    android:layout_toEndOf="@id/minus"
                     android:fontFamily="@font/poppins_medium"
                     android:text="1 servings"
+                    android:textAlignment="center"
                     android:textColor="#000000"
                     android:textSize="@dimen/_10sdp" />
 
@@ -112,7 +122,7 @@
                     android:src="@drawable/ic_add_square_icon" />
             </RelativeLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_30sdp"
                 android:layout_marginTop="@dimen/_17sdp"
@@ -121,8 +131,9 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="@dimen/_22sdp"
-                    android:layout_height="@dimen/_22sdp"
+                    android:id="@+id/imageWatch"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_15sdp"
                     android:layout_marginStart="@dimen/_8sdp"
                     android:src="@drawable/ic_food_clock" />
 
@@ -132,9 +143,11 @@
                     android:layout_marginStart="@dimen/_8sdp"
                     android:fontFamily="@font/poppins_medium"
                     android:text="Total Time"
+                    android:textAlignment="center"
                     android:textColor="#000000"
                     android:textSize="@dimen/_10sdp" />
-            </LinearLayout>
+
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/tv_totaltime"
@@ -153,8 +166,8 @@
                 android:layout_marginTop="@dimen/_7sdp"
                 android:background="@drawable/time_bg"
                 android:gravity="center|start"
-                android:visibility="gone"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -179,21 +192,22 @@
                 android:layout_marginTop="@dimen/_5sdp"
                 android:fontFamily="@font/poppins_medium"
                 android:text="0 min"
-                android:visibility="gone"
                 android:textColor="#FE9F45"
-                android:textSize="@dimen/_10sdp" />
+                android:textSize="@dimen/_10sdp"
+                android:visibility="gone" />
 
         </LinearLayout>
 
     </RelativeLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/relImages"
         android:layout_gravity="center"
-        android:layout_marginBottom="@dimen/_10sdp"
         android:layout_marginHorizontal="@dimen/_5sdp"
         android:layout_marginTop="@dimen/_15sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
         android:gravity="center"
         android:orientation="horizontal"
         android:weightSum="4">
