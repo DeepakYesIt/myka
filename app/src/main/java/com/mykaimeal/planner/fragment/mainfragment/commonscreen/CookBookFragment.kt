@@ -658,13 +658,15 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         dialogMoveRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val rlMove = dialogMoveRecipe.findViewById<RelativeLayout>(R.id.rlMove)
         val imgCrossDiscardChanges = dialogMoveRecipe.findViewById<ImageView>(R.id.imgCrossDiscardChanges)
+
         spinnerActivityLevel = dialogMoveRecipe.findViewById(R.id.spinnerActivityLevel)
         cookbookListLocal.clear()
         cookbookListLocal.addAll(cookbookList)
         cookbookListLocal.removeFirst()
         cookbookListLocal.removeIf {
-            it.id== id
+            it.id== 0
         }
+
         spinnerActivityLevel.setItems(cookbookListLocal.map { it.name })
 
         dialogMoveRecipe.show()

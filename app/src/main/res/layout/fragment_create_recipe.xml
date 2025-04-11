@@ -427,7 +427,7 @@
                 android:background="@drawable/edittext_bg"
                 android:fontFamily="@font/poppins"
                 android:foreground="?attr/selectableItemBackground"
-                android:hint="Select a cookbook"
+                android:text="Favorites"
                 android:padding="@dimen/_10sdp"
                 android:paddingStart="@dimen/_20sdp"
                 android:textColor="#3C4541"

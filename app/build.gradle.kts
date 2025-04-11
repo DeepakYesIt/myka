@@ -104,11 +104,11 @@ dependencies {
     //viewpager
     implementation("androidx.viewpager2:viewpager2:1.1.0")
 
-    implementation ("com.google.mlkit:image-labeling:17.0.7")
+//    implementation ("com.google.mlkit:image-labeling:17.0.7")
 
 
-    ////hfhffhf
-    implementation ("org.jsoup:jsoup:1.16.1")
+//    ////hfhffhf
+//    implementation ("org.jsoup:jsoup:1.16.1")
 
  /*   ////for app link creating
     implementation ("com.leocardz:link-preview:1.3.3@aar")*/

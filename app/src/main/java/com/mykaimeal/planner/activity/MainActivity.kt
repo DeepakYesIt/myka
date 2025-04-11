@@ -1010,9 +1010,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
 
 
         rlDoneBtn.setOnClickListener {
-            if (spinnerActivityLevel.text.toString()
-                    .equals(ErrorMessage.cookBookSelectError, true)
-            ) {
+            if (spinnerActivityLevel.text.toString().equals("", true)) {
                 BaseApplication.alertError(
                     this,
                     ErrorMessage.selectCookBookError,
