@@ -66,14 +66,10 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         allergenIngAdapter = AdapterAllergensIngItem(allergenIngModelData, requireActivity(), this)
         binding.rcyAllergensDesc.adapter = allergenIngAdapter
 
-
-
         val cookingFor = sessionManagement.getCookingFor()
         val progressValue: Int
         val maxProgress: Int
         val restrictionText: String
-
-
 
         /// checked session value cooking for
         if (cookingFor.equals("Myself")) {
@@ -166,11 +162,13 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
         }
 
         binding.rlUpdateAllergens.setOnClickListener {
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireActivity())) {
-                updateAllergensApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            if (status == "2") {
+                ///checking the device of mobile data in online and offline(show network error message)
+                if (BaseApplication.isOnline(requireActivity())) {
+                    updateAllergensApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
 
@@ -414,6 +412,8 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 status = "2"
                 binding.tvNextBtn.isClickable = true
                 binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                binding.rlUpdateAllergens.isClickable = true
+                binding.rlUpdateAllergens.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 return
             }
 
@@ -421,10 +421,14 @@ class AllergensIngredientsFragment : Fragment(), OnItemClickedListener {
                 status = "2"
                 binding.tvNextBtn.isClickable = true
                 binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+
+                binding.rlUpdateAllergens.isClickable = true
+                binding.rlUpdateAllergens.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 allergensSelectedId = list!!
             } else {
                 status = ""
                 binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                binding.rlUpdateAllergens.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             }
     }
 

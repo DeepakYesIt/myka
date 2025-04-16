@@ -143,17 +143,18 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
         binding.tvNextBtn.setOnClickListener(this)
 
         binding.rlUpdateMealRoutine.setOnClickListener {
-            if (isOnline(requireContext())) {
-                if (mealRoutineSelectedId.size>0){
-                    updateMealRoutineApi()
-                }else{
-                    alertError(requireContext(), ErrorMessage.mealTypetError, false)
+            if (status=="2"){
+                if (isOnline(requireContext())) {
+                    if (mealRoutineSelectedId.size>0){
+                        updateMealRoutineApi()
+                    }else{
+                        alertError(requireContext(), ErrorMessage.mealTypetError, false)
+                    }
+                } else {
+                    alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-            } else {
-                alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
-
     }
 
     private fun stillSkipDialog() {
@@ -332,6 +333,8 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
             status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlUpdateMealRoutine.isClickable = true
+            binding.rlUpdateMealRoutine.setBackgroundResource(R.drawable.green_fill_corner_bg)
             return
         }
 
@@ -339,10 +342,13 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
             status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlUpdateMealRoutine.isClickable = true
+            binding.rlUpdateMealRoutine.setBackgroundResource(R.drawable.green_fill_corner_bg)
             mealRoutineSelectedId = list!!
         } else {
             status = ""
             binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.rlUpdateMealRoutine.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
 

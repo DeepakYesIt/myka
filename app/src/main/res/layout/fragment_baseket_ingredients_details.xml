@@ -92,7 +92,7 @@
                     android:layout_marginTop="@dimen/_7sdp"
                     android:layout_marginEnd="@dimen/_20sdp"
                     android:fontFamily="@font/montserrat_bold"
-                    android:text="$4.17"
+                    android:text=""
                     android:textColor="@color/light_green"
                     android:textSize="@dimen/_12sdp" />
 
@@ -102,7 +102,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_7sdp"
                     android:layout_marginEnd="@dimen/_20sdp"
-                    android:layout_toRightOf="@+id/tvActualPrices"
+                    android:layout_toEndOf="@+id/tvActualPrices"
                     android:fontFamily="@font/montserrat_bold"
                     android:text="$5.17"
                     android:textColor="@color/grey2"

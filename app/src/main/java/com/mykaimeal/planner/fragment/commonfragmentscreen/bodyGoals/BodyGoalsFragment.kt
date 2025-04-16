@@ -272,11 +272,13 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
         }
 
         binding.rlUpdateBodyGoals.setOnClickListener {
-            ///checking the device of mobile data in online and offline(show network error message)
-            if (BaseApplication.isOnline(requireActivity())) {
-                updateBodyGoalApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            if (status=="2"){
+                ///checking the device of mobile data in online and offline(show network error message)
+                if (BaseApplication.isOnline(requireActivity())) {
+                    updateBodyGoalApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
     }
@@ -345,6 +347,9 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
             this.status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+
+            binding.rlUpdateBodyGoals.isClickable = true
+            binding.rlUpdateBodyGoals.setBackgroundResource(R.drawable.green_fill_corner_bg)
             bodySelect = position.toString()
             return
         }
@@ -353,10 +358,13 @@ class BodyGoalsFragment : Fragment(), OnItemClickListener {
             this.status = "2"
             binding.tvNextBtn.isClickable = true
             binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+            binding.rlUpdateBodyGoals.isClickable = true
+            binding.rlUpdateBodyGoals.setBackgroundResource(R.drawable.green_fill_corner_bg)
             bodySelect = position.toString()
         } else {
             this.status = ""
             binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.rlUpdateBodyGoals.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
 

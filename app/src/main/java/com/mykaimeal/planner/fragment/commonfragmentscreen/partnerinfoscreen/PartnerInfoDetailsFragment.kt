@@ -250,13 +250,14 @@ class PartnerInfoDetailsFragment : Fragment() {
         }
 
         binding.rlUpdatePartInfo.setOnClickListener{
-            if (BaseApplication.isOnline(requireContext())) {
-                updatePartnerInfoApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            if (status=="2"){
+                if (BaseApplication.isOnline(requireContext())) {
+                    updatePartnerInfoApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
-
 
     }
 
@@ -300,17 +301,21 @@ class PartnerInfoDetailsFragment : Fragment() {
                 if (binding.tvChooseGender.text.toString().isNotEmpty()) {
                     status = "2"
                     binding.tvNextBtn.setBackgroundResource(R.drawable.green_fill_corner_bg)
+                    binding.rlUpdatePartInfo.setBackgroundResource(R.drawable.green_fill_corner_bg)
                 } else {
                     status = "1"
                     binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                    binding.rlUpdatePartInfo.setBackgroundResource(R.drawable.gray_btn_unselect_background)
                 }
             } else {
                 status = "1"
                 binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                binding.rlUpdatePartInfo.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             }
         } else {
             status = "1"
             binding.tvNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            binding.rlUpdatePartInfo.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
 
     }

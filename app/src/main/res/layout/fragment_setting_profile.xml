@@ -254,7 +254,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppins"
-                                android:text="Calories:"
+                                android:text="Calories"
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/_11sdp" />
 
@@ -306,7 +306,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppins"
-                                android:text="Fats:"
+                                android:text="Fats"
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/_11sdp" />
 
@@ -358,7 +358,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppins"
-                                android:text="Carbs:"
+                                android:text="Carbs"
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/_11sdp" />
 
@@ -410,7 +410,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppins"
-                                android:text="Protein:"
+                                android:text="Protein"
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/_11sdp" />
 

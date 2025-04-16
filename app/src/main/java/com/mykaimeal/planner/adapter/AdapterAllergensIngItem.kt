@@ -10,10 +10,11 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterBodyGoalsBinding
 import com.mykaimeal.planner.fragment.commonfragmentscreen.allergensIngredients.model.AllergensIngredientModelData
 
-class AdapterAllergensIngItem(private var allergensIngredientsData: List<AllergensIngredientModelData>,
-                              private var requireActivity: FragmentActivity,
-                              private var onItemClickedListener: OnItemClickedListener
-):
+class AdapterAllergensIngItem(
+    private var allergensIngredientsData: List<AllergensIngredientModelData>,
+    private var requireActivity: FragmentActivity,
+    private var onItemClickedListener: OnItemClickedListener
+) :
     RecyclerView.Adapter<AdapterAllergensIngItem.ViewHolder>() {
 
     private val selectedPositions = mutableSetOf<Int>() // Track selected positions
@@ -22,17 +23,19 @@ class AdapterAllergensIngItem(private var allergensIngredientsData: List<Allerge
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding: AdapterBodyGoalsBinding = AdapterBodyGoalsBinding.inflate(inflater, parent,false);
+        val binding: AdapterBodyGoalsBinding =
+            AdapterBodyGoalsBinding.inflate(inflater, parent, false);
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.tvTitleName.text=allergensIngredientsData[position].name
+        holder.binding.tvTitleName.text = allergensIngredientsData[position].name
 
         holder.binding.apply {
             // Update UI based on the item's 'selected' property
-            imageRightTick.visibility = if (allergensIngredientsData[position].selected) View.VISIBLE else View.GONE
+            imageRightTick.visibility =
+                if (allergensIngredientsData[position].selected) View.VISIBLE else View.GONE
             relMainLayout.setBackgroundResource(
                 if (allergensIngredientsData[position].selected) R.drawable.orange_box_bg else R.drawable.gray_box_border_bg
             )
@@ -68,26 +71,29 @@ class AdapterAllergensIngItem(private var allergensIngredientsData: List<Allerge
                             dietaryId.add(allergensIngredientsData[position].id.toString())
                             onItemClickedListener.itemClicked(position, dietaryId, "2", "true")
                         }
-                    } else -> { // Handle individual item selection
-                    // Deselect "Select All" if any other item is clicked
-                 /*   if (selectedPositions.contains(0)) {
-                        selectedPositions.remove(0)*/
+                    }
+
+                    else -> { // Handle individual item selection
+                        // Deselect "Select All" if any other item is clicked
+                        /*   if (selectedPositions.contains(0)) {
+                               selectedPositions.remove(0)*/
                         allergensIngredientsData[0].selected = false
                         dietaryId.clear()
-                /*    }*/
+                        /*    }*/
 
-                    // Toggle the current item's selection state
-                    allergensIngredientsData[position].selected = !allergensIngredientsData[position].selected
-                    if (allergensIngredientsData[position].selected) {
-                        selectedPositions.add(position)
-                        dietaryId.add(allergensIngredientsData[position].id.toString())
-                        onItemClickedListener.itemClicked(position, dietaryId, "2", "true")
-                    } else {
-                        selectedPositions.remove(position)
-                        dietaryId.remove(allergensIngredientsData[position].id.toString())
-                        onItemClickedListener.itemClicked(position, dietaryId, "2", "false")
+                        // Toggle the current item's selection state
+                        allergensIngredientsData[position].selected =
+                            !allergensIngredientsData[position].selected
+                        if (allergensIngredientsData[position].selected) {
+                            selectedPositions.add(position)
+                            dietaryId.add(allergensIngredientsData[position].id.toString())
+                            onItemClickedListener.itemClicked(position, dietaryId, "2", "true")
+                        } else {
+                            selectedPositions.remove(position)
+                            dietaryId.remove(allergensIngredientsData[position].id.toString())
+                            onItemClickedListener.itemClicked(position, dietaryId, "2", "false")
+                        }
                     }
-                }
                 }
 
                 notifyDataSetChanged() // Refresh the UI
@@ -110,7 +116,7 @@ class AdapterAllergensIngItem(private var allergensIngredientsData: List<Allerge
         notifyDataSetChanged()
     }
 
-    class ViewHolder(var binding: AdapterBodyGoalsBinding) : RecyclerView.ViewHolder(binding.root){
+    class ViewHolder(var binding: AdapterBodyGoalsBinding) : RecyclerView.ViewHolder(binding.root) {
     }
 
 }

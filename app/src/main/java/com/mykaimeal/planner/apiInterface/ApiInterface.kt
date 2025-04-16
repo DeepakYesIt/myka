@@ -689,7 +689,7 @@ interface ApiInterface {
 
     @FormUrlEncoded
     @POST(ApiEndPoint.getProductsDetailsUrl)
-    suspend fun getProductsDetailsUrl(@Field("id") id:String?): Response<JsonObject>
+    suspend fun getProductsDetailsUrl(@Field("id") id:String?,@Field("query") query:String?): Response<JsonObject>
 
 
     @FormUrlEncoded
