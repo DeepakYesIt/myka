@@ -2,6 +2,7 @@ package com.mykaimeal.planner.fragment.mainfragment.profilesetting.subscriptionp
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
@@ -25,6 +28,7 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.bumptech.glide.Glide
+import com.google.gson.Gson
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.SubscriptionAdaptor
@@ -33,13 +37,22 @@ import com.mykaimeal.planner.basedata.AppConstant
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.BaseApplication.alertError
 import com.mykaimeal.planner.basedata.BaseApplication.isOnline
+import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentHomeSubscriptionAllPlanBinding
+import com.mykaimeal.planner.fragment.mainfragment.profilesetting.subscriptionplan.viewmodel.SubscriptionPlanViewModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.HomeViewModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.HomeApiResponse
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import com.mykaimeal.planner.model.SubscriptionModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 import java.util.stream.Collectors
 
+
+
+@AndroidEntryPoint
 class SubscriptionAllPlanFragment : Fragment() {
 
     private var _binding: FragmentHomeSubscriptionAllPlanBinding?=null
@@ -52,12 +65,10 @@ class SubscriptionAllPlanFragment : Fragment() {
     private var premiumWeekly = ""
     private var planID = AppConstant.Premium_Weekly
     private var planType = "Starter"
+    private lateinit var viewModel: SubscriptionPlanViewModel
     private lateinit var sessionManagement: SessionManagement
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         _binding=FragmentHomeSubscriptionAllPlanBinding.inflate(layoutInflater, container, false)
 
@@ -66,6 +77,12 @@ class SubscriptionAllPlanFragment : Fragment() {
             llBottomNavigation.visibility = View.GONE
         }
 
+
+        viewModel = ViewModelProvider(requireActivity())[SubscriptionPlanViewModel::class.java]
+
+        binding.rlNextBtn.isClickable=false
+        binding.rlNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+
         sessionManagement = SessionManagement(requireContext())
 
         backButton()
@@ -73,9 +90,18 @@ class SubscriptionAllPlanFragment : Fragment() {
         initialize()
 
         startBillingApi()
-        
 
         return binding.root
+    }
+
+    private fun apiStatus() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.subscriptionPurchaseType {
+                BaseApplication.dismissMe()
+                handleApiResponse(it,"status")
+            }
+        }
     }
 
     private fun backButton(){
@@ -89,7 +115,6 @@ class SubscriptionAllPlanFragment : Fragment() {
 
     @SuppressLint("SetTextI18n", "ResourceAsColor")
     private fun initialize() {
-
         if (sessionManagement.getImage() != null) {
             Glide.with(requireContext())
                 .load(BaseUrl.imageBaseUrl + sessionManagement.getImage())
@@ -97,13 +122,10 @@ class SubscriptionAllPlanFragment : Fragment() {
                 .error(R.drawable.mask_group_icon)
                 .into(binding.imageProfile)
         }
-
         if (sessionManagement.getUserName() != null) {
             binding.tvTextNames.text = "You’ve got a gift from\n"+sessionManagement.getUserName()
             binding.tvSecretCookBook.text = sessionManagement.getUserName()+"secret cookbook"
         }
-
-
         binding.crossImages.setOnClickListener{
             findNavController().navigateUp()
         }
@@ -114,9 +136,11 @@ class SubscriptionAllPlanFragment : Fragment() {
             selectPlan(
                 binding.relSubscriptionBasic,
                 binding.imgBasicClick,
+                binding.imagePrevious,
                 binding.tvNewKai,
                 binding.tvNewDollar,
                 listOf(binding.relPopularPlan, binding.relBestPlan),
+                listOf(binding.imagePreviousMonthly, binding.imagePreviousyearly),
                 listOf(binding.imgPopularClick, binding.imgBaseClick),
                 listOf(binding.tvProkaiUser, binding.tvLovekaiUser),
                 listOf(binding.tvNewDollarMonthly, binding.tvNewDollaryearly),AppConstant.Premium_Weekly,"Starter")
@@ -125,9 +149,11 @@ class SubscriptionAllPlanFragment : Fragment() {
             selectPlan(
                 binding.relPopularPlan,
                 binding.imgPopularClick,
+                binding.imagePreviousMonthly,
                 binding.tvProkaiUser,
                 binding.tvNewDollarMonthly,
                 listOf(binding.relSubscriptionBasic, binding.relBestPlan),
+                listOf(binding.imagePrevious, binding.imagePreviousyearly),
                 listOf(binding.imgBasicClick, binding.imgBaseClick),
                 listOf(binding.tvNewKai, binding.tvLovekaiUser),
                 listOf(binding.tvNewDollar, binding.tvNewDollaryearly),AppConstant.Premium_Monthly,"Popular"
@@ -137,27 +163,28 @@ class SubscriptionAllPlanFragment : Fragment() {
             selectPlan(
                 binding.relBestPlan,
                 binding.imgBaseClick,
+                binding.imagePreviousyearly,
                 binding.tvLovekaiUser,
                 binding.tvNewDollaryearly,
                 listOf(binding.relSubscriptionBasic, binding.relPopularPlan),
+                listOf(binding.imagePrevious, binding.imagePreviousMonthly),
                 listOf(binding.imgBasicClick, binding.imgPopularClick),
                 listOf(binding.tvNewKai, binding.tvProkaiUser),
                 listOf(binding.tvNewDollar, binding.tvNewDollarMonthly),AppConstant.Premium_Annual,"Best")
         }
-
         binding.rlNextBtn.setOnClickListener {
-            if (isOnline(requireContext())) {
-                if (!planID.equals("",true)){
-                    planPurchases()
-                }else{
-                    alertError(requireContext(), ErrorMessage.planError, false)
+            if (binding.rlNextBtn.isClickable){
+                if (isOnline(requireContext())) {
+                    if (!planID.equals("",true)){
+                        planPurchases()
+                    }else{
+                        alertError(requireContext(), ErrorMessage.planError, false)
+                    }
+                } else {
+                    alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-            } else {
-                alertError(requireContext(), ErrorMessage.networkError, false)
             }
         }
-
-
     }
 
     private fun planPurchases() {
@@ -206,21 +233,23 @@ class SubscriptionAllPlanFragment : Fragment() {
         })
     }
 
-    private fun selectPlan(selectedPlan: View, selectedImage: ImageView, selectedUserText: TextView, selectedDollarText: TextView, otherPlans: List<View>, otherImages: List<ImageView>, otherUserTexts: List<TextView>, otherDollarTexts: List<TextView>, planIDUser:String,planTypeStatus:String) {
+    private fun selectPlan(selectedPlan: View, selectedImage: ImageView, crossImage: ImageView, selectedUserText: TextView, selectedDollarText: TextView, otherPlans: List<View>, otherCroseImage: List<ImageView>, otherImages: List<ImageView>, otherUserTexts: List<TextView>, otherDollarTexts: List<TextView>, planIDUser:String,planTypeStatus:String) {
         planID=planIDUser
         planType=planTypeStatus
         selectedPlan.setBackgroundResource(R.drawable.subscription_click_bg)
         selectedImage.setImageResource(R.drawable.selected_plan_icon)
+        crossImage.setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_IN)
         selectedUserText.setTextColor(Color.parseColor("#FFFFFF"))
         selectedDollarText.setTextColor(Color.parseColor("#FFFFFF"))
-        otherPlans.forEach { it.setBackgroundResource(R.drawable.subscription_unclick_bg) }
-        otherImages.forEach { it.setImageResource(R.drawable.unselelected_plan_icon) }
-        otherUserTexts.forEach { it.setTextColor(Color.parseColor("#000000")) }
-        otherDollarTexts.forEach { it.setTextColor(Color.parseColor("#000000")) }
+        otherPlans.forEach { it.setBackgroundResource(R.drawable.subscription_unclick_bg)}
+        otherCroseImage.forEach { it.setColorFilter(Color.parseColor("#757575"), PorterDuff.Mode.SRC_IN)}
+        otherImages.forEach { it.setImageResource(R.drawable.unselelected_plan_icon)}
+        otherUserTexts.forEach { it.setTextColor(Color.parseColor("#000000"))}
+        otherDollarTexts.forEach { it.setTextColor(Color.parseColor("#000000"))}
     }
 
     private fun startBillingApi() {
-        BaseApplication.showMe(requireActivity())
+//        BaseApplication.showMe(requireActivity())
         billingClient = BillingClient.newBuilder(requireActivity())
             .setListener(purchasesUpdatedListener)
             .enablePendingPurchases()
@@ -274,7 +303,6 @@ class SubscriptionAllPlanFragment : Fragment() {
             }
         }
 
-
     private fun handlePurchase(purchase: Purchase) {
         val consumeParams = ConsumeParams.newBuilder()
             .setPurchaseToken(purchase.purchaseToken)
@@ -295,8 +323,11 @@ class SubscriptionAllPlanFragment : Fragment() {
                          sessionManagement.setSubscriptionId(purchase.orderId.toString())
                          sessionManagement.setPurchaseToken(purchase.purchaseToken)
                          sessionManagement.setPlanType(planType)
-                         Log.d("****", "subscription_id" + purchase.orderId.toString())
-                         Log.d("**** ", "subscription_PurchaseToken" + purchase.purchaseToken)
+
+                         Log.d("****", "subscription_id ${purchase.orderId}")
+                         Log.d("**** ", "subscription_PurchaseToken ${purchase.purchaseToken}")
+                         Log.d("****", "planType $planType")
+
                          requireActivity().runOnUiThread(Runnable {
                              callingPurchaseSubscriptionApi(purchase.orderId, purchase.purchaseToken)
                          })
@@ -315,7 +346,65 @@ class SubscriptionAllPlanFragment : Fragment() {
     }
 
     private fun callingPurchaseSubscriptionApi(orderId: String?, purchaseToken: String) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            viewModel.subscriptionGoogle( {
+                BaseApplication.dismissMe()
+                handleApiResponse(it,"purchase")
+            }, planType,purchaseToken,orderId)
+        }
+    }
 
+    private fun handleApiResponse(result: NetworkResult<String>,type:String) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessResponse(result.data.toString(),type)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessResponse(data: String,type:String) {
+        try {
+            val apiModel = Gson().fromJson(data, HomeApiResponse::class.java)
+            Log.d("@@@ Recipe Details ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (type.equals("purchase",true)){
+                    sessionManagement.setSubscriptionId("")
+                    sessionManagement.setPurchaseToken("")
+                    binding.rlNextBtn.isClickable=false
+                    binding.rlNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                    Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_SHORT).show()
+                }else{
+                    if (apiModel.data?.Subscription_status==1){
+                        binding.rlNextBtn.isClickable=true
+                        binding.rlNextBtn.setBackgroundResource(R.drawable.green_btn_background)
+                    }else{
+                        binding.rlNextBtn.isClickable=false
+                        binding.rlNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                    }
+                }
+            } else {
+                handleError(apiModel.code,apiModel.message)
+            }
+
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+
+    private fun handleError(code: Int, message: String) {
+        if (code == ErrorMessage.code) {
+            showAlert(message, true)
+        } else {
+            showAlert(message, false)
+        }
+    }
+
+    private fun showAlert(message: String?, status: Boolean) {
+        alertError(requireContext(), message, status)
     }
 
     private fun getPrices() {
@@ -367,11 +456,15 @@ class SubscriptionAllPlanFragment : Fragment() {
                     }
                 }
             }
-
             override fun onBillingServiceDisconnected() {
                 billingClient!!.startConnection(this)
             }
         })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        apiStatus()
     }
 
     override fun onDestroyView() {

@@ -1,16 +1,27 @@
 package com.mykaimeal.planner.adapter
 
+import android.annotation.SuppressLint
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
+import com.mykaimeal.planner.OnItemClickListener
+import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterAllIngredientsItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.allingredient.model.IngredientList
 import com.mykaimeal.planner.model.DataModel
 
 class AdapterAllIngredientsItem(
-    private var datalist: MutableList<IngredientList>?,
-    private var requireActivity: FragmentActivity
+    private var datalist: MutableList<IngredientList>,
+    private var requireActivity: FragmentActivity,
+    private var onItemClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<AdapterAllIngredientsItem.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -20,19 +31,34 @@ class AdapterAllIngredientsItem(
         return ViewHolder(binding)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.textTittles.text = datalist!![position].name
+        val data=datalist[position]
+
+        holder.binding.textTittles.text = data.name
+
+        if (data.status==true){
+            holder.binding.imgTick.visibility=View.VISIBLE
+        }else{
+            holder.binding.imgTick.visibility=View.GONE
+        }
+
+        holder.binding.root.setOnClickListener {
+            val data=datalist[position]
+            data.status = data.status != true
+            datalist[position] = data
+            notifyDataSetChanged()
+            onItemClickListener.itemClick(position,data.name,"selected")
+        }
 
 
-/*
-        holder.binding.imageShapeable.setImageResource(datalist[position].image)
-*/
+
 
     }
 
     override fun getItemCount(): Int {
-        return datalist!!.size
+        return datalist.size
     }
 
     fun filterList(filteredList: MutableList<IngredientList>) {

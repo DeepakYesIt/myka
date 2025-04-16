@@ -6,23 +6,37 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.appsflyer.AppsFlyerConversionListener
 import com.appsflyer.AppsFlyerLib
 import com.appsflyer.deeplink.DeepLinkResult
+import com.google.gson.Gson
 import com.mykaimeal.planner.R
+import com.mykaimeal.planner.basedata.BaseApplication
+import com.mykaimeal.planner.basedata.BaseApplication.alertError
+import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.commonworkutils.AppsFlyerConstants
 import com.mykaimeal.planner.databinding.ActivitySplashBinding
+import com.mykaimeal.planner.fragment.mainfragment.profilesetting.subscriptionplan.viewmodel.SubscriptionPlanViewModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.HomeApiResponse
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
+
+@AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySplashBinding
     private lateinit var sessionManagement: SessionManagement
+    private lateinit var viewModel: SubscriptionPlanViewModel
+
 
     companion object {
         public const val SPLASH_DELAY = 3000L // 3 seconds delay
@@ -34,11 +48,59 @@ class SplashActivity : AppCompatActivity() {
         setContentView(binding.root)
         sessionManagement = SessionManagement(this)
         // Initialize screen actions
+        viewModel = ViewModelProvider(this)[SubscriptionPlanViewModel::class.java]
 
-        initialize()
+        if (sessionManagement.getSubscriptionId().toString().equals("",true)){
+            initialize()
+        }else{
+
+            Log.d("****", "subscription_id ${sessionManagement.getSubscriptionId()}")
+            Log.d("**** ", "subscription_PurchaseToken ${sessionManagement.getPurchaseToken()}")
+            Log.d("****", "planType $sessionManagement.getPlanType()")
+
+            BaseApplication.showMe(this)
+            lifecycleScope.launch {
+                viewModel.subscriptionGoogle( {
+                    BaseApplication.dismissMe()
+                    handleApiResponse(it)
+                }, sessionManagement.getPlanType(),sessionManagement.getPurchaseToken(),sessionManagement.getSubscriptionId())
+            }
+        }
+
+    }
+
+    private fun handleApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, HomeApiResponse::class.java)
+            Log.d("@@@ Recipe Details ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                sessionManagement.setSubscriptionId("")
+                sessionManagement.setPurchaseToken("")
+                initialize()
+            } else {
+                showAlert(apiModel.message, false)
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    private fun showAlert(message: String?, status: Boolean) {
+        alertError(this, message, status)
     }
 
     private fun initialize() {
+
 
         val afDevKey: String = AppsFlyerConstants.afDevKey
 

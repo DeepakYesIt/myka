@@ -453,6 +453,10 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
         binding.rcyPopularCat.isNestedScrollingEnabled = false
 
 
+        binding.layRoot.setOnClickListener {
+            findNavController().navigate(R.id.searchFragment)
+        }
+
         binding.relAddRecipeWeb.setOnClickListener {
             addRecipeFromWeb()
         }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/subscription_main_bg"
+    android:background="@drawable/subscription_plan"
     android:orientation="vertical"
     tools:context=".fragment.mainfragment.profilesetting.subscriptionplan.SubscriptionAllPlanFragment">
 
@@ -193,19 +193,17 @@
                             android:text="New to Kai"
                             android:textColor="@color/white"
                             android:textSize="@dimen/_15sdp" />
-
                         <RelativeLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true">
-
                             <ImageView
                                 android:id="@+id/imagePrevious"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerHorizontal="true"
-                                android:src="@drawable/weekly_icon" />
-
+                                android:src="@drawable/weekly_icon"
+                                app:tint="#FFFFFFCC" />
                             <TextView
                                 android:id="@+id/tvNewDollar"
                                 android:layout_width="wrap_content"
@@ -215,13 +213,9 @@
                                 android:text="$1.99/ Weekly"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/_11sdp" />
-
                         </RelativeLayout>
-
                     </RelativeLayout>
-
                 </RelativeLayout>
-
                 <RelativeLayout
                     android:id="@+id/relPopularPlan"
                     android:layout_width="match_parent"
@@ -230,7 +224,6 @@
                     android:layout_marginTop="@dimen/_15sdp"
                     android:background="@drawable/subscription_unclick_bg"
                     android:padding="@dimen/_10sdp">
-
                     <RelativeLayout
                         android:id="@+id/relPopularClick"
                         android:layout_width="match_parent"
@@ -300,7 +293,6 @@
                     </RelativeLayout>
 
                 </RelativeLayout>
-
                 <RelativeLayout
                     android:id="@+id/relBestPlan"
                     android:layout_width="match_parent"
@@ -379,9 +371,7 @@
                     </RelativeLayout>
 
                 </RelativeLayout>
-
             </RelativeLayout>
-
             <RelativeLayout
                 android:id="@+id/rlNextBtn"
                 android:layout_width="match_parent"
@@ -404,11 +394,6 @@
                     android:textSize="@dimen/_12sdp" />
 
             </RelativeLayout>
-
-
         </RelativeLayout>
-
     </ScrollView>
-
-
 </RelativeLayout>

@@ -68,7 +68,7 @@
                 android:background="@drawable/ing_edittext_select_bg"
                 android:fontFamily="@font/poppins"
                 android:layout_toStartOf="@+id/relQuantity"
-                android:hint="Qnt"
+                android:hint="QTY"
                 android:paddingVertical="@dimen/_8sdp"
                 android:inputType="number"
                 android:layout_centerVertical="true"

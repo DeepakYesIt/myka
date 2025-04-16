@@ -621,9 +621,15 @@ interface ApiInterface {
     @FormUrlEncoded
     @POST(ApiEndPoint.subscriptionGoogleUrl)
     suspend fun subscriptionGoogle(
+        @Field("type") type: String?,
         @Field("purchase_token") purchaseToken: String?,
         @Field("subscription_id") subscriptionId: String?
     ): Response<JsonObject>
+
+
+
+    @POST(ApiEndPoint.checkSubscriptionUrl)
+    suspend fun subscriptionPurchaseType(): Response<JsonObject>
 
 
     @FormUrlEncoded

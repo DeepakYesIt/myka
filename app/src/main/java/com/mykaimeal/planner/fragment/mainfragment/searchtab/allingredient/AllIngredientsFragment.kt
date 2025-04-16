@@ -24,11 +24,14 @@ import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentAllIngredientsBinding
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.allingredient.model.AllIngredientsModel
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.allingredient.model.AllIngredientsModelData
+import com.mykaimeal.planner.fragment.mainfragment.searchtab.allingredient.model.CategoryModel
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.allingredient.model.IngredientList
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.allingredient.viewmodel.AllIngredientsViewModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import com.mykaimeal.planner.model.DataModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -40,8 +43,11 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
     private var adapterAllIngItem: AdapterAllIngredientsItem? = null
     private var adapterAllIngCategoryItem: AllIngredientsCategoryItem? = null
     private lateinit var allIngredientsModelData:AllIngredientsViewModel
-    private val dataList = ArrayList<DataModel>()
-    private var ingredients: MutableList<IngredientList>?=null
+    private var ingredients: MutableList<IngredientList> = mutableListOf()
+    private var categoryModel:MutableList<CategoryModel> = mutableListOf()
+    private var lastSelected="Fruit"
+    private lateinit var textListener: TextWatcher
+    private var textChangedJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,7 +61,15 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
             it.llBottomNavigation.visibility = View.VISIBLE
         }
 
+        adapterAllIngCategoryItem = AllIngredientsCategoryItem(categoryModel, requireActivity(),this)
+        binding.rcyIngredientCategory.adapter = adapterAllIngCategoryItem
         allIngredientsModelData = ViewModelProvider(this)[AllIngredientsViewModel::class.java]
+
+
+        showCount(0)
+
+        adapterAllIngItem = AdapterAllIngredientsItem(ingredients, requireActivity(),this)
+        binding.rcyAllIngredients.adapter = adapterAllIngItem
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -70,46 +84,39 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
 
     private fun initialize() {
 
-        /*binding.llFruits.setOnClickListener(this)
-        binding.llVegetables.setOnClickListener(this)
-        binding.llDairyEgg.setOnClickListener(this)
-        binding.llBakery.setOnClickListener(this)*/
         binding.imageBackIcon.setOnClickListener(this)
 
-        binding.etIngRecipes.addTextChangedListener(object :
-            TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(editable: Editable) {
-                searchable(editable.toString())
-            }
-        })
 
-        // This Api call when the screen in loaded
-        if (BaseApplication.isOnline(requireActivity())){
-            launchApi()
-        }else{
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        textListener = object : TextWatcher {
+            private var searchFor = "" // Or view.editText.text.toString()
+
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val searchText = s.toString()
+                if (searchText!= searchFor) {
+                    searchFor = searchText
+                    textChangedJob?.cancel()
+                    // Launch a new coroutine in the lifecycle scope
+                    textChangedJob = lifecycleScope.launch {
+                        delay(1000)  // Debounce time
+                        if (searchText.equals(searchFor,true)) {
+                            searchRecipeApi(searchText)
+                        }
+                    }
+                }
+            }
         }
+
+
+        searchRecipeApi("")
+
 
     }
 
-    private fun searchable(editText: String) {
-        val filteredList: MutableList<IngredientList> = java.util.ArrayList<IngredientList>()
-        for (item in ingredients!!) {
-            if (item.name!!.toLowerCase().contains(editText.lowercase(Locale.getDefault()))) {
-                filteredList.add(item)
-            }
-        }
-        if (filteredList.size > 0) {
-            adapterAllIngItem!!.filterList(filteredList)
-            binding.rcyAllIngredients.visibility = View.VISIBLE
-        } else {
-            binding.rcyAllIngredients.visibility = View.GONE
-        }
-    }
-
-    private fun launchApi() {
+    private fun searchRecipeApi(type:String){
         if (BaseApplication.isOnline(requireActivity())) {
             BaseApplication.showMe(requireContext())
             lifecycleScope.launch {
@@ -120,7 +127,7 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
                         is NetworkResult.Error -> showAlert(it.message, false)
                         else -> showAlert(it.message, false)
                     }
-                },"","","")
+                },lastSelected,type,"")
             }
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
@@ -131,7 +138,6 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
     private fun showAlert(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)
     }
-
 
     @SuppressLint("SetTextI18n")
     private fun handleSuccessResponse(data: String) {
@@ -157,91 +163,39 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
 
     private fun showDataInUi(data: AllIngredientsModelData) {
         try {
-            if (data.categories!=null && data.categories.size>0){
-                adapterAllIngCategoryItem = AllIngredientsCategoryItem(data.categories, requireActivity(),this)
-                binding.rcyIngredientCategory.adapter = adapterAllIngCategoryItem
+
+            categoryModel.clear()
+            ingredients.clear()
+
+            data.ingredients?.let {
+                ingredients.addAll(it)
             }
 
-            if (data.ingredients!=null && data.ingredients.size>0){
-                ingredients=data.ingredients
-                adapterAllIngItem = AdapterAllIngredientsItem(data.ingredients, requireActivity())
-                binding.rcyAllIngredients.adapter = adapterAllIngItem
+            data.categories?.forEach {
+                categoryModel.add(CategoryModel(it, it.equals(lastSelected,true)))
             }
 
+            if (categoryModel.size>0){
+                adapterAllIngCategoryItem?.filterList(categoryModel)
+            }
 
-
+            if (ingredients.size>0){
+                val count = ingredients.count { it.status == true }
+                showCount(count)
+                adapterAllIngItem?.filterList(ingredients)
+                binding.rcyAllIngredients.visibility = View.VISIBLE
+                binding.tvNodata.visibility = View.GONE
+            } else {
+                binding.rcyAllIngredients.visibility = View.GONE
+                binding.tvNodata.visibility = View.VISIBLE
+            }
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
     }
 
-/*    private fun allIngredientsModel() {
-        val dataList = ArrayList<DataModel>()
-        val data1 = DataModel()
-        val data2 = DataModel()
-        val data3 = DataModel()
-        val data4 = DataModel()
-        val data5 = DataModel()
-        val data6 = DataModel()
-        val data7 = DataModel()
-        val data8 = DataModel()
-
-        data1.title = "Apple"
-        data1.isOpen = false
-        data1.type = "AllIngredients"
-        data1.image = R.drawable.apple_ing_image
-
-        data2.title = "Avacado"
-        data2.isOpen = false
-        data2.type = "AllIngredients"
-        data2.image = R.drawable.avacado_ing_image
-
-        data3.title = "Oranges"
-        data3.isOpen = false
-        data3.type = "AllIngredients"
-        data3.image = R.drawable.orange_ing_image
-
-        data4.title = "Grapes"
-        data4.isOpen = false
-        data4.type = "AllIngredients"
-        data4.image = R.drawable.grapes_ing_image
-
-        data5.title = "Mango"
-        data5.isOpen = false
-        data5.type = "AllIngredients"
-        data5.image = R.drawable.banana_ing_image
-
-        data6.title = "Guava"
-        data6.isOpen = false
-        data6.type = "AllIngredients"
-        data6.image = R.drawable.guava_ing_image
-
-        data7.title = "Watermelon"
-        data7.isOpen = false
-        data7.type = "AllIngredients"
-        data7.image = R.drawable.watermelon_ing_image
-
-        data8.title = "Apricot"
-        data8.isOpen = false
-        data8.type = "AllIngredients"
-        data8.image = R.drawable.apricot_ing_image
-
-        dataList.add(data1)
-        dataList.add(data2)
-        dataList.add(data3)
-        dataList.add(data4)
-        dataList.add(data5)
-        dataList.add(data6)
-        dataList.add(data7)
-        dataList.add(data8)
-
-        adapterAllIngItem = AdapterAllIngredientsItem(dataList, requireActivity())
-        binding.rcyAllIngredients.adapter = adapterAllIngItem
-    }*/
-
     override fun onClick(item: View?) {
         when(item!!.id){
-
             R.id.imageBackIcon->{
                 findNavController().navigateUp()
             }
@@ -254,9 +208,38 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
         _binding = null
     }
 
-    override fun itemClick(position: Int?, status: String?, type: String?) {
-        TODO("Not yet implemented")
+    override fun onResume() {
+        super.onResume()
+        binding.etIngRecipes.addTextChangedListener(textListener)
     }
 
+    override fun onPause() {
+        binding.etIngRecipes.removeTextChangedListener(textListener)
+        super.onPause()
+    }
 
+    @SuppressLint("SetTextI18n")
+    override fun itemClick(position: Int?, status: String?, type: String?) {
+        if (type.equals("filter",true)){
+            lastSelected=status.toString()
+            // This Api call when the screen in loaded
+            searchRecipeApi("")
+        }else{
+            val count = ingredients.count { it.status == true }
+            showCount(count)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showCount(count:Int){
+        if (count==0){
+            binding.tvCount.text= "Search Recipes"
+            binding.relApplyBtn.isClickable=false
+            binding.relApplyBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+        }else{
+            binding.tvCount.text= "Search Recipes ($count)"
+            binding.relApplyBtn.isClickable=true
+            binding.relApplyBtn.setBackgroundResource(R.drawable.green_btn_background)
+        }
+    }
 }
