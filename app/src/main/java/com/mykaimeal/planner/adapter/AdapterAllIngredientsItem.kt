@@ -36,7 +36,14 @@ class AdapterAllIngredientsItem(
 
         val data=datalist[position]
 
-        holder.binding.textTittles.text = data.name
+
+        data.name?.let {
+            val foodName = it
+            val result = foodName.mapIndexed { index, c ->
+                if (index == 0 || c.isUpperCase()) c.uppercaseChar() else c
+            }.joinToString("")
+            holder.binding.textTittles.text = result
+        }
 
         if (data.status==true){
             holder.binding.imgTick.visibility=View.VISIBLE

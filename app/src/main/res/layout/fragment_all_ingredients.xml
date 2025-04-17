@@ -104,6 +104,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_semibold"
                 android:text="Fridge"
+                android:visibility="gone"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_14sdp" />
             <androidx.recyclerview.widget.RecyclerView

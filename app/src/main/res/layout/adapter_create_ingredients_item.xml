@@ -6,21 +6,19 @@
 
     <LinearLayout
         android:id="@+id/llLayouts"
-        android:layout_width="@dimen/_290sdp"
+        android:layout_width="match_parent"
         android:layout_height="@dimen/_40sdp"
         android:layout_centerHorizontal="true"
         android:layout_marginVertical="@dimen/_5sdp"
         android:background="@drawable/create_unselect_bg"
-        android:orientation="horizontal"
-        android:weightSum="2">
+        android:orientation="horizontal">
 
         <RelativeLayout
             android:id="@+id/relImages"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/_40sdp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:layout_weight=".3">
+            android:layout_marginStart="@dimen/_10sdp">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imageData"
@@ -39,80 +37,85 @@
                 android:layout_centerInParent="true" />
 
         </RelativeLayout>
-
-        <EditText
-            android:id="@+id/etAddIngredients"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.8"
-            android:background="@drawable/ing_edittext_select_bg"
-            android:fontFamily="@font/poppins"
-            android:layout_marginStart="@dimen/_5sdp"
-            android:paddingVertical="@dimen/_8sdp"
-            android:gravity="center|start"
-            android:layout_gravity="center_vertical"
-            android:hint="Pizza"
-            android:paddingHorizontal="@dimen/_10sdp"
-            android:singleLine="true"
-            android:textSize="@dimen/_12sdp" />
-
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.9">
-
+        <LinearLayout
+            android:id="@+id/lay2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
             <EditText
-                android:id="@+id/etAddIngQuantity"
-                android:layout_width="@dimen/_45sdp"
+                android:id="@+id/etAddIngredients"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="@drawable/ing_edittext_select_bg"
                 android:fontFamily="@font/poppins"
-                android:layout_toStartOf="@+id/relQuantity"
-                android:hint="QTY"
+                android:layout_marginStart="@dimen/_5sdp"
                 android:paddingVertical="@dimen/_8sdp"
-                android:inputType="number"
-                android:layout_centerVertical="true"
-                android:maxLength="3"
+                android:gravity="center|start"
+                android:layout_gravity="center_vertical"
+                android:hint="Pizza"
                 android:paddingHorizontal="@dimen/_10sdp"
                 android:singleLine="true"
-                android:textSize="@dimen/_10sdp" />
+                android:textSize="@dimen/_12sdp" />
 
-            <RelativeLayout
-                android:id="@+id/relQuantity"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="@drawable/height_type_bg"
-                android:layout_alignParentEnd="true"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="@dimen/_5sdp">
-
-                <com.skydoves.powerspinner.PowerSpinnerView
-                    android:id="@+id/spinnerQntType"
-                    android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_weight="1">
+                <EditText
+                    android:id="@+id/etAddIngQuantity"
+                    android:layout_width="@dimen/_45sdp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/_5sdp"
+                    android:background="@drawable/ing_edittext_select_bg"
                     android:fontFamily="@font/poppins"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:hint="Type"
-                    android:padding="5dp"
-                    android:textColor="#3C4541"
-                    android:textColorHint="#3C4541"
-                    android:textSize="@dimen/_10sdp"
-                    app:spinner_arrow_gravity="end"
-                    app:spinner_arrow_padding="8dp"
-                    app:spinner_arrow_show="true"
-                    app:spinner_arrow_tint="#000"
-                    app:spinner_divider_show="false"
-                    app:spinner_popup_background="@drawable/bg_cover"
-                    app:spinner_item_height="46dp"
-                    app:spinner_popup_max_height="@dimen/_200sdp"
-                    app:spinner_popup_animation="fade"
-                    app:spinner_popup_elevation="14dp"
-                    />
+                    android:layout_toStartOf="@+id/relQuantity"
+                    android:hint="QTY"
+                    android:paddingVertical="@dimen/_8sdp"
+                    android:inputType="number"
+                    android:layout_centerVertical="true"
+                    android:maxLength="3"
+                    android:paddingHorizontal="@dimen/_10sdp"
+                    android:singleLine="true"
+                    android:textSize="@dimen/_10sdp" />
+                <RelativeLayout
+                    android:id="@+id/relQuantity"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/height_type_bg"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:layout_margin="@dimen/_5sdp">
 
-            </RelativeLayout>
+                    <com.skydoves.powerspinner.PowerSpinnerView
+                        android:id="@+id/spinnerQntType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:hint="Type"
+                        android:padding="5dp"
+                        android:singleLine="true"
+                        android:textColor="#3C4541"
+                        android:textColorHint="#3C4541"
+                        android:textSize="@dimen/_10sdp"
+                        app:spinner_arrow_gravity="end"
+                        app:spinner_arrow_padding="8dp"
+                        app:spinner_arrow_show="true"
+                        app:spinner_arrow_tint="#000"
+                        app:spinner_divider_show="false"
+                        app:spinner_popup_background="@drawable/bg_cover"
+                        app:spinner_item_height="46dp"
+                        app:spinner_popup_max_height="@dimen/_200sdp"
+                        app:spinner_popup_animation="fade"
+                        app:spinner_popup_elevation="14dp"
+                        />
 
-        </RelativeLayout>
-
+                </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
     <ImageView

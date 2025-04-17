@@ -113,7 +113,21 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
 
         searchRecipeApi("")
 
-
+        binding.relApplyBtn.setOnClickListener {
+            if (binding.relApplyBtn.isClickable){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    val mealType = ingredients
+                        .filter { it.status == true }.joinToString(", ") { it.name.toString() }
+                    val bundle = Bundle().apply {
+                        putString("recipeName",mealType)
+                        putString("screenType","Ingredients")
+                    }
+                    findNavController().navigate(R.id.searchedRecipeBreakfastFragment,bundle)
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
+        }
     }
 
     private fun searchRecipeApi(type:String){

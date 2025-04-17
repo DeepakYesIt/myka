@@ -101,15 +101,6 @@ class AdapterCreateIngredientsItem(private var datalist: MutableList<RecyclerVie
             holder.binding.layProgess.root.visibility= View.GONE
         }
 
-/*        listOf(
-            "Teaspoon (tsp)", "Tablespoon (tbsp)", "Cup", "Milliliter (ml)", "Liter (L)",
-            "Fluid Ounce (fl oz)", "Pint (pt)", "Quart (qt)", "Gallon (gal)",
-            "Gram (g)", "Kilogram (kg)", "Milligram (mg)", "Ounce (oz)", "Pound (lb)",
-            "Pinch", "Dash", "Drop", "Handful", "Slice", "Stick", "Clove", "Piece",
-            "Can", "Bottle", "Jar", "Packet", "Bunch", "Sprig",
-            "Inch", "Centimeter", "Feet"
-        )*/
-
         // Update the model when quantity changes
         holder.binding.etAddIngredients.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {

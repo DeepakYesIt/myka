@@ -92,14 +92,17 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
         screenType = arguments?.getString("screenType", "Search") ?: "Search"
         recipeType = arguments?.getString("recipeName", "") ?: ""
         if (!screenType.equals("Search",true)){
-            arguments?.let { bundle ->
-                val mealJson = bundle.getString("mealJsonArray")
-                val dietJson = bundle.getString("dietJsonArray")
-                val cookTimeJson = bundle.getString("cookTimeJsonArray")
-                fullListMealType = jsonArrayToList(mealJson) as MutableList
-                fullListDietType = jsonArrayToList(dietJson)as MutableList
-                fullListCookTime = jsonArrayToList(cookTimeJson)as MutableList
+            if (!screenType.equals("Ingredients",true)){
+                arguments?.let { bundle ->
+                    val mealJson = bundle.getString("mealJsonArray")
+                    val dietJson = bundle.getString("dietJsonArray")
+                    val cookTimeJson = bundle.getString("cookTimeJsonArray")
+                    fullListMealType = jsonArrayToList(mealJson) as MutableList
+                    fullListDietType = jsonArrayToList(dietJson)as MutableList
+                    fullListCookTime = jsonArrayToList(cookTimeJson)as MutableList
+                }
             }
+
         }
 
         cookbookList.clear()
@@ -108,7 +111,9 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
                 "", "", 0, "", "Favourites", 0, "", 0)
         cookbookList.add(0, data)
 
-        binding.tvSearchedTitle.text = recipeType.toString()
+        if (!screenType.equals("Ingredients",true)){
+            binding.tvSearchedTitle.text = recipeType.toString()
+        }
 
         backHandle()
 
@@ -145,7 +150,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
     private fun launchApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-                        if (screenType.equals("Search",true)){
+                        if (screenType.equals("Search",true) || screenType.equals("Ingredients",true)){
                         searchedRecipeViewModel.recipeSearchedApi({
                     BaseApplication.dismissMe()
                     handleApiSearchResponse(it)

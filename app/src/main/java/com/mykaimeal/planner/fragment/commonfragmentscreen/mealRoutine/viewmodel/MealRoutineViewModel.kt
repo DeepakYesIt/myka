@@ -63,4 +63,8 @@ class MealRoutineViewModel @Inject constructor(private val repository: MainRepos
         repository.getCookBookRequestApi { successCallback(it) }
     }
 
+    suspend fun getMealByUrl(successCallback: (response: NetworkResult<String>) -> Unit,url:String?){
+        repository.getMealByUrl({successCallback(it)},url)
+    }
+
 }
