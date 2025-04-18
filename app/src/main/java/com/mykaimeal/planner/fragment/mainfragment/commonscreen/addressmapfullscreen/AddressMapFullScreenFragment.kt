@@ -111,7 +111,6 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
 
     private fun initialize() {
 
-
         binding?.tvAddress?.text=userAddress.toString()
 
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -324,7 +323,7 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
                 streetName = address.thoroughfare ?: "" // Street Name
                 streetNum = address.subThoroughfare ?: "" // Street Number
                 apartNum = address.premises ?: "" // Apartment Number
-                city = address.subLocality ?: "" // City
+                city = address.locality ?: "" // City
                 states = address.adminArea ?: "" // State/Province
                 country = address.countryName ?: "" // Country
                 zipcode = address.postalCode ?: "" // Zip Code

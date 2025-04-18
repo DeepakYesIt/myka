@@ -2513,4 +2513,24 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
+
+    override suspend fun getGraphScreenUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        month: String?
+    ) {
+        try {
+            api.getGraphScreenUrl(month).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
 }

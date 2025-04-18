@@ -119,5 +119,7 @@ object ApiEndPoint {
 
     const val getMissingIngBasketUrl="get-missing-ingredient-screen"
 
+    const val graph="graph"
+
 
 }

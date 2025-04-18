@@ -54,6 +54,7 @@ import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentBasketScreenBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addressmapfullscreen.model.AddAddressModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.AddressPrimaryResponse
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.BasketScreenModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.BasketScreenModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.GetAddressListModel
@@ -276,12 +277,11 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     @SuppressLint("SetTextI18n")
     private fun handleApiAddressPrimaryResponse(data: String) {
         try {
-            val apiModel = Gson().fromJson(data, GetAddressListModel::class.java)
+            val apiModel = Gson().fromJson(data, AddressPrimaryResponse::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                if (apiModel.data != null && apiModel.data.size > 0) {
-                    showDataInAddressUI(apiModel.data)
-                }
+                dialogMiles?.dismiss()
+                getBasketList()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -324,7 +324,6 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     }
 
     private fun showDataInAddressUI(data: MutableList<GetAddressListModelData>?) {
-
         addressList = data
         adapterGetAddressItem = AdapterGetAddressItem(addressList, requireActivity(), this)
         rcySavedAddress!!.adapter = adapterGetAddressItem

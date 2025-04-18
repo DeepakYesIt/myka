@@ -31,6 +31,11 @@ class ShoppingListViewModel @Inject constructor(private val repository: MainRepo
     }
 
 
+    suspend fun getDislikeSearchIngredients(successCallback: (response: NetworkResult<String>) -> Unit,itemCount:String?,type:String){
+        repository.getDislikeSearchIngredients({ successCallback(it) },itemCount,type)
+    }
+
+
     suspend fun addShoppingCartUrlApi(successCallback: (response: NetworkResult<String>) -> Unit,foodIds: MutableList<String>?, schId:MutableList<String>?,
                                 foodName:MutableList<String>?,status:MutableList<String>?){
         repository.addShoppingCartUrlApi ({ successCallback(it) },foodIds,schId,foodName,status)

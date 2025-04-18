@@ -10,11 +10,23 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class StatisticsViewModel@Inject constructor(private val repository: MainRepository) : ViewModel()  {
+class StatisticsViewModel @Inject constructor(private val repository: MainRepository) :
+    ViewModel() {
 
 
-    suspend fun generateLinkUrl(successCallback: (response: NetworkResult<String>) -> Unit, link: RequestBody?, image: MultipartBody.Part?){
-        repository.generateLinkUrl({ successCallback(it) },link,image)
+    suspend fun generateLinkUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        link: RequestBody?,
+        image: MultipartBody.Part?
+    ) {
+        repository.generateLinkUrl({ successCallback(it) }, link, image)
+    }
+
+    suspend fun getGraphScreenUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        month: String?
+    ) {
+        repository.getGraphScreenUrl({ successCallback(it) }, month)
     }
 
 }

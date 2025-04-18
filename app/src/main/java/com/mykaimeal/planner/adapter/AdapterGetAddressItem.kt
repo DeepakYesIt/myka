@@ -27,11 +27,11 @@ class AdapterGetAddressItem(private var addressList: MutableList<GetAddressListM
 
         val itemList= addressList?.get(position)
 
-        if (itemList!!.type!=null){
+        if (itemList?.type!=null){
             holder.binding.tvSetName.text=itemList.type.toString()
         }
 
-        if (itemList.primary!=null){
+        if (itemList?.primary!=null){
             if (itemList.primary==1){
                 holder.binding.relHomeLayout.setBackgroundResource(R.drawable.outline_address_green_border_bg)
             /*    holder.binding.imgPrimary.visibility=View.VISIBLE*/
@@ -42,18 +42,18 @@ class AdapterGetAddressItem(private var addressList: MutableList<GetAddressListM
         }
 
         val addressParts = listOf(
-            itemList.apart_num,
-            itemList.street_num,
-            itemList.street_name,
-            itemList.city,
-            itemList.state,
-            itemList.country,
-            itemList.zipcode
+            itemList?.apart_num,
+            itemList?.street_num,
+            itemList?.street_name,
+            itemList?.city,
+            itemList?.state,
+            itemList?.country,
+            itemList?.zipcode
         )
 
         val isAddressComplete = addressParts.all { !it.isNullOrBlank() }
-        val latitude = itemList.latitude
-        val longitude = itemList.longitude
+        val latitude = itemList?.latitude
+        val longitude = itemList?.longitude
 
         if (isAddressComplete) {
             val fullAddress = addressParts.joinToString(" ")
@@ -67,7 +67,7 @@ class AdapterGetAddressItem(private var addressList: MutableList<GetAddressListM
         }
 
         holder.binding.relSelectHome.setOnClickListener{
-            if (itemList.id!=null && itemList.latitude!=null && itemList.longitude!=null){
+            if (itemList?.id!=null && itemList?.latitude!=null && itemList.longitude!=null){
                 updateSelection(position)
                 onItemClickedListener.itemLongClick(itemList.id, latitude.toString(), longitude.toString(),"SelectPrimary")
             }

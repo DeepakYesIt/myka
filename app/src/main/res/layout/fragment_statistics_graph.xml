@@ -136,6 +136,8 @@
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_below="@id/textSpent"
                 android:layout_marginHorizontal="@dimen/_16sdp"
+                android:padding="0dp"
+                android:clipToPadding="false"
                 android:layout_height="400dp" />
 
             <com.github.mikephil.charting.charts.BarChart

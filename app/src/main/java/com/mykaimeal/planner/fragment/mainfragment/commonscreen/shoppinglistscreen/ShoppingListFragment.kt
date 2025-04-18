@@ -2,10 +2,14 @@ package com.mykaimeal.planner.fragment.mainfragment.commonscreen.shoppinglistscr
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,22 +17,28 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.PopupWindow
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.BasketYourRecipeAdapter
+import com.mykaimeal.planner.adapter.IngredientsAdapterItem
 import com.mykaimeal.planner.adapter.IngredientsShoppingAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.commonworkutils.CommonWorkUtils
 import com.mykaimeal.planner.databinding.FragmentShoppingListBinding
+import com.mykaimeal.planner.fragment.commonfragmentscreen.ingredientDislikes.model.DislikedIngredientsModel
+import com.mykaimeal.planner.fragment.commonfragmentscreen.ingredientDislikes.model.DislikedIngredientsModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Recipes
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.shoppinglistscreen.model.ShoppingListModel
@@ -37,8 +47,9 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.shoppinglistscre
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 @AndroidEntryPoint
 class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
@@ -55,7 +66,12 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private var foodName = mutableListOf<String>()
     private var statusType = mutableListOf<String>()
     private lateinit var commonWorkUtils: CommonWorkUtils
-
+    private lateinit var textListener: TextWatcher
+    private lateinit var rlWriteNameHere: RelativeLayout
+    private var textChangedJob: Job? = null
+    private var dislikedIngredientData: MutableList<DislikedIngredientsModelData>? = null
+    private var popupWindow: PopupWindow? = null
+    private var ingredientsAdapterItem: IngredientsAdapterItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,7 +80,8 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         // Inflate the layout for this fragment
         binding = FragmentShoppingListBinding.inflate(layoutInflater, container, false)
 
-        shoppingListViewModel = ViewModelProvider(requireActivity())[ShoppingListViewModel::class.java]
+        shoppingListViewModel =
+            ViewModelProvider(requireActivity())[ShoppingListViewModel::class.java]
         commonWorkUtils = CommonWorkUtils(requireActivity())
 
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -92,9 +109,9 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
     private fun initialize() {
 
-    /*    binding.textSeeAll3.setOnClickListener {
-            findNavController().navigate(R.id.shoppingMissingIngredientsFragment)
-        }*/
+        /*    binding.textSeeAll3.setOnClickListener {
+                findNavController().navigate(R.id.shoppingMissingIngredientsFragment)
+            }*/
 
         binding.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()
@@ -120,8 +137,11 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         tvCounter = dialogRemoveDay.findViewById(R.id.tvCounter)
         val tvLabel = dialogRemoveDay.findViewById<EditText>(R.id.tvLabel)
         val tvDialogAddBtn = dialogRemoveDay.findViewById<TextView>(R.id.tvDialogAddBtn)
+        rlWriteNameHere = dialogRemoveDay.findViewById(R.id.rlWriteNameHere)
         dialogRemoveDay.show()
         dialogRemoveDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        textWatcher()
 
         tvDialogCancelBtn.setOnClickListener {
             dialogRemoveDay.dismiss()
@@ -173,7 +193,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 user_id = null
             )
 
-        // Add to both UI and new list
+            // Add to both UI and new list
             ingredientList?.add(newIngredient)
             adapterShoppingAdapter.notifyItemInserted(ingredientList?.size!! - 1)
 
@@ -201,19 +221,129 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
     }
 
+
+    private fun textWatcher() {
+
+        textListener = object : TextWatcher {
+            private var searchFor = "" // Or view.editText.text.toString()
+
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val searchText = s.toString()
+                if (searchText != searchFor) {
+                    searchFor = searchText
+                    textChangedJob?.cancel()
+                    // Launch a new coroutine in the lifecycle scope
+                    textChangedJob = lifecycleScope.launch {
+                        delay(1000)  // Debounce time
+                        if (searchText == searchFor) {
+                            if (BaseApplication.isOnline(requireActivity())) {
+                                searchable(searchText)
+                            } else {
+                                BaseApplication.alertError(
+                                    requireContext(),
+                                    ErrorMessage.networkError,
+                                    false
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun searchable(editText: String) {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            shoppingListViewModel.getDislikeSearchIngredients({
+                BaseApplication.dismissMe()
+                when (it) {
+                    is NetworkResult.Success -> {
+                        val gson = Gson()
+                        try {
+                            val dietaryModel = gson.fromJson(it.data, DislikedIngredientsModel::class.java)
+                            if (dietaryModel.code == 200 && dietaryModel.success) {
+                                if (dietaryModel.data != null) {
+                                    showDataInUi(dietaryModel.data)
+                                }
+                            } else {
+                                if (dietaryModel.code == ErrorMessage.code) {
+                                    showAlertFunction(dietaryModel.message, true)
+                                } else {
+                                    showAlertFunction(dietaryModel.message, false)
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.d("IngredientDislike@@@@", "message:--" + e.message)
+                        }
+                    }
+
+                    is NetworkResult.Error -> {
+                        showAlertFunction(it.message, false)
+                    }
+
+                    else -> {
+                        showAlertFunction(it.message, false)
+                    }
+                }
+            }, editText, "Shopping")
+
+        }
+    }
+
+    private fun showDataInUi(searchModelData: MutableList<DislikedIngredientsModelData>) {
+        try {
+            dislikedIngredientData = searchModelData
+            loadSearch()
+
+        } catch (e: Exception) {
+            popupWindow?.dismiss()
+            Log.d("AddMeal", "message:--" + e.message)
+        }
+    }
+
+    private fun loadSearch() {
+        val inflater =
+            requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater?
+        val popupView: View? = inflater?.inflate(R.layout.item_select_layoutdrop, null)
+        // Allows dismissing the popup when touching outside
+        popupWindow?.isOutsideTouchable = true
+        popupWindow = PopupWindow(
+            popupView,
+            rlWriteNameHere.width,
+            RelativeLayout.LayoutParams.WRAP_CONTENT,
+            true
+        )
+        popupWindow?.showAsDropDown(rlWriteNameHere, 0, 0, Gravity.CENTER)
+        val rcyData = popupView?.findViewById<RecyclerView>(R.id.rcy_data)
+        ingredientsAdapterItem =
+            dislikedIngredientData?.let { IngredientsAdapterItem(it, requireActivity(), this) }
+        rcyData!!.adapter = ingredientsAdapterItem
+    }
+
+
+    private fun showAlertFunction(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
+    }
+
+
     private fun addToCartUrlApi(dismiss: Dialog) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             shoppingListViewModel.addShoppingCartUrlApi({
                 BaseApplication.dismissMe()
-                handleCartApiResponse(it,dismiss)
+                handleCartApiResponse(it, dismiss)
             }, foodIds, schIds, foodName, statusType)
         }
     }
 
     private fun handleCartApiResponse(result: NetworkResult<String>, dismiss: Dialog) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessCartResponse(result.data.toString(),dismiss)
+            is NetworkResult.Success -> handleSuccessCartResponse(result.data.toString(), dismiss)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
@@ -295,13 +425,14 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             binding.rlYourRecipes.visibility = View.GONE
         }
 
-        if (ingredientList!=null){
+        if (ingredientList != null) {
             ingredientList?.clear()
         }
 
         if (data.ingredient != null && data.ingredient.size > 0) {
             ingredientList = data.ingredient
-            adapterShoppingAdapter = IngredientsShoppingAdapter(data.ingredient, requireActivity(), this)
+            adapterShoppingAdapter =
+                IngredientsShoppingAdapter(data.ingredient, requireActivity(), this)
             binding.rcvIngredients.adapter = adapterShoppingAdapter
         }
     }
@@ -389,14 +520,25 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         position: Int?
     ) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessIngResponse(result.data.toString(), item, quantity, position)
+            is NetworkResult.Success -> handleSuccessIngResponse(
+                result.data.toString(),
+                item,
+                quantity,
+                position
+            )
+
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessIngResponse(data: String, item: Ingredient?, quantity: String, position: Int?) {
+    private fun handleSuccessIngResponse(
+        data: String,
+        item: Ingredient?,
+        quantity: String,
+        position: Int?
+    ) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
@@ -412,7 +554,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                         adapterShoppingAdapter.updateList(ingredientList!!)
                     }
                 }
-              getShoppingList()
+                getShoppingList()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
