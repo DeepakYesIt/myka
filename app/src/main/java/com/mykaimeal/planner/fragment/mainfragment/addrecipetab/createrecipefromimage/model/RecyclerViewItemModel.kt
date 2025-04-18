@@ -2,8 +2,8 @@ package com.mykaimeal.planner.fragment.mainfragment.addrecipetab.createrecipefro
 
 data class RecyclerViewItemModel(
     var uri: String?,
-    var ingredientName: String,
+    var ingredientName: String?,
     var status: Boolean = false,
-    var quantity: String,
-    var measurement: String=""
+    var quantity: String?,
+    var measurement: String?=""
 )

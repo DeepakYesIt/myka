@@ -15,7 +15,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -62,28 +61,20 @@ import java.io.File
 
 
 @AndroidEntryPoint
-class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImage,AdapterCookIngredientsItem.CookIngName {
+class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImage {
 
     private lateinit var binding: FragmentCreateRecipeBinding
-    private var quantity: Int = 1
     private var file: File? = null
-    private var ingredientList: MutableList<RecyclerViewItemModel>? = null
-    private var cookList: MutableList<RecyclerViewCookIngModel>? = null
+    private var ingredientList: MutableList<RecyclerViewItemModel> =  mutableListOf()
+    private var cookList: MutableList<RecyclerViewCookIngModel> = mutableListOf()
     private var adapter: AdapterCreateIngredientsItem? = null
-    private var showIngredientImage: ImageView? = null
-    private var showCrossIngImage: ImageView? = null
-    private var root: RelativeLayout? = null
-    private val ingredientLists: MutableList<String>? = null
-    private var position: Int? = 0
+    private var position: Int = 0
     private var checkBase64Url:Boolean?=false
     private var recipeMainImageUri: String? = null
-    private var cookDescription: String? = null
     private var recipeStatus: String? = "0"
     private var adapterCook: AdapterCookIngredientsItem? = null
     private lateinit var createRecipeViewModel: CreateRecipeViewModel
     private lateinit var commonWorkUtils: CommonWorkUtils
-
-
     private var recipeName:String?=""
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
         mutableListOf()
@@ -101,10 +92,21 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
         }
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
+
         createRecipeViewModel = ViewModelProvider(requireActivity())[CreateRecipeViewModel::class.java]
 
         recipeName = arguments?.getString("name", "")?:""
 
+
+        backButton()
+
+        initialize()
+
+        return binding.root
+    }
+
+
+    private fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -112,10 +114,6 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
                     addRecipeDiscardDialog()
                 }
             })
-
-        initialize()
-
-        return binding.root
     }
 
 
@@ -124,13 +122,11 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.let { uri ->
-
                 // val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, uri)
                 file = MediaUtility.getPath(requireContext(), uri)?.let { File(it) }
                 /*processImage(bitmap)*/
                 // Now you can send the image URI to Vision API for processing
                 // Convert image to Base64
-
                 binding.addImageIcon.visibility = View.GONE
                 checkBase64Url=true
                 recipeMainImageUri = UriToBase64(requireActivity(), uri)
@@ -146,28 +142,47 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
     private fun initialize() {
 
         cookbookList.clear()
-
-        val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
-                "", "", 0, "", "Favorites", 0, "", 0)
+        val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("", "", 0, "", "Favorites", 0, "", 0)
         cookbookList.add(0, data)
 
-        ingredientList = mutableListOf()
 
         // Add the first blank EditText item
-        ingredientList?.add(RecyclerViewItemModel("", "", false,"",""))
+        ingredientList.add(RecyclerViewItemModel("", "", false,"",""))
 
         // Set up RecyclerView and Adapter
-        adapter = AdapterCreateIngredientsItem(ingredientList!!, requireActivity(), this)
+        adapter = AdapterCreateIngredientsItem(ingredientList, requireActivity(), this){ updatedPosition, updatedItem ->
+
+            // ✅ Update the status of the specific item
+            updatedItem.status = updatedItem.ingredientName?.isNotBlank() == true &&
+                    updatedItem.quantity?.isNotBlank() == true &&
+                    updatedItem.measurement?.isNotBlank() == true
+            // ✅ Update the item in the list
+            ingredientList[updatedPosition] = updatedItem
+            // ✅ Refresh only the changed child
+           binding.rcyCreateIngredients.adapter?.notifyItemChanged(updatedPosition)
+        }
         binding.rcyCreateIngredients.adapter = adapter
 
-        // Handle "+" button click
+        // Ingredients Handle "+" button click
         binding.imageCrtIngPlus.setOnClickListener {
-            if (adapter!!.isAllFieldsFilled()){
-                adapter!!.addNewItem()
-                binding.rcyCreateIngredients.scrollToPosition(ingredientList!!.size - 1) // Scroll to the new item
-            }else{
-                // Highlight empty fields
-                adapter!!.highlightEmptyFields(binding.rcyCreateIngredients)
+            var result = true // Default to true, assuming all values are filled
+
+            // Iterate through each item in the ingredientList and check if all values are filled
+            ingredientList.forEachIndexed { _, item ->
+                if (item.ingredientName?.isBlank() == true ||
+                    item.quantity?.isBlank() == true ||
+                    item.measurement?.isBlank() == true) {
+                    // If any field is blank in the current position, set result to false
+                    result = false
+                    // Show a toast message indicating which position has missing values
+                    Toast.makeText(requireContext(), ErrorMessage.ingredientInstructions, Toast.LENGTH_LONG).show()
+                    return@forEachIndexed // Exit early after finding the first invalid item
+                }
+            }
+            // If all values are filled, add a new ingredient; otherwise, do nothing
+            if (result) {
+                ingredientList.add(RecyclerViewItemModel("", "", false, "", ""))
+                adapter?.update(ingredientList)
             }
         }
 
@@ -180,49 +195,50 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        cookList = mutableListOf()
-
         // Initialize with Step-1 by default
-        cookList?.add(RecyclerViewCookIngModel(1))
+        cookList.add(RecyclerViewCookIngModel(1))
 
         // Setup RecyclerView
-        adapterCook = AdapterCookIngredientsItem(cookList!!,requireActivity(),this)
-        binding.rcyCookInstructions.apply {
-            adapter = adapterCook
+        adapterCook = AdapterCookIngredientsItem(cookList,requireActivity()){ updatedPosition, updatedItem ->
+            cookList[updatedPosition] = updatedItem
+            binding.rcyCookInstructions.adapter?.notifyItemChanged(updatedPosition)
         }
+        binding.rcyCookInstructions.adapter=adapterCook
 
-        // Handle "+" button click
         binding.imageCookIns.setOnClickListener {
-     /*       adapterCook!!.addNewItem() // Add new step dynamically*/
-            if (adapterCook!!.isAllIngFieldFilled()){
-                adapterCook!!.addNewItem()
-                binding.rcyCookInstructions.scrollToPosition(cookList!!.size - 1) // Scroll to the new item
-            }else{
-                // Highlight empty fields
-                adapterCook!!.highlightEmptyIngFields(binding.rcyCookInstructions)
+            // Check if any item has a blank or null description
+            val hasEmptyField = cookList.any { it.description.isNullOrBlank() }
+            if (hasEmptyField) {
+                Toast.makeText(requireContext(), ErrorMessage.validCookingInstructions, Toast.LENGTH_LONG).show()
+            } else {
+                // All descriptions are filled, so add a new step
+                cookList.add(RecyclerViewCookIngModel(1)) // You can update '1' to meaningful data if needed
+                adapterCook?.update(cookList)
             }
         }
 
+
+        // serving count - and +
         binding.imgMinus.setOnClickListener {
-            if (quantity > 1) {
-                quantity--
-                updateValue()
-            } else {
-                Toast.makeText(requireActivity(), "Minimum serving atleast value is one", Toast.LENGTH_LONG).show()
+            val currentValue = binding.textValue.text.toString().toInt()
+            if (currentValue > 1) {
+                updateValue(currentValue - 1)
             }
         }
 
         binding.imgPlus.setOnClickListener {
-            if (quantity < 99) {
-                quantity++
-                updateValue()
+            val currentValue = binding.textValue.text.toString().toInt()
+            if (currentValue < 99) {
+                updateValue(currentValue + 1)
             }
         }
 
+        // backButton handle
         binding.relBacks.setOnClickListener {
             addRecipeDiscardDialog()
         }
 
+        // save button handle
         binding.layBottom.setOnClickListener {
             if (validate()) {
                 if (BaseApplication.isOnline(requireActivity())) {
@@ -233,22 +249,28 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
             }
         }
 
+        // Private button handle
         binding.textPrivate.setOnClickListener {
             radioButton(true)
         }
+
+        // Public button handle
         binding.textPublic.setOnClickListener {
             radioButton(false)
         }
 
+        // add Image handle
         binding.addImages.setOnClickListener {
             openCameraGallery(false)
         }
 
+        // cookBookList
         if (BaseApplication.isOnline(requireActivity())) {
             getCookBookList()
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
+
     }
 
     private fun radioButton(type: Boolean) {
@@ -264,51 +286,36 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
     }
 
     private fun validate(): Boolean {
-        val hasEmptyDescription = cookList?.any { it.description.isEmpty() } == true
-        val hasIncompleteIngredient = ingredientList?.any {
-            it.uri.isNullOrBlank() ||
-                    it.ingredientName.isBlank() ||
-                    it.quantity.isBlank() ||
-                    it.measurement.isBlank()
-        } == true
+
+        var result = true // Default to true, assuming all values are filled
+
+        // Iterate through each item in the ingredientList and check if all values are filled
+        ingredientList.forEachIndexed { _, item ->
+            if (item.ingredientName?.isBlank() == true ||
+                item.quantity?.isBlank() == true ||
+                item.measurement?.isBlank() == true) {
+                // If any field is blank in the current position, set result to false
+                result = false
+                return@forEachIndexed // Exit early after finding the first invalid item
+            }
+        }
+
+        val hasEmptyField = cookList.any { it.description.isNullOrBlank() }
 
         if (binding.etRecipeName.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.recipeName, false)
             return false
-        } else if (hasIncompleteIngredient) {
-            commonWorkUtils.alertDialog(requireActivity(), "Please complete all ingredient fields", false)
+        } else if (!result) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.ingredientInstructions, false)
             return false
-        } else if (hasEmptyDescription) {
+        } else if (hasEmptyField) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validCookingInstructions, false)
             return false
         }else if (binding.edtTotalTime.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validTotalTime, false)
             return false
         }
-        /* else if (binding.spinnerCookBook.text.toString().trim().isEmpty()) {
-            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.selectCookBookError, false)
-            return false
-        } */
-
         return true
-
-
-        /*   val hasEmptyDescription = cookList?.any { it.description.isEmpty() } == true
-           if (binding.etRecipeName.text.toString().trim().isEmpty()) {
-               commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.recipeName, false)
-               return false
-           } else if (binding.edtTotalTime.text.toString().trim().isEmpty()) {
-               commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validTotalTime, false)
-               return false
-           }else if (hasEmptyDescription) {
-               commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validCookingInstructions, false)
-               return false
-           }
-           *//*else if (binding.spinnerCookBook.text.toString().trim().isEmpty()){
-            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.selectCookBookError, false)
-            return false
-        }*//*
-        return true*/
     }
 
     private fun updateBackground(llCreateTitle: LinearLayout, text: String) {
@@ -322,55 +329,52 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
     @SuppressLint("SuspiciousIndentation")
     private fun createRecipeApi() {
         lifecycleScope.launch {
-            if (!checkBase64Url!!) {
-                recipeMainImageUri = imageUrlToBase64(recipeMainImageUri!!)
-            }
+            try {
+                if (!checkBase64Url!!) {
+                    checkBase64Url=true
+                    recipeMainImageUri = imageUrlToBase64(recipeMainImageUri!!)
+                }
 
-            val jsonObject = JsonObject()
-            Log.d("fdfdf", "ffd:--0" + ingredientList!!.size)
 
-            // Create a JsonArray for ingredients
-            val ingArray = JsonArray()
-            val prepArray = JsonArray()
-
-            // Extract required fields dynamically
-            ingredientList?.forEach { item ->
-               /* val ingredientString = "${item.ingredientName},${item.quantity},${item.measurement}"*/
-                val ingredientString = item.ingredientName
-                ingArray.add(ingredientString)
-            }
-
-            // Prepare prep steps
-            cookList?.forEach { items ->
-                prepArray.add(items.description)
-            }
-
-            var cookBookID = ""
-            if (binding.spinnerCookBook.text.toString().isNotEmpty()) {
-                cookBookID = cookbookList[binding.spinnerCookBook.selectedIndex].id.toString()
-            }
-
-            // Add data to JSON object
-            jsonObject.addProperty("recipe_key", recipeStatus.toString())
-            jsonObject.addProperty("cook_book", cookBookID)
-            jsonObject.addProperty("title", binding.etRecipeName.text.toString().trim())
-            jsonObject.add("ingr", ingArray)
-            jsonObject.addProperty("summary", binding.edtSummary.text.toString().trim())
-            jsonObject.addProperty("yield", binding.textValue.text.toString().trim())
-            jsonObject.addProperty("totalTime", binding.edtTotalTime.text.toString().trim())
-            jsonObject.add("prep", prepArray)
-            jsonObject.addProperty("img", recipeMainImageUri ?: "")  // Ensure it's not null
+                val jsonObject = JsonObject()
+                Log.d("fdfdf", "ffd:--0" + ingredientList.size)
+                // Create a JsonArray for ingredients
+                val ingArray = JsonArray()
+                val prepArray = JsonArray()
+                // Extract required fields dynamically
+                ingredientList.forEach { item ->
+                    /* val ingredientString = "${item.ingredientName},${item.quantity},${item.measurement}"*/
+                    ingArray.add(item.ingredientName)
+                }
+                // Prepare prep steps
+                cookList.forEach { items ->
+                    prepArray.add(items.description)
+                }
+                var cookBookID = ""
+                if (binding.spinnerCookBook.text.toString().isNotEmpty()) {
+                    cookBookID = cookbookList[binding.spinnerCookBook.selectedIndex].id.toString()
+                }
+                // Add data to JSON object
+                jsonObject.addProperty("recipe_key", recipeStatus.toString())
+                jsonObject.addProperty("cook_book", cookBookID)
+                jsonObject.addProperty("title", binding.etRecipeName.text.toString().trim())
+                jsonObject.add("ingr", ingArray)
+                jsonObject.addProperty("summary", binding.edtSummary.text.toString().trim())
+                jsonObject.addProperty("yield", binding.textValue.text.toString().trim())
+                jsonObject.addProperty("totalTime", binding.edtTotalTime.text.toString().trim())
+                jsonObject.add("prep", prepArray)
+                jsonObject.addProperty("img", recipeMainImageUri ?: "")  // Ensure it's not null
 //            jsonObject.addProperty("tags", binding.etRecipeName.text.toString().trim())
-
-            Log.d("json object", "******$jsonObject")
-
-            BaseApplication.showMe(requireContext())
-
-            // Call API after everything is ready
-            createRecipeViewModel.createRecipeRequestApi({
-                BaseApplication.dismissMe()
-                handleApiCreateRecipeResponse(it)
-            }, jsonObject)
+                Log.d("json object", "******$jsonObject")
+                BaseApplication.showMe(requireContext())
+                // Call API after everything is ready
+                createRecipeViewModel.createRecipeRequestApi({
+                    BaseApplication.dismissMe()
+                    handleApiCreateRecipeResponse(it)
+                }, jsonObject)
+            }catch (e:Exception){
+                Log.d("@Error ","*********"+e.message)
+            }
         }
     }
 
@@ -482,7 +486,7 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
                                 status = false
                             )
                         }.toMutableList()
-                        adapterCook!!.update(cookList!!)
+                        adapterCook!!.update(cookList)
                     }
 
                     if (recipe.totalTime!=null && recipe.totalTime!=0){
@@ -492,15 +496,13 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
                     if (recipe.ingredients!=null){
                         // Map the response values to your IngredientModel list
                         ingredientList = recipe.ingredients.map { response ->
-                            RecyclerViewItemModel(
-                                uri = response.image, // Set the image URI
-                                ingredientName = response.food.toString(), // Set the ingredient name
-                                quantity = response.quantity.toString(), // Convert quantity to String
-                                measurement = response.measure.toString(), // Set the measurement
-                                status = false // Default status
-                            )
-                        }.toMutableList()
-                        adapter?.update(ingredientList!!)
+                            if (!response.food.toString().equals("",true) && !response.quantity.toString().equals("",true)){
+                                RecyclerViewItemModel(uri = response.image, ingredientName = response.food.toString(), quantity = response.quantity.toString(), measurement = response.measure.toString(), status = true)
+                            }else{
+                                RecyclerViewItemModel(uri = response.image, ingredientName = response.food.toString(), quantity = response.quantity.toString(), measurement = response.measure.toString(), status = false)
+                            }
+                         }.toMutableList()
+                        adapter?.update(ingredientList)
                     }
                 }
             }
@@ -554,17 +556,17 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
     @SuppressLint("SetTextI18n")
     private fun handleSuccessCreateApiResponse(data: String) {
         try {
-                 val apiModel = Gson().fromJson(data, CreateRecipeSuccessModel::class.java)
+            val apiModel = Gson().fromJson(data, CreateRecipeSuccessModel::class.java)
                  Log.d("@@@ addMea List ", "message :- $data")
-                 if (apiModel.code == 200 && apiModel.success) {
+            if (apiModel.code == 200 && apiModel.success) {
                      addRecipeSuccessDialog()
-                 } else {
-                     if (apiModel.code == ErrorMessage.code) {
-                         showAlert(apiModel.message, true)
-                     } else {
-                         showAlert(apiModel.message, false)
-                     }
-                 }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
@@ -574,8 +576,9 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
         BaseApplication.alertError(requireContext(), message, status)
     }
 
-    private fun updateValue() {
-        binding.textValue.text = String.format("%02d", quantity)
+    @SuppressLint("SetTextI18n")
+    private fun updateValue(value:Int) {
+        binding.textValue.text =""+value
     }
 
     private fun addRecipeDiscardDialog() {
@@ -619,12 +622,8 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
         }
     }
 
-    override fun uploadImage(imageView: ImageView?, pos: Int, cross: ImageView?, root: RelativeLayout) {
-        // Save references for later use
-        this.showIngredientImage = imageView
-        this.showCrossIngImage = cross
+    override fun uploadImage(pos: Int) {
         this.position = pos
-        this.root = root
         openCameraGallery(true)
     }
 
@@ -651,13 +650,11 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
         if (result.resultCode == Activity.RESULT_OK) {
             try {
                 result.data?.data?.let { uri ->
-                    file = MediaUtility.getPath(requireContext(), uri)?.let { File(it) }
-
-                    ingredientList!![position!!].uri = UriToBase64(requireActivity(), uri)
-                    ingredientList!![position!!].status=true
-                    showCrossIngImage?.visibility = View.VISIBLE
-                    showIngredientImage?.setImageURI(uri)
-                    ingredientLists?.add(file!!.absolutePath)
+                    val localData=ingredientList[position]
+                    localData.uri=uri.toString()
+                    localData.status=false
+                    ingredientList[position] = localData
+                    adapter?.update(ingredientList)
                 }
             }catch (e:Exception){
                 BaseApplication.alertError(requireContext(), e.message, false)
@@ -665,22 +662,5 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
         }
     }
 
-    override fun crossImage(cross: ImageView?, imageView: ImageView?, textView: TextView?, pos: Int) {
-        this.position = pos
-        showCrossIngImage?.visibility = View.GONE
-    }
-
-    override fun cookIngName(description: String?, pos: Int, cross: ImageView?) {
-        // Save references for later use
-        this.cookDescription = description
-        this.showCrossIngImage = cross
-        this.position = pos
-
-    }
-
-    override fun crossCookIngName(cross: ImageView?, textView: TextView?, pos: Int) {
-
-        showCrossIngImage?.visibility = View.VISIBLE
-    }
 
 }

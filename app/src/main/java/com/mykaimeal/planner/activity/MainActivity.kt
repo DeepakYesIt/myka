@@ -368,23 +368,23 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
     }
 
     private fun handleDeepLink(intent: Intent?) {
-            intent?.data?.let { uri ->
-                val deepLinkValue = uri.getQueryParameter("deep_link_value")
-                val deepLinkSub1 = uri.getQueryParameter("deep_link_sub1")
-                Log.d("DeepLink", "Deep link value: $deepLinkValue, Sub1: $deepLinkSub1")
+        intent?.data?.let { uri ->
+            val deepLinkValue = uri.getQueryParameter("deep_link_value")
+            val deepLinkSub1 = uri.getQueryParameter("deep_link_sub1")
+            Log.d("DeepLink", "Deep link value: $deepLinkValue, Sub1: $deepLinkSub1")
 
-                // Navigate to the appropriate screen based on the deep link
-                when (deepLinkValue) {
-                    "profile_screen" -> {
-                        // Navigate to Profile screen
-                        startActivity(Intent(this, AuthActivity::class.java))
-                    }
-                    else -> {
-                        // Handle other cases or show a default screen
-                    }
+            // Navigate to the appropriate screen based on the deep link
+            when (deepLinkValue) {
+                "profile_screen" -> {
+                    // Navigate to Profile screen
+                    startActivity(Intent(this, AuthActivity::class.java))
+                }
+                else -> {
+                    // Handle other cases or show a default screen
                 }
             }
         }
+    }
 
     private fun startDestination() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.frameContainerMain) as NavHostFragment
@@ -708,7 +708,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
                     showData(apiModel.data)
                 }
             } else {
-                 handleError(apiModel.code,apiModel.message)
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlertFunction(e.message, false)
@@ -1070,7 +1070,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             R.id.llAddRecipe -> {
                 findNavController(R.id.frameContainerMain).navigate(R.id.searchFragmentDummy)
                 binding.cardViewAddRecipe.visibility = View.VISIBLE
-             }
+            }
 
             R.id.llPlan -> {
                 binding.cardViewAddRecipe.visibility = View.GONE
@@ -1210,15 +1210,15 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
         cookbookList.clear()
         val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
-                "",
-                "",
-                0,
-                "",
-                "Favorites",
-                0,
-                "",
-                0
-            )
+            "",
+            "",
+            0,
+            "",
+            "Favorites",
+            0,
+            "",
+            0
+        )
         cookbookList.add(0, data)
         spinnerActivityLevel.setItems(cookbookList.map { it.name })
 
@@ -1284,7 +1284,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
                     spinnerActivityLevel.setItems(cookbookList.map { it.name })
                 }
             } else {
-               handleError(apiModel.code,apiModel.message)
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)

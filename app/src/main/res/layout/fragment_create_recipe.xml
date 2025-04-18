@@ -11,7 +11,7 @@
         android:id="@+id/lay_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginHorizontal="@dimen/_6sdp"
         android:layout_marginTop="@dimen/_10sdp"
         android:gravity="start|center">
 
@@ -42,7 +42,7 @@
         android:layout_height="match_parent"
         android:layout_above="@id/lay_bottom"
         android:layout_below="@id/lay_title"
-        android:layout_margin="@dimen/_10sdp"
+        android:layout_margin="@dimen/_6sdp"
         android:fillViewport="true">
 
         <LinearLayout
@@ -163,7 +163,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/_5sdp"
                             android:layout_marginEnd="@dimen/_5sdp"
-                            android:text="01"
+                            android:text="1"
                             android:textColor="#000000"
                             android:textSize="@dimen/_13sdp"
                             android:textStyle="bold" />
@@ -206,13 +206,17 @@
                     android:src="@drawable/add_image" />
             </RelativeLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rcyCreateIngredients"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:orientation="vertical"/>
+                android:layout_height="wrap_content">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcyCreateIngredients"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:orientation="vertical"/>
+            </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -242,13 +246,17 @@
                     android:src="@drawable/add_image" />
             </RelativeLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rcyCookInstructions"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:orientation="vertical"/>
+                android:layout_height="wrap_content">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcyCookInstructions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:orientation="vertical"/>
+            </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"

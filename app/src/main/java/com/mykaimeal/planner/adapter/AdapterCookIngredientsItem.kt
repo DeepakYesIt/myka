@@ -6,7 +6,6 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -14,112 +13,74 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterCookInstructionsItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.addrecipetab.createrecipefragment.model.RecyclerViewCookIngModel
 
-
-class AdapterCookIngredientsItem(private var datalist: MutableList<RecyclerViewCookIngModel>, private var requireActivity: FragmentActivity,
-                                 private var cookIngName: CookIngName
+class AdapterCookIngredientsItem(
+    private var datalist: MutableList<RecyclerViewCookIngModel>,
+    private var requireActivity: FragmentActivity,
+    private val onExerciseUpdated: (Int, RecyclerViewCookIngModel) -> Unit
 ) : RecyclerView.Adapter<AdapterCookIngredientsItem.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding: AdapterCookInstructionsItemBinding =
-            AdapterCookInstructionsItemBinding.inflate(inflater, parent, false);
+        val binding = AdapterCookInstructionsItemBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
-
+    @SuppressLint("SetTextI18n")
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = datalist[position]
 
-        holder.binding.tvInstructions.text="Step-"+item.count.toString()
+        // Set step number
+        holder.binding.tvInstructions.text = "Step- "+(position+1)
 
-        if (item.description!=null){
-            holder.binding.etAddIngredients.setText(item.description.toString())
-            updateBackground(holder.binding.llLayouts, item.description)
-        }else{
-            holder.binding.etAddIngredients.setText("")
-            updateBackground(holder.binding.llLayouts, "")
+        // Remove old text watcher if any
+        holder.ingredientsWatcher?.let {
+            holder.binding.etAddIngredients.removeTextChangedListener(it)
         }
 
-
-        // Update the model when quantity changes
-        holder.binding.etAddIngredients.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                item.description = s.toString()
-                updateBackground(holder.binding.llLayouts, s.toString())
-                cookIngName.cookIngName(s.toString(), position, holder.binding.imgCross)
-            }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-
-        holder.binding.imgCross.setOnClickListener{
-            removeStep(position)
+        // Set description text only if different
+        val currentText = item.description ?: ""
+        if (holder.binding.etAddIngredients.text.toString() != currentText) {
+            holder.binding.etAddIngredients.setText(currentText)
+            holder.binding.etAddIngredients.setSelection(currentText.length)
         }
-    }
 
-    private fun updateBackground(llLayouts: LinearLayout, text: String) {
-        if (text.isNotEmpty()) {
-            llLayouts.setBackgroundResource(R.drawable.create_select_bg) // Change this drawable
+        // Background color based on content
+        if (currentText.isNotEmpty()) {
+            holder.binding.llLayouts.setBackgroundResource(R.drawable.create_select_bg)
         } else {
-            llLayouts.setBackgroundResource(R.drawable.create_unselect_bg)  // Default background
+            holder.binding.llLayouts.setBackgroundResource(R.drawable.create_unselect_bg)
         }
-    }
 
-    // Function to check if all EditTexts are filled
-    fun isAllIngFieldFilled(): Boolean {
-        return datalist.all { it.description.isNotEmpty() }
-    }
-
-    // Function to remove a step and update step numbers
-    private fun removeStep(position: Int) {
-        if (position == 0) return // Prevent deleting Step-1
-        datalist.removeAt(position)
-        notifyItemRemoved(position)
-        updateStepNumbers()
-    }
-
-    // Function to update step numbers dynamically
-    private fun updateStepNumbers() {
-        for (i in datalist.indices) {
-            datalist[i].count = i + 1 // Reset step numbers sequentially
-        }
-        notifyDataSetChanged()
-    }
-
-    fun highlightEmptyIngFields(recyclerView: RecyclerView) {
-        for (i in datalist.indices) {
-            val holder = recyclerView.findViewHolderForAdapterPosition(i) as? ViewHolder
-            holder?.binding!!.etAddIngredients.let { editText ->
-                if (datalist[i].description.trim().isEmpty()) {
+        // Create new text watcher
+        val ingredientsWatcher = object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val pos = holder.bindingAdapterPosition
+                if (pos != RecyclerView.NO_POSITION) {
+                    datalist[pos].description = s.toString()
+                    onExerciseUpdated(pos, datalist[pos])
                 }
             }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         }
+
+        // Attach new text watcher
+        holder.ingredientsWatcher = ingredientsWatcher
+        holder.binding.etAddIngredients.addTextChangedListener(ingredientsWatcher)
     }
 
-    override fun getItemCount(): Int {
-        return datalist.size
-    }
+    override fun getItemCount(): Int = datalist.size
 
-    fun addNewItem() {
-        val newStep = RecyclerViewCookIngModel(datalist.size + 1) // Next step number
-        datalist.add(newStep)
-        notifyItemInserted(datalist.size - 1)
-    }
-
+    @SuppressLint("NotifyDataSetChanged")
     fun update(recyclerViewCookIngModels: MutableList<RecyclerViewCookIngModel>) {
-        this.datalist= recyclerViewCookIngModels
+        this.datalist = recyclerViewCookIngModels
         notifyDataSetChanged()
-
     }
 
-    class ViewHolder(var binding: AdapterCookInstructionsItemBinding) :
+    class ViewHolder(val binding: AdapterCookInstructionsItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
+        var ingredientsWatcher: TextWatcher? = null
     }
 
-    interface CookIngName {
-        // all are the abstract methods.
-        fun cookIngName(description: String?, pos: Int, cross: ImageView?)
-        fun crossCookIngName(cross: ImageView?, textView: TextView?, pos: Int)
-    }
 }
