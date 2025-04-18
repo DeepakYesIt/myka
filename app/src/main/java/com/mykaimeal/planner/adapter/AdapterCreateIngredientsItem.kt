@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.adapter
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.TextWatcher
@@ -21,52 +22,60 @@ import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterCreateIngredientsItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.addrecipetab.createrecipefromimage.model.RecyclerViewItemModel
 
-class AdapterCreateIngredientsItem(private var datalist: MutableList<RecyclerViewItemModel>, private var requireActivity: FragmentActivity,
-                                   private var uploadImage: UploadImage
-) : RecyclerView.Adapter<AdapterCreateIngredientsItem.ViewHolder>() {
+class AdapterCreateIngredientsItem(var datalist: MutableList<RecyclerViewItemModel>,
+                                   var requireActivity: FragmentActivity,
+                                   var uploadImage: UploadImage,
+                                   private val onExerciseUpdated: (Int, RecyclerViewItemModel) -> Unit
+                                   ) : RecyclerView.Adapter<AdapterCreateIngredientsItem.ViewHolder>() {
 
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding: AdapterCreateIngredientsItemBinding =
-            AdapterCreateIngredientsItemBinding.inflate(inflater, parent, false);
+        val binding: AdapterCreateIngredientsItemBinding = AdapterCreateIngredientsItemBinding.inflate(inflater, parent, false);
         return ViewHolder(binding)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val item = datalist[position]
 
-        if (item.ingredientName!=null){
-            holder.binding.etAddIngredients.setText(item.ingredientName.toString())
-        }
-
-        if (item.quantity!=null){
-            holder.binding.etAddIngQuantity.setText(item.quantity.toString())
-        }
 
         holder.binding.relImages.setOnClickListener{
-            uploadImage.uploadImage(holder.binding.imageData, position, holder.binding.imgCross,holder.binding.layProgess.root )
+            uploadImage.uploadImage(position)
         }
 
         holder.binding.spinnerQntType.setItems(
-            listOf("tsp", "tbsp", "cup", "ml", "liter", "fl oz","unit", "Pint", "quart", "gallon", "gram", "kg", "mg", "ounce", "pound",
+            listOf("tsp", "tbsp", "cup", "ml", "liter", "floz","unit", "Pint", "quart", "gallon", "gram", "kg", "mg", "ounce", "pound",
                 "pinch", "dash", "drop", "handful", "slice", "stick", "piece", "can", "bottle", "jar", "packet", "bunch", "sprig", "inch", "cm", "feet")
         )
+
+
+        if (item.status) {
+            holder.binding.llLayouts.setBackgroundResource(R.drawable.create_select_bg) // Change this drawable
+        } else {
+            holder.binding.llLayouts.setBackgroundResource(R.drawable.create_unselect_bg)  // Default background
+        }
 
         if (item.measurement!=null){
             holder.binding.spinnerQntType.text = item.measurement.toString()
         }
 
-        holder.binding.spinnerQntType.setOnSpinnerItemSelectedListener<String> { _, _, _, selectedItem ->
-            item.measurement = selectedItem  // Update the model when user selects an item
-        }
+        var previousSelectedItem: String? = null
 
-        item.measurement=holder.binding.spinnerQntType.text.toString().trim()
-
-        holder.binding.imgCross.setOnClickListener{
-
+        holder.binding.spinnerQntType.setOnSpinnerItemSelectedListener<String> { _, _, newPos, selectedItem ->
+            // Check if the selected item is different from the previous one
+            if (previousSelectedItem != selectedItem) {
+                val data = datalist[position]
+                data.status = datalist[position].ingredientName!!.isNotBlank() && datalist[position].quantity!!.isNotBlank()
+                data.measurement = selectedItem
+                datalist[position] = data
+                // Notify only the changed item to avoid cursor issues
+                notifyItemChanged(position)
+                // Update the previousSelectedItem
+                previousSelectedItem = selectedItem
+            }
         }
 
         if (item.uri!=null){
@@ -101,24 +110,50 @@ class AdapterCreateIngredientsItem(private var datalist: MutableList<RecyclerVie
             holder.binding.layProgess.root.visibility= View.GONE
         }
 
-        // Update the model when quantity changes
-        holder.binding.etAddIngredients.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                item.ingredientName = s.toString()
-                updateBackground(holder.binding.llLayouts, s.toString())
-            }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
 
-   // Update the model when quantity changes
-        holder.binding.etAddIngQuantity.addTextChangedListener(object : TextWatcher {
+        holder.ingredientsWatcher?.let { holder.binding.etAddIngredients.removeTextChangedListener(it) }
+        holder.quantityWatcher?.let { holder.binding.etAddIngQuantity.removeTextChangedListener(it) }
+
+
+
+        if (holder.binding.etAddIngredients.text.toString() != (item.ingredientName ?: "")) {
+            holder.binding.etAddIngredients.setText(item.ingredientName ?: "")
+            holder.binding.etAddIngredients.setSelection(holder.binding.etAddIngredients.text.length)
+        }
+
+        if (holder.binding.etAddIngQuantity.text.toString() != (item.quantity ?: "")) {
+            holder.binding.etAddIngQuantity.setText(item.quantity ?: "")
+            holder.binding.etAddIngQuantity.setSelection(holder.binding.etAddIngQuantity.text.length)
+        }
+
+
+
+        val ingredientsWatcher = object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                item.quantity = s.toString()
+                datalist[holder.adapterPosition].ingredientName = s.toString()
+                onExerciseUpdated(holder.adapterPosition, datalist[holder.adapterPosition])
             }
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
+        }
+        val quantityWatcher = object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                datalist[holder.adapterPosition].quantity = s.toString()
+                onExerciseUpdated(holder.adapterPosition, datalist[holder.adapterPosition])
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        }
+
+        holder.binding.etAddIngredients.addTextChangedListener(ingredientsWatcher)
+        holder.binding.etAddIngQuantity.addTextChangedListener(quantityWatcher)
+
+        holder.ingredientsWatcher = ingredientsWatcher
+        holder.quantityWatcher = quantityWatcher
+
+
     }
 
     private fun updateBackground(llLayouts: LinearLayout, text: String) {
@@ -129,31 +164,12 @@ class AdapterCreateIngredientsItem(private var datalist: MutableList<RecyclerVie
         }
     }
 
-    // Function to check if all EditTexts are filled
-    fun isAllFieldsFilled(): Boolean {
-        return datalist.all { it.ingredientName.isNotEmpty() }
-    }
-
     override fun getItemCount(): Int {
         return datalist.size
     }
 
-    // Function to highlight empty fields
-    fun highlightEmptyFields(recyclerView: RecyclerView) {
-        for (i in datalist.indices) {
-            val holder = recyclerView.findViewHolderForAdapterPosition(i) as? ViewHolder
-            holder?.binding!!.etAddIngredients.let { editText ->
-               /* if (datalist[i].ingredientName.trim().isEmpty()) {
-                }*/
-            }
-        }
-    }
 
-    fun addNewItem() {
-        datalist.add(RecyclerViewItemModel("","",false,"","")) // Add a blank item
-        notifyItemInserted(datalist.size - 1)
-    }
-
+    @SuppressLint("NotifyDataSetChanged")
     fun update(toMutableList: MutableList<RecyclerViewItemModel>) {
         this.datalist=toMutableList
         notifyDataSetChanged()
@@ -162,14 +178,13 @@ class AdapterCreateIngredientsItem(private var datalist: MutableList<RecyclerVie
 
     class ViewHolder(var binding: AdapterCreateIngredientsItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
+        var ingredientsWatcher: TextWatcher? = null
+        var quantityWatcher: TextWatcher? = null
     }
 
     interface UploadImage {
         // all are the abstract methods.
-        fun uploadImage(imageView: ImageView?, pos: Int, cross: ImageView?, root: RelativeLayout)
-        fun crossImage(cross: ImageView?, imageView: ImageView?, textView: TextView?, pos: Int)
+        fun uploadImage(pos:Int)
     }
-
 
 }

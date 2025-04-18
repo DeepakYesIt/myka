@@ -2,6 +2,6 @@ package com.mykaimeal.planner.fragment.mainfragment.addrecipetab.createrecipefra
 
 data class RecyclerViewCookIngModel(
     var count: Int,
-    var description:String="",
+    var description:String?="",
     var status: Boolean = false,
 )
