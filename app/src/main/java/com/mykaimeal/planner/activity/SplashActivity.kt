@@ -6,15 +6,12 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.appsflyer.AppsFlyerConversionListener
 import com.appsflyer.AppsFlyerLib
 import com.appsflyer.deeplink.DeepLinkResult
 import com.google.gson.Gson
-import com.mykaimeal.planner.R
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.BaseApplication.alertError
 import com.mykaimeal.planner.basedata.NetworkResult
@@ -26,8 +23,6 @@ import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apire
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-
 
 @AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")

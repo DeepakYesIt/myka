@@ -44,4 +44,8 @@ class BasketScreenViewModel @Inject constructor(private val repository: MainRepo
         repository.makeAddressPrimaryUrl({ successCallback(it) },id)
     }
 
+    suspend fun selectStoreProductUrl(successCallback: (response: NetworkResult<String>) -> Unit,storeName:String?,storeId:String?) {
+        repository.selectStoreProductUrl({ successCallback(it) },storeName,storeId)
+    }
+
 }

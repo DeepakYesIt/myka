@@ -59,20 +59,20 @@ import java.util.Calendar
 import java.util.Locale
 
 @AndroidEntryPoint
-class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeListener {
+class AddMealCookedFragment : Fragment(), OnItemClickListener, OnItemMealTypeListener {
     private lateinit var binding: FragmentAddMealCookedBinding
     private lateinit var addMealCookedViewModel: AddMealCookedViewModel
-    private var searchAdapterItem:SearchAdapterItem?=null
-    private var recipes: List<Recipe>?=null
+    private var searchAdapterItem: SearchAdapterItem? = null
+    private var recipes: List<Recipe>? = null
     private var quantity: Int = 1
     private var lastSelectedDate: Long? = null
-    private var selectedDate:String=""
-    private var status:String=""
-    private var clickable:String=""
-    private var mealType:String=""
-    private var recipeUri:String=""
-    private var planType:String="1"
-    var popupWindow:PopupWindow?=null
+    private var selectedDate: String = ""
+    private var status: String = ""
+    private var clickable: String = ""
+    private var mealType: String = ""
+    private var recipeUri: String = ""
+    private var planType: String = "1"
+    var popupWindow: PopupWindow? = null
     private lateinit var textListener: TextWatcher
     private var textChangedJob: Job? = null
     private var mealRoutineList: MutableList<MealRoutineModelData> = mutableListOf()
@@ -82,7 +82,7 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        binding= FragmentAddMealCookedBinding.inflate(layoutInflater, container, false)
+        binding = FragmentAddMealCookedBinding.inflate(layoutInflater, container, false)
 
         val mainActivity = activity as? MainActivity
         mainActivity?.binding?.apply {
@@ -99,18 +99,20 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
         return binding.root
     }
 
-    private fun backButton(){
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                findNavController().navigateUp()
-            }
-        })
+    private fun backButton() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
     }
 
     @SuppressLint("SetTextI18n", "MissingInflatedId")
     private fun initialize() {
 
-        binding.relDateCalendar.setOnClickListener{
+        binding.relDateCalendar.setOnClickListener {
             openDialog()
         }
 
@@ -128,7 +130,11 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
                         mealType()
                     } else {
                         // Handle the case where the list is empty
-                        BaseApplication.alertError(requireContext(), "No meal routines available.", false)
+                        BaseApplication.alertError(
+                            requireContext(),
+                            "No meal routines available.",
+                            false
+                        )
                     }
                 }
             } else {
@@ -158,12 +164,13 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
                 quantity--
                 updateValue()
             } else {
-                Toast.makeText(requireActivity(), ErrorMessage.servingError, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity(), ErrorMessage.servingError, Toast.LENGTH_LONG)
+                    .show()
             }
         }
 
-        binding.testAddMeals.setOnClickListener{
-            if (clickable=="2"){
+        binding.testAddMeals.setOnClickListener {
+            if (clickable == "2") {
                 if (BaseApplication.isOnline(requireActivity())) {
                     addMealsApi()
                 } else {
@@ -183,7 +190,7 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val searchText = s.toString()
-                if (searchText!= searchFor) {
+                if (searchText != searchFor) {
                     searchFor = searchText
                     textChangedJob?.cancel()
                     // Launch a new coroutine in the lifecycle scope
@@ -193,7 +200,11 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
                             if (BaseApplication.isOnline(requireActivity())) {
                                 searchRecipeApi(searchText)
                             } else {
-                                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                                BaseApplication.alertError(
+                                    requireContext(),
+                                    ErrorMessage.networkError,
+                                    false
+                                )
                             }
                         }
                     }
@@ -234,7 +245,7 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
     private fun addMealsApi() {
         // Create a JsonObject for the main JSON structure
         val jsonObject = JsonObject()
-        if (recipeUri!= null) {
+        if (recipeUri != null) {
             jsonObject.addProperty("type", binding.tvTitleName.text.toString().trim())
             jsonObject.addProperty("plan_type", planType)
             jsonObject.addProperty("uri", recipeUri)
@@ -254,31 +265,43 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
     }
 
 
-    private fun mealType(){
+    private fun mealType() {
         val inflater = requireContext().getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater?
         val popupView: View? = inflater?.inflate(R.layout.item_select_layoutdrop, null)
         popupWindow = PopupWindow(popupView, 400, RelativeLayout.LayoutParams.WRAP_CONTENT, true)
-        popupWindow?.showAsDropDown(binding.laytype,  0, 0, Gravity.CENTER)
+        popupWindow?.showAsDropDown(binding.laytype, 0, 0, Gravity.CENTER)
 
-            // Access views inside the inflated layout using findViewById
-            val rcyData = popupView?.findViewById<RecyclerView>(R.id.rcy_data)
+        // Access views inside the inflated layout using findViewById
+        val rcyData = popupView?.findViewById<RecyclerView>(R.id.rcy_data)
 ////
-            rcyData?.adapter= AdapterMealTypeMeal(mealRoutineList,requireContext(),this)
+        rcyData?.adapter = AdapterMealTypeMeal(mealRoutineList, requireContext(), this)
 
-            binding.tvTitleName.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.drop_up_icon, 0)
+        binding.tvTitleName.setCompoundDrawablesWithIntrinsicBounds(
+            0,
+            0,
+            R.drawable.drop_up_icon,
+            0
+        )
 
-            // Set the dismiss listener
-            popupWindow?.setOnDismissListener {
-                binding.tvTitleName.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.drop_down_icon, 0)
-            }
+        // Set the dismiss listener
+        popupWindow?.setOnDismissListener {
+            binding.tvTitleName.setCompoundDrawablesWithIntrinsicBounds(
+                0,
+                0,
+                R.drawable.drop_down_icon,
+                0
+            )
+        }
 
     }
 
     private fun handleApiAddToPlanResponse(
-        result: NetworkResult<String>) {
+        result: NetworkResult<String>
+    ) {
         when (result) {
             is NetworkResult.Success -> handleSuccessAddToPlanResponse(
-                result.data.toString())
+                result.data.toString()
+            )
 
             is NetworkResult.Error -> showAlertFunction(result.message, false)
             else -> showAlertFunction(result.message, false)
@@ -311,10 +334,10 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
 
     @SuppressLint("DefaultLocale", "SetTextI18n")
     private fun updateValue() {
-        binding.tvServing.text = "serves"+String.format("%02d", quantity)
+        binding.tvServing.text = "serves" + String.format("%02d", quantity)
     }
 
-    private fun openDialog(){
+    private fun openDialog() {
 
         val dialog = Dialog(requireActivity())
         // Set custom layout
@@ -327,7 +350,7 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
         }
         // Get today's date
         val today = Calendar.getInstance()
-       // Set the minimum date to today
+        // Set the minimum date to today
         calendarView?.minDate = today.timeInMillis
 
         calendarView?.setOnDateChangeListener { _, year, month, dayOfMonth ->
@@ -341,12 +364,12 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
             val dateFormatForApi = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val formattedDateApi = dateFormatForApi.format(calendar.time)
 
-            selectedDate=formattedDateApi
+            selectedDate = formattedDateApi
             // Format the date to "17 January 2025"
             val dateFormatForShow = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
             val formattedDateShow = dateFormatForShow.format(calendar.time)
 
-            binding.tvDateCooked.text=formattedDateShow
+            binding.tvDateCooked.text = formattedDateShow
 
             checkable()
             // Dismiss the dialog
@@ -357,14 +380,14 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
 
 
     private fun checkable() {
-        if (selectedDate!=""){
-            if (status=="2"){
-                clickable="2"
+        if (selectedDate != "") {
+            if (status == "2") {
+                clickable = "2"
                 binding.testAddMeals.setBackgroundResource(R.drawable.green_btn_background)
-            }else{
+            } else {
                 binding.testAddMeals.setBackgroundResource(R.drawable.gray_btn_unselect_background)
             }
-        }else{
+        } else {
             binding.testAddMeals.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
     }
@@ -374,12 +397,12 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             addMealCookedViewModel.recipeSearchApi({
-                binding.layProgress.visibility=View.GONE
+                binding.layProgress.visibility = View.GONE
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
                         try {
-                          /*  val gson = Gson()*/
+                            /*  val gson = Gson()*/
                             val gson = GsonBuilder()
                                 .registerTypeAdapter(ImagesModel::class.java, ImagesDeserializer())
                                 .create()
@@ -391,56 +414,63 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
                                 popupWindow?.dismiss()
                                 if (searchModel.code == ErrorMessage.code) {
                                     showAlertFunction(searchModel.message, true)
-                                }else{
-                                    if (!searchModel.message.equals("Search query cannot be empty.")){
+                                } else {
+                                    if (!searchModel.message.equals("Search query cannot be empty.")) {
                                         showAlertFunction(searchModel.message, false)
                                     }
                                 }
                             }
-                        }catch (e:Exception){
+                        } catch (e: Exception) {
                             popupWindow?.dismiss()
-                            Log.d("AddMeal","message:--"+e.message)
+                            Log.d("AddMeal", "message:--" + e.message)
                         }
                     }
+
                     is NetworkResult.Error -> {
                         popupWindow?.dismiss()
                         showAlertFunction(it.message, false)
                     }
+
                     else -> {
                         popupWindow?.dismiss()
                         showAlertFunction(it.message, false)
                     }
                 }
-            },searchText)
+            }, searchText)
         }
     }
 
     private fun showDataInUi(searchModelData: SearchModelData) {
         try {
-            if (searchModelData!=null){
-                if (searchModelData.recipes!=null && searchModelData.recipes.size>0){
-                    recipes=searchModelData.recipes
+            if (searchModelData != null) {
+                if (searchModelData.recipes != null && searchModelData.recipes.size > 0) {
+                    recipes = searchModelData.recipes
                     loadSearch()
-                }else{
+                } else {
                     popupWindow?.dismiss()
                 }
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             popupWindow?.dismiss()
-            Log.d("AddMeal","message:--"+e.message)
+            Log.d("AddMeal", "message:--" + e.message)
         }
     }
 
 
-    private fun loadSearch(){
+    private fun loadSearch() {
         val inflater = requireContext().getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater?
         val popupView: View? = inflater?.inflate(R.layout.item_select_layoutdrop, null)
         // Allows dismissing the popup when touching outside
         popupWindow?.isOutsideTouchable = true
-        popupWindow = PopupWindow(popupView, binding.relCookedMeals.width, RelativeLayout.LayoutParams.WRAP_CONTENT, true)
-        popupWindow?.showAsDropDown(binding.relCookedMeals,  0, 0, Gravity.CENTER)
+        popupWindow = PopupWindow(
+            popupView,
+            binding.relCookedMeals.width,
+            RelativeLayout.LayoutParams.WRAP_CONTENT,
+            true
+        )
+        popupWindow?.showAsDropDown(binding.relCookedMeals, 0, 0, Gravity.CENTER)
         val rcyData = popupView?.findViewById<RecyclerView>(R.id.rcy_data)
-        searchAdapterItem = recipes?.let { SearchAdapterItem(it, requireActivity(),this) }
+        searchAdapterItem = recipes?.let { SearchAdapterItem(it, requireActivity(), this) }
         rcyData!!.adapter = searchAdapterItem
     }
 
@@ -451,25 +481,25 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
     @SuppressLint("SetTextI18n")
     override fun itemClick(position: Int?, uri: String?, type: String?) {
 
-        if (planType=="1"){
-            binding.textFridge.text="Fridge (1)"
-            binding.textFreezer.text="Freezer (0)"
-        }else{
-            binding.textFridge.text="Fridge (0)"
-            binding.textFreezer.text="Freezer (1)"
+        if (planType == "1") {
+            binding.textFridge.text = "Fridge (1)"
+            binding.textFreezer.text = "Freezer (0)"
+        } else {
+            binding.textFridge.text = "Fridge (0)"
+            binding.textFreezer.text = "Freezer (1)"
         }
 
         popupWindow?.dismiss()
         binding.etCookedDishes.text.clear()
-        mealType=type.toString()
-        recipeUri= uri.toString()
-        status="2"
-        binding.cardViewSearchRecipe.visibility=View.GONE
-        binding.cardViewRecipe.visibility=View.VISIBLE
+        mealType = type.toString()
+        recipeUri = uri.toString()
+        status = "2"
+        binding.cardViewSearchRecipe.visibility = View.GONE
+        binding.cardViewRecipe.visibility = View.VISIBLE
 
-        if (recipes!![position!!].recipe!=null){
-            if (recipes!![position].recipe?.image!=null){
-                if (recipes!![position].recipe?.images?.SMALL?.url!=null){
+        if (recipes!![position!!].recipe != null) {
+            if (recipes!![position].recipe?.image != null) {
+                if (recipes!![position].recipe?.images?.SMALL?.url != null) {
                     val imageUrl = recipes!![position].recipe?.images?.SMALL?.url
                     Glide.with(requireActivity())
                         .load(imageUrl)
@@ -482,7 +512,7 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
                                 target: Target<Drawable>?,
                                 isFirstResource: Boolean
                             ): Boolean {
-                                binding.layProgess.root.visibility= View.GONE
+                                binding.layProgess.root.visibility = View.GONE
                                 return false
                             }
 
@@ -493,7 +523,7 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
                                 dataSource: DataSource?,
                                 isFirstResource: Boolean
                             ): Boolean {
-                                binding.layProgess.root.visibility= View.GONE
+                                binding.layProgess.root.visibility = View.GONE
                                 return false
                             }
                         })
@@ -505,15 +535,15 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
                         .error(R.drawable.add_meal_icon)
                         .placeholder(R.drawable.add_meal_icon)
                         .into(binding.imageLogo)
-                }else{
-                    binding.layProgess.root.visibility= View.GONE
+                } else {
+                    binding.layProgess.root.visibility = View.GONE
                 }
             }
         }
 
-        binding.tvTitleName.text=type.toString()
-        binding.tvName.visibility=View.VISIBLE
-        binding.tvName.text= recipes!![position].recipe?.label
+        binding.tvTitleName.text = type.toString()
+        binding.tvName.visibility = View.VISIBLE
+        binding.tvName.text = recipes!![position].recipe?.label
 
         checkable()
 
@@ -531,6 +561,6 @@ class AddMealCookedFragment : Fragment(),OnItemClickListener, OnItemMealTypeList
 
     override fun itemMealTypeSelect(position: Int?, status: String?, type: String?) {
         popupWindow?.dismiss()
-        binding.tvTitleName.text=mealRoutineList[position!!].name
+        binding.tvTitleName.text = mealRoutineList[position!!].name
     }
 }

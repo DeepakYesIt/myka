@@ -10,10 +10,7 @@ import androidx.navigation.fragment.findNavController
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.AdapterOrderHistoryDetailsItem
-import com.mykaimeal.planner.adapter.AdapterOrderHistoryItem
-import com.mykaimeal.planner.databinding.AdapterOrderHistoryDetailsItemBinding
 import com.mykaimeal.planner.databinding.FragmentOrderDetailsScreenBinding
-import com.mykaimeal.planner.databinding.FragmentOrderHistoryBinding
 import com.mykaimeal.planner.model.DataModel
 
 class OrderDetailsScreenFragment : Fragment() {

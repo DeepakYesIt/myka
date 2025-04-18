@@ -23,7 +23,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -264,21 +263,54 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
             binding.textPrivate.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_uncheck_gray_icon, 0, 0, 0)
             recipeStatus="1"
         }
-
     }
 
     private fun validate(): Boolean {
+        val hasEmptyDescription = cookList?.any { it.description.isEmpty() } == true
+        val hasIncompleteIngredient = ingredientList?.any {
+            it.uri.isNullOrBlank() ||
+                    it.ingredientName.isBlank() ||
+                    it.quantity.isBlank() ||
+                    it.measurement.isBlank()
+        } == true
+
         if (binding.etRecipeName.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.recipeName, false)
             return false
-        } else if (binding.edtTotalTime.text.toString().trim().isEmpty()) {
+        } else if (hasIncompleteIngredient) {
+            commonWorkUtils.alertDialog(requireActivity(), "Please complete all ingredient fields", false)
+            return false
+        } else if (hasEmptyDescription) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validCookingInstructions, false)
+            return false
+        }else if (binding.edtTotalTime.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validTotalTime, false)
             return false
-        } /*else if (binding.spinnerCookBook.text.toString().trim().isEmpty()){
+        }
+        /* else if (binding.spinnerCookBook.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.selectCookBookError, false)
             return false
-        }*/
+        } */
+
         return true
+
+
+        /*   val hasEmptyDescription = cookList?.any { it.description.isEmpty() } == true
+           if (binding.etRecipeName.text.toString().trim().isEmpty()) {
+               commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.recipeName, false)
+               return false
+           } else if (binding.edtTotalTime.text.toString().trim().isEmpty()) {
+               commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validTotalTime, false)
+               return false
+           }else if (hasEmptyDescription) {
+               commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validCookingInstructions, false)
+               return false
+           }
+           *//*else if (binding.spinnerCookBook.text.toString().trim().isEmpty()){
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.selectCookBookError, false)
+            return false
+        }*//*
+        return true*/
     }
 
     private fun updateBackground(llCreateTitle: LinearLayout, text: String) {

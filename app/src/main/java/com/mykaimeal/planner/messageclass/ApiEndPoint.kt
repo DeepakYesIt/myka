@@ -117,6 +117,10 @@ object ApiEndPoint {
     const val userDietSuggestionUrl="user-diet-suggetion"
 
     const val generateLinkUrl="generate-link"
+    const val selectStoreProductUrl="select-store-product"
+
+
+    const val getMissingIngBasketUrl="get-missing-ingredient-screen"
 
 
 }

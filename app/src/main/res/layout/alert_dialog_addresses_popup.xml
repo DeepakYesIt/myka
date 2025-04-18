@@ -9,6 +9,11 @@
     app:cardCornerRadius="@dimen/_10sdp"
     app:cardElevation="@dimen/_5sdp">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -202,7 +207,6 @@
             android:textColor="@color/black"
             android:textSize="@dimen/_15sdp" />
 
-
         <RelativeLayout
             android:id="@+id/relUpdateAddress"
             android:layout_width="match_parent"
@@ -214,6 +218,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/_10sdp"
+                android:nestedScrollingEnabled="false"
                 android:orientation="vertical"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
@@ -241,5 +246,7 @@
         </RelativeLayout>
 
     </RelativeLayout>
+
+    </ScrollView>
 
 </androidx.cardview.widget.CardView>

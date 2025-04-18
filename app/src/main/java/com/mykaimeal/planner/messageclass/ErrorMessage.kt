@@ -72,6 +72,7 @@ object ErrorMessage {
      const val validEmailPhone:String="Please Enter Valid Email or Phone Number"
      const val validPhone:String="Please Enter Valid Phone Number"
      const val validTotalTime:String="Please add total time in minutes"
+     const val validCookingInstructions:String="Please fill all steps with a description"
      const val selectReasonEmpty:String="Please select reason"
      const val dobError:String="Please select DOB"
      const val selectIdTypeError:String="Select id type"

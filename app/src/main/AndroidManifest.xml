@@ -75,8 +75,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
+                    android:scheme="https"
                     android:host="mykaimealplanner.onelink.me"
-                    android:scheme="https" />
+                    android:pathPrefix="/mPqu" />
             </intent-filter>
 
         </activity>
@@ -140,6 +141,10 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+<!--        <service
+            android:name=".listener.ToastWorker"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false"/>-->
 
         <meta-data
             android:name="com.appsflyer.devkey"

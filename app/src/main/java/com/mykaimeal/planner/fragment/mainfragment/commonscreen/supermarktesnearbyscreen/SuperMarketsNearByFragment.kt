@@ -41,6 +41,7 @@ import com.mykaimeal.planner.databinding.FragmentSuperMarketsNearByBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.viewmodel.BasketDetailsSuperMarketViewModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Store
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -56,6 +57,10 @@ class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener, OnM
     private var longitude = "0.0"
     private lateinit var mapView: MapView
     private var mMap: GoogleMap? = null
+    private var storeUid: String? = ""
+    private var storeName: String? = ""
+
+    private var stores: MutableList<Store>?=null
 
     private val storeLocations = mutableListOf<LatLng>() // List to store locations
 
@@ -162,21 +167,33 @@ class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener, OnM
     private fun showUIData(data: MutableList<Store>?) {
         try {
             if (!data.isNullOrEmpty()) {
+                stores=data
                 // Set adapter
-                adapter = AdapterSuperMarket(data, requireActivity(), this, 0)
+                adapter = AdapterSuperMarket(stores, requireActivity(), this)
                 binding.recySuperMarket.adapter = adapter
 
-                // Extract LatLng and store in list
-                storeLocations.clear()
-                for (store in data) {
-                    val address = store.address
-                    val latitude = address?.lat ?: 0.0  // Default to 0.0 if null
-                    val longitude = address?.lon ?: 0.0 // Default to 0.0 if null
-                    storeLocations.add(LatLng(latitude, longitude))
-                }
+                stores?.forEach { store ->
+                        val lat = store.address?.lat
+                        val lng = store.address?.lon
+                        val storeName = store.store_name ?: "Store"
 
-                // Update Google Map
-                mMap?.let { updateMap(it) }
+                        if (lat != null && lng != null) {
+                            val location = LatLng(lat, lng)
+                            mMap?.addMarker(MarkerOptions().position(location).title(storeName)) }
+                    }
+
+
+                /*  // Extract LatLng and store in list
+                  storeLocations.clear()
+                  for (store in data) {
+                      val address = store.address
+                      val latitude = address?.lat ?: 0.0  // Default to 0.0 if null
+                      val longitude = address?.lon ?: 0.0 // Default to 0.0 if null
+                      storeLocations.add(LatLng(latitude, longitude))
+                  }
+
+                  // Update Google Map
+                  mMap?.let { updateMap(it) }*/
             }
         } catch (e: Exception) {
             showAlert(e.message ?: "An error occurred", false)
@@ -236,7 +253,52 @@ class SuperMarketsNearByFragment : Fragment(), OnItemSelectUnSelectListener, OnM
     }
 
     override fun itemSelectUnSelect(id: Int?, status: String?, type: String?, position: Int?) {
+        if (type == "SuperMarket") {
+            storeUid = position?.let { stores?.get(it)?.store_uuid.toString() }
+            storeName = position?.let { stores?.get(it)?.store_name.toString() }
 
+            if (BaseApplication.isOnline(requireActivity())) {
+                selectSuperMarketApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+    }
+
+    private fun selectSuperMarketApi() {
+        lifecycleScope.launch {
+            basketDetailsSuperMarketViewModel.selectStoreProductUrl({
+                BaseApplication.dismissMe()
+                handleSelectSupermarketApiResponse(it)
+            }, storeName, storeUid)
+        }
+    }
+
+    private fun handleSelectSupermarketApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuperMarketResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuperMarketResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                findNavController().navigateUp()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
     }
 
 

@@ -11,9 +11,7 @@ import com.mykaimeal.planner.OnItemClickedListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.AdapterOrderHistoryItem
-import com.mykaimeal.planner.adapter.RecipeCookedAdapter
 import com.mykaimeal.planner.databinding.FragmentOrderHistoryBinding
-import com.mykaimeal.planner.databinding.FragmentSettingProfileBinding
 import com.mykaimeal.planner.model.DataModel
 
 class OrderHistoryFragment : Fragment(), OnItemClickedListener {

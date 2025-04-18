@@ -86,13 +86,21 @@ class AdapterCookBookDetailsItem(var datalist: MutableList<CookBookDataModel>?, 
             holder.binding.layProgess.root.visibility= View.GONE
         }
 
-
         holder.binding.tvAddToPlan.setOnClickListener {
             onItemClickListener.itemClick(position,"1","")
         }
 
         holder.binding.basketImg.setOnClickListener {
-            onItemClickListener.itemClick(position,"2","")
+            var mealType = ""
+            if (datalist!![position].data?.recipe?.mealType != null && datalist!![position].data?.recipe?.mealType?.isNotEmpty() == true) {
+                mealType = datalist!![position].data?.recipe?.mealType!![0]
+                mealType = if (mealType.contains("/")) {
+                    mealType.split("/")[0] // Get the first part before the slash
+                } else {
+                    mealType // Return as is if no slash is present
+                }
+            }
+            onItemClickListener.itemClick(position,"2",mealType)
         }
 
         holder.binding.tvMoveRecipe.setOnClickListener{

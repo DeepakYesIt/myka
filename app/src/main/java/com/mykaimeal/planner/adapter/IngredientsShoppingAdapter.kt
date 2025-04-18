@@ -12,6 +12,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.chauthai.swipereveallayout.SwipeRevealLayout
 import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterBasketIngItemBinding
@@ -33,9 +34,7 @@ class IngredientsShoppingAdapter(private var ingredientsData: MutableList<Ingred
 
         val data= ingredientsData?.get(position)
 
-
         if (data != null) {
-
             if (data.sch_id!=null){
                 holder.binding.textCount.text=data.sch_id.toString()
             }
@@ -44,7 +43,7 @@ class IngredientsShoppingAdapter(private var ingredientsData: MutableList<Ingred
                 if (data.pro_price!="Not available"){
                     holder.binding.tvFoodPrice.text=data.pro_price.toString()
                 }else{
-                    holder.binding.tvFoodPrice.text="$00"
+                    holder.binding.tvFoodPrice.text="$0"
                 }
             }
 
@@ -101,6 +100,23 @@ class IngredientsShoppingAdapter(private var ingredientsData: MutableList<Ingred
             if (ingredientsData?.get(position)?.sch_id.toString().toInt() < 1000) {
                 onItemSelectListener.itemSelect(position,"Plus","ShoppingIngredients")
             }
+        }
+
+        holder.binding.swipeLayout.setSwipeListener(object : SwipeRevealLayout.SwipeListener {
+            override fun onClosed(view: SwipeRevealLayout) {
+            }
+
+            override fun onOpened(view: SwipeRevealLayout) {
+                // Change to desired background color
+            }
+
+            override fun onSlide(view: SwipeRevealLayout, slideOffset: Float) {
+                // Optional: Gradually change color based on slide offset
+            }
+        })
+
+        holder.binding.deleteLayout.setOnClickListener{
+            onItemSelectListener.itemSelect(position,"Delete","Ingredients")
         }
 
     }

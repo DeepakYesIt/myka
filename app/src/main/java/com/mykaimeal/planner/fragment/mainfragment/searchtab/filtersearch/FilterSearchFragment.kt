@@ -188,7 +188,7 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
                 }
 
                 if (showFullList.size>5){
-                    showFullList.add(Diet(name = "More","", selected = true))
+                    showFullList.add(Diet(name = "More", selected = true,""))
                 }
 
                 val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
@@ -200,6 +200,7 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
                 adapterFilterDietItem = AdapterFilterDietItem(showFullList, requireActivity(), this)
                 binding.rcyDiet.adapter = adapterFilterDietItem
             }
+
             if (fullListCookTime.size > 0) {
                 fullListCookTime.forEachIndexed { index, diet ->
                     if (index<2){
@@ -300,9 +301,9 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
 
 
     private fun filter(text: String) {
-         val list1: MutableList<MealType> = mutableListOf()
-         val list2: MutableList<Diet> = mutableListOf()
-         val list3: MutableList<CookTime> = mutableListOf()
+        val list1: MutableList<MealType> = mutableListOf()
+        val list2: MutableList<Diet> = mutableListOf()
+        val list3: MutableList<CookTime> = mutableListOf()
         try {
 
             if (showMealType.size > 0) {
@@ -366,27 +367,27 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
 //        if (type.equals("check")){
 //
 //        }else{
-            if (type.equals("MealType",true)) {
-                showMealType.removeLast()
-                for (i in 5 until fullListMealType.size step 5) {
-                    showMealType.add(fullListMealType[i])
-                }
-                adapterFilterMealItem?.updateList(showMealType)
+        if (type.equals("MealType",true)) {
+            showMealType.removeLast()
+            for (i in 5 until fullListMealType.size step 5) {
+                showMealType.add(fullListMealType[i])
             }
-            if (type.equals("Diet",true)) {
-                showFullList.removeLast()
-                for (i in 5 until originalFullList.size step 5) {
-                    showFullList.add(originalFullList[i])
-                }
-                adapterFilterDietItem?.updateList(showFullList)
+            adapterFilterMealItem?.updateList(showMealType)
+        }
+        if (type.equals("Diet",true)) {
+            showFullList.removeLast()
+            for (i in 5 until originalFullList.size step 5) {
+                showFullList.add(originalFullList[i])
             }
-            if (type.equals("CookTime",true)) {
-                showListCookTime.removeLast()
-                for (i in 2 until fullListCookTime.size step 2) {
-                    showListCookTime.add(fullListCookTime[i])
-                }
-                adapterFilterCookBookItem?.updateList(showListCookTime)
+            adapterFilterDietItem?.updateList(showFullList)
+        }
+        if (type.equals("CookTime",true)) {
+            showListCookTime.removeLast()
+            for (i in 2 until fullListCookTime.size step 2) {
+                showListCookTime.add(fullListCookTime[i])
             }
+            adapterFilterCookBookItem?.updateList(showListCookTime)
+        }
 //        }
 
 

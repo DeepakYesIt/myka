@@ -15,7 +15,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.findNavController
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
-import com.mykaimeal.planner.databinding.FragmentPaymentCreditDebitBinding
 import com.mykaimeal.planner.databinding.FragmentTrackOrderScreenBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -49,10 +48,11 @@ class TrackOrderScreenFragment : Fragment() {
     private fun setupBackNavigation() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                val bundle = Bundle().apply {
+                findNavController().navigate(R.id.shoppingMissingIngredientsFragment)
+       /*         val bundle = Bundle().apply {
                     putString("id","yes")
                 }
-                findNavController().navigate(R.id.orderHistoryFragment,bundle)
+                findNavController().navigate(R.id.orderHistoryFragment,bundle)*/
             }
         })
     }
@@ -61,10 +61,12 @@ class TrackOrderScreenFragment : Fragment() {
     private fun initialize() {
 
         binding.imgTrackOrder.setOnClickListener{
-            val bundle = Bundle().apply {
+            findNavController().navigate(R.id.shoppingMissingIngredientsFragment)
+
+            /*val bundle = Bundle().apply {
                 putString("id","yes")
             }
-            findNavController().navigate(R.id.orderHistoryFragment,bundle)
+            findNavController().navigate(R.id.orderHistoryFragment,bundle)*/
         }
 
         val webSettings: WebSettings = binding.webView.settings

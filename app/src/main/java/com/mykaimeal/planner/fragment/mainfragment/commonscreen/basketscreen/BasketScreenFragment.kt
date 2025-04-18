@@ -60,6 +60,7 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.mod
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.GetAddressListModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Recipes
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Store
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.viewmodel.BasketScreenViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.listener.OnPlacesDetailsListener
@@ -86,12 +87,16 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     private var recipe: MutableList<Recipes>? = null
     private var ingredientList: MutableList<Ingredient>? = null
     private var storeUid: String? = ""
+    private var storeName: String? = ""
     private var clickStatus: Boolean = false
     private var dialogMiles: Dialog? = null
     private lateinit var tvAddress: AutoCompleteTextView
     private var statusTypes: String? = "Home"
     private var latitude: String? = ""
     private var longitude: String? = ""
+    private var addressId: String? = ""
+    private var stores: MutableList<Store>? = null
+    private var addressList: MutableList<GetAddressListModelData>? = null
 
     private var userLatitude: String? = ""
     private var userLongitude: String? = ""
@@ -110,9 +115,12 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     private var states: String? = ""
     private var zipcode: String? = ""
     private var country: String? = ""
+    private var selectType: String? = ""
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var locationManager: LocationManager? = null
     private lateinit var commonWorkUtils: CommonWorkUtils
+
+    private var hasShownPopup = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -127,9 +135,11 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
         }
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        locationManager = requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
+        locationManager =
+            requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
 
-        basketScreenViewModel = ViewModelProvider(requireActivity())[BasketScreenViewModel::class.java]
+        basketScreenViewModel =
+            ViewModelProvider(requireActivity())[BasketScreenViewModel::class.java]
         commonWorkUtils = CommonWorkUtils(requireActivity())
 
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -140,13 +150,22 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                 }
             })
 
-        addressDialog()
-
-   /*     if (BaseApplication.isOnline(requireActivity())) {
-            getBasketList()
+        if (!hasShownPopup) {
+            addressDialog()
+            hasShownPopup = true
         } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }*/
+            if (BaseApplication.isOnline(requireActivity())) {
+                getBasketList()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+
+        /*     if (BaseApplication.isOnline(requireActivity())) {
+                 getBasketList()
+             } else {
+                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+             }*/
 
 
         initialize()
@@ -168,6 +187,10 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             findNavController().navigate(R.id.basketYourRecipeFragment)
         }
 
+        binding.textSeeAll3.setOnClickListener {
+            findNavController().navigate(R.id.shoppingMissingIngredientsFragment)
+        }
+
         binding.textShoppingList.setOnClickListener {
             findNavController().navigate(R.id.shoppingListFragment)
         }
@@ -176,14 +199,9 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             if (clickStatus) {
                 findNavController().navigate(R.id.basketDetailSuperMarketFragment)
             } else {
-                showAlert(R.string.available_products.toString(), false)
+                showAlert(getString(R.string.available_products), false)
             }
-            /*val bundle = Bundle().apply {
-                putString("storeUId",storeUid)
-            }*/
-
         }
-
     }
 
     private fun getAddressList() {
@@ -203,17 +221,17 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             basketScreenViewModel.getBasketUrl({
                 BaseApplication.dismissMe()
                 handleApiBasketResponse(it)
-            }, "014d3d2e-ad5d-4b00-9198-af07acce2f3a",userLatitude,userLongitude)
+            }, "014d3d2e-ad5d-4b00-9198-af07acce2f3a", userLatitude, userLongitude)
         }
     }
 
-    private fun addressPrimaryApi(id: String) {
+    private fun addressPrimaryApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             basketScreenViewModel.makeAddressPrimaryUrl({
                 BaseApplication.dismissMe()
                 handleApiPrimaryResponse(it)
-            }, id)
+            }, addressId)
         }
     }
 
@@ -307,7 +325,8 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
 
     private fun showDataInAddressUI(data: MutableList<GetAddressListModelData>?) {
 
-        adapterGetAddressItem = AdapterGetAddressItem(data, requireActivity(), this)
+        addressList = data
+        adapterGetAddressItem = AdapterGetAddressItem(addressList, requireActivity(), this)
         rcySavedAddress!!.adapter = adapterGetAddressItem
 
     }
@@ -339,8 +358,9 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
         }
 
         if (data.stores != null && data.stores.size > 0) {
+            stores = data.stores
             binding.rlSuperMarket.visibility = View.VISIBLE
-            adapter = SuperMarketListAdapter(data.stores, requireActivity(), this, 0)
+            adapter = SuperMarketListAdapter(stores, requireActivity(), this)
             binding.rcvSuperMarket.adapter = adapter
         } else {
             binding.rlSuperMarket.visibility = View.GONE
@@ -394,6 +414,11 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
 
         dialogMiles?.show()
 
+        dialogMiles?.setOnDismissListener {
+            // Call your API here when dialog is dismissed
+            getBasketList()
+        }
+
         getAddressList()
 
         dialogMiles?.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
@@ -437,8 +462,16 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
 
 
         relDone?.setOnClickListener {
-            fullAddressDialog()
-            dialogMiles?.dismiss()
+            if (selectType != "") {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    addressPrimaryApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            } else {
+                fullAddressDialog()
+                dialogMiles?.dismiss()
+            }
         }
     }
 
@@ -581,7 +614,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             val apiModel = Gson().fromJson(data, AddAddressModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success == true) {
-               getBasketList()
+                getBasketList()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -782,11 +815,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessRemoveBasketResponse(
-        data: String,
-        position: Int?,
-        dialogRemoveDay: Dialog
-    ) {
+    private fun handleSuccessRemoveBasketResponse(data: String, position: Int?, dialogRemoveDay: Dialog) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
@@ -833,7 +862,14 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                 removeRecipeBasketDialog(recipeId, position)
             }
         } else if (type == "SuperMarket") {
-            storeUid = recipeId
+            storeName = position?.let { stores?.get(it)?.store_name.toString() }
+            storeUid = position?.let { stores?.get(it)?.store_uuid.toString() }
+
+            if (BaseApplication.isOnline(requireActivity())) {
+                selectSuperMarketApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         } else {
             if (recipeId == "Minus") {
                 if (BaseApplication.isOnline(requireActivity())) {
@@ -857,6 +893,44 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
         }
 
     }
+
+
+    private fun selectSuperMarketApi() {
+        lifecycleScope.launch {
+            basketScreenViewModel.selectStoreProductUrl({
+                BaseApplication.dismissMe()
+                handleSelectSupermarketApiResponse(it)
+            }, storeName, storeUid)
+        }
+    }
+
+    private fun handleSelectSupermarketApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuperMarketResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuperMarketResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                getBasketList()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
 
     private fun removeAddRecipeServing(position: Int?, type: String) {
         val item = position?.let { recipe?.get(it) }
@@ -894,8 +968,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
         foodId: String?,
         quantity: String,
         item: Ingredient?,
-        position: Int?
-    ) {
+        position: Int?) {
         lifecycleScope.launch {
             basketScreenViewModel.basketIngIncDescUrl({
                 BaseApplication.dismissMe()
@@ -1027,29 +1100,30 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     }
 
 
-    override fun itemLongClick(position: Int?, status: String?, type: String?, isZiggleEnabled: String) {
-
-        if (isZiggleEnabled=="Click"){
-            userLatitude=status.toString()
-            userLongitude=type.toString()
-
-            if (BaseApplication.isOnline(requireActivity())) {
-                getBasketList()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }else if (isZiggleEnabled=="SelectPrimary"){
-            if (BaseApplication.isOnline(requireActivity())) {
-                addressPrimaryApi(position.toString())
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        } else{
+    override fun itemLongClick(
+        position: Int?,
+        status: String?,
+        type: String?,
+        isZiggleEnabled: String
+    ) {
+        /*   if (isZiggleEnabled == "Click") {
+               selectType = isZiggleEnabled
+               userLatitude = status.toString()
+               userLongitude = type.toString()
+               if (BaseApplication.isOnline(requireActivity())) {
+                   getBasketList()
+               } else {
+                   BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+               }
+           } else*/ if (isZiggleEnabled == "SelectPrimary") {
+            selectType = isZiggleEnabled
+            addressId = position.toString()
+        } else if (isZiggleEnabled == "Edit") {
             val bundle = Bundle().apply {
-                putString("latitude", status)
-                putString("longitude", type)
-                putString("address", isZiggleEnabled)
-                putString("addressId", position.toString())
+                putString("latitude", addressList?.get(position!!)?.latitude)
+                putString("longitude", addressList?.get(position!!)?.longitude)
+                putString("address", type)
+                putString("addressId", addressList?.get(position!!)?.id.toString())
                 putString("type", "Checkout")
             }
             findNavController().navigate(R.id.addressMapFullScreenFragment, bundle)

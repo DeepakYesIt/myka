@@ -45,8 +45,8 @@ class MealRoutineViewModel @Inject constructor(private val repository: MainRepos
     }
 
     suspend fun addBasketRequest(successCallback: (response: NetworkResult<String>) -> Unit,
-                                 uri: String,quantity: String){
-        repository.addBasketRequestApi({ successCallback(it) },uri,quantity)
+                                 uri: String,quantity: String,type: String){
+        repository.addBasketRequestApi({ successCallback(it) },uri,quantity,type)
     }
 
     suspend fun recipeAddToPlanRequest(successCallback: (response: NetworkResult<String>) -> Unit, jsonObject: JsonObject

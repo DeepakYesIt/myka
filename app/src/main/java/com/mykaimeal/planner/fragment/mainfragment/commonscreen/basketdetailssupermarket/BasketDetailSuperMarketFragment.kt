@@ -50,6 +50,8 @@ import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.api
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @AndroidEntryPoint
 class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
@@ -65,6 +67,12 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private var latitude = "0.0"
     private var longitude = "0.0"
+    private var storeUid: String? = ""
+    private var storeName: String? = ""
+
+    private var stores: MutableList<Store>?=null
+    private var clickStatus: Boolean = false
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,7 +85,7 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            requireActivity(),
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     findNavController().navigateUp()
@@ -116,7 +124,11 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
         }
 
         binding.rlGoToCheckout.setOnClickListener {
-            findNavController().navigate(R.id.checkoutScreenFragment)
+            if (clickStatus) {
+                findNavController().navigate(R.id.checkoutScreenFragment)
+            } else {
+                showAlert(getString(R.string.available_products), false)
+            }
         }
 
         if (BaseApplication.isOnline(requireActivity())){
@@ -141,7 +153,6 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
         }else{
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
-
     }
 
     @SuppressLint("MissingPermission")
@@ -234,7 +245,8 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
 
     private fun showDataInUI(data: BasketDetailsSuperMarketModelData?) {
 
-        if (data!!.total!=null){
+        if (data!!.total!=null || data.total=="0.0"){
+            clickStatus = true
             binding.textPrice.text=data.total.toString()
         }
 
@@ -341,7 +353,7 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
                 bottomSheetDialog!!.setContentView(R.layout.bottom_sheet_select_super_market_near_me)
                 rcvBottomDialog = bottomSheetDialog!!.findViewById<RecyclerView>(R.id.rcvBottomDialog)
                 bottomSheetDialog!!.show()
-                adapter = AdapterSuperMarket(data, requireActivity(), this,0)
+                adapter = AdapterSuperMarket(data, requireActivity(), this)
                 rcvBottomDialog!!.adapter = adapter
             }
 
@@ -376,15 +388,64 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
                 val mainId:String= products!![position!!].id.toString()
                 val productId:String= products!![position].pro_id.toString()
                 val productName:String= products!![position].name.toString()
+                val foodId:String= products!![position].food_id.toString()
+                val schId:String= products!![position].sch_id.toString()
                 val bundle = Bundle().apply {
                     putString("id",mainId)
                     putString("SwapProId",productId)
                     putString("SwapProName",productName)
+                    putString("foodId",foodId)
+                    putString("schId",schId)
                 }
                 findNavController().navigate(R.id.basketProductDetailsFragment,bundle)
             }
-        }else{
+        }else if (type=="SuperMarket"){
             bottomSheetDialog!!.dismiss()
+
+            storeUid = position?.let { stores?.get(it)?.store_uuid.toString() }
+            storeName = position?.let { stores?.get(it)?.store_name.toString() }
+
+            if (BaseApplication.isOnline(requireActivity())) {
+                selectSuperMarketApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+    }
+
+    private fun selectSuperMarketApi() {
+        lifecycleScope.launch {
+            basketDetailsSuperMarketViewModel.selectStoreProductUrl({
+                BaseApplication.dismissMe()
+                handleSelectSupermarketApiResponse(it)
+            }, storeName, storeUid)
+        }
+    }
+
+    private fun handleSelectSupermarketApiResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuperMarketResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuperMarketResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                getBasketDetailsApi()
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
         }
     }
 

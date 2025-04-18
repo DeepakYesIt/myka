@@ -120,13 +120,13 @@ interface MainRepository {
      successCallback: (response: NetworkResult<String>) -> Unit, name: RequestBody?, image: MultipartBody.Part?, status: RequestBody?, id: RequestBody?)
 
  suspend fun likeUnlikeRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,  uri: String,likeType: String,type: String)
- suspend fun superMarketSaveRequest(successCallback: (response: NetworkResult<String>) -> Unit,  uuid: String)
+ suspend fun superMarketSaveRequest(successCallback: (response: NetworkResult<String>) -> Unit,  uuid: String?,storeName:String?)
 
  suspend fun moveRecipeRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, id: String, cook_book: String)
 
  suspend fun deleteCookBookRequestApi(successCallback: (response: NetworkResult<String>) -> Unit, id: String)
 
- suspend fun addBasketRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,  uri: String,quantity: String)
+ suspend fun addBasketRequestApi(successCallback: (response: NetworkResult<String>) -> Unit,  uri: String,quantity: String,type: String)
 
  suspend fun getCardAndBankRequestApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
@@ -174,6 +174,9 @@ interface MainRepository {
     suspend fun userPreferencesAllergiesApi(successCallback: (response: NetworkResult<String>) -> Unit,allergicSearch:String?,allergicNum:String?)
     suspend fun addToCartUrlApi(successCallback: (response: NetworkResult<String>) -> Unit,foodIds: MutableList<String>?,
                                 schId:String?, foodName:MutableList<String>?,status: MutableList<String>?)
+
+    suspend fun addShoppingCartUrlApi(successCallback: (response: NetworkResult<String>) -> Unit,foodIds: MutableList<String>?,
+                                schId:MutableList<String>?, foodName:MutableList<String>?,status: MutableList<String>?)
 
     suspend fun updateBodyGoalApi(successCallback: (response: NetworkResult<String>) -> Unit,bodyGoal: String?)
 
@@ -259,16 +262,17 @@ interface MainRepository {
 
 
     suspend fun deleteCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?)
+    suspend fun getMissingIngBasketUrl(successCallback: (response: NetworkResult<String>) -> Unit)
     suspend fun setPreferredCardMealMeUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?)
 
-    suspend fun getProductsUrl(successCallback: (response: NetworkResult<String>) -> Unit,query:String?)
-    suspend fun getProductsDetailsUrl(successCallback: (response: NetworkResult<String>) -> Unit,proId:String?,query:String?)
+    suspend fun getProductsUrl(successCallback: (response: NetworkResult<String>) -> Unit,query:String?,foodId:String?,schId:String?)
+    suspend fun getProductsDetailsUrl(successCallback: (response: NetworkResult<String>) -> Unit,proId:String?,query:String?,foodId:String?,schId:String?)
     suspend fun updateDietSuggestionUrl(successCallback: (response: NetworkResult<String>) -> Unit,gender: String?, dob: String?, height: String?,
                                         heightType: String?, weight: String?, weightType: String?, activityLevel: String?)
-    suspend fun getSelectProductsUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?,productId:String?)
+    suspend fun getSelectProductsUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?,productId:String?,schId:String?)
     suspend fun recipeSwapUrl(successCallback: (response: NetworkResult<String>) -> Unit,id:String?,uri:String?)
 
-    suspend fun generateLinkUrl(
-        successCallback: (response: NetworkResult<String>) -> Unit, link: RequestBody?, image: MultipartBody.Part?)
+    suspend fun generateLinkUrl(successCallback: (response: NetworkResult<String>) -> Unit, link: RequestBody?, image: MultipartBody.Part?)
+    suspend fun selectStoreProductUrl(successCallback: (response: NetworkResult<String>) -> Unit, storeName: String?, storeId: String?)
 
 }

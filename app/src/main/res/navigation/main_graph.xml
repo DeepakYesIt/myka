@@ -321,7 +321,7 @@
         tools:layout="@layout/fragment_basket_detail_super_market" />
     <fragment
         android:id="@+id/shoppingMissingIngredientsFragment"
-        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.ShoppingMissingIngredientsFragment"
+        android:name="com.mykaimeal.planner.fragment.mainfragment.commonscreen.missingingredientbasket.ShoppingMissingIngredientsFragment"
         android:label="fragment_shopping_missing_ingredients"
         tools:layout="@layout/fragment_shopping_missing_ingredients" />
     <fragment

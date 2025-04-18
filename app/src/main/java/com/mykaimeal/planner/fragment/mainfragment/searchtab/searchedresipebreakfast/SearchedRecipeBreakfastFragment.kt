@@ -65,6 +65,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
     private var adapterSearchedRecipeItem: AdapterSearchedRecipeItem? = null
     private var recipeType: String? = null
     private var screenType: String? = null
+    private var mealType: String? = null
     private var fullListMealType: MutableList<String> = mutableListOf()
     private var fullListDietType: MutableList<String> = mutableListOf()
     private var fullListCookTime: MutableList<String> = mutableListOf()
@@ -108,7 +109,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
         cookbookList.clear()
 
         val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
-                "", "", 0, "", "Favourites", 0, "", 0)
+            "", "", 0, "", "Favourites", 0, "", 0)
         cookbookList.add(0, data)
 
         if (!screenType.equals("Ingredients",true)){
@@ -150,8 +151,8 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
     private fun launchApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-                        if (screenType.equals("Search",true) || screenType.equals("Ingredients",true)){
-                        searchedRecipeViewModel.recipeSearchedApi({
+            if (screenType.equals("Search",true) || screenType.equals("Ingredients",true)){
+                searchedRecipeViewModel.recipeSearchedApi({
                     BaseApplication.dismissMe()
                     handleApiSearchResponse(it)
                 }, recipeType)
@@ -584,6 +585,11 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
             }
 
             "2" -> {
+                if (screenType=="Search"){
+                    mealType=recipeType
+                }else{
+                    mealType= type
+                }
                 if (BaseApplication.isOnline(requireActivity())) {
                     toggleIsLike(position, "basket")
                 } else {
@@ -795,7 +801,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
             searchedRecipeViewModel.addBasketRequest({
                 BaseApplication.dismissMe()
                 handleBasketApiResponse(it)
-            }, uri, "")
+            }, uri, "",mealType.toString())
         }
     }
 

@@ -21,6 +21,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import com.mykaimeal.planner.R
+import com.mykaimeal.planner.activity.MainActivity
+import com.mykaimeal.planner.adapter.AdapterOnBoardingSubscriptionItem
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
@@ -28,14 +31,10 @@ import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.ConsumeResponseListener
-import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.google.gson.Gson
-import com.mykaimeal.planner.R
-import com.mykaimeal.planner.activity.MainActivity
-import com.mykaimeal.planner.adapter.AdapterOnBoardingSubscriptionItem
 import com.mykaimeal.planner.basedata.AppConstant
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.BaseApplication.alertError
@@ -47,7 +46,6 @@ import com.mykaimeal.planner.fragment.mainfragment.profilesetting.subscriptionpl
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.HomeApiResponse
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import com.mykaimeal.planner.model.OnSubscriptionModel
-import com.mykaimeal.planner.model.SubscriptionModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
@@ -126,7 +124,6 @@ class SubscriptionPlanOverViewFragment : Fragment() {
                                 .build()
                         }.collect(Collectors.toList())
                         val queryProductDetailsParams = QueryProductDetailsParams.newBuilder().setProductList(productList).build()
-
 
                         billingClient?.queryProductDetailsAsync(queryProductDetailsParams) { billingResult1, productDetailsList ->
                             for (productDetails in productDetailsList) {

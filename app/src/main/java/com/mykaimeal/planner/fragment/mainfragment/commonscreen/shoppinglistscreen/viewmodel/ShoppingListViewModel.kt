@@ -31,9 +31,9 @@ class ShoppingListViewModel @Inject constructor(private val repository: MainRepo
     }
 
 
-    suspend fun addToCartUrlApi(successCallback: (response: NetworkResult<String>) -> Unit,foodIds: MutableList<String>?, schId:String?,
+    suspend fun addShoppingCartUrlApi(successCallback: (response: NetworkResult<String>) -> Unit,foodIds: MutableList<String>?, schId:MutableList<String>?,
                                 foodName:MutableList<String>?,status:MutableList<String>?){
-        repository.addToCartUrlApi ({ successCallback(it) },foodIds,schId,foodName,status)
+        repository.addShoppingCartUrlApi ({ successCallback(it) },foodIds,schId,foodName,status)
     }
 
 }

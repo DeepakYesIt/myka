@@ -16,7 +16,7 @@ data class GetAddressListModelData(
     val id: Int?,
     val latitude: String?,
     val longitude: String?,
-    val primary: Int?,
+    var primary: Int?,
     val state: String?,
     val street_name: String?,
     val street_num: String?,

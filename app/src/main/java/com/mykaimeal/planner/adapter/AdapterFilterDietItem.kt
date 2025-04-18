@@ -36,7 +36,7 @@ class AdapterFilterDietItem(
             }else{
                 holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
             }
-         }else{
+        }else{
             holder.binding.tvItem.setTextColor(android.graphics.Color.parseColor("#000000"))
             holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
         }

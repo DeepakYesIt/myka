@@ -85,7 +85,6 @@
 
             </RelativeLayout>
 
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardViewSearchRecipe"
                 android:layout_width="match_parent"
@@ -129,7 +128,6 @@
                 </RelativeLayout>
 
             </androidx.cardview.widget.CardView>
-
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/imageLogo"

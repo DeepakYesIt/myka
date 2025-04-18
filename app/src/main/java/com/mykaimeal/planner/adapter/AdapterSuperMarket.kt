@@ -21,17 +21,17 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.mod
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-class AdapterSuperMarket(private var storesData: MutableList<Store>?,
-                         private var requireActivity: FragmentActivity,
-                         private var onItemSelectListener: OnItemSelectUnSelectListener,
-                         private var pos: Int
-): RecyclerView.Adapter<AdapterSuperMarket.ViewHolder>() {
+class AdapterSuperMarket(
+    private var storesData: MutableList<Store>?,
+    private var requireActivity: FragmentActivity,
+    private var onItemSelectListener: OnItemSelectUnSelectListener,
+) : RecyclerView.Adapter<AdapterSuperMarket.ViewHolder>() {
 
-    private var selectedPosition = pos // Default no selection
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding: AdapterSuperMarketItemBinding = AdapterSuperMarketItemBinding.inflate(inflater, parent,false);
+        val binding: AdapterSuperMarketItemBinding =
+            AdapterSuperMarketItemBinding.inflate(inflater, parent, false);
         return ViewHolder(binding)
     }
 
@@ -39,35 +39,47 @@ class AdapterSuperMarket(private var storesData: MutableList<Store>?,
 
         val data = storesData?.get(position)
 
-        // ✅ Correctly update the background based on selection
-        if (selectedPosition == position) {
-            holder.binding.relativeLayoutMain.setBackgroundResource(R.drawable.supermarket_selection_bg) // Default
-        } else {
-            holder.binding.relativeLayoutMain.background=null // Selected
+        if (data?.is_slected != null) {
+            if (data.is_slected == 1) {
+                holder.binding.relativeLayoutMain.setBackgroundResource(R.drawable.supermarket_selection_bg) // Default
+            } else {
+                holder.binding.relativeLayoutMain.background = null // Selected
+            }
         }
 
-        data?.let {
+        /* // ✅ Correctly update the background based on selection
+         if (selectedPosition == position) {
+             holder.binding.relativeLayoutMain.setBackgroundResource(R.drawable.supermarket_selection_bg) // Default
+         } else {
+             holder.binding.relativeLayoutMain.background=null // Selected
+         }*/
 
-            if (it.all_items==1){
-                if (it.missing!=null){
-                    holder.binding.tvSuperMarketItems.setTextColor(android.graphics.Color.parseColor("#FF3232"))
-                    holder.binding.tvSuperMarketItems.text=it.missing.toString()+"ITEMS MISSING"
+        data?.let {
+            if (it.missing != "0") {
+                if (it.missing != null) {
+                    holder.binding.tvSuperMarketItems.setTextColor(
+                        android.graphics.Color.parseColor(
+                            "#FF3232"
+                        )
+                    )
+                    holder.binding.tvSuperMarketItems.text =
+                        it.missing.toString() + " ITEMS MISSING"
                 }
-            }else{
+            } else {
                 holder.binding.tvSuperMarketItems.setTextColor(android.graphics.Color.parseColor("#06C169"))
-                holder.binding.tvSuperMarketItems.text="ALL ITEMS"
+                holder.binding.tvSuperMarketItems.text = "ALL ITEMS"
             }
 
-            if (it.total!=null){
+            if (it.total != null) {
                 val roundedNetTotal = it.total.let {
                     BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
                 }
-                holder.binding.tvSuperMarketRupees.text= "$$roundedNetTotal"
+                holder.binding.tvSuperMarketRupees.text = "$$roundedNetTotal"
             }
 
-/*
-            holder.binding.tvSuperMarketItems.text = it.store_name ?: ""
-*/
+            /*
+                        holder.binding.tvSuperMarketItems.text = it.store_name ?: ""
+            */
 
             // ✅ Load image with Glide
             Glide.with(requireActivity)
@@ -103,22 +115,39 @@ class AdapterSuperMarket(private var storesData: MutableList<Store>?,
 
         // ✅ Click event for selection
         holder.binding.relativeLayoutMain.setOnClickListener {
-            val previousPosition = selectedPosition
-            selectedPosition = position // ✅ Use `position` instead of `holder.adapterPosition`
-            // Refresh the UI for both previously selected and newly selected item
-            notifyItemChanged(previousPosition)
-            notifyItemChanged(selectedPosition)
+            updateSelection(position)
+            onItemSelectListener.itemSelectUnSelect(
+                position,
+                storesData!![position].store_uuid.toString(),
+                "SuperMarket",
+                position
+            )
 
-            // ✅ Notify selection change
-            onItemSelectListener.itemSelectUnSelect(position,data!!.store_uuid.toString(),"SuperMarket",position)
+            /*        val previousPosition = selectedPosition
+                selectedPosition = position // ✅ Use `position` instead of `holder.adapterPosition`
+                // Refresh the UI for both previously selected and newly selected item
+                notifyItemChanged(previousPosition)
+                notifyItemChanged(selectedPosition)
+
+                // ✅ Notify selection change
+                onItemSelectListener.itemSelectUnSelect(position,data!!.store_uuid.toString(),"SuperMarket",position)*/
         }
+    }
+
+    private fun updateSelection(selectedPosition: Int) {
+        storesData?.forEachIndexed { index, stores ->
+            stores.is_slected = if (index == selectedPosition) 1 else 0
+        }
+
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
         return storesData!!.size
     }
 
-    class ViewHolder(var binding: AdapterSuperMarketItemBinding) : RecyclerView.ViewHolder(binding.root){
+    class ViewHolder(var binding: AdapterSuperMarketItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
     }
 }
