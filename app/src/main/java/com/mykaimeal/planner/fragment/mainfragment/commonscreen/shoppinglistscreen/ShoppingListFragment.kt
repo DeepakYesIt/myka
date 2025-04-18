@@ -123,28 +123,52 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     }
 
     private fun addItemDialog() {
-        val dialogRemoveDay: Dialog = context?.let { Dialog(it) }!!
-        dialogRemoveDay.setContentView(R.layout.alert_dialog_add_new_item)
-        dialogRemoveDay.window!!.setLayout(
+        val context = requireContext()
+        val dialog = Dialog(context)
+        dialog.setContentView(R.layout.alert_dialog_add_new_item)
+        dialog.window?.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT
         )
-        dialogRemoveDay.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val tvDialogCancelBtn = dialogRemoveDay.findViewById<TextView>(R.id.tvDialogCancelBtn)
-        val imageCross = dialogRemoveDay.findViewById<ImageView>(R.id.imageCross)
-        val imageMinus = dialogRemoveDay.findViewById<ImageView>(R.id.imageMinus)
-        val imagePlus = dialogRemoveDay.findViewById<ImageView>(R.id.imagePlus)
-        tvCounter = dialogRemoveDay.findViewById(R.id.tvCounter)
-        val tvLabel = dialogRemoveDay.findViewById<EditText>(R.id.tvLabel)
-        val tvDialogAddBtn = dialogRemoveDay.findViewById<TextView>(R.id.tvDialogAddBtn)
-        rlWriteNameHere = dialogRemoveDay.findViewById(R.id.rlWriteNameHere)
-        dialogRemoveDay.show()
-        dialogRemoveDay.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
-        textWatcher()
+        val tvDialogCancelBtn = dialog.findViewById<TextView>(R.id.tvDialogCancelBtn)
+        val imageCross = dialog.findViewById<ImageView>(R.id.imageCross)
+        val imageMinus = dialog.findViewById<ImageView>(R.id.imageMinus)
+        val imagePlus = dialog.findViewById<ImageView>(R.id.imagePlus)
+        tvCounter = dialog.findViewById(R.id.tvCounter)
+        val tvLabel = dialog.findViewById<EditText>(R.id.tvLabel)
+        val tvDialogAddBtn = dialog.findViewById<TextView>(R.id.tvDialogAddBtn)
+        rlWriteNameHere = dialog.findViewById(R.id.rlWriteNameHere)
 
-        tvDialogCancelBtn.setOnClickListener {
-            dialogRemoveDay.dismiss()
+        // TextWatcher with debounce
+        var searchFor = ""
+        textListener = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val searchText = s.toString()
+                if (searchText != searchFor) {
+                    searchFor = searchText
+                    textChangedJob?.cancel()
+                    textChangedJob = lifecycleScope.launch {
+                        delay(1000)
+                        if (searchText == searchFor) {
+                            searchable(searchText)
+
+                        }
+                    }
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        }
+
+        tvLabel.addTextChangedListener(textListener)
+
+        dialog.setOnDismissListener {
+            tvLabel.removeTextChangedListener(textListener)
         }
 
         imageMinus.setOnClickListener {
@@ -168,10 +192,22 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         imageCross.setOnClickListener {
-            dialogRemoveDay.dismiss()
+            dialog.dismiss()
+        }
+
+        tvDialogCancelBtn.setOnClickListener {
+            dialog.dismiss()
         }
 
         tvDialogAddBtn.setOnClickListener {
+            val inputName = tvLabel.text.toString().trim()
+            val quantityText = tvCounter?.text.toString()
+            val schId = quantityText.toIntOrNull()
+
+            if (inputName.isEmpty()) {
+                commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.enterIngName, false)
+                return@setOnClickListener
+            }
 
             val newIngredient = Ingredient(
                 created_at = null,
@@ -179,81 +215,31 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 food_id = null,
                 id = null,
                 market_id = "",
-                name = tvLabel.text.toString().trim(),
+                name = inputName,
                 price = "",
                 pro_id = null,
                 pro_img = null,
-                pro_name = tvLabel.text.toString().trim(),
+                pro_name = inputName,
                 pro_price = "Not available",
                 product_id = null,
-                quantity = tvCounter?.text.toString(),
-                sch_id = tvCounter?.text.toString().toIntOrNull(),
+                quantity = quantityText,
+                sch_id = schId,
                 status = null,
                 updated_at = null,
                 user_id = null
             )
 
-            // Add to both UI and new list
-            ingredientList?.add(newIngredient)
-            adapterShoppingAdapter.notifyItemInserted(ingredientList?.size!! - 1)
-
-            dialogRemoveDay.dismiss()
-
-            /*if (foodName!=null){
-                foodName.clear()
+            ingredientList?.let {
+                it.add(newIngredient)
+                adapterShoppingAdapter.notifyItemInserted(it.size - 1)
             }
-            statusType = mutableListOf("0")
 
-            val eightDigitNumber = Random.nextInt(10000000, 99999999)  // Generates 8-digit number
-            foodIds.add(eightDigitNumber.toString())
-            val inputText = tvLabel.text.toString().trim() // Get text and trim spaces
-            if (inputText.isNotEmpty()) { // Check if input is not empty
-                foodName.add(inputText) // Add to list
-                tvLabel.text.clear() // Clear input field after adding
-                if (BaseApplication.isOnline(requireActivity())) {
-                    addToCartUrlApi(dialogRemoveDay)
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            } else {
-                commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.enterIngName, false)
-            }*/
+            dialog.dismiss()
+
+            // Optional: Add API logic here
         }
-    }
 
-
-    private fun textWatcher() {
-
-        textListener = object : TextWatcher {
-            private var searchFor = "" // Or view.editText.text.toString()
-
-            override fun afterTextChanged(s: Editable?) {}
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val searchText = s.toString()
-                if (searchText != searchFor) {
-                    searchFor = searchText
-                    textChangedJob?.cancel()
-                    // Launch a new coroutine in the lifecycle scope
-                    textChangedJob = lifecycleScope.launch {
-                        delay(1000)  // Debounce time
-                        if (searchText == searchFor) {
-                            if (BaseApplication.isOnline(requireActivity())) {
-                                searchable(searchText)
-                            } else {
-                                BaseApplication.alertError(
-                                    requireContext(),
-                                    ErrorMessage.networkError,
-                                    false
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        dialog.show()
     }
 
     private fun searchable(editText: String) {
@@ -298,7 +284,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private fun showDataInUi(searchModelData: MutableList<DislikedIngredientsModelData>) {
         try {
             dislikedIngredientData = searchModelData
-            loadSearch()
+//            loadSearch()
 
         } catch (e: Exception) {
             popupWindow?.dismiss()
@@ -320,8 +306,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         )
         popupWindow?.showAsDropDown(rlWriteNameHere, 0, 0, Gravity.CENTER)
         val rcyData = popupView?.findViewById<RecyclerView>(R.id.rcy_data)
-        ingredientsAdapterItem =
-            dislikedIngredientData?.let { IngredientsAdapterItem(it, requireActivity(), this) }
+        ingredientsAdapterItem = dislikedIngredientData?.let { IngredientsAdapterItem(it, requireActivity(), this) }
         rcyData!!.adapter = ingredientsAdapterItem
     }
 
@@ -431,13 +416,17 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
         if (data.ingredient != null && data.ingredient.size > 0) {
             ingredientList = data.ingredient
-            adapterShoppingAdapter =
-                IngredientsShoppingAdapter(data.ingredient, requireActivity(), this)
+            adapterShoppingAdapter = IngredientsShoppingAdapter(data.ingredient, requireActivity(), this)
             binding.rcvIngredients.adapter = adapterShoppingAdapter
         }
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
+
+        if (type=="IngredientsItem"){
+
+
+        }
 
     }
 
