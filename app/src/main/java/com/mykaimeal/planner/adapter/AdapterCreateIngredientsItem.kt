@@ -56,7 +56,7 @@ class AdapterCreateIngredientsItem(private var datalist: MutableList<RecyclerVie
         )
 
         if (item.measurement!=null){
-            holder.binding.spinnerQntType.setText(item.measurement.toString())
+            holder.binding.spinnerQntType.text = item.measurement.toString()
         }
 
         holder.binding.spinnerQntType.setOnSpinnerItemSelectedListener<String> { _, _, _, selectedItem ->

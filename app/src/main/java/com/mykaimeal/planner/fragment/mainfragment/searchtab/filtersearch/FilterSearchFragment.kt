@@ -277,41 +277,7 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
         })
 
         binding.relApplyBtn.setOnClickListener {
-          /*  val bundle = Bundle()
-            bundle.putSerializable("recently", recentlyPostData as Serializable?)*/
             if (binding.relApplyBtn.isClickable){
-
-//                val mealType:MutableList<String> = mutableListOf()
-//                val diet:MutableList<String> = mutableListOf()
-//                val cookTime:MutableList<String> = mutableListOf()
-//                mealType.clear()
-//                diet.clear()
-//                cookTime.clear()
-//                showMealType.forEach {
-//                    if (it.selected==true){
-//                        mealType.add(it.value.toString())
-//                    }
-//                }
-//                showFullList.forEach {
-//                    if (it.selected==true){
-//                        diet.add(it.value.toString())
-//                    }
-//                }
-//                showListCookTime.forEach {
-//                    if (it.selected==true){
-//                        cookTime.add(it.value.toString())
-//                    }
-//                }
-//                // Convert to JSONArray
-//                val mealJsonArray = JSONArray(mealType)
-//                val dietJsonArray = JSONArray(diet)
-//                val cookTimeJsonArray = JSONArray(cookTime)
-//                val bundle = Bundle()
-//                bundle.putString("mealJsonArray", mealJsonArray.toString())
-//                bundle.putString("dietJsonArray", dietJsonArray.toString())
-//                bundle.putString("cookTimeJsonArray", cookTimeJsonArray.toString())
-//                findNavController().navigate(R.id.searchedRecipeBreakfastFragment,bundle)
-
                 val mealType = showMealType.filter { it.selected == true }.map { it.name.toString() }
                 val diet = showFullList.filter { it.selected == true }.map { it.value.toString() }
                 val cookTime = showListCookTime.filter { it.selected == true }.map { it.value.toString() }

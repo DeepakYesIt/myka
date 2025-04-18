@@ -188,6 +188,8 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
 
         // Setup RecyclerView
         adapterCook = AdapterCookIngredientsItem(cookList!!,requireActivity(),this)
+
+
         binding.rcyCookInstructions.apply {
             adapter = adapterCook
         }

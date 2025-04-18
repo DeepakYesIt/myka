@@ -144,8 +144,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
         }
 
-
-
         // Register for result
         resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -161,8 +159,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         //using function for find destination graph
         startDestination()
 
-
-//        fetchDataOnLoad()
         startTimer(this@MainActivity)
 
 
