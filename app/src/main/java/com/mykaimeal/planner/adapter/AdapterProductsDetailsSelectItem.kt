@@ -35,17 +35,26 @@ class AdapterProductsDetailsSelectItem(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val data = datalist[position]
+        if (data != null) {
+            if (data.sch_id != null) {
+                holder.binding.textCount.text = data.sch_id.toString()
+            }
 
-        if (data.name!=null){
-            val foodName = data.name
-            val result = foodName.mapIndexed { index, c ->
-                if (index == 0 || c.isUpperCase()) c.uppercaseChar() else c
-            }.joinToString("")
-            holder.binding.textProductName.text=result
-        }
+            if (data.name != null) {
+                val foodName = data.name
+                val result = foodName.mapIndexed { index, c ->
+                    if (index == 0 || c.isUpperCase()) c.uppercaseChar() else c
+                }.joinToString("")
+                holder.binding.textProductName.text = result
+            }
 
-        if (data.formatted_price != null) {
-            holder.binding.textPrice.text = data.formatted_price.toString()
+            if (data.formatted_price != null) {
+                if (data.formatted_price!= "Not available") {
+                    holder.binding.textPrice.text = data.formatted_price.toString()
+                }else{
+                    holder.binding.textPrice.text="$0"
+                }
+            }
         }
 
         data.let {
@@ -95,32 +104,45 @@ class AdapterProductsDetailsSelectItem(
             onItemSelectListener.itemSelect(position, data.product_id, "products")
         }
 
-
         holder.binding.productDetails.setOnClickListener {
             onItemSelectListener.itemSelect(position, data.product_id, "swap")
         }
 
-
-
-      /*  holder.binding.imageMinusIcon.setOnClickListener{
-            if (ingredientsData?.get(position)?.sch_id.toString().toInt() > 1) {
-                onItemSelectListener.itemSelect(position,"Minus","Ingredients")
-            }else{
+        holder.binding.imageMinusIcon.setOnClickListener {
+            if (datalist[position].sch_id.toString().toInt() > 1) {
+                onItemSelectListener.itemSelect(position, "Minus", "Ingredients")
+            } else {
                 Toast.makeText(requireActivity, ErrorMessage.servingError, Toast.LENGTH_LONG).show()
             }
         }
 
 
-        holder.binding.imageAddIcon.setOnClickListener{
-            if (ingredientsData?.get(position)?.sch_id.toString().toInt() < 1000) {
-                onItemSelectListener.itemSelect(position,"Plus","Ingredients")
+        holder.binding.imageAddIcon.setOnClickListener {
+            if (datalist[position].sch_id.toString().toInt() < 1000) {
+                onItemSelectListener.itemSelect(position, "Plus", "Ingredients")
             }
-        }*/
+        }
 
     }
 
     override fun getItemCount(): Int {
         return datalist.size
+    }
+
+    fun submitList(basketProducts: MutableList<BasketProductsDetailsModelData>) {
+        this.datalist = basketProducts
+        notifyDataSetChanged()
+
+    }
+
+    fun filterList(filteredList: MutableList<BasketProductsDetailsModelData>) {
+        this.datalist = filteredList
+        notifyDataSetChanged()
+    }
+
+    fun updateList(basketProductsDetailsModelData: MutableList<BasketProductsDetailsModelData>) {
+        this.datalist = basketProductsDetailsModelData
+        notifyDataSetChanged()
     }
 
 

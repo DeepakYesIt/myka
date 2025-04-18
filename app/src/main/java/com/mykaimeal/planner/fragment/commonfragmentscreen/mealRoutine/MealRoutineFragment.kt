@@ -249,10 +249,23 @@ class MealRoutineFragment : Fragment(), View.OnClickListener, OnItemClickedListe
     private fun showDataInUi(mealRoutineModelsData: MutableList<MealRoutineModelData>) {
         try {
             if (mealRoutineModelsData != null && mealRoutineModelsData.isNotEmpty()) {
-                if (mealRoutineViewModel.getMealRoutineData()==null){
-                    // Add "None" option at the first position
-                    mealRoutineModelsData.add(0, MealRoutineModelData( id = -1, "Select All",selected = false)) // ID set to -1 as an indicator
+                // Check if list is null
+                if (mealRoutineViewModel.getMealRoutineData() == null) {
+                    // By default, assume "Select All" should be false
+                    var isAllSelected = false
+
+                    // Check if all items are selected
+                    if (mealRoutineModelsData.isNotEmpty() && mealRoutineModelsData.all { it.selected }) {
+                        isAllSelected = true
+                    }
+
+                    // Add "Select All" at the first position with proper selection status
+                    mealRoutineModelsData.add(
+                        0,
+                        MealRoutineModelData(id = -1, "Select All", selected = isAllSelected)
+                    )
                 }
+                // Set the data and adapter
                 mealRoutineModelData = mealRoutineModelsData
                 mealRoutineAdapter = MealRoutineAdapter(mealRoutineModelsData, requireActivity(), this)
                 binding.rcyMealRoutine.adapter = mealRoutineAdapter

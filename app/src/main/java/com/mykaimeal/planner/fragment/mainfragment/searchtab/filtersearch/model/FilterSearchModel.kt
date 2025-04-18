@@ -15,13 +15,13 @@ data class FilterSearchModelData(
 
 data class Diet(  
     val name: String?,
-    val selected:Boolean?=false
+    var selected:Boolean?=false
 )
 
 data class CookTime(
     val name: String?,
     val value: String?,
-    val selected:Boolean?=false
+    var selected:Boolean?=false
 )
 
 data class MealType(

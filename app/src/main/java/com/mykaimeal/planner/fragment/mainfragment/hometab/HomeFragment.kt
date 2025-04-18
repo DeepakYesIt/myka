@@ -51,17 +51,17 @@ import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
+import com.mykaimeal.planner.adapter.HomeSuperMarketList
 import com.mykaimeal.planner.adapter.RecipeCookedAdapter
-import com.mykaimeal.planner.adapter.SuperMarketListAdapter
 import com.mykaimeal.planner.apiInterface.BaseUrl
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.databinding.FragmentHomeBinding
-import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Store
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.HomeViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.HomeApiResponse
-import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModels
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModelsData
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
@@ -75,7 +75,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private var recipeCookedAdapter: RecipeCookedAdapter? = null
-    private var adapterSuperMarket: SuperMarketListAdapter? = null
+    private var adapterSuperMarket: HomeSuperMarketList? = null
     private var recySuperMarket: RecyclerView? = null
     private lateinit var sessionManagement: SessionManagement
     private lateinit var viewModel: HomeViewModel
@@ -86,8 +86,10 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private var latitude: String = "0"
     private var longitude: String = "0"
     private var storeUuid: String = ""
+    private var storeName: String = ""
     private var cookstatus = false
     private var tAG: String = "Location"
+    private var superMarketData: MutableList<SuperMarketModelsData>?=null
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
         mutableListOf()
 
@@ -190,33 +192,32 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     @SuppressLint("SetTextI18n")
     private fun handleMarketSuccessResponse(data: String) {
         try {
-            val apiModel = Gson().fromJson(data, SuperMarketModel::class.java)
+            val apiModel = Gson().fromJson(data, SuperMarketModels::class.java)
             Log.d("@@@ Recipe Details ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success == true) {
                 showUIData(apiModel.data)
             } else {
-                apiModel.code?.let { apiModel.message?.let { it1 -> handleError(it, it1) } }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
     }
 
-    private fun showUIData(data: MutableList<Store>?) {
+    private fun showUIData(data: MutableList<SuperMarketModelsData>?) {
         try {
             if (data != null) {
+                superMarketData=data
                 val dialogAddItem: Dialog = context?.let { Dialog(it) }!!
                 dialogAddItem.setContentView(R.layout.alert_dialog_super_market)
                 dialogAddItem.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                dialogAddItem.window!!.setLayout(
-                    WindowManager.LayoutParams.MATCH_PARENT,
-                    WindowManager.LayoutParams.WRAP_CONTENT
-                )
+                dialogAddItem.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
                 recySuperMarket = dialogAddItem.findViewById(R.id.recySuperMarket)
                 val rlDoneBtn = dialogAddItem.findViewById<RelativeLayout>(R.id.rlDoneBtn)
+                dialogAddItem.setCancelable(false)
                 dialogAddItem.show()
                 dialogAddItem.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                adapterSuperMarket = SuperMarketListAdapter(data, requireActivity(), this, 0)
+                adapterSuperMarket = HomeSuperMarketList(data, requireActivity(), this, 0)
                 recySuperMarket!!.adapter = adapterSuperMarket
 
                 rlDoneBtn.setOnClickListener {
@@ -228,7 +229,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                                     BaseApplication.dismissMe()
                                     dialogAddItem.dismiss()
                                     handleApiResponse(it,"storeData")
-                                },storeUuid)
+                                },storeUuid,storeName)
                             }
                         } else {
                             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
@@ -438,8 +439,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 //        binding!!.relMonthlySavings.setOnClickListener(this)
         binding.imageCheckSav.setOnClickListener(this)
         binding.rlLayCheckSavings.setOnClickListener(this)
-
-
 
     }
     
@@ -744,7 +743,9 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
     
     override fun itemSelect(position: Int?, status: String?, type: String?) {
-        storeUuid=status.toString()
+
+        storeUuid= position?.let { superMarketData?.get(it)?.store_uuid.toString() }.toString()
+        storeName= position?.let { superMarketData?.get(it)?.store_name.toString() }.toString()
     }
 
     @Deprecated("Deprecated in Java")
@@ -816,8 +817,6 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 showLocationError(requireContext(), ErrorMessage.locationError)
             }
         }
-
-
     }
 
     private fun showLocationError(context: Context?, errorMsg: String?) {

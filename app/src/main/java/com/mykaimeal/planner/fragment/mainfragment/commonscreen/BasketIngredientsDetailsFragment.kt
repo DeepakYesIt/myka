@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +26,7 @@ import com.mykaimeal.planner.databinding.FragmentBaseketIngredientsDetailsBindin
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.model.BasketDetailsModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.model.BasketDetailsModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.viewmodel.BasketProductsDetailsViewModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -35,6 +37,10 @@ class BasketIngredientsDetailsFragment : Fragment() {
     private lateinit var basketProductsDetailsViewModel: BasketProductsDetailsViewModel
     private var proId: String = ""
     private var proName: String = ""
+    private var foodId: String = ""
+    private var schId: String = ""
+    private var quantity: Int = 1
+    private var type: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,8 +49,10 @@ class BasketIngredientsDetailsFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentBaseketIngredientsDetailsBinding.inflate(inflater, container, false)
 
-        proId = arguments?.getString("SwapProId", "")?:""
-        proName = arguments?.getString("SwapProName", "")?:""
+        proId = arguments?.getString("SwapProId", "") ?: ""
+        proName = arguments?.getString("SwapProName", "") ?: ""
+        foodId = arguments?.getString("foodId", "") ?: ""
+        schId = arguments?.getString("schId", "") ?: ""
 
         basketProductsDetailsViewModel = ViewModelProvider(requireActivity())[BasketProductsDetailsViewModel::class.java]
 
@@ -63,19 +71,109 @@ class BasketIngredientsDetailsFragment : Fragment() {
 
     private fun initialize() {
 
-        binding.relDoneBtn.setOnClickListener{
-            findNavController().navigateUp()
+        binding.relDoneBtn.setOnClickListener {
+            if (BaseApplication.isOnline(requireActivity())) {
+                removeAddIngServing()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+            /*findNavController().navigateUp()*/
         }
 
-        binding.relBack.setOnClickListener{
+        binding.relBack.setOnClickListener {
             findNavController().navigateUp()
         }
-
 
         if (BaseApplication.isOnline(requireContext())) {
             getProductsDetailsApi()
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+
+        binding.tvRemoveBasket.setOnClickListener {
+            type = "delete"
+            if (BaseApplication.isOnline(requireActivity())) {
+                removeAddIngServing()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+
+
+        binding.imageMinusIcon.setOnClickListener {
+            type = "minus"
+            if (quantity > 1) {
+                quantity--
+                updateValue()
+            } else {
+                Toast.makeText(requireActivity(), ErrorMessage.servingError, Toast.LENGTH_LONG)
+                    .show()
+            }
+        }
+
+        binding.imageAddIcon.setOnClickListener {
+            type = "plus"
+            if (quantity < 99) {
+                quantity++
+                updateValue()
+            }
+        }
+    }
+
+    private fun removeAddIngServing() {
+        val count = if (type.equals("plus", true) || type.equals("minus", true)) {
+            binding.textCount.text.toString().trim().toIntOrNull() ?: 0
+        } else {
+            0
+        }
+        increaseIngRecipe(count.toString())
+    }
+
+    @SuppressLint("DefaultLocale")
+    private fun updateValue() {
+        binding.textCount.text = String.format("%02d", quantity)
+    }
+
+    private fun increaseIngRecipe(quantity: String) {
+        lifecycleScope.launch {
+            basketProductsDetailsViewModel.basketIngIncDescUrl({
+                BaseApplication.dismissMe()
+                handleApiIngResponse(it)
+            }, foodId, quantity)
+        }
+    }
+
+    private fun handleApiIngResponse(
+        result: NetworkResult<String>
+    ) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessIngResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessIngResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (type == "delete") {
+                    findNavController().navigate(R.id.basketScreenFragment)
+                } else {
+                    findNavController().navigateUp()
+                }
+
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
         }
     }
 
@@ -86,7 +184,7 @@ class BasketIngredientsDetailsFragment : Fragment() {
             basketProductsDetailsViewModel.getProductsDetailsUrl({
                 BaseApplication.dismissMe()
                 handleApiProductsDetailsApiResponse(it)
-            }, proId,proName)
+            }, proId, proName, foodId, schId)
         }
     }
 
@@ -130,11 +228,20 @@ class BasketIngredientsDetailsFragment : Fragment() {
                 binding.tvIngredientsName.text = data.name.toString()
             }
 
+            if (data.sch_id != null) {
+                binding.textCount.text = data.sch_id.toString()
+                quantity = data.sch_id
+            }
+
+            if (data.unit_size != null) {
+                binding.tvQuantity.text = data.unit_size.toString()
+            }
+
             if (data.formatted_price != null) {
                 binding.tvActualPrices.text = data.formatted_price.toString()
             }
 
-            if (data.image!=null){
+            if (data.image != null) {
                 // ✅ Load image with Glide
                 Glide.with(requireActivity())
                     .load(data.image)
@@ -163,7 +270,7 @@ class BasketIngredientsDetailsFragment : Fragment() {
                         }
                     })
                     .into(binding.imageData)
-            }else{
+            } else {
                 binding.layProgess.root.visibility = View.GONE
             }
         }

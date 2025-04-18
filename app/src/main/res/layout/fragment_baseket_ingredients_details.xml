@@ -102,6 +102,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_7sdp"
                     android:layout_marginEnd="@dimen/_20sdp"
+                    android:visibility="gone"
                     android:layout_toEndOf="@+id/tvActualPrices"
                     android:fontFamily="@font/montserrat_bold"
                     android:text="$5.17"
@@ -118,7 +119,7 @@
                 android:layout_marginTop="@dimen/_7sdp"
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:fontFamily="@font/montserrat"
-                android:text="12 eggs"
+                android:text=""
                 android:textColor="@color/grey2"
                 android:textSize="@dimen/_12sdp" />
 
@@ -173,12 +174,14 @@
                 android:layout_height="@dimen/_1sdp"
                 android:layout_below="@+id/tvRemoveBasket"
                 android:layout_marginTop="@dimen/_15sdp"
+                android:visibility="gone"
                 android:background="@color/grey3"/>
 
             <RelativeLayout
                 android:id="@+id/relDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:layout_below="@+id/viewRemoveBasket">
 
@@ -209,7 +212,7 @@
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:fontFamily="@font/montserrat"
                 android:layout_below="@+id/relDetails"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:text="Lorem ipsum dolor sit amet consectetur. Cursus fusce aliquet vitae lectus etiam. At quis massa etiam enim adipiscing aliquam felis sed lobortis. Ridiculus augue id phasellus tellus a sed diam vestibulum. Mi sed urna nulla sem mi."
                 android:textColor="@color/black"
                 android:textSize="@dimen/_12sdp" />
@@ -219,6 +222,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_1sdp"
                 android:layout_below="@+id/tvDetailsDesc"
+                android:visibility="gone"
                 android:layout_marginTop="@dimen/_15sdp"
                 android:background="@color/grey3"/>
 
@@ -269,6 +273,7 @@
                 android:layout_height="@dimen/_1sdp"
                 android:layout_below="@+id/tvIngredientsDesc"
                 android:layout_marginTop="@dimen/_15sdp"
+                android:visibility="gone"
                 android:background="@color/grey3"/>
 
             <RelativeLayout
@@ -312,14 +317,12 @@
                 android:textColor="@color/black"
                 android:textSize="@dimen/_12sdp" />
 
-
             <RelativeLayout
                 android:id="@+id/relDoneBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tvDirectionsDesc"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginTop="@dimen/_40sdp"
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:layout_marginBottom="@dimen/_20sdp"
                 android:background="@drawable/green_btn_background">

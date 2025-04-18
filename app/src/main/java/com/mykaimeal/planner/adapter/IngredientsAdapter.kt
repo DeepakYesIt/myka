@@ -45,7 +45,7 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
                 if (data.pro_price!="Not available"){
                     holder.binding.tvFoodPrice.text=data.pro_price.toString()
                 }else{
-                    holder.binding.tvFoodPrice.text="$00"
+                    holder.binding.tvFoodPrice.text="$0"
                 }
             }
 
@@ -136,10 +136,6 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
     }
 
     class ViewHolder(var binding: AdapterBasketIngItemBinding) : RecyclerView.ViewHolder(binding.root){
-
-
-
-
     }
 
 }

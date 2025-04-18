@@ -1371,7 +1371,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         if (item != null) {
             if (item.recipe?.uri != null) {
                 if (apiType.equals("basket", true)) {
-                    addBasketData(item.recipe.uri)
+                    addBasketData(item.recipe.uri,type)
                 } else {
                     val newLikeStatus = if (item.is_like == 0) "1" else "0"
                     if (newLikeStatus.equals("0", true)) {
@@ -1488,13 +1488,13 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
     }
 
-    private fun addBasketData(uri: String) {
+    private fun addBasketData(uri: String, type: String) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             viewModel.addBasketRequest({
                 BaseApplication.dismissMe()
                 handleBasketApiResponse(it)
-            }, uri, "")
+            }, uri, "",type)
         }
     }
 

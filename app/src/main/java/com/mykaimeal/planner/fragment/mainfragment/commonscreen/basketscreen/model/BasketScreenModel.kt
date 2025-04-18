@@ -45,6 +45,7 @@ data class Store(
     val store_uuid: String?,
     val image:String?,
     val all_items:Int?,
+    var is_slected:Int?,
     val missing:String?,
     val total:Double?
 )

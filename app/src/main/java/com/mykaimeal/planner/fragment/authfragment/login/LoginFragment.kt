@@ -125,6 +125,9 @@ class LoginFragment : Fragment() {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun initialize() {
+      /*  val deviceId = Settings.Secure.getString(requireActivity().contentResolver, Settings.Secure.ANDROID_ID)
+
+        Log.d("dfdgdf","fdf::::::::_-----------"+deviceId)*/
 
         /// value get for social login
         cookingFor = when (sessionManagement.getCookingFor()) {
@@ -378,9 +381,7 @@ class LoginFragment : Fragment() {
 
     /// handle set session and redirection implement
     private fun showDataInUi(loginModelData: LoginModelData) {
-
         try {
-
             sessionManagement.setEmail(loginModelData.email ?: "")
 
             sessionManagement.setUserName(loginModelData.name ?: "")

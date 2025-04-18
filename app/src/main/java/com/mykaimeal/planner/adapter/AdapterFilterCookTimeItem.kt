@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.mykaimeal.planner.OnItemClickListener
+import com.mykaimeal.planner.OnItemClickedListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterSearchFilterItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.CookTime
@@ -14,11 +15,11 @@ import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.
 class AdapterFilterCookTimeItem(
     private var datalist: MutableList<CookTime>?,
     private var requireActivity: FragmentActivity,
-    private var onItemClickListener: OnItemClickListener
+    private var onItemClickListener: OnItemClickedListener
 ) : RecyclerView.Adapter<AdapterFilterCookTimeItem.ViewHolder>() {
 
-    private var selected: Boolean = false
-    private var isExpanded = false
+    private val selectedItems = mutableListOf<String>() // Declare this in your adapter or pass it from outside
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding: AdapterSearchFilterItemBinding =
@@ -29,9 +30,11 @@ class AdapterFilterCookTimeItem(
     @SuppressLint("ResourceAsColor")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.binding.tvItem.text = datalist!![position].name
+        val item = datalist!![position]
 
-        if (datalist!![position].selected==true){
+        holder.binding.tvItem.text = item.name
+
+        if (item.name=="More"){
             holder.binding.tvItem.setTextColor(android.graphics.Color.parseColor("#06C169"))
             holder.binding.relMainLayouts.background=null
         }else{
@@ -40,18 +43,19 @@ class AdapterFilterCookTimeItem(
         }
 
         holder.binding.relMainLayouts.setOnClickListener {
-            if (datalist!![position].selected==true){
-                onItemClickListener.itemClick(position,datalist!![position].name,"CookTime")
-            }else{
-                if (selected) {
-                    selected = false
-                    holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
-                } else {
-                    selected = true
-                    holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
-                    onItemClickListener.itemClick(position,datalist!![position].name,"CookTime")
+            item.selected = !(item.selected ?: false) // Toggle selection safely
+            if (item.selected == true) {
+                holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
+                if (!selectedItems.contains(item.name)) {
+                    selectedItems.add(item.name.toString())
                 }
+            } else {
+                holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
+                selectedItems.remove(item.name)
             }
+
+            // Notify listener (if needed)
+            onItemClickListener.itemClicked(position,selectedItems,item.name,"CookTime")
         }
     }
 

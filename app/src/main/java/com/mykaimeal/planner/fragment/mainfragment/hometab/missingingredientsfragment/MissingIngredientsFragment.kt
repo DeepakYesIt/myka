@@ -161,7 +161,6 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
-
     }
 
     private fun clearList(){

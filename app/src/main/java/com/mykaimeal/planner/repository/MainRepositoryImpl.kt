@@ -1056,10 +1056,10 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
 
     override suspend fun superMarketSaveRequest(
         successCallback: (response: NetworkResult<String>) -> Unit,
-        store: String
+        store: String?,storeName: String?
     ) {
         try {
-            api.superMarketSaveRequestApi(store).apply {
+            api.superMarketSaveRequestApi(store,storeName).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -1113,12 +1113,9 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
     }
 
     override suspend fun addBasketRequestApi(
-        successCallback: (response: NetworkResult<String>) -> Unit,
-        uri: String,
-        quantity: String
-    ) {
+        successCallback: (response: NetworkResult<String>) -> Unit, uri: String, quantity: String,type: String) {
         try {
-            api.addBasketRequestApi(uri, quantity).apply {
+            api.addBasketRequestApi(uri, quantity,type).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -1448,6 +1445,29 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
+
+    override suspend fun addShoppingCartUrlApi(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        foodIds: MutableList<String>?,
+        schId: MutableList<String>?,
+        foodName: MutableList<String>?,
+        status: MutableList<String>?
+    ) {
+        try {
+            api.addShoppingCartUrlApi(foodIds, schId, foodName, status).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e:  Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
     override suspend fun updateReasonTakeAwayApi(successCallback: (response: NetworkResult<String>) -> Unit, takeway: String?, takeWayName: String?) {
         try {
             api.updateReasonTakeAwayApi(takeway,takeWayName).apply {
@@ -1694,6 +1714,23 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
+
+    override suspend fun getMissingIngBasketUrl(successCallback: (response: NetworkResult<String>) -> Unit) {
+        try {
+            api.getMissingIngBasketUrl().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
     override suspend fun recipePreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit) {
         try {
             api.recipePreferencesApi().apply {
@@ -1908,8 +1945,7 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
 
     override suspend fun subscriptionGoogle(
         successCallback: (response: NetworkResult<String>) -> Unit,
-        purchaseToken: String?, subscriptionId: String?
-    ) {
+        purchaseToken: String?, subscriptionId: String?) {
         try {
             api.subscriptionGoogle(purchaseToken, subscriptionId).apply {
                 if (isSuccessful) {
@@ -2274,10 +2310,10 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
     }
 
     override suspend fun getProductsUrl(
-        successCallback: (response: NetworkResult<String>) -> Unit,query:String?
+        successCallback: (response: NetworkResult<String>) -> Unit,query:String?,foodId:String?,schId:String?
     ) {
         try {
-            api.getProductsUrl(query).apply {
+            api.getProductsUrl(query,foodId,schId).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -2293,10 +2329,10 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
 
 
     override suspend fun getProductsDetailsUrl(
-        successCallback: (response: NetworkResult<String>) -> Unit,proId:String?,query:String?
+        successCallback: (response: NetworkResult<String>) -> Unit,proId:String?,query:String?,foodId:String?,schId:String?
     ) {
         try {
-            api.getProductsDetailsUrl(proId,query).apply {
+            api.getProductsDetailsUrl(proId,query,foodId, schId).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -2312,10 +2348,10 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
 
 
     override suspend fun getSelectProductsUrl(
-        successCallback: (response: NetworkResult<String>) -> Unit,id:String?,productId:String?
+        successCallback: (response: NetworkResult<String>) -> Unit,id:String?,productId:String?,schId: String?
     ) {
         try {
-            api.getSelectProductsUrl(id,productId).apply {
+            api.getSelectProductsUrl(id,productId,schId).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))
@@ -2430,6 +2466,26 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
     ) {
         try {
             api.generateLinkUrl(link, image).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+
+    override suspend fun selectStoreProductUrl(
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        storeName: String?, storeId:String?,
+    ) {
+        try {
+            api.selectStoreProductUrl(storeName, storeId).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

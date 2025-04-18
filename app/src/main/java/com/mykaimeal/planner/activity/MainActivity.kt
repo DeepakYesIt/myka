@@ -1,4 +1,4 @@
-package com.mykaimeal .planner.activity
+package com.mykaimeal.planner.activity
 
 import PlanApiResponse
 import android.annotation.SuppressLint
@@ -40,7 +40,6 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
-import com.mykaimeal.planner.activity.AuthActivity
 import com.mykaimeal.planner.adapter.ChooseDayAdapter
 import com.mykaimeal.planner.adapter.ImageViewPagerAdapter
 import com.mykaimeal.planner.adapter.IndicatorAdapter
@@ -121,7 +120,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
 
         //using function for find destination graph
         startDestination()
-
 
 //        fetchDataOnLoad()
         startTimer(this@MainActivity)
@@ -371,7 +369,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             mealRoutineViewModel.addBasketRequest({
                 BaseApplication.dismissMe()
                 handleBasketApiResponse(it)
-            }, uri.toString(), "")
+            }, uri.toString(), "",mealType)
         }
     }
 
@@ -822,7 +820,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
     }
 
     /// use switch case to redirection or handle click event
-    override fun onClick(v: View?) {
+    override fun onClick(v:  View?) {
         when (v!!.id) {
             R.id.llHome -> {
                 binding.cardViewAddRecipe.visibility = View.GONE
@@ -1146,7 +1144,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             if (hoursPassed < 24) return
         }
         Log.d("timer working","***** 24 hours passed! Calling API now.")
-//        Toast.makeText(this@MainActivity, "24 hours passed! Calling API now.", Toast.LENGTH_LONG).show()
+//        Toast.makeText(this@com.mykaimeal.planner.activity.MainActivity, "24 hours passed! Calling API now.", Toast.LENGTH_LONG).show()
         // Save current time
         prefs.edit().putLong(LAST_SHOWN_KEY, currentMillis).apply()
         fetchDataOnLoad()

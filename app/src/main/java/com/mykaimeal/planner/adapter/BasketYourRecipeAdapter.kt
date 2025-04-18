@@ -34,8 +34,9 @@ class BasketYourRecipeAdapter(private var yourRecipesData: MutableList<Recipes>?
         val data= yourRecipesData?.get(position)
 
         if (data != null) {
-            holder.binding.tvFoodName.text=data.data!!.recipe?.label
-            if (data.data.recipe?.images?.SMALL?.url!=null){
+            holder.binding.tvFoodName.text = data.data?.recipe?.label ?: ""
+
+            if (data.data?.recipe?.images?.SMALL?.url!=null){
                 Glide.with(requireActivity)
                     .load(data.data.recipe.images.SMALL.url)
                     .error(R.drawable.no_image)

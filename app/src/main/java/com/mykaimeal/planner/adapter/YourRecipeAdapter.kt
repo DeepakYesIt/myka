@@ -34,8 +34,17 @@ class YourRecipeAdapter(private var yourRecipesData: MutableList<Dinner>,
         val data= yourRecipesData.get(position)
 
         if (data != null) {
-            holder.binding.tvFoodName.text=data.data!!.recipe?.label
-            if (data.data.recipe?.images?.SMALL?.url!=null){
+
+            if (data.data!=null){
+                if (data.data.recipe!=null){
+                    if (data.data.recipe.label!=null){
+                        holder.binding.tvFoodName.text=data.data.recipe?.label
+                    }
+                }
+            }
+
+
+            if (data.data?.recipe?.images?.SMALL?.url!=null){
                 Glide.with(requireActivity)
                     .load(data.data.recipe.images.SMALL.url)
                     .error(R.drawable.no_image)

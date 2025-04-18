@@ -92,7 +92,16 @@ class AdapterSearchedRecipeItem(var datalist: MutableList<Recipe>?, private var 
             }
 
             holder.binding.imgBasket.setOnClickListener{
-                onItemClickListener.itemClick(position,"2","")
+                var mealType = ""
+                if (datalist!![position].recipe?.mealType != null && datalist!![position].recipe?.mealType?.isNotEmpty() == true) {
+                    mealType = datalist!![position].recipe?.mealType!![0]
+                    mealType = if (mealType.contains("/")) {
+                        mealType.split("/")[0] // Get the first part before the slash
+                    } else {
+                        mealType // Return as is if no slash is present
+                    }
+                }
+                onItemClickListener.itemClick(position,"2",mealType)
             }
 
             holder.binding.imgHeartRed.setOnClickListener {

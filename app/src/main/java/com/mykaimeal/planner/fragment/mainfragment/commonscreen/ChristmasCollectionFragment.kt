@@ -2,15 +2,12 @@ package com.mykaimeal.planner.fragment.mainfragment.commonscreen
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -32,6 +29,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.appsflyer.share.LinkGenerator
 import com.appsflyer.share.ShareInviteHelper
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -93,6 +92,8 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
 
     private var savedfile: File? = null
     private var generateLinkApp: String? =""
+    private var referLink: String =""
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
@@ -269,8 +270,9 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         binding.relShareCookBook.setOnClickListener{
             if (type=="1"){
                 binding.cardViewMenuPopUp.visibility = View.GONE
-          /*      copyShareInviteLink()*/
-                dynamicValueUpdate()
+                shareImageWithText("Hey! I am inviting you to download My-Kai App!"+
+                        "\nclick on the link below:\n\n",
+                    referLink)
             }else{
                 commonWorkUtils.alertDialog(requireContext(),ErrorMessage.shareCookBookError,false)
             }
@@ -284,173 +286,83 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         binding.rlAddRecipes.setOnClickListener {
             findNavController().navigate(R.id.createRecipeFragment)
         }
-    }
 
-    private fun dynamicValueUpdate(){
-
-        // Step 1: Inflate the layout without adding it to the screen
-        val inflater = LayoutInflater.from(context)
-        val view = inflater.inflate(
-            R.layout.layout_screen_share_content,
-            null
-        )  // replace with your layout name
-
-        // Step 2: Set the values programmatically
-        val titleText = view.findViewById<TextView>(R.id.tvTittles)
-        titleText.text =
-            "Hey! I put together this cookbook in My Kai, and I think you’ll love it! It’s packed with delicious meals, check it out and let me know what you think!"
-
-        val imageView = view.findViewById<ImageView>(R.id.imageMain)
-        imageView.setImageResource(R.mipmap.app_icon) // or use Glide/Picasso to load from URL
-
-        val tvName = view.findViewById<TextView>(R.id.tvName)
-        tvName.text = "My-kai"
-
-        // Step 3 (Optional): Convert view to bitmap if needed for sharing
-        val specWidth = View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY)
-        val specHeight = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-        view.measure(specWidth, specHeight)
-        view.layout(0, 0, view.measuredWidth, view.measuredHeight)
-
-        val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        view.draw(canvas)
-
-        val filename = "shared_layout_${System.currentTimeMillis()}.jpg"
-        val file = File(requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename)
-        val outputStream = FileOutputStream(file)
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream) // use PNG if transparency needed
-        outputStream.flush()
-        outputStream.close()
-
-        // Save file reference
-        savedfile = file
         copyShareInviteLink()
-
-        Log.d("ImageSave", "Image saved at: ${file.absolutePath}")
-
-        if (BaseApplication.isOnline(requireActivity())) {
-            generateLinkApi()
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
     }
-
-    private fun generateLinkApi() {
-        BaseApplication.showMe(requireContext())
-        lifecycleScope.launch {
-            val cookBookName = generateLinkApp?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val filePart: MultipartBody.Part? = if (savedfile != null) {
-                val requestBody = savedfile?.asRequestBody(savedfile!!.extension.toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("image", savedfile?.name, requestBody!!)
-            } else {
-                null
-            }
-
-            viewModel.generateLinkUrl({
-                BaseApplication.dismissMe()
-                handleGenerateLinkApiResponse(it)
-            }, cookBookName, filePart)
-        }
-    }
-
-    private fun handleGenerateLinkApiResponse(result: NetworkResult<String>) {
-        when (result) {
-            is NetworkResult.Success -> handleLinkGenerateSuccessResponse(result.data.toString())
-            is NetworkResult.Error -> showAlert(result.message, false)
-            else -> showAlert(result.message, false)
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun handleLinkGenerateSuccessResponse(data: String) {
-        try {
-            val apiModel = Gson().fromJson(data, LinkGenerateModel::class.java)
-            Log.d("@@@ Plan List ", "message :- $data")
-            if (apiModel.code == 200 && apiModel.success == true) {
-                if (apiModel.data!=null){
-                    shareLinkApi(apiModel.data)
-                }
-            } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
-            }
-        } catch (e: Exception) {
-            showAlert(e.message, false)
-        }
-    }
-
-    private fun shareLinkApi(data: String) {
-        Log.d("dfdfdfdf", "dfdd:----- $data")
-        val dataLink = data.toString()
-
-        // Generate the link using AppsFlyer
-        val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity())
-        // Add only the dataLink as a deep link parameter
-        linkGenerator.addParameter("dataLink", dataLink)
-        val listener: LinkGenerator.ResponseListener = object : LinkGenerator.ResponseListener {
-            override fun onResponse(generatedLink: String) {
-                val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, generatedLink)
-                }
-
-                val chooser = Intent.createChooser(shareIntent, "Share invite link via")
-                requireActivity().startActivity(chooser)
-            }
-
-            override fun onResponseError(error: String) {
-                Log.d("LinkGen", "Error generating link: $error")
-            }
-        }
-// Generate the link
-        linkGenerator.generateLink(requireActivity(), listener)
-    }
-
-
 
     @SuppressLint("RestrictedApi")
     private fun copyShareInviteLink() {
 
-        val currentCampaign = "user_invite"
-        val currentChannel = "mobile_share"
-        val currentReferrerId = sessionManagement.getId().toString()
+        val afUserId = sessionManagement.getId()?.toString().orEmpty()
+        val referrerCode = sessionManagement.getReferralCode()?.toString().orEmpty()
+        val providerName = sessionManagement.getUserName()?.toString().orEmpty()
+        val providerImage = sessionManagement.getImage()?.toString().orEmpty()
 
-        // Base OneLink URL (Replace this with your actual OneLink domain)
-        val baseOneLink = "https://mykaimealplanner.onelink.me/mPqu/"
+        val baseUrl = "https://mykaimealplanner.onelink.me/mPqu/"
 
-        // Manually append query parameters to ensure they appear in the final link
-        val deepLinkUrl = Uri.parse(baseOneLink).buildUpon()
-            .appendQueryParameter("af_user_id", currentReferrerId)
+        val fullUrl = Uri.parse(baseUrl).buildUpon()
+            .appendQueryParameter("af_user_id", afUserId)
+            .appendQueryParameter("Referrer", referrerCode)
             .appendQueryParameter("CookbooksID", id)
             .appendQueryParameter("ItemName", name)
             .appendQueryParameter("ScreenName", "CookBooksType")
+            .appendQueryParameter("providerName", providerName)
+            .appendQueryParameter("providerImage", providerImage)
             .build()
             .toString()
 
-        Log.d("AppsFlyer", "Generated Deep Link: $deepLinkUrl")
-
-        // Prepare share message
-        val message = "Hi, I am inviting you to download My-Kai app!\n\nClick on the link below:\n$deepLinkUrl"
-
-        // Open share dialog
-        requireActivity().runOnUiThread {
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, message)
-            }
-            requireActivity().startActivity(Intent.createChooser(shareIntent, "Share invite link via"))
-
-            // Log invite event to AppsFlyer
-            val logInviteMap = hashMapOf("referrerId" to currentReferrerId, "campaign" to currentCampaign)
-            ShareInviteHelper.logInvite(requireActivity(), currentChannel, logInviteMap)
-        }
+        referLink = fullUrl
+        Log.d("AF_TEST", "Custom Raw Link: $referLink")
     }
 
 
+    private fun shareImageWithText(description: String,  link: String) {
+        // Download image using Glide
+        Glide.with(requireContext())
+            .asBitmap() // Request a Bitmap image
+            .load(image) // Provide the URL to load the image from
+            .into(object : CustomTarget<Bitmap>() { override fun onResourceReady(resource: Bitmap,
+                                                                                 transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                try {
+                    // Save the image to a file in the app's external storage
+                    val file = File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "shared_image.png"
+                    )
+                    val fos = FileOutputStream(file)
+                    resource.compress(Bitmap.CompressFormat.PNG, 100, fos)
+                    fos.close()
+
+                    // Create URI for the file using FileProvider
+                    val uri: Uri = FileProvider.getUriForFile(
+                        requireContext(),
+                        requireActivity().packageName + ".provider", // Make sure this matches your manifest provider
+                        file
+                    )
+
+                    // Format the message with line breaks
+                    val formattedText = """$description$link""".trimIndent()
+
+                    // Create an intent to share the image and text
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "image/png"
+                        putExtra(Intent.EXTRA_STREAM, uri)
+                        putExtra(Intent.EXTRA_TEXT, formattedText)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+
+                    // Launch the share dialog
+                    requireContext().startActivity(Intent.createChooser(shareIntent, "Share Image"))
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Log.d("ImageShareError", "onResourceReady: ${e.message}")
+                }
+            }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
+                    // Optional: Handle if the image load is cleared or cancelled
+                }
+            })
+    }
 
     private fun removeCookBookDialog() {
         val dialogRemoveCookBook: Dialog = context?.let { Dialog(it) }!!
@@ -485,7 +397,7 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
             }
             "2" -> {
                 if (BaseApplication.isOnline(requireActivity())) {
-                    addBasketData(localData[position!!].data?.recipe!!.uri!!)
+                    addBasketData(localData[position!!].data?.recipe!!.uri!!, type.toString())
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
@@ -668,13 +580,13 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
         }
     }
 
-    private fun addBasketData(uri: String) {
+    private fun addBasketData(uri: String,mealType:String) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             viewModel.addBasketRequest({
                 BaseApplication.dismissMe()
                 handleBasketApiResponse(it)
-            }, uri,"")
+            }, uri,"",mealType)
         }
     }
 

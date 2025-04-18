@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.mykaimeal.planner.OnItemClickListener
+import com.mykaimeal.planner.OnItemClickedListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterSearchFilterItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.Diet
@@ -14,7 +15,7 @@ import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.
 class AdapterFilterMealItem(
     private var datalist: MutableList<MealType>?,
     private var requireActivity: FragmentActivity,
-    private var onItemClickListener: OnItemClickListener
+    private var onItemClickListener: OnItemClickedListener
 ) : RecyclerView.Adapter<AdapterFilterMealItem.ViewHolder>() {
 
     private val selectedItems = mutableListOf<String>() // Declare this in your adapter or pass it from outside
@@ -33,7 +34,7 @@ class AdapterFilterMealItem(
         holder.binding.tvItem.text = datalist!![position].name
 
         // Update UI based on selection state
-        if (item.selected == true) {
+        if (item.name=="More") {
             holder.binding.tvItem.setTextColor(Color.parseColor("#06C169"))
             holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
         } else {
@@ -42,22 +43,21 @@ class AdapterFilterMealItem(
         }
 
         holder.binding.relMainLayouts.setOnClickListener {
-            item.selected = !item.selected!! // Toggle selection
+            item.selected = !(item.selected ?: false) // Toggle selection safely
 
-            if (item.selected!!) {
-                holder.binding.tvItem.setTextColor(Color.parseColor("#06C169"))
+            if (item.selected == true) {
                 holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
                 if (!selectedItems.contains(item.name)) {
                     selectedItems.add(item.name.toString())
                 }
             } else {
-                holder.binding.tvItem.setTextColor(Color.parseColor("#000000"))
                 holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
                 selectedItems.remove(item.name)
             }
 
-            // Notify listener (if needed)
-            onItemClickListener.itemClick(position, item.name, "MealType")
+// Notify listener (if needed)
+            onItemClickListener.itemClicked(position,selectedItems,item.name,"MealType")
+
         }
     }
 

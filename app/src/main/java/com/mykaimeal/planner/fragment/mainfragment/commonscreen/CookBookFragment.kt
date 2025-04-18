@@ -208,8 +208,6 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
             }
             findNavController().navigate(R.id.createRecipeFragment,bundle)
         }
-
-
     }
 
     private fun getCookBookTypeList(){
@@ -229,7 +227,7 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
             }
             "2" -> {
                 if (BaseApplication.isOnline(requireActivity())) {
-                    addBasketData(localData[position!!].data?.recipe!!.uri!!)
+                    addBasketData(localData[position!!].data?.recipe!!.uri!!,type)
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
@@ -255,13 +253,13 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
         }
     }
 
-    private fun addBasketData(uri: String) {
+    private fun addBasketData(uri: String, type: String?) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             viewModel.addBasketRequest({
                 BaseApplication.dismissMe()
                 handleBasketApiResponse(it)
-            }, uri,"")
+            }, uri,"", type.toString())
         }
     }
 

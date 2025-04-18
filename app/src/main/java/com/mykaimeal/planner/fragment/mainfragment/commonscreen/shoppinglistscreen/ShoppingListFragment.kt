@@ -49,9 +49,9 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private var tvCounter: TextView? = null
     private var quantity: Int = 1
     private var recipe: MutableList<Recipes>? = null
-
     private var ingredientList: MutableList<Ingredient>? = null
     private var foodIds = mutableListOf<String>()
+    private var schIds = mutableListOf<String>()
     private var foodName = mutableListOf<String>()
     private var statusType = mutableListOf<String>()
     private lateinit var commonWorkUtils: CommonWorkUtils
@@ -66,7 +66,6 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
         shoppingListViewModel = ViewModelProvider(requireActivity())[ShoppingListViewModel::class.java]
         commonWorkUtils = CommonWorkUtils(requireActivity())
-
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -83,21 +82,19 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
-
         return binding.root
     }
 
     @SuppressLint("DefaultLocale")
     private fun updateValue() {
         tvCounter!!.text = String.format("%02d", quantity)
-
     }
 
     private fun initialize() {
 
-        binding.textSeeAll3.setOnClickListener {
+    /*    binding.textSeeAll3.setOnClickListener {
             findNavController().navigate(R.id.shoppingMissingIngredientsFragment)
-        }
+        }*/
 
         binding.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()
@@ -155,7 +152,34 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         tvDialogAddBtn.setOnClickListener {
-            if (foodName!=null){
+
+            val newIngredient = Ingredient(
+                created_at = null,
+                deleted_at = "",
+                food_id = null,
+                id = null,
+                market_id = "",
+                name = tvLabel.text.toString().trim(),
+                price = "",
+                pro_id = null,
+                pro_img = null,
+                pro_name = tvLabel.text.toString().trim(),
+                pro_price = "Not available",
+                product_id = null,
+                quantity = tvCounter?.text.toString(),
+                sch_id = tvCounter?.text.toString().toIntOrNull(),
+                status = null,
+                updated_at = null,
+                user_id = null
+            )
+
+        // Add to both UI and new list
+            ingredientList?.add(newIngredient)
+            adapterShoppingAdapter.notifyItemInserted(ingredientList?.size!! - 1)
+
+            dialogRemoveDay.dismiss()
+
+            /*if (foodName!=null){
                 foodName.clear()
             }
             statusType = mutableListOf("0")
@@ -173,17 +197,17 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 }
             } else {
                 commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.enterIngName, false)
-            }
+            }*/
         }
     }
 
     private fun addToCartUrlApi(dismiss: Dialog) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            shoppingListViewModel.addToCartUrlApi({
+            shoppingListViewModel.addShoppingCartUrlApi({
                 BaseApplication.dismissMe()
                 handleCartApiResponse(it,dismiss)
-            }, foodIds, tvCounter!!.text.toString().trim(), foodName, statusType)
+            }, foodIds, schIds, foodName, statusType)
         }
     }
 
@@ -271,12 +295,14 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             binding.rlYourRecipes.visibility = View.GONE
         }
 
+        if (ingredientList!=null){
+            ingredientList?.clear()
+        }
+
         if (data.ingredient != null && data.ingredient.size > 0) {
             ingredientList = data.ingredient
-            adapterShoppingAdapter =
-                IngredientsShoppingAdapter(data.ingredient, requireActivity(), this)
+            adapterShoppingAdapter = IngredientsShoppingAdapter(data.ingredient, requireActivity(), this)
             binding.rcvIngredients.adapter = adapterShoppingAdapter
-
         }
     }
 
@@ -314,6 +340,12 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
+            } else if (status == "Delete") {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddIngServing(position, "Delete")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         }
     }
@@ -329,6 +361,9 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 else -> count // No change if `apiType` doesn't match
             }
             increaseIngRecipe(foodId, count.toString(), item, position)
+        } else {
+            val foodId = item?.food_id
+            increaseIngRecipe(foodId, "0", item, position)
         }
     }
 
@@ -354,38 +389,30 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         position: Int?
     ) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessIngResponse(
-                result.data.toString(),
-                item,
-                quantity,
-                position
-            )
-
+            is NetworkResult.Success -> handleSuccessIngResponse(result.data.toString(), item, quantity, position)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessIngResponse(
-        data: String,
-        item: Ingredient?,
-        quantity: String,
-        position: Int?
-    ) {
+    private fun handleSuccessIngResponse(data: String, item: Ingredient?, quantity: String, position: Int?) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                // Toggle the is_like value
-                item?.sch_id = quantity.toInt()
-                if (item != null) {
-                    ingredientList?.set(position!!, item)
+                if (quantity != "0") {
+                    // Toggle the is_like value
+                    item?.sch_id = quantity.toInt()
+                    if (item != null) {
+                        ingredientList?.set(position!!, item)
+                    }
+                    // Update the adapter
+                    if (ingredientList != null) {
+                        adapterShoppingAdapter.updateList(ingredientList!!)
+                    }
                 }
-                // Update the adapter
-                if (ingredientList != null) {
-                    adapterShoppingAdapter.updateList(ingredientList!!)
-                }
+              getShoppingList()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)

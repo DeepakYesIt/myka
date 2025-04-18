@@ -56,9 +56,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.gson.Gson
 import com.mykaimeal.planner.OnItemLongClickListener
-import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
-import com.mykaimeal.planner.adapter.AdapterCardPreferredItem
+import com.mykaimeal.planner.adapter.AdapterCheckoutIngredientsItem
 import com.mykaimeal.planner.adapter.AdapterGetAddressItem
 import com.mykaimeal.planner.adapter.PlacesAutoCompleteAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
@@ -90,12 +89,17 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
     private lateinit var mapView: MapView
     private var mMap: GoogleMap? = null
     private var status: Boolean = false
+    private var openStatus: Boolean = false
     private lateinit var checkoutScreenViewModel: CheckoutScreenViewModel
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var locationManager: LocationManager? = null
     private lateinit var sessionManagement: SessionManagement
     private var rcySavedAddress: RecyclerView? = null
     private var dialogMiles: Dialog? = null
+    private var selectType: String? = ""
+    private var addressId: String? = ""
+
+    private lateinit var adapterCheckoutIngredients: AdapterCheckoutIngredientsItem
 
     private var latitude: String? = ""
     private var longitude: String? = ""
@@ -120,7 +124,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
     private var country: String? = ""
     private lateinit var commonWorkUtils: CommonWorkUtils
     private var adapterGetAddressItem: AdapterGetAddressItem? = null
-
+    private var addressList: MutableList<GetAddressListModelData>?=null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -134,7 +138,8 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
             ViewModelProvider(requireActivity())[CheckoutScreenViewModel::class.java]
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        locationManager = requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
+        locationManager =
+            requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
 
         sessionManagement = SessionManagement(requireContext())
         commonWorkUtils = CommonWorkUtils(requireActivity())
@@ -211,10 +216,20 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
             } else {
                 binding!!.imageCheckRadio.setImageResource(R.drawable.radio_green_icon)
                 status = true
-
             }
         }
 
+        binding!!.imageDown.setOnClickListener {
+            if (openStatus) {
+                openStatus = false
+                binding!!.relIngredients.visibility = View.GONE
+                binding!!.imageDown.setImageResource(R.drawable.drop_down_icon)
+            } else {
+                binding!!.imageDown.setImageResource(R.drawable.drop_up_icon)
+                binding!!.relIngredients.visibility = View.VISIBLE
+                openStatus = true
+            }
+        }
     }
 
     private fun getCheckoutApi() {
@@ -369,6 +384,12 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
             binding!!.tvItemsCount.text = data.ingredient_count.toString() + " Items"
         }
 
+        if (!data.ingredient.isNullOrEmpty()) {
+            adapterCheckoutIngredients =
+                AdapterCheckoutIngredientsItem(data.ingredient, requireActivity())
+            binding!!.rcyIngredients.adapter = adapterCheckoutIngredients
+        }
+
 
         data.let {
             // ✅ Load image with Glide
@@ -491,10 +512,17 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
             getPlaceDetails(place.id, placesApi)
         }
 
-
         relDone?.setOnClickListener {
-            fullAddressDialog()
-            dialogMiles?.dismiss()
+            if (selectType != "") {
+                if (BaseApplication.isOnline(requireActivity())) {
+                    addressPrimaryApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            } else {
+                fullAddressDialog()
+                dialogMiles?.dismiss()
+            }
         }
     }
 
@@ -538,7 +566,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
     }
 
     private fun showDataInAddressUI(data: MutableList<GetAddressListModelData>?) {
-
+        addressList=data
         adapterGetAddressItem = AdapterGetAddressItem(data, requireActivity(), this)
         rcySavedAddress!!.adapter = adapterGetAddressItem
 
@@ -828,13 +856,13 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         return true
     }
 
-    private fun addressPrimaryApi(id: String) {
+    private fun addressPrimaryApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             checkoutScreenViewModel.makeAddressPrimaryUrl({
                 BaseApplication.dismissMe()
                 handleApiPrimaryResponse(it)
-            }, id)
+            }, addressId)
         }
     }
 
@@ -956,28 +984,16 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         mapView.onLowMemory()
     }
 
-    override fun itemLongClick(id: Int?, latitudeValue: String?, longitudeValue: String?, isZiggleEnabled: String) {
-        if (isZiggleEnabled=="Click"){
-   /*         latitudeValue=status.toString()
-            longitudeValue=type.toString()*/
-
-            if (BaseApplication.isOnline(requireActivity())) {
-                getCheckoutApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }else if (isZiggleEnabled=="SelectPrimary"){
-            if (BaseApplication.isOnline(requireActivity())) {
-                addressPrimaryApi(id.toString())
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        } else{
+    override fun itemLongClick(position: Int?, latitudeValue: String?, fullAddress: String?, isZiggleEnabled: String) {
+        if (isZiggleEnabled == "SelectPrimary") {
+            selectType = isZiggleEnabled
+            addressId = id.toString()
+        } else if (isZiggleEnabled == "Edit") {
             val bundle = Bundle().apply {
-                putString("latitude", latitudeValue)
-                putString("longitude", longitudeValue)
-                putString("address", isZiggleEnabled)
-                putString("addressId", id.toString())
+                putString("latitude", addressList?.get(position!!)?.latitude)
+                putString("longitude", addressList?.get(position!!)?.longitude)
+                putString("address", fullAddress)
+                putString("addressId", addressList?.get(position!!)?.id.toString())
                 putString("type", "Checkout")
             }
             findNavController().navigate(R.id.addressMapFullScreenFragment, bundle)

@@ -33,8 +33,8 @@ class PlanViewModel @Inject constructor(private val repository: MainRepository) 
     }
 
     suspend fun addBasketRequest(successCallback: (response: NetworkResult<String>) -> Unit,
-                                  uri: String,quantity: String){
-        repository.addBasketRequestApi({ successCallback(it) },uri,quantity)
+                                  uri: String,quantity: String,type:String){
+        repository.addBasketRequestApi({ successCallback(it) },uri,quantity,type)
     }
 
 

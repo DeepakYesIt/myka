@@ -23,4 +23,10 @@ class BasketDetailsSuperMarketViewModel @Inject constructor(private val reposito
         repository.basketIngIncDescUrl({ successCallback(it) },foodId, quantity)
     }
 
+    suspend fun selectStoreProductUrl(successCallback: (response: NetworkResult<String>) -> Unit,storeName:String?,storeId:String?) {
+        repository.selectStoreProductUrl({ successCallback(it) },storeName,storeId)
+    }
+
+
+
 }

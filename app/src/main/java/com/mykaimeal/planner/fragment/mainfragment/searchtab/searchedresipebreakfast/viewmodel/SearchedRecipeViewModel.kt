@@ -33,9 +33,9 @@ class SearchedRecipeViewModel @Inject constructor(private val repository: MainRe
 
     suspend fun addBasketRequest(
         successCallback: (response: NetworkResult<String>) -> Unit,
-        uri: String, quantity: String
+        uri: String, quantity: String, type:String
     ) {
-        repository.addBasketRequestApi({ successCallback(it) }, uri, quantity)
+        repository.addBasketRequestApi({ successCallback(it) }, uri, quantity,type)
     }
 
     suspend fun likeUnlikeRequest(

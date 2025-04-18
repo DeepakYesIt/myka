@@ -405,7 +405,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/tvSuperMarketName"
-                        android:text="8 items"
+                        android:text=""
                         android:textColor="#ADADAD"
                         android:textSize="@dimen/_13sdp" />
 
@@ -422,12 +422,30 @@
 
             </RelativeLayout>
 
+            <RelativeLayout
+                android:id="@+id/relIngredients"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:visibility="gone"
+                android:layout_below="@+id/relSuperMarketsItems">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcyIngredients"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+            </RelativeLayout>
+
 
             <RelativeLayout
                 android:id="@+id/relBillingDetailAmount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/relSuperMarketsItems"
+                android:layout_below="@+id/relIngredients"
                 android:layout_marginHorizontal="@dimen/_20sdp"
                 android:layout_marginTop="@dimen/_10sdp">
 

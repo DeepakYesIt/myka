@@ -1,7 +1,6 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen.statistics
 
 import android.annotation.SuppressLint
-import android.content.ClipData
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -15,14 +14,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.FileProvider
-import androidx.core.content.PackageManagerCompat.LOG_TAG
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.appsflyer.AppsFlyerLib
 import com.appsflyer.deeplink.DeepLinkResult
-import com.appsflyer.share.LinkGenerator
-import com.appsflyer.share.ShareInviteHelper
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.github.mikephil.charting.components.XAxis
@@ -219,36 +215,55 @@ class StatisticsGraphFragment : Fragment() {
 
     @SuppressLint("RestrictedApi")
     private fun copyShareInviteLink() {
-        val currentCampaign = "user_invite"
-        val currentChannel = "mobile_share"
 
         val afUserId = sessionManagement.getId()?.toString().orEmpty()
         val referrerCode = sessionManagement.getReferralCode()?.toString().orEmpty()
         val providerName = sessionManagement.getUserName()?.toString().orEmpty()
         val providerImage = sessionManagement.getImage()?.toString().orEmpty()
 
-        val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity())
-            .setBaseDeeplink("https://mykaimealplanner.onelink.me/mPqu")
+        val baseUrl = "https://mykaimealplanner.onelink.me/mPqu/"
 
-        linkGenerator.campaign = currentCampaign
-        linkGenerator.channel = currentChannel
+        val fullUrl = Uri.parse(baseUrl).buildUpon()
+            .appendQueryParameter("af_user_id", afUserId)
+            .appendQueryParameter("Referrer", referrerCode)
+            .appendQueryParameter("providerName", providerName)
+            .appendQueryParameter("providerImage", providerImage)
+            .build()
+            .toString()
 
-        linkGenerator.addParameter("af_user_id", afUserId)
-        linkGenerator.addParameter("Referrer", referrerCode)
-        linkGenerator.addParameter("providerName", providerName)
-        linkGenerator.addParameter("providerImage", providerImage)
-        Log.d(LOG_TAG, "Link params: ${linkGenerator.userParams}")
-        val listener = object : LinkGenerator.ResponseListener {
-            override fun onResponse(s: String) {
-                referLink = s
-                Log.d(LOG_TAG, "Generated Link: $referLink")
-            }
+        referLink = fullUrl
+        Log.d("AF_TEST", "Custom Raw Link: $referLink")
 
-            override fun onResponseError(s: String) {
-                Log.d(LOG_TAG, "onResponseError called: $s")
-            }
-        }
 
-        linkGenerator.generateLink(requireActivity(), listener)
+        /*    val currentCampaign = "user_invite"
+            val currentChannel = "mobile_share"
+
+            val afUserId = sessionManagement.getId()?.toString().orEmpty()
+            val referrerCode = sessionManagement.getReferralCode()?.toString().orEmpty()
+            val providerName = sessionManagement.getUserName()?.toString().orEmpty()
+            val providerImage = sessionManagement.getImage()?.toString().orEmpty()
+
+            val linkGenerator = ShareInviteHelper.generateInviteUrl(requireActivity())
+                .setBaseDeeplink("https://mykaimealplanner.onelink.me/mPqu")
+                .setCampaign(currentCampaign)
+                .setChannel(currentChannel)
+                .addParameter("af_user_id", afUserId)
+                .addParameter("referrer", referrerCode)
+                .addParameter("providerName", providerName)
+                .addParameter("providerImage", providerImage)
+
+            Log.d("AF_TEST", "Params: ${linkGenerator.userParams}")
+
+            linkGenerator.generateLink(requireActivity(), object : LinkGenerator.ResponseListener {
+                override fun onResponse(s: String) {
+                    referLink = s
+                    Log.d("AF_TEST", "Generated Link: $s")
+                }
+
+                override fun onResponseError(s: String) {
+                    Log.e("AF_TEST", "Error Generating Link: $s")
+                }
+            })*/
+
     }
 }

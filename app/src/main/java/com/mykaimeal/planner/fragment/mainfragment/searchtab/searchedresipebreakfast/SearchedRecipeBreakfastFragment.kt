@@ -31,7 +31,6 @@ import com.mykaimeal.planner.adapter.ChooseDayAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentSearchedRecipeBreakfastBinding
-import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.MealType
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchedresipebreakfast.viewmodel.SearchedRecipeViewModel
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.model.Recipe
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.model.SearchModel
@@ -65,9 +64,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
     private var adapterSearchedRecipeItem: AdapterSearchedRecipeItem? = null
     private var recipeType: String? = null
     private var screenType: String? = null
-    private var fullListMealType: MutableList<String>? = null
-    private var fullListDietType: MutableList<String>? = null
-    private var fullListCookTime: MutableList<String>? = null
+    private var mealType: String? = null
     private lateinit var searchedRecipeViewModel: SearchedRecipeViewModel
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
         mutableListOf()
@@ -92,14 +89,16 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
         recipeType = arguments?.getString("recipeName", "") ?: ""
         screenType = arguments?.getString("screenType", "") ?: ""
 
-        if (screenType!="Search"){
-           /* fullListMealType=*/
+        if (screenType != "Search") {
+            /* fullListMealType=*/
         }
 
         cookbookList.clear()
 
-        val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
-                "", "", 0, "", "Favourites", 0, "", 0)
+        val data =
+            com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
+                "", "", 0, "", "Favourites", 0, "", 0
+            )
         cookbookList.add(0, data)
 
         binding.tvSearchedTitle.text = recipeType.toString()
@@ -127,16 +126,16 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
     private fun launchApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-                        if (screenType=="Search"){
+            if (screenType == "Search") {
                 searchedRecipeViewModel.recipeSearchedApi({
                     BaseApplication.dismissMe()
                     handleApiSearchResponse(it)
                 }, recipeType)
-            }else{
+            } else {
                 searchedRecipeViewModel.recipeFilterSearchApi({
                     BaseApplication.dismissMe()
                     handleApiSearchResponse(it)
-                }, null,null,null)
+                }, null, null, null)
             }
 
         }
@@ -144,9 +143,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
 
     private fun handleApiSearchResponse(result: NetworkResult<String>) {
         when (result) {
-            is NetworkResult.Success -> {
-                handleSearchSuccessResponse(result.data.toString())
-            }
+            is NetworkResult.Success -> { handleSearchSuccessResponse(result.data.toString()) }
 
             is NetworkResult.Error -> {
                 showAlert(result.message, false)
@@ -198,8 +195,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
             if (recipes.size > 0) {
                 binding.rcySearchedItem.visibility = View.VISIBLE
                 binding.tvnoData.visibility = View.GONE
-                adapterSearchedRecipeItem =
-                    AdapterSearchedRecipeItem(recipes, requireActivity(), this)
+                adapterSearchedRecipeItem = AdapterSearchedRecipeItem(recipes, requireActivity(), this)
                 binding.rcySearchedItem.adapter = adapterSearchedRecipeItem
             } else {
                 showNoData()
@@ -229,9 +225,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
         binding.imgBasketIcon.setOnClickListener {
             findNavController().navigate(R.id.basketScreenFragment)
         }
-
     }
-
 
     private fun chooseDayDialog(position: Int?) {
         val dialogChooseDay: Dialog = context?.let { Dialog(it) }!!
@@ -561,6 +555,11 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
             }
 
             "2" -> {
+                if (screenType=="Search"){
+                    mealType=recipeType
+                }else{
+                    mealType= type
+                }
                 if (BaseApplication.isOnline(requireActivity())) {
                     toggleIsLike(position, "basket")
                 } else {
@@ -647,7 +646,11 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
 
         rlDoneBtn.setOnClickListener {
             if (spinnerActivityLevel.text.toString().equals("", true)) {
-                BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
+                BaseApplication.alertError(
+                    requireContext(),
+                    ErrorMessage.selectCookBookError,
+                    false
+                )
             } else {
                 val cookbooktype = cookbookList[spinnerActivityLevel.selectedIndex].id
                 recipeLikeAndUnlikeData(
@@ -772,7 +775,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
             searchedRecipeViewModel.addBasketRequest({
                 BaseApplication.dismissMe()
                 handleBasketApiResponse(it)
-            }, uri, "")
+            }, uri, "", mealType.toString())
         }
     }
 

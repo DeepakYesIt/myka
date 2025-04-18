@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.mykaimeal.planner.OnItemLongClickListener
+import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterAddressItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.GetAddressListModelData
 
@@ -32,13 +33,17 @@ class AdapterGetAddressItem(private var addressList: MutableList<GetAddressListM
 
         if (itemList.primary!=null){
             if (itemList.primary==1){
-                holder.binding.imgPrimary.visibility=View.VISIBLE
-                onItemClickedListener.itemLongClick(position,itemList.latitude.toString(),itemList.longitude.toString(),"Click")
+                holder.binding.relHomeLayout.setBackgroundResource(R.drawable.outline_address_green_border_bg)
+            /*    holder.binding.imgPrimary.visibility=View.VISIBLE*/
+            }else{
+                holder.binding.relHomeLayout.setBackgroundResource(R.drawable.height_type_bg)
+
             }
         }
 
         val addressParts = listOf(
             itemList.apart_num,
+            itemList.street_num,
             itemList.street_name,
             itemList.city,
             itemList.state,
@@ -56,17 +61,26 @@ class AdapterGetAddressItem(private var addressList: MutableList<GetAddressListM
 
             if (latitude != null && longitude != null && fullAddress.isNotBlank()) {
                 holder.binding.imagePencilIcon.setOnClickListener {
-                    onItemClickedListener.itemLongClick(itemList.id, latitude.toString(), longitude.toString(), fullAddress)
+                    onItemClickedListener.itemLongClick(position, latitude.toString(), fullAddress, "Edit")
                 }
             }
         }
 
         holder.binding.relSelectHome.setOnClickListener{
             if (itemList.id!=null && itemList.latitude!=null && itemList.longitude!=null){
+                updateSelection(position)
                 onItemClickedListener.itemLongClick(itemList.id, latitude.toString(), longitude.toString(),"SelectPrimary")
             }
         }
 
+    }
+
+    private fun updateSelection(selectedPosition: Int) {
+        addressList?.forEachIndexed { index, stores ->
+            stores.primary = if (index == selectedPosition) 1 else 0
+        }
+
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {

@@ -23,11 +23,8 @@ import java.math.RoundingMode
 class SuperMarketListAdapter(
     private var storesData: MutableList<Store>?,
     private var requireActivity: FragmentActivity,
-    private var onItemSelectListener: OnItemSelectListener,
-    pos: Int
+    private var onItemSelectListener: OnItemSelectListener
 ) : RecyclerView.Adapter<SuperMarketListAdapter.ViewHolder>() {
-
-    private var selectedPosition = pos // Default no selection
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -41,34 +38,42 @@ class SuperMarketListAdapter(
 
         val data = storesData?.get(position)
 
-        // ✅ Correctly update the background based on selection
-        if (selectedPosition == position) {
-            // ✅ Notify selection change
-            onItemSelectListener.itemSelect(position, data!!.store_uuid.toString(), "SuperMarket")
-            holder.binding.relativeLayoutMain.setBackgroundResource(R.drawable.supermarket_selection_bg) // Default
-        } else {
-            holder.binding.relativeLayoutMain.background=null // Selected
+        if (data?.is_slected != null) {
+            if (data.is_slected == 1) {
+                holder.binding.relativeLayoutMain.setBackgroundResource(R.drawable.supermarket_selection_bg) // Default
+            } else {
+                holder.binding.relativeLayoutMain.background = null // Selected
+            }
         }
 
+        /*     // ✅ Correctly update the background based on selection
+             if (selectedPosition == position) {
+                 // ✅ Notify selection change
+                 onItemSelectListener.itemSelect(position, data!!.store_uuid.toString(), "SuperMarket")
+                 holder.binding.relativeLayoutMain.setBackgroundResource(R.drawable.supermarket_selection_bg) // Default
+             } else {
+                 holder.binding.relativeLayoutMain.background=null // Selected
+             }*/
+
         data?.let {
-            if (it.all_items==1){
-                if (it.missing!=null){
+            if (it.missing !=null) {
+                if (it.missing != "0") {
                     holder.binding.tvSuperMarketItems.setTextColor(android.graphics.Color.parseColor("#FF3232"))
-                    holder.binding.tvSuperMarketItems.text=it.missing.toString()+" ITEMS MISSING"
+                    holder.binding.tvSuperMarketItems.text = it.missing.toString() + " ITEMS MISSING"
+                } else {
+                    holder.binding.tvSuperMarketItems.setTextColor(android.graphics.Color.parseColor("#06C169"))
+                    holder.binding.tvSuperMarketItems.text = "ALL ITEMS"
                 }
-            }else{
-                holder.binding.tvSuperMarketItems.setTextColor(android.graphics.Color.parseColor("#06C169"))
-                holder.binding.tvSuperMarketItems.text="ALL ITEMS"
             }
 
-            if (it.total!=null){
+            if (it.total != null) {
                 val roundedNetTotal = it.total.let {
                     BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
                 }
-                holder.binding.tvSuperMarketRupees.text= "$$roundedNetTotal"
+                holder.binding.tvSuperMarketRupees.text = "$$roundedNetTotal"
             }
-/*
-            holder.binding.tvSuperMarketItems.text = it.store_name ?: ""*/
+            /*
+                        holder.binding.tvSuperMarketItems.text = it.store_name ?: ""*/
             // ✅ Load image with Glide
             Glide.with(requireActivity)
                 .load(it.image)
@@ -103,18 +108,40 @@ class SuperMarketListAdapter(
 
         // ✅ Click event for selection
         holder.binding.relativeLayoutMain.setOnClickListener {
-            val previousPosition = selectedPosition
-            selectedPosition = position // ✅ Use `position` instead of `holder.adapterPosition`
-            // Refresh the UI for both previously selected and newly selected item
-            notifyItemChanged(previousPosition)
-            notifyItemChanged(selectedPosition)
+            updateSelection(position)
+            onItemSelectListener.itemSelect(
+                position,
+                storesData!![position].store_uuid.toString(),
+                "SuperMarket"
+            )
+
+            /*    val previousPosition = storesData?.indexOfFirst { it.is_slected == 1 }
+                if (previousPosition != null && previousPosition != -1 && previousPosition != position) {
+                    storesData!![previousPosition].is_slected = 0
+                    notifyItemChanged(previousPosition)
+                }
+
+                if (previousPosition != position) {
+                    data?.is_slected = 1
+                    onItemSelectListener.itemSelect(position, data!!.store_uuid.toString(), "SuperMarket")
+                    notifyItemChanged(position)
+                }*/
         }
+    }
+
+    private fun updateSelection(selectedPosition: Int) {
+        storesData?.forEachIndexed { index, stores ->
+            stores.is_slected = if (index == selectedPosition) 1 else 0
+        }
+
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
         return storesData?.size ?: 0
     }
 
-    class ViewHolder(var binding: AdapterLayoutSupermarketBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(var binding: AdapterLayoutSupermarketBinding) :
+        RecyclerView.ViewHolder(binding.root)
 }
 

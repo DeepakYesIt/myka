@@ -16,7 +16,7 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.google.gson.Gson
-import com.mykaimeal.planner.OnItemClickListener
+import com.mykaimeal.planner.OnItemClickedListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.AdapterFilterCookTimeItem
@@ -36,7 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class FilterSearchFragment : Fragment(), OnItemClickListener {
+class FilterSearchFragment : Fragment(), OnItemClickedListener {
 
     private var _binding: FragmentFilterSearchBinding? = null
     private val binding get() = _binding!!
@@ -134,24 +134,27 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
         try {
             if (data.mealType != null && data.mealType.size > 0) {
                 fullListMealType = data.mealType
-                val mealTypeList = data.mealType ?: return
-                val mealTypeDisplayList = if (mealTypeList.size > 5) {
-                    mealTypeList.take(5).toMutableList().apply {
-                        add(MealType(id = -1, image = "", name = "More", selected = true))
-                    }
-                } else {
-                    mealTypeList
-                }
+                val mealTypeList = fullListMealType ?: return
 
-                val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+               // Prepare the list to display (add "More" if there are more than 5)
+                val mealTypeDisplayList = mealTypeList
+                    .take(5)
+                    .toMutableList()
+                    .apply {
+                        if (mealTypeList.size > 5) {
+                            add(MealType(id = -1, image = "", name = "More", selected = true))
+                        }
+                    }
+
+            // Setup Flexbox Layout Manager
+                binding.rcyMealType.layoutManager = FlexboxLayoutManager(requireContext()).apply {
                     flexDirection = FlexDirection.ROW
                     flexWrap = FlexWrap.WRAP
                     justifyContent = JustifyContent.FLEX_START
                 }
 
-                adapterFilterMealItem =
-                    AdapterFilterMealItem(mealTypeDisplayList, requireActivity(), this)
-                binding.rcyMealType.layoutManager = flexboxLayoutManager
+              // Initialize and set adapter
+                adapterFilterMealItem = AdapterFilterMealItem(mealTypeDisplayList, requireActivity(), this)
                 binding.rcyMealType.adapter = adapterFilterMealItem
             }
 
@@ -223,27 +226,30 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
         }
     }
 
-    override fun itemClick(position: Int?, status: String?, type: String?) {
-        if (type == "MealType") {
-            if (status == "More") {
-                adapterFilterMealItem!!.updateList(fullListMealType)    // refresh adapter with full list
-            }
-        } else if (type == "Diet") {
-            if (status == "More") {
-                adapterFilterDietItem!!.updateList(originalFullList)    // refresh adapter with full list
-            }
-        } else {
-            if (status == "More") {
-                adapterFilterCookBookItem!!.updateList(fullListCookTime)    // refresh adapter with full list
-            }
-
-        }
-
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun itemClicked(position: Int?, list: MutableList<String>?, status: String?, type: String?) {
+
+        if (type == "MealType") {
+            Log.d("dfd","sfsf:--- "+list?.size)
+            if (status == "More") {
+                adapterFilterMealItem!!.updateList(fullListMealType)    // refresh adapter with full list
+            }
+        } else if (type == "Diet") {
+            Log.d("dfd","sfsf:--- "+list?.size)
+            if (status == "More") {
+                adapterFilterDietItem!!.updateList(originalFullList)    // refresh adapter with full list
+            }
+        } else {
+            Log.d("dfd","sfsf:--- "+list?.size)
+            if (status == "More") {
+                adapterFilterCookBookItem!!.updateList(fullListCookTime)    // refresh adapter with full list
+            }
+        }
     }
 
 }

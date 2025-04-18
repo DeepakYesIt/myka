@@ -12,8 +12,8 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository) 
         repository.homeDetailsRequestApi{ successCallback(it) }
     }
 
-    suspend fun superMarketSaveRequest(successCallback: (response: NetworkResult<String>) -> Unit,uuid:String){
-        repository.superMarketSaveRequest({ successCallback(it) },uuid)
+    suspend fun superMarketSaveRequest(successCallback: (response: NetworkResult<String>) -> Unit,uuid:String?,storeName:String?){
+        repository.superMarketSaveRequest({ successCallback(it) },uuid,storeName)
     }
 
     suspend fun likeUnlikeRequest(successCallback: (response: NetworkResult<String>) -> Unit,
