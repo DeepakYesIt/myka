@@ -79,6 +79,7 @@ object ApiEndPoint {
     const val filterSearchUrl="for-filter-search"
     const val superMarketsUrl="super-markets"
     const val subscriptionGoogleUrl="subscription/google"
+    const val checkSubscriptionUrl="checkSubscription"
     const val getAddressUrl="get-address"
     const val addAddressUrl="add-address"
     const val makeAddressPrimaryUrl="make-address-primary"

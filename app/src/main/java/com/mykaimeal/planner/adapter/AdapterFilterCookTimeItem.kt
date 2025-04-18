@@ -7,18 +7,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.mykaimeal.planner.OnItemClickListener
-import com.mykaimeal.planner.OnItemClickedListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterSearchFilterItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.model.CookTime
 
 class AdapterFilterCookTimeItem(
-    private var datalist: MutableList<CookTime>?,
+    private var datalist: MutableList<CookTime>,
     private var requireActivity: FragmentActivity,
-    private var onItemClickListener: OnItemClickedListener
+    private var onItemClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<AdapterFilterCookTimeItem.ViewHolder>() {
-
-    private val selectedItems = mutableListOf<String>() // Declare this in your adapter or pass it from outside
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -27,45 +24,45 @@ class AdapterFilterCookTimeItem(
         return ViewHolder(binding)
     }
 
-    @SuppressLint("ResourceAsColor")
+    @SuppressLint("ResourceAsColor", "NotifyDataSetChanged")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        val item = datalist!![position]
+        val item=datalist[position]
 
         holder.binding.tvItem.text = item.name
 
-        if (item.name=="More"){
+        if (item.selected==true){
             holder.binding.tvItem.setTextColor(android.graphics.Color.parseColor("#06C169"))
-            holder.binding.relMainLayouts.background=null
+            if (item.name.equals("More")){
+                holder.binding.relMainLayouts.background=null
+            }else{
+                holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
+            }
         }else{
             holder.binding.tvItem.setTextColor(android.graphics.Color.parseColor("#000000"))
             holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
         }
 
         holder.binding.relMainLayouts.setOnClickListener {
-            item.selected = !(item.selected ?: false) // Toggle selection safely
-            if (item.selected == true) {
-                holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_bg)
-                if (!selectedItems.contains(item.name)) {
-                    selectedItems.add(item.name.toString())
-                }
-            } else {
-                holder.binding.relMainLayouts.setBackgroundResource(R.drawable.month_year_unselected_bg)
-                selectedItems.remove(item.name)
+            if (item.name.equals("More")){
+                onItemClickListener.itemClick(position, datalist[position].name,"CookTime")
+            }else{
+                val data=datalist[position]
+                data.selected = item.selected != true
+                datalist[position] = data
+                notifyDataSetChanged()
+                onItemClickListener.itemClick(position, datalist[position].name,"check")
             }
-
-            // Notify listener (if needed)
-            onItemClickListener.itemClicked(position,selectedItems,item.name,"CookTime")
         }
     }
 
     override fun getItemCount(): Int {
-        return datalist!!.size
+        return datalist.size
     }
 
-    fun updateList(newList: MutableList<CookTime>?) {
-        datalist!!.clear()
-        newList?.let { datalist!!.addAll(it) }
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(newList: MutableList<CookTime>) {
+        datalist=newList
         notifyDataSetChanged()
     }
 

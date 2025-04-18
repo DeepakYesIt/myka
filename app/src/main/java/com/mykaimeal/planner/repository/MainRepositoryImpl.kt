@@ -1942,12 +1942,26 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
-
-    override suspend fun subscriptionGoogle(
-        successCallback: (response: NetworkResult<String>) -> Unit,
-        purchaseToken: String?, subscriptionId: String?) {
+    override suspend fun subscriptionGoogle(successCallback: (response: NetworkResult<String>) -> Unit,
+                                            type: String?, purchaseToken: String?, subscriptionId: String?) {
         try {
-            api.subscriptionGoogle(purchaseToken, subscriptionId).apply {
+            api.subscriptionGoogle(type,purchaseToken, subscriptionId).apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
+    override suspend fun subscriptionPurchaseType(successCallback: (response: NetworkResult<String>) -> Unit) {
+        try {
+            api.subscriptionPurchaseType().apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

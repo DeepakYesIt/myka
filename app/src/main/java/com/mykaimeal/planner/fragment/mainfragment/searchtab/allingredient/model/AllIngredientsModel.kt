@@ -19,5 +19,6 @@ data class IngredientList(
     val deleted_at: Any,
     val id: Int?,
     val name: String?,
+    var status: Boolean?=false,
     val updated_at: Any
 )

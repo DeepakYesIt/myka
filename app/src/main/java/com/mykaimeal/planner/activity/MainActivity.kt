@@ -2,6 +2,7 @@ package com.mykaimeal.planner.activity
 
 import PlanApiResponse
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
@@ -9,6 +10,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -21,9 +23,12 @@ import android.view.WindowManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -35,11 +40,19 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.imageview.ShapeableImageView
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
+import com.mykaimeal.planner.adapter.AdapterUrlIngredientItem
 import com.mykaimeal.planner.adapter.ChooseDayAdapter
 import com.mykaimeal.planner.adapter.ImageViewPagerAdapter
 import com.mykaimeal.planner.adapter.IndicatorAdapter
@@ -50,6 +63,8 @@ import com.mykaimeal.planner.databinding.ActivityMainBinding
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykaimeal.planner.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModelData
 import com.mykaimeal.planner.fragment.commonfragmentscreen.mealRoutine.viewmodel.MealRoutineViewModel
+import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.model.SearchMealUrlModel
+import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.model.SearchMealUrlModelData
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.Data
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.RecipesModel
@@ -97,7 +112,18 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
 
     private lateinit var indicatorAdapter: IndicatorAdapter
 
-
+    private lateinit var resultLauncher: ActivityResultLauncher<Intent>
+    private var bottomSheetDialog: BottomSheetDialog? = null
+    private var rcyIngredients: RecyclerView? = null
+    private var tvTitleName: TextView? = null
+    private var tvTitleDesc: TextView? = null
+    private var layMainProgress: View? = null
+    private var imgRecipeLike: ImageView? = null
+    private var imageData: ShapeableImageView? = null
+    private var lay_progess: View ? = null
+    private var adapterUrlIngredients: AdapterUrlIngredientItem? = null
+    private var loadDataStatus: Boolean = false
+    private var uri: String = ""
 
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -118,6 +144,20 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
         }
 
+
+
+        // Register for result
+        resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data
+                val submittedResult = data?.getStringExtra("submitted_result")
+                binding.cardViewAddRecipe.visibility = View.VISIBLE
+                if (!submittedResult.equals("close")){
+                    searchBottomDialog(submittedResult)
+                }
+            }
+        }
+
         //using function for find destination graph
         startDestination()
 
@@ -126,6 +166,184 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
 
 
     }
+
+
+    private fun searchBottomDialog(submittedResult: String?) {
+        bottomSheetDialog = BottomSheetDialog(this, R.style.BottomSheetDialog)
+        bottomSheetDialog?.setContentView(R.layout.bottom_import_recipe_url)
+        rcyIngredients = bottomSheetDialog?.findViewById(R.id.rcyIngredients)
+        tvTitleName = bottomSheetDialog?.findViewById(R.id.tvTitleName)
+        tvTitleDesc = bottomSheetDialog?.findViewById(R.id.tvTitleDesc)
+        layMainProgress = bottomSheetDialog?.findViewById(R.id.layMainProgress)
+        imgRecipeLike = bottomSheetDialog?.findViewById(R.id.imgRecipeLike)
+        imageData = bottomSheetDialog?.findViewById(R.id.imageData)
+        lay_progess = bottomSheetDialog?.findViewById(R.id.lay_progess)
+        bottomSheetDialog?.show()
+
+        imgRecipeLike!!.setOnClickListener{
+            if (loadDataStatus){
+                addFavTypeDialogUrl(submittedResult)
+            }
+        }
+
+        searchMealUrlApi(submittedResult)
+
+    }
+
+    private fun addFavTypeDialogUrl(submittedResult: String?) {
+        val dialogAddRecipe = Dialog(this)
+        dialogAddRecipe.setContentView(R.layout.alert_dialog_add_recipe)
+        dialogAddRecipe.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialogAddRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val rlDoneBtn = dialogAddRecipe.findViewById<RelativeLayout>(R.id.rlDoneBtn)
+        spinnerActivityLevel = dialogAddRecipe.findViewById(R.id.spinnerActivityLevel)
+        val relCreateNewCookBook = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
+        val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
+        cookbookList.clear()
+        val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("", "", 0, "", "Favorites", 0, "", 0)
+        cookbookList.add(0, data)
+        spinnerActivityLevel.setItems(cookbookList.map { it.name })
+        dialogAddRecipe.show()
+        dialogAddRecipe.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        getCookBookList()
+
+        relCreateNewCookBook.setOnClickListener {
+            relCreateNewCookBook.setBackgroundResource(R.drawable.light_green_rectangular_bg)
+            imgCheckBoxOrange.setImageResource(R.drawable.orange_uncheck_box_images)
+            dialog?.dismiss()
+            dialogAddRecipe.dismiss()
+            bottomSheetDialog?.dismiss()
+            val bundle = Bundle()
+            bundle.putString("value", "New")
+            bundle.putString("uri", submittedResult)
+            findNavController(R.id.frameContainerMain).navigate(R.id.createCookBookFragment, bundle)
+        }
+
+        rlDoneBtn.setOnClickListener {
+            if (spinnerActivityLevel.text.toString().equals("", true)) {
+                BaseApplication.alertError(this, ErrorMessage.selectCookBookError, false)
+            } else {
+                val cookbooktype = cookbookList[spinnerActivityLevel.selectedIndex].id
+                recipeLikeAndUnlikeDataUrl(submittedResult.toString(), "0",cookbooktype.toString(),dialogAddRecipe)
+            }
+        }
+
+    }
+
+
+    private fun recipeLikeAndUnlikeDataUrl(submittedResult: String, likeType: String, cookbooktype: String, dialogAddRecipe: Dialog?) {
+        BaseApplication.showMe(this)
+        lifecycleScope.launch {
+            mealRoutineViewModel.likeUnlikeRequest({
+                BaseApplication.dismissMe()
+                handleLikeAndUnlikeApiResponseUrl(it,dialogAddRecipe)
+            }, submittedResult, likeType, cookbooktype)
+        }
+    }
+
+
+    private fun searchMealUrlApi(submittedResult: String?) {
+        if (BaseApplication.isOnline(this)) {
+            layMainProgress!!.visibility=View.VISIBLE
+            lifecycleScope.launch {
+                mealRoutineViewModel.getMealByUrl({
+                    layMainProgress!!.visibility=View.GONE
+                    when (it) {
+                        is NetworkResult.Success -> handleSuccessMealResponse(it.data.toString())
+                        is NetworkResult.Error -> showAlert(it.message, false)
+                        else -> showAlert(it.message, false)
+                    }
+                },submittedResult)
+            }
+        } else {
+            BaseApplication.alertError(this, ErrorMessage.networkError, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessMealResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SearchMealUrlModel::class.java)
+            Log.d("@@@ Recipe Details ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success==true) {
+                if (apiModel.data!=null){
+                    showURlData(apiModel.data)
+                }else{
+                    Toast.makeText(this,apiModel.message,Toast.LENGTH_LONG).show()
+                }
+
+            } else {
+                apiModel.code?.let { apiModel.message?.let { it1 -> handleError(it, it1) } }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun showURlData(data: SearchMealUrlModelData?) {
+        try {
+            if (data!!.label!=null){
+                tvTitleName!!.text=data.label.toString()
+            }
+
+            if (data.uri!=null){
+                uri=data.uri.toString()
+            }
+
+
+            if (data.image !=null){
+                Glide.with(this)
+                    .load(data.image)
+                    .error(R.drawable.no_image)
+                    .placeholder(R.drawable.no_image)
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            lay_progess?.visibility= View.GONE
+                            return false
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            lay_progess?.visibility= View.GONE
+                            return false
+                        }
+                    })
+                    .into(imageData!!)
+            }else{
+                lay_progess?.visibility= View.GONE
+            }
+
+            if (data.source!=null){
+                tvTitleDesc!!.text="By "+data.source.toString()
+            }
+
+            if (data.ingredients!=null && data.ingredients.size>0){
+                adapterUrlIngredients = AdapterUrlIngredientItem(data.ingredients, this)
+                rcyIngredients!!.adapter = adapterUrlIngredients
+                rcyIngredients!!.visibility=View.VISIBLE
+            }else{
+                rcyIngredients!!.visibility=View.GONE
+            }
+            loadDataStatus=true
+
+
+        }catch (e:Exception){
+            showAlert(e.message, false)
+        }
+    }
+
 
     private fun setEvent(){
         binding.llHome.setOnClickListener(this)
@@ -136,6 +354,17 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         binding.relAddRecipeWeb.setOnClickListener(this)
         binding.relCreateNewRecipe.setOnClickListener(this)
         binding.relRecipeImage.setOnClickListener(this)
+
+
+        binding.cardViewAddRecipe.setOnClickListener {
+            binding.cardViewAddRecipe.visibility = View.GONE
+            val bundle = Bundle().apply {
+                putString("ClickedUrl","")
+            }
+            findNavController(R.id.frameContainerMain).navigate(R.id.searchFragment,bundle)
+        }
+
+
     }
 
     private fun handleDeepLink(intent: Intent?) {
@@ -232,12 +461,15 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             }/* else if (isValidUrl(etPasteURl.text.toString().trim())){
                 commonWorkUtils.alertDialog(this, ErrorMessage.validUrl, false)
             }*/ else {
-                binding.cardViewAddRecipe.visibility = View.VISIBLE
-                val bundle = Bundle().apply {
-                    putString("url",etPasteURl.text.toString().trim())
-                }
-                findNavController(R.id.frameContainerMain).navigate(R.id.webViewByUrlFragment,bundle)
+                binding.cardViewAddRecipe.visibility = View.GONE
+//                val bundle = Bundle().apply {
+//                    putString("url",etPasteURl.text.toString().trim())
+//                }
+//                findNavController(R.id.frameContainerMain).navigate(R.id.webViewByUrlFragment,bundle)
                 dialogWeb.dismiss()
+                val intent = Intent(this, WebViewByUrlActivity::class.java)
+                intent.putExtra("url", etPasteURl.text.toString().trim())
+                resultLauncher.launch(intent)
             }
         }
     }
@@ -836,9 +1068,9 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             }
 
             R.id.llAddRecipe -> {
-//                binding.cardViewAddRecipe.visibility = View.VISIBLE
                 findNavController(R.id.frameContainerMain).navigate(R.id.searchFragmentDummy)
-            }
+                binding.cardViewAddRecipe.visibility = View.VISIBLE
+             }
 
             R.id.llPlan -> {
                 binding.cardViewAddRecipe.visibility = View.GONE
@@ -964,7 +1196,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         breakfastModels: MutableList<BreakfastModel>?,
         newLikeStatus: String
     ) {
-        val dialogAddRecipe: Dialog = Dialog(this)
+        val dialogAddRecipe = Dialog(this)
         dialogAddRecipe.setContentView(R.layout.alert_dialog_add_recipe)
         dialogAddRecipe.window!!.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -1088,6 +1320,30 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         }
     }
 
+    private fun handleLikeAndUnlikeApiResponseUrl(result: NetworkResult<String>, dialogAddRecipe: Dialog?, ) {
+        when (result) {
+            is NetworkResult.Success -> handleLikeAndUnlikeSuccessResponseUrl(result.data.toString(), dialogAddRecipe)
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleLikeAndUnlikeSuccessResponseUrl(data: String,dialogAddRecipe: Dialog?) {
+        try {
+            val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
+            Log.d("@@@ Plan List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                dialogAddRecipe?.dismiss()
+                bottomSheetDialog?.dismiss()
+            } else {
+                handleError(apiModel.code,apiModel.message)
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     private fun handleLikeAndUnlikeSuccessResponse(
         data: String,
@@ -1149,7 +1405,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         prefs.edit().putLong(LAST_SHOWN_KEY, currentMillis).apply()
         fetchDataOnLoad()
     }
-
 
     override fun onDestroy() {
         super.onDestroy()

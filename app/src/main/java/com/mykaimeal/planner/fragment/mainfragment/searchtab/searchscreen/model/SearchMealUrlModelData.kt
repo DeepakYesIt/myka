@@ -1,5 +1,7 @@
 package com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.model
 
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.recipedetails.apiresponse.ImagesModel
+
 data class SearchMealUrlModelData(
     val calories: Double?,
     val cautions: MutableList<String>?,
@@ -9,7 +11,7 @@ data class SearchMealUrlModelData(
     val dishType: MutableList<String>?,
     val healthLabels: MutableList<String>?,
     val image: String?,
-    val images: MutableList<Any?>,
+    val images: ImagesModel,
     val ingredientLines: MutableList<String>?,
     val ingredients: MutableList<Ingredient>?,
     val instructionLines: MutableList<String>?,

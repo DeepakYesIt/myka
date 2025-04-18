@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/layRoot"
     android:background="@color/white">
 
     <RelativeLayout
@@ -253,8 +254,7 @@
                     android:id="@+id/rcySearchRecipe"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/_10sdp"
-                    android:layout_marginStart="@dimen/_10sdp"
+                    android:layout_margin="@dimen/_10sdp"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
             </LinearLayout>
@@ -264,7 +264,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/llSearchRecipientIng"
-                android:layout_marginTop="@dimen/_18sdp"
+                android:layout_marginTop="@dimen/_8sdp"
                 android:orientation="vertical">
 
                 <TextView
@@ -280,8 +280,7 @@
                     android:id="@+id/rcySearchMeal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_10sdp"
-                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_margin="@dimen/_10sdp"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     app:spanCount="2" />
@@ -293,7 +292,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/llSearchByMeal"
-                android:layout_marginTop="@dimen/_18sdp"
+                android:layout_marginTop="@dimen/_8sdp"
                 android:orientation="vertical">
 
                 <TextView
@@ -309,7 +308,7 @@
                     android:id="@+id/rcyPopularCat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_10sdp"
+                    android:layout_marginHorizontal="@dimen/_10sdp"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:layout_marginBottom="@dimen/_20sdp"
                     android:orientation="horizontal"
@@ -344,7 +343,7 @@
                 android:padding="@dimen/_20sdp">
 
                 <RelativeLayout
-                    android:id="@+id/relAddRecipeWeb"
+                    android:id="@+id/relAddRecipeWeb1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 

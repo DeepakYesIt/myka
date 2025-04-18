@@ -2,6 +2,8 @@ package com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +18,7 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.google.gson.Gson
-import com.mykaimeal.planner.OnItemClickedListener
+import com.mykaimeal.planner.OnItemClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.AdapterFilterCookTimeItem
@@ -34,9 +36,11 @@ import com.mykaimeal.planner.fragment.mainfragment.searchtab.filtersearch.viewmo
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import java.util.Locale
 
 @AndroidEntryPoint
-class FilterSearchFragment : Fragment(), OnItemClickedListener {
+class FilterSearchFragment : Fragment(), OnItemClickListener {
 
     private var _binding: FragmentFilterSearchBinding? = null
     private val binding get() = _binding!!
@@ -44,9 +48,14 @@ class FilterSearchFragment : Fragment(), OnItemClickedListener {
     private var adapterFilterDietItem: AdapterFilterDietItem? = null
     private var adapterFilterCookBookItem: AdapterFilterCookTimeItem? = null
     private lateinit var filterSearchViewModel: FilterSearchViewModel
-    private var fullListMealType: MutableList<MealType>? = null
-    private var originalFullList: MutableList<Diet>? = null
-    private var fullListCookTime: MutableList<CookTime>? = null
+    private var fullListMealType: MutableList<MealType> = mutableListOf()
+    private var originalFullList: MutableList<Diet> = mutableListOf()
+    private var fullListCookTime: MutableList<CookTime> = mutableListOf()
+
+    private var showMealType: MutableList<MealType> = mutableListOf()
+    private var showFullList: MutableList<Diet> = mutableListOf()
+    private var showListCookTime: MutableList<CookTime> = mutableListOf()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,6 +70,9 @@ class FilterSearchFragment : Fragment(), OnItemClickedListener {
         }
 
         filterSearchViewModel = ViewModelProvider(this)[FilterSearchViewModel::class.java]
+
+
+        binding.relApplyBtn.isClickable=false
 
         backButton()
 
@@ -132,41 +144,51 @@ class FilterSearchFragment : Fragment(), OnItemClickedListener {
 
     private fun showDataInUi(data: FilterSearchModelData) {
         try {
-            if (data.mealType != null && data.mealType.size > 0) {
-                fullListMealType = data.mealType
-                val mealTypeList = fullListMealType ?: return
 
-               // Prepare the list to display (add "More" if there are more than 5)
-                val mealTypeDisplayList = mealTypeList
-                    .take(5)
-                    .toMutableList()
-                    .apply {
-                        if (mealTypeList.size > 5) {
-                            add(MealType(id = -1, image = "", name = "More", selected = true))
-                        }
+            fullListMealType.clear()
+            originalFullList.clear()
+            fullListCookTime.clear()
+
+            showFullList.clear()
+            showMealType.clear()
+            showListCookTime.clear()
+
+            data.mealType?.let {
+                fullListMealType.addAll(it)
+            }
+            data.Diet?.let {
+                originalFullList.addAll(it)
+            }
+            data.cook_time?.let {
+                fullListCookTime.addAll(it)
+            }
+            if (fullListMealType.size > 0) {
+                fullListMealType.forEachIndexed { index, diet ->
+                    if (index<5){
+                        showMealType.add(diet)
                     }
-
-            // Setup Flexbox Layout Manager
-                binding.rcyMealType.layoutManager = FlexboxLayoutManager(requireContext()).apply {
+                }
+                if (showMealType.size>5){
+                    showMealType.add(MealType(id = -1, image = "", name = "More", "",selected = true))
+                }
+                val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
                     flexDirection = FlexDirection.ROW
                     flexWrap = FlexWrap.WRAP
                     justifyContent = JustifyContent.FLEX_START
                 }
-
-              // Initialize and set adapter
-                adapterFilterMealItem = AdapterFilterMealItem(mealTypeDisplayList, requireActivity(), this)
+                binding.rcyMealType.layoutManager = flexboxLayoutManager
+                adapterFilterMealItem = AdapterFilterMealItem(showMealType, requireActivity(), this)
                 binding.rcyMealType.adapter = adapterFilterMealItem
             }
-
-            if (data.Diet != null && data.Diet.size > 0) {
-                originalFullList = data.Diet
-                val dietList = data.Diet ?: return
-                val dietDisplayList = if (dietList.size > 5) {
-                    dietList.take(5).toMutableList().apply {
-                        add(Diet(name = "More", selected = true))
+            if (originalFullList.size > 0) {
+                originalFullList.forEachIndexed { index, diet ->
+                    if (index<5){
+                        showFullList.add(diet)
                     }
-                } else {
-                    dietList
+                }
+
+                if (showFullList.size>5){
+                    showFullList.add(Diet(name = "More", selected = true,""))
                 }
 
                 val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
@@ -174,35 +196,31 @@ class FilterSearchFragment : Fragment(), OnItemClickedListener {
                     flexWrap = FlexWrap.WRAP
                     justifyContent = JustifyContent.FLEX_START
                 }
-
-                adapterFilterDietItem = AdapterFilterDietItem(dietDisplayList, requireActivity(), this)
                 binding.rcyDiet.layoutManager = flexboxLayoutManager
+                adapterFilterDietItem = AdapterFilterDietItem(showFullList, requireActivity(), this)
                 binding.rcyDiet.adapter = adapterFilterDietItem
             }
-            if (data.cook_time != null && data.cook_time.size > 0) {
 
-                fullListCookTime = data.cook_time
-                val cookTimeList = data.cook_time ?: return
-
-                val displayList = if (cookTimeList.size > 5) {
-                    cookTimeList.take(5).toMutableList().apply {
-                        add(CookTime(name = "More", value = "", selected = true))
+            if (fullListCookTime.size > 0) {
+                fullListCookTime.forEachIndexed { index, diet ->
+                    if (index<2){
+                        showListCookTime.add(diet)
                     }
-                } else {
-                    cookTimeList
                 }
 
+                if (showListCookTime.size>5){
+                    showListCookTime.add(CookTime(name = "More", value = "", selected = true))
+                }
                 val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
                     flexDirection = FlexDirection.ROW
                     flexWrap = FlexWrap.WRAP
                     justifyContent = JustifyContent.FLEX_START
                 }
-
-                adapterFilterCookBookItem = AdapterFilterCookTimeItem(displayList.toMutableList(), requireActivity(), this)
                 binding.rcyCookTime.layoutManager = flexboxLayoutManager
+                adapterFilterCookBookItem = AdapterFilterCookTimeItem(showListCookTime, requireActivity(), this)
                 binding.rcyCookTime.adapter = adapterFilterCookBookItem
-
             }
+
 
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -219,37 +237,181 @@ class FilterSearchFragment : Fragment(), OnItemClickedListener {
             findNavController().navigateUp()
         }
 
+
+        binding.etIngRecipeSearchBar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+
+            }
+
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+
+            }
+
+            override fun afterTextChanged(editable: Editable) {
+                if (editable.toString().isEmpty()) {
+
+                    if (showMealType.size>0){
+                        adapterFilterMealItem?.updateList(showMealType)
+                        binding.rcyMealType.visibility=View.VISIBLE
+                    }else{
+                        binding.rcyMealType.visibility=View.GONE
+                    }
+
+                    if (showFullList.size>0){
+                        adapterFilterDietItem?.updateList(showFullList)
+                        binding.rcyDiet.visibility=View.VISIBLE
+                    }else{
+                        binding.rcyDiet.visibility=View.GONE
+                    }
+
+                    if (showListCookTime.size>0){
+                        adapterFilterCookBookItem?.updateList(showListCookTime)
+                        binding.rcyCookTime.visibility=View.VISIBLE
+                    }else{
+                        binding.rcyCookTime.visibility=View.GONE
+                    }
+
+                } else {
+                    filter(editable.toString())
+                }
+            }
+        })
+
         binding.relApplyBtn.setOnClickListener {
-          /*  val bundle = Bundle()
-            bundle.putSerializable("recently", recentlyPostData as Serializable?)*/
-            findNavController().navigate(R.id.searchedRecipeBreakfastFragment)
+            if (binding.relApplyBtn.isClickable){
+                val mealType = showMealType.filter { it.selected == true }.map { it.name.toString() }
+                val diet = showFullList.filter { it.selected == true }.map { it.value.toString() }
+                val cookTime = showListCookTime.filter { it.selected == true }.map { it.value.toString() }
+
+                val bundle = Bundle().apply {
+                    putString("recipeName","")
+                    putString("mealJsonArray", JSONArray(mealType).toString())
+                    putString("dietJsonArray", JSONArray(diet).toString())
+                    putString("cookTimeJsonArray", JSONArray(cookTime).toString())
+                    putString("screenType", "filter")
+                }
+
+                findNavController().navigate(R.id.searchedRecipeBreakfastFragment, bundle)
+
+            }
+        }
+
+
+    }
+
+
+    private fun filter(text: String) {
+        val list1: MutableList<MealType> = mutableListOf()
+        val list2: MutableList<Diet> = mutableListOf()
+        val list3: MutableList<CookTime> = mutableListOf()
+        try {
+
+            if (showMealType.size > 0) {
+                for (item in showMealType) {
+                    val category = item.name?.lowercase(Locale.getDefault())
+                    if (category != null && category.contains(text.lowercase(Locale.getDefault()))) {
+                        list1.add(item)
+                    }
+                }
+                if (list1.size > 0) {
+                    adapterFilterMealItem?.updateList(list1)
+                    binding.rcyMealType.visibility=View.VISIBLE
+                }else{
+                    binding.rcyMealType.visibility=View.GONE
+                }
+            }else{
+                binding.rcyMealType.visibility=View.GONE
+            }
+
+            if (showFullList.size > 0) {
+                for (item in showFullList) {
+                    val category = item.name?.lowercase(Locale.getDefault())
+                    if (category != null && category.contains(text.lowercase(Locale.getDefault()))) {
+                        list2.add(item)
+                    }
+                }
+                if (list2.size > 0) {
+                    adapterFilterDietItem?.updateList(list2)
+                    binding.rcyDiet.visibility=View.VISIBLE
+                }else{
+                    binding.rcyDiet.visibility=View.GONE
+                }
+            }else{
+                binding.rcyDiet.visibility=View.GONE
+            }
+            if (showListCookTime.size > 0) {
+                for (item in showListCookTime) {
+                    val category = item.name?.lowercase(Locale.getDefault())
+                    if (category != null && category.contains(text.lowercase(Locale.getDefault()))) {
+                        list3.add(item)
+                    }
+                }
+                if (list3.size > 0) {
+                    adapterFilterCookBookItem?.updateList(list3)
+                    binding.rcyCookTime.visibility=View.VISIBLE
+                }else{
+                    binding.rcyCookTime.visibility=View.GONE
+                }
+            }else{
+                binding.rcyCookTime.visibility=View.GONE
+            }
+        }catch (e:Exception){
+            binding.rcyDiet.visibility=View.GONE
+            binding.rcyCookTime.visibility=View.GONE
+            binding.rcyMealType.visibility=View.GONE
         }
     }
 
+    @SuppressLint("SetTextI18n")
+    override fun itemClick(position: Int?, status: String?, type: String?) {
+//        if (type.equals("check")){
+//
+//        }else{
+        if (type.equals("MealType",true)) {
+            showMealType.removeLast()
+            for (i in 5 until fullListMealType.size step 5) {
+                showMealType.add(fullListMealType[i])
+            }
+            adapterFilterMealItem?.updateList(showMealType)
+        }
+        if (type.equals("Diet",true)) {
+            showFullList.removeLast()
+            for (i in 5 until originalFullList.size step 5) {
+                showFullList.add(originalFullList[i])
+            }
+            adapterFilterDietItem?.updateList(showFullList)
+        }
+        if (type.equals("CookTime",true)) {
+            showListCookTime.removeLast()
+            for (i in 2 until fullListCookTime.size step 2) {
+                showListCookTime.add(fullListCookTime[i])
+            }
+            adapterFilterCookBookItem?.updateList(showListCookTime)
+        }
+//        }
+
+
+        val count = showMealType.count { it.selected == true } + showFullList.count { it.selected == true } + showListCookTime.count { it.selected == true }
+
+
+
+        Log.d("count", "******$count")
+
+        if (count==0){
+            binding.tvCount.text= "Apply"
+            binding.relApplyBtn.isClickable=false
+            binding.relApplyBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+        }else{
+            binding.tvCount.text= "Apply ($count)"
+            binding.relApplyBtn.isClickable=true
+            binding.relApplyBtn.setBackgroundResource(R.drawable.green_btn_background)
+        }
+
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun itemClicked(position: Int?, list: MutableList<String>?, status: String?, type: String?) {
-
-        if (type == "MealType") {
-            Log.d("dfd","sfsf:--- "+list?.size)
-            if (status == "More") {
-                adapterFilterMealItem!!.updateList(fullListMealType)    // refresh adapter with full list
-            }
-        } else if (type == "Diet") {
-            Log.d("dfd","sfsf:--- "+list?.size)
-            if (status == "More") {
-                adapterFilterDietItem!!.updateList(originalFullList)    // refresh adapter with full list
-            }
-        } else {
-            Log.d("dfd","sfsf:--- "+list?.size)
-            if (status == "More") {
-                adapterFilterCookBookItem!!.updateList(fullListCookTime)    // refresh adapter with full list
-            }
-        }
     }
 
 }

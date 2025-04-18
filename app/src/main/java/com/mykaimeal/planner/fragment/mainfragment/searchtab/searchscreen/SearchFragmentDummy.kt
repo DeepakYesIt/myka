@@ -101,7 +101,7 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
         clickedUrl = arguments?.getString("ClickedUrl", "")?:""
 
 
-        searchRecipeViewModel = ViewModelProvider(this)[SearchRecipeViewModel::class.java]
+        searchRecipeViewModel = ViewModelProvider(requireActivity())[SearchRecipeViewModel::class.java]
         cookbookList.clear()
         val data= com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favourites",0,"",0)
         cookbookList.add(0,data)
@@ -115,16 +115,16 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
         })
 
 
-        binding.cardViewAddRecipe.visibility=View.VISIBLE
-
-        if (clickedUrl!=""){
-            searchBottomDialog()
-        }
+        binding.cardViewAddRecipe.visibility=View.GONE
+//
+//        if (clickedUrl!=""){
+//            searchBottomDialog()
+//        }
 
         initialize()
 
-      // This Api call when the screen in loaded
         lunchApi()
+
 
         return binding.root
     }
@@ -375,6 +375,7 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
 
     private fun showData(data: Data?) {
         try {
+            searchRecipeViewModel.setData(data)
             if (data?.ingredient!=null && data.ingredient.size>0){
                 ingredient=data.ingredient
                 searchRecipeAdapter = SearchRecipeAdapter(data.ingredient, requireActivity())
@@ -448,16 +449,22 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
         binding.rcyPopularCat.isNestedScrollingEnabled = false
 
 
-        binding.relAddRecipeWeb.setOnClickListener {
+        binding.layRoot.setOnClickListener {
+            findNavController().navigate(R.id.searchFragment)
+        }
+
+        binding.relAddRecipeWeb1.setOnClickListener {
             addRecipeFromWeb()
         }
         binding.relCreateNewRecipe.setOnClickListener {
+            binding.cardViewAddRecipe.visibility=View.GONE
             val bundle = Bundle().apply {
                 putString("name","")
             }
             findNavController().navigate(R.id.createRecipeFragment,bundle)
         }
         binding.relRecipeImage.setOnClickListener {
+            binding.cardViewAddRecipe.visibility=View.GONE
             findNavController().navigate(R.id.createRecipeImageFragment)
         }
 
@@ -474,7 +481,7 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
         val etPasteURl = dialogWeb.findViewById<EditText>(R.id.etPasteURl)
         val rlSearchRecipe = dialogWeb.findViewById<RelativeLayout>(R.id.rlSearchRecipe)
         val imageCrossWeb = dialogWeb.findViewById<ImageView>(R.id.imageCrossWeb)
-        dialogWeb.show()
+
         dialogWeb.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
         imageCrossWeb.setOnClickListener{
@@ -495,6 +502,10 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
                 dialogWeb.dismiss()
             }
         }
+
+        dialogWeb.show()
+
+
     }
 
     private fun handleError(code: Int, message: String) {

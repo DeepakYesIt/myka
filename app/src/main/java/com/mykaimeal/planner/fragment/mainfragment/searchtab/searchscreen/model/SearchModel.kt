@@ -15,7 +15,9 @@ data class SearchModelData(
 data class Recipe(
     val _links: Links?,
     var is_like: Int?,
-    val recipe: RecipeX?
+    val recipe: RecipeX?,
+    val review_number: Int?=0,
+    val review: Double?=0.0,
 )
 
 data class Links(

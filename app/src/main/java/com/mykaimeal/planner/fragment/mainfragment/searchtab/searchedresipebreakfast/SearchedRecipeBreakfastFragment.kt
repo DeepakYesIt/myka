@@ -43,6 +43,7 @@ import com.mykaimeal.planner.model.DateModel
 import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -65,6 +66,9 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
     private var recipeType: String? = null
     private var screenType: String? = null
     private var mealType: String? = null
+    private var fullListMealType: MutableList<String> = mutableListOf()
+    private var fullListDietType: MutableList<String> = mutableListOf()
+    private var fullListCookTime: MutableList<String> = mutableListOf()
     private lateinit var searchedRecipeViewModel: SearchedRecipeViewModel
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
         mutableListOf()
@@ -86,22 +90,31 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
 
         searchedRecipeViewModel = ViewModelProvider(this)[SearchedRecipeViewModel::class.java]
 
+        screenType = arguments?.getString("screenType", "Search") ?: "Search"
         recipeType = arguments?.getString("recipeName", "") ?: ""
-        screenType = arguments?.getString("screenType", "") ?: ""
+        if (!screenType.equals("Search",true)){
+            if (!screenType.equals("Ingredients",true)){
+                arguments?.let { bundle ->
+                    val mealJson = bundle.getString("mealJsonArray")
+                    val dietJson = bundle.getString("dietJsonArray")
+                    val cookTimeJson = bundle.getString("cookTimeJsonArray")
+                    fullListMealType = jsonArrayToList(mealJson) as MutableList
+                    fullListDietType = jsonArrayToList(dietJson)as MutableList
+                    fullListCookTime = jsonArrayToList(cookTimeJson)as MutableList
+                }
+            }
 
-        if (screenType != "Search") {
-            /* fullListMealType=*/
         }
 
         cookbookList.clear()
 
-        val data =
-            com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
-                "", "", 0, "", "Favourites", 0, "", 0
-            )
+        val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
+            "", "", 0, "", "Favourites", 0, "", 0)
         cookbookList.add(0, data)
 
-        binding.tvSearchedTitle.text = recipeType.toString()
+        if (!screenType.equals("Ingredients",true)){
+            binding.tvSearchedTitle.text = recipeType.toString()
+        }
 
         backHandle()
 
@@ -111,6 +124,18 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
         launchApi()
 
         return binding.root
+    }
+
+
+    private fun jsonArrayToList(jsonString: String?): List<String> {
+        val list = mutableListOf<String>()
+        if (jsonString != null) {
+            val jsonArray = JSONArray(jsonString)
+            for (i in 0 until jsonArray.length()) {
+                list.add(jsonArray.getString(i))
+            }
+        }
+        return list
     }
 
     private fun backHandle() {
@@ -126,16 +151,16 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
     private fun launchApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            if (screenType == "Search") {
+            if (screenType.equals("Search",true) || screenType.equals("Ingredients",true)){
                 searchedRecipeViewModel.recipeSearchedApi({
                     BaseApplication.dismissMe()
                     handleApiSearchResponse(it)
                 }, recipeType)
-            } else {
+            }else{
                 searchedRecipeViewModel.recipeFilterSearchApi({
                     BaseApplication.dismissMe()
                     handleApiSearchResponse(it)
-                }, null, null, null)
+                }, fullListMealType,fullListDietType,fullListCookTime)
             }
 
         }
@@ -143,7 +168,9 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
 
     private fun handleApiSearchResponse(result: NetworkResult<String>) {
         when (result) {
-            is NetworkResult.Success -> { handleSearchSuccessResponse(result.data.toString()) }
+            is NetworkResult.Success -> {
+                handleSearchSuccessResponse(result.data.toString())
+            }
 
             is NetworkResult.Error -> {
                 showAlert(result.message, false)
@@ -195,7 +222,8 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
             if (recipes.size > 0) {
                 binding.rcySearchedItem.visibility = View.VISIBLE
                 binding.tvnoData.visibility = View.GONE
-                adapterSearchedRecipeItem = AdapterSearchedRecipeItem(recipes, requireActivity(), this)
+                adapterSearchedRecipeItem =
+                    AdapterSearchedRecipeItem(recipes, requireActivity(), this)
                 binding.rcySearchedItem.adapter = adapterSearchedRecipeItem
             } else {
                 showNoData()
@@ -225,7 +253,9 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
         binding.imgBasketIcon.setOnClickListener {
             findNavController().navigate(R.id.basketScreenFragment)
         }
+
     }
+
 
     private fun chooseDayDialog(position: Int?) {
         val dialogChooseDay: Dialog = context?.let { Dialog(it) }!!
@@ -402,23 +432,23 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
         val allViews = listOf(tvBreakfast, tvLunch, tvDinner, tvSnacks, tvTeatime)
 
         tvBreakfast.setOnClickListener {
-            updateSelection("Breakfast", tvBreakfast, allViews)
+            updateSelection(ErrorMessage.Breakfast, tvBreakfast, allViews)
         }
 
         tvLunch.setOnClickListener {
-            updateSelection("Lunch", tvLunch, allViews)
+            updateSelection(ErrorMessage.Lunch, tvLunch, allViews)
         }
 
         tvDinner.setOnClickListener {
-            updateSelection("Dinner", tvDinner, allViews)
+            updateSelection(ErrorMessage.Dinner, tvDinner, allViews)
         }
 
         tvSnacks.setOnClickListener {
-            updateSelection("Snacks", tvSnacks, allViews)
+            updateSelection(ErrorMessage.Snacks, tvSnacks, allViews)
         }
 
         tvTeatime.setOnClickListener {
-            updateSelection("Brunch", tvTeatime, allViews)
+            updateSelection(ErrorMessage.Brunch, tvTeatime, allViews)
         }
 
 
@@ -646,11 +676,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
 
         rlDoneBtn.setOnClickListener {
             if (spinnerActivityLevel.text.toString().equals("", true)) {
-                BaseApplication.alertError(
-                    requireContext(),
-                    ErrorMessage.selectCookBookError,
-                    false
-                )
+                BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
             } else {
                 val cookbooktype = cookbookList[spinnerActivityLevel.selectedIndex].id
                 recipeLikeAndUnlikeData(
@@ -775,7 +801,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
             searchedRecipeViewModel.addBasketRequest({
                 BaseApplication.dismissMe()
                 handleBasketApiResponse(it)
-            }, uri, "", mealType.toString())
+            }, uri, "",mealType.toString())
         }
     }
 

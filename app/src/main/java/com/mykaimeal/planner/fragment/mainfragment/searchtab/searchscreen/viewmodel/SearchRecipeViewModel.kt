@@ -2,6 +2,7 @@ package com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.viewm
 
 import androidx.lifecycle.ViewModel
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.apiresponse.Data
 import com.mykaimeal.planner.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -9,12 +10,24 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchRecipeViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
+
+    private var dataLocal: Data?=null
+
     suspend fun recipeSearchApi(successCallback: (response: NetworkResult<String>) -> Unit, itemSearch: String?){
         repository.recipeSearchApi ({ successCallback(it) },itemSearch)
     }
 
     suspend fun recipeforSearchApi(successCallback: (response: NetworkResult<String>) -> Unit){
         repository.recipeforSearchApi { successCallback(it) }
+    }
+
+
+    fun setData(data: Data?){
+        dataLocal=data
+    }
+
+    fun getData():Data?{
+        return dataLocal
     }
 
     suspend fun recipePreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){

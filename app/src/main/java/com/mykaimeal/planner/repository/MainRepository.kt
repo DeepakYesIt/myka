@@ -233,7 +233,11 @@ interface MainRepository {
     suspend fun getFilterList(successCallback: (response: NetworkResult<String>) -> Unit)
 
     suspend fun getSuperMarket(successCallback: (response: NetworkResult<String>) -> Unit, latitude: String?, longitude:String?)
-    suspend fun subscriptionGoogle(successCallback: (response: NetworkResult<String>) -> Unit, purchaseToken: String?, subscriptionId:String?)
+
+
+    suspend fun subscriptionGoogle(successCallback: (response: NetworkResult<String>) -> Unit, type: String?, purchaseToken: String?, subscriptionId:String?)
+
+    suspend fun subscriptionPurchaseType(successCallback: (response: NetworkResult<String>) -> Unit)
 
     suspend fun getBasketUrl(successCallback: (response: NetworkResult<String>) -> Unit,storeId:String?,latitude:String?,longitude:String?)
     suspend fun getAddressUrl(successCallback: (response: NetworkResult<String>) -> Unit)

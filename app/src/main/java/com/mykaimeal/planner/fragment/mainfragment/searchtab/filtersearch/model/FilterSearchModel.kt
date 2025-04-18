@@ -13,9 +13,10 @@ data class FilterSearchModelData(
     val mealType: MutableList<MealType>?
 )
 
-data class Diet(  
+data class Diet(
     val name: String?,
-    var selected:Boolean?=false
+    var selected:Boolean?=false,
+    val value: String?
 )
 
 data class CookTime(
@@ -28,5 +29,6 @@ data class MealType(
     val id: Int?,
     val image: String?,
     val name: String?,
+    val value: String?,
     var selected:Boolean?=false
 )

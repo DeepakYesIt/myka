@@ -261,21 +261,54 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
             binding.textPrivate.setCompoundDrawablesWithIntrinsicBounds(R.drawable.radio_uncheck_gray_icon, 0, 0, 0)
             recipeStatus="1"
         }
-
     }
 
     private fun validate(): Boolean {
+        val hasEmptyDescription = cookList?.any { it.description.isEmpty() } == true
+        val hasIncompleteIngredient = ingredientList?.any {
+            it.uri.isNullOrBlank() ||
+                    it.ingredientName.isBlank() ||
+                    it.quantity.isBlank() ||
+                    it.measurement.isBlank()
+        } == true
+
         if (binding.etRecipeName.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.recipeName, false)
             return false
-        } else if (binding.edtTotalTime.text.toString().trim().isEmpty()) {
+        } else if (hasIncompleteIngredient) {
+            commonWorkUtils.alertDialog(requireActivity(), "Please complete all ingredient fields", false)
+            return false
+        } else if (hasEmptyDescription) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validCookingInstructions, false)
+            return false
+        }else if (binding.edtTotalTime.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validTotalTime, false)
             return false
-        } /*else if (binding.spinnerCookBook.text.toString().trim().isEmpty()){
+        }
+        /* else if (binding.spinnerCookBook.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.selectCookBookError, false)
             return false
-        }*/
+        } */
+
         return true
+
+
+        /*   val hasEmptyDescription = cookList?.any { it.description.isEmpty() } == true
+           if (binding.etRecipeName.text.toString().trim().isEmpty()) {
+               commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.recipeName, false)
+               return false
+           } else if (binding.edtTotalTime.text.toString().trim().isEmpty()) {
+               commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validTotalTime, false)
+               return false
+           }else if (hasEmptyDescription) {
+               commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validCookingInstructions, false)
+               return false
+           }
+           *//*else if (binding.spinnerCookBook.text.toString().trim().isEmpty()){
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.selectCookBookError, false)
+            return false
+        }*//*
+        return true*/
     }
 
     private fun updateBackground(llCreateTitle: LinearLayout, text: String) {
@@ -397,80 +430,77 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
     private fun showDataInUi(recipeNameModelData: List<CreateRecipeNameModelData>?) {
         try {
             if (recipeNameModelData!=null){
-                if (recipeNameModelData!=null){
-                    val recipe : Recipe? =recipeNameModelData[0].recipe
-                    if (recipe!=null){
-                        if (recipe.label !=null){
-                            binding.etRecipeName.setText(recipe.label.toString())
-                        }
+                val recipe : Recipe? =recipeNameModelData[0].recipe
+                if (recipe!=null){
+                    if (recipe.label !=null){
+                        binding.etRecipeName.setText(recipe.label.toString())
+                    }
+                    if (recipe.images?.SMALL?.url!=null){
+                        val imageUrl = recipe.images.SMALL.url
+                        recipeMainImageUri = recipe.images.SMALL.url
+                        checkBase64Url=false
+                        Glide.with(requireActivity())
+                            .load(imageUrl)
+                            .error(R.drawable.no_image)
+                            .placeholder(R.drawable.no_image)
+                            .listener(object : RequestListener<Drawable> {
+                                override fun onLoadFailed(
+                                    e: GlideException?,
+                                    model: Any?,
+                                    target: Target<Drawable>?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    binding.layProgess.root.visibility= View.GONE
+                                    binding.addImageIcon.visibility= View.VISIBLE
+                                    return false
+                                }
 
-                        if (recipe.images?.SMALL?.url!=null){
-                            val imageUrl = recipe.images.SMALL.url
-                            recipeMainImageUri = recipe.images.SMALL.url
-                            checkBase64Url=false
-                            Glide.with(requireActivity())
-                                .load(imageUrl)
-                                .error(R.drawable.no_image)
-                                .placeholder(R.drawable.no_image)
-                                .listener(object : RequestListener<Drawable> {
-                                    override fun onLoadFailed(
-                                        e: GlideException?,
-                                        model: Any?,
-                                        target: Target<Drawable>?,
-                                        isFirstResource: Boolean
-                                    ): Boolean {
-                                        binding.layProgess.root.visibility= View.GONE
-                                        binding.addImageIcon.visibility= View.VISIBLE
-                                        return false
-                                    }
+                                override fun onResourceReady(
+                                    resource: Drawable?,
+                                    model: Any?,
+                                    target: Target<Drawable>?,
+                                    dataSource: DataSource?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    binding.layProgess.root.visibility= View.GONE
+                                    binding.addImageIcon.visibility= View.GONE
+                                    return false
+                                }
+                            })
+                            .into(binding.addImages)
+                    }else{
+                        binding.layProgess.root.visibility= View.GONE
+                        binding.addImageIcon.visibility= View.VISIBLE
+                    }
 
-                                    override fun onResourceReady(
-                                        resource: Drawable?,
-                                        model: Any?,
-                                        target: Target<Drawable>?,
-                                        dataSource: DataSource?,
-                                        isFirstResource: Boolean
-                                    ): Boolean {
-                                        binding.layProgess.root.visibility= View.GONE
-                                        binding.addImageIcon.visibility= View.GONE
-                                        return false
-                                    }
-                                })
-                                .into(binding.addImages)
-                        }else{
-                            binding.layProgess.root.visibility= View.GONE
-                            binding.addImageIcon.visibility= View.VISIBLE
-                        }
+                    if (recipe.instructionLines!=null){
+                        // Map the instruction lines to RecyclerViewCookIngModel
+                        cookList = recipe.instructionLines.mapIndexed { index, instruction ->
+                            RecyclerViewCookIngModel(
+                                count = index + 1,
+                                description = instruction,
+                                status = false
+                            )
+                        }.toMutableList()
+                        adapterCook!!.update(cookList!!)
+                    }
 
-                        if (recipe.instructionLines!=null){
-                            // Map the instruction lines to RecyclerViewCookIngModel
-                            cookList = recipe.instructionLines.mapIndexed { index, instruction ->
-                                RecyclerViewCookIngModel(
-                                    count = index + 1,
-                                    description = instruction,
-                                    status = false
-                                )
-                            }.toMutableList()
-                            adapterCook!!.update(cookList!!)
-                        }
+                    if (recipe.totalTime!=null && recipe.totalTime!=0){
+                        binding.edtTotalTime.setText(recipe.totalTime.toString())
+                    }
 
-                        if (recipe.totalTime!=null && recipe.totalTime!=0){
-                            binding.edtTotalTime.setText(recipe.totalTime.toString())
-                        }
-
-                        if (recipe.ingredients!=null){
-                            // Map the response values to your IngredientModel list
-                            ingredientList = recipe.ingredients.map { response ->
-                                RecyclerViewItemModel(
-                                    uri = response.image as String, // Set the image URI
-                                    ingredientName = response.food as String, // Set the ingredient name
-                                    quantity = (response.quantity as Number).toString(), // Convert quantity to String
-                                    measurement = response.measure as String, // Set the measurement
-                                    status = false // Default status
-                                )
-                            }.toMutableList()
-                            adapter!!.update(ingredientList!!)
-                        }
+                    if (recipe.ingredients!=null){
+                        // Map the response values to your IngredientModel list
+                        ingredientList = recipe.ingredients.map { response ->
+                            RecyclerViewItemModel(
+                                uri = response.image, // Set the image URI
+                                ingredientName = response.food.toString(), // Set the ingredient name
+                                quantity = response.quantity.toString(), // Convert quantity to String
+                                measurement = response.measure.toString(), // Set the measurement
+                                status = false // Default status
+                            )
+                        }.toMutableList()
+                        adapter?.update(ingredientList!!)
                     }
                 }
             }

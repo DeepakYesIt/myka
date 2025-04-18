@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_above="@+id/llIndicator"
         android:layout_centerHorizontal="true"
-        android:visibility="gone"
+        android:visibility="visible"
         android:background="#90FFFFFF"
         android:layout_height="match_parent">
         <androidx.cardview.widget.CardView
@@ -175,9 +175,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/indecator_footer" />
-
         </LinearLayout>
-
         <LinearLayout
             android:id="@+id/llPlanIndicator"
             android:layout_width="0dp"
@@ -187,14 +185,11 @@
             android:layout_weight="1"
             android:gravity="center"
             android:visibility="invisible">
-
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/indecator_footer" />
-
         </LinearLayout>
-
         <LinearLayout
             android:id="@+id/llCookedIndicator"
             android:layout_width="0dp"
@@ -204,16 +199,12 @@
             android:layout_weight="1"
             android:gravity="center"
             android:visibility="invisible">
-
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/indecator_footer" />
-
         </LinearLayout>
-
     </LinearLayout>
-
     <RelativeLayout
         android:id="@+id/llBottomNavigation"
         android:layout_width="match_parent"
@@ -227,13 +218,12 @@
             android:layout_alignParentBottom="true"
             android:background="@drawable/bottom_navigation_bg"
             android:orientation="horizontal"
-            android:paddingVertical="@dimen/_15sdp"
             android:weightSum="5">
 
             <LinearLayout
                 android:id="@+id/llHome"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_70sdp"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center"
@@ -259,7 +249,7 @@
             <LinearLayout
                 android:id="@+id/llSearch"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center"
@@ -286,7 +276,7 @@
             <LinearLayout
                 android:id="@+id/llAddRecipe"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center"
@@ -312,7 +302,7 @@
             <LinearLayout
                 android:id="@+id/llPlan"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center"
@@ -338,7 +328,7 @@
             <LinearLayout
                 android:id="@+id/llCooked"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center"
@@ -365,5 +355,4 @@
 
 
     </RelativeLayout>
-
 </RelativeLayout>
