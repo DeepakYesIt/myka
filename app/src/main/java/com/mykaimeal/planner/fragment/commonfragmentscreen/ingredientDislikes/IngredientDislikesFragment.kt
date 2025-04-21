@@ -482,25 +482,7 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
                 }
             },editText,sessionManagement.getCookingScreen().toString())
 
-
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /*    if (editText!=""){
             binding.relMoreButton.visibility=View.GONE

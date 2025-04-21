@@ -72,7 +72,7 @@ class AddMealCookedFragment : Fragment(), OnItemClickListener, OnItemMealTypeLis
     private var mealType: String = ""
     private var recipeUri: String = ""
     private var planType: String = "1"
-    var popupWindow: PopupWindow? = null
+    private var popupWindow: PopupWindow? = null
     private lateinit var textListener: TextWatcher
     private var textChangedJob: Job? = null
     private var mealRoutineList: MutableList<MealRoutineModelData> = mutableListOf()
@@ -462,12 +462,7 @@ class AddMealCookedFragment : Fragment(), OnItemClickListener, OnItemMealTypeLis
         val popupView: View? = inflater?.inflate(R.layout.item_select_layoutdrop, null)
         // Allows dismissing the popup when touching outside
         popupWindow?.isOutsideTouchable = true
-        popupWindow = PopupWindow(
-            popupView,
-            binding.relCookedMeals.width,
-            RelativeLayout.LayoutParams.WRAP_CONTENT,
-            true
-        )
+        popupWindow = PopupWindow(popupView, binding.relCookedMeals.width, RelativeLayout.LayoutParams.WRAP_CONTENT, true)
         popupWindow?.showAsDropDown(binding.relCookedMeals, 0, 0, Gravity.CENTER)
         val rcyData = popupView?.findViewById<RecyclerView>(R.id.rcy_data)
         searchAdapterItem = recipes?.let { SearchAdapterItem(it, requireActivity(), this) }

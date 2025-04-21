@@ -16,6 +16,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.appsflyer.AppsFlyerLib
 import com.appsflyer.deeplink.DeepLinkResult
@@ -26,13 +27,20 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.google.gson.Gson
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
+import com.mykaimeal.planner.basedata.BaseApplication
+import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.basedata.SessionManagement
 import com.mykaimeal.planner.customview.SpendingChartView
 import com.mykaimeal.planner.databinding.FragmentStatisticsGraphBinding
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.shoppinglistscreen.model.ShoppingListModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.statistics.model.StatisticsGraphScreen
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.statistics.viewmodel.StatisticsViewModel
+import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 
@@ -156,6 +164,55 @@ class StatisticsGraphFragment : Fragment() {
 
 
         copyShareInviteLink()
+
+        if (BaseApplication.isOnline(requireContext())) {
+            getGraphList()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
+    private fun getGraphList() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            statisticsViewModel.getGraphScreenUrl({
+                BaseApplication.dismissMe()
+                handleApiGraphResponse(it)
+            },"")
+        }
+    }
+
+    private fun handleApiGraphResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessGraphResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    private fun showAlert(message: String?, status: Boolean) {
+        BaseApplication.alertError(requireContext(), message, status)
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessGraphResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, StatisticsGraphScreen::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+          /*  if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data != null) {
+                    showDataShoppingUI(apiModel.data)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }*/
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
     }
 
     private fun redirectToPlayStore() {

@@ -55,6 +55,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.gson.Gson
+import com.google.i18n.phonenumbers.NumberParseException
+import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.mykaimeal.planner.OnItemLongClickListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.adapter.AdapterCheckoutIngredientsItem
@@ -281,8 +283,15 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
     private fun showDataInUI(data: CheckoutScreenModelData?) {
 
         if (data!!.phone != null || data.country_code != null) {
-            binding!!.tvAddNumber.text = "(" + data.country_code + ")" + data.phone.toString()
-            binding!!.tvAddNumber.setTextColor(Color.parseColor("#000000"))
+                val rawNumber = data.phone.toString().filter { it.isDigit() }
+                val formattedNumber = if (rawNumber.length >= 10) {
+                    "-${rawNumber.substring(0, 3)}-${rawNumber.substring(3, 6)}-${rawNumber.substring(6, 10)}"
+                } else {
+                    rawNumber // fallback in case the number is shorter than 10 digits
+                }
+                binding?.tvAddNumber?.text = data.country_code+formattedNumber
+                binding?.tvAddNumber?.setTextColor(Color.parseColor("#000000"))
+
         }
 
         data.address?.let { address ->
@@ -420,6 +429,17 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
                     }
                 })
                 .into(binding!!.imageWelmart)
+        }
+    }
+
+    private fun formatPhoneNumber(rawNumber: String): String {
+        val phoneUtil = PhoneNumberUtil.getInstance()
+        return try {
+            val numberProto = phoneUtil.parse(rawNumber, "US")
+            phoneUtil.format(numberProto, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
+                .replace(" ", "-")
+        } catch (e: NumberParseException) {
+            rawNumber
         }
     }
 

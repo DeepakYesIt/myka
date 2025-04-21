@@ -133,7 +133,8 @@
                     android:text=""
                     android:textColor="@color/black"
                     android:textColorHint="@color/light_black"
-                    android:textSize="@dimen/_12sdp" />
+                    android:textSize="@dimen/_12sdp"
+                    tools:ignore="TextFields" />
 
                 <TextView
                     android:id="@+id/tvVerify"

@@ -31,8 +31,8 @@ interface ApiInterface {
 
     @GET(ApiEndPoint.dislikeIngredients + "/{value}/{value1}")
     suspend fun getDislikeSearchIngredients(
-        @Path("value") country: String?,
-        @Path("value1") state: String?
+        @Path("value") item: String?,
+        @Path("value1") search: String?
     ): Response<JsonObject>
 
     @GET(ApiEndPoint.allergensIngredients + "/{value}")
@@ -799,6 +799,12 @@ interface ApiInterface {
     suspend fun selectStoreProductUrl(
         @Field("store_name") storeName: String?,
         @Field("store_id") storeId: String?
+    ): Response<JsonObject>
+
+    @FormUrlEncoded
+    @POST(ApiEndPoint.graph)
+    suspend fun getGraphScreenUrl(
+        @Field("month") month: String?
     ): Response<JsonObject>
 
 

@@ -200,5 +200,8 @@ dependencies {
 
     implementation ("androidx.work:work-runtime-ktx:2.8.1")
 
+    ///for phone number
+    implementation ("com.googlecode.libphonenumber:libphonenumber:8.13.32") // or latest
+
 
 }
