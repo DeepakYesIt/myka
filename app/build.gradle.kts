@@ -22,8 +22,8 @@ android {
         versionName = "1.2"*/
 
         ///for my-kai app development
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 4
+        versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
