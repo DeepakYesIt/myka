@@ -414,6 +414,10 @@ interface ApiInterface {
     suspend fun userPreferencesApi(): Response<JsonObject>
 
 
+    @POST(ApiEndPoint.getSubscriptionDeltailsUrl)
+    suspend fun userSubscriptionCountApi(): Response<JsonObject>
+
+
     @FormUrlEncoded
     @POST(ApiEndPoint.getUserPreferences)
     suspend fun userPreferencesDislikeApi(

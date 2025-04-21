@@ -62,15 +62,17 @@
                 android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginHorizontal="@dimen/_5sdp"
                 android:layout_below="@+id/llCookBookItems">
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rcyCookBookDetails"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:spanCount="2"
-                    tools:listitem="@layout/adapter_cookbook_details_item"
                     android:nestedScrollingEnabled="false"
                     android:orientation="vertical"
-                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"/>
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:spanCount="2"
+                    tools:listitem="@layout/adapter_cookbook_details_item" />
+
                 <TextView
                     android:id="@+id/tvnoData"
                     android:layout_width="match_parent"
@@ -113,6 +115,16 @@
             android:textColor="@color/white"
             android:textSize="@dimen/_12sdp" />
 
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/btnLock"
+        android:layout_width="match_parent"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:layout_below="@id/rlToolbar"
+        android:background="#90FFFFFF"
+        android:layout_height="match_parent">
     </RelativeLayout>
 
 </RelativeLayout>

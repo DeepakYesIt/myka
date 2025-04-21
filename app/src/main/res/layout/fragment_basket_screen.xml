@@ -1,74 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".fragment.mainfragment.commonscreen.basketscreen.BasketScreenFragment">
+    <RelativeLayout
+        android:id="@+id/rlHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
 
+        <ImageView
+            android:id="@+id/imageBackIcon"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/_4sdp"
+            android:src="@drawable/back_icon"
+            app:tint="@color/black" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:fontFamily="@font/montserrat_medium"
+            android:text="Basket"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_13ssp"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/textShoppingList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/button_bg"
+            android:drawablePadding="@dimen/_5sdp"
+            android:fontFamily="@font/poppins"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:paddingVertical="@dimen/_5sdp"
+            android:text="Shopping list"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_9ssp"
+            app:drawableStartCompat="@drawable/ic_shopping_list" />
+
+    </RelativeLayout>
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rlHeader">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_10sdp"
             android:orientation="vertical">
-
-            <RelativeLayout
-                android:id="@+id/rlHeader"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_10sdp"
-                android:layout_marginTop="@dimen/_20sdp"
-                android:orientation="horizontal"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/imageBackIcon"
-                    android:layout_width="@dimen/_18sdp"
-                    android:layout_height="@dimen/_20sdp"
-                    android:layout_centerVertical="true"
-                    android:padding="@dimen/_4sdp"
-                    android:src="@drawable/back_icon"
-                    app:tint="@color/black" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:layout_marginEnd="@dimen/_10sdp"
-                    android:fontFamily="@font/montserrat_medium"
-                    android:text="Basket"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_13ssp"
-                    android:textStyle="bold" />
-
-
-                <TextView
-                    android:id="@+id/textShoppingList"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:background="@drawable/button_bg"
-                    android:drawablePadding="@dimen/_5sdp"
-                    android:fontFamily="@font/poppins"
-                    android:paddingHorizontal="@dimen/_10sdp"
-                    android:paddingVertical="@dimen/_5sdp"
-                    android:text="Shopping list"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_9ssp"
-                    app:drawableStartCompat="@drawable/ic_shopping_list" />
-
-            </RelativeLayout>
-
             <RelativeLayout
                 android:id="@+id/rlSuperMarket"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/rlHeader"
                 android:layout_marginTop="@dimen/_15sdp">
 
                 <RelativeLayout
@@ -112,7 +108,6 @@
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
             </RelativeLayout>
-
             <RelativeLayout
                 android:id="@+id/rlYourRecipes"
                 android:layout_width="match_parent"
@@ -161,7 +156,6 @@
 
 
             </RelativeLayout>
-
             <RelativeLayout
                 android:id="@+id/rlIngredients"
                 android:layout_width="match_parent"
@@ -212,7 +206,6 @@
 
 
             </RelativeLayout>
-
             <RelativeLayout
                 android:id="@+id/relBillingDetails"
                 android:layout_width="match_parent"
@@ -232,7 +225,6 @@
                     android:textStyle="bold" />
 
             </RelativeLayout>
-
             <RelativeLayout
                 android:id="@+id/relBillingDetailAmount"
                 android:layout_width="match_parent"
@@ -418,7 +410,6 @@
                 </LinearLayout>
 
             </RelativeLayout>
-
             <TextView
                 android:id="@+id/textConfirmOrder"
                 android:layout_width="match_parent"
@@ -433,10 +424,15 @@
                 android:text="Confirm Order"
                 android:textAlignment="center"
                 android:textColor="@color/light_green" />
-
-
         </RelativeLayout>
-
     </ScrollView>
-
-</LinearLayout>
+    <RelativeLayout
+        android:id="@+id/btnLock"
+        android:layout_width="match_parent"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:layout_below="@id/rlHeader"
+        android:background="#90FFFFFF"
+        android:layout_height="match_parent">
+    </RelativeLayout>
+</RelativeLayout>

@@ -579,14 +579,30 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
             "4" -> {
                 if (BaseApplication.isOnline(requireActivity())) {
-                    // Safely get the item and position
-                    val newLikeStatus =
-                        if (userDataLocal.userData?.get(position!!)?.is_like == 0) "1" else "0"
-                    if (newLikeStatus.equals("0", true)) {
-                        recipeLikeAndUnlikeData(position, newLikeStatus, "", null)
-                    } else {
-                        addFavTypeDialog(position, newLikeStatus)
+
+                    if ((activity as? MainActivity)?.Subscription_status==1){
+                        if ((activity as? MainActivity)?.favorite!! <=2){
+                            // Safely get the item and position
+                            val newLikeStatus = if (userDataLocal.userData?.get(position!!)?.is_like == 0) "1" else "0"
+                            if (newLikeStatus.equals("0", true)) {
+                                recipeLikeAndUnlikeData(position, newLikeStatus, "", null)
+                            } else {
+                                addFavTypeDialog(position, newLikeStatus)
+                            }
+                        }else{
+                            (activity as? MainActivity)?.subscriptionAlertError()
+                        }
+                    }else{
+                        // Safely get the item and position
+                        val newLikeStatus =
+                            if (userDataLocal.userData?.get(position!!)?.is_like == 0) "1" else "0"
+                        if (newLikeStatus.equals("0", true)) {
+                            recipeLikeAndUnlikeData(position, newLikeStatus, "", null)
+                        } else {
+                            addFavTypeDialog(position, newLikeStatus)
+                        }
                     }
+
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }

@@ -22,6 +22,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mykaimeal.planner.R

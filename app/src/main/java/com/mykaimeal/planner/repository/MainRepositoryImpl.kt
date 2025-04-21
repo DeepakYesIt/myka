@@ -1325,6 +1325,22 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
         }
     }
 
+    override suspend fun userSubscriptionCountApi(successCallback: (response: NetworkResult<String>) -> Unit) {
+        try {
+            api.userSubscriptionCountApi().apply {
+                if (isSuccessful) {
+                    body()?.let {
+                        successCallback(NetworkResult.Success(it.toString()))
+                    } ?: successCallback(NetworkResult.Error(ErrorMessage.apiError))
+                } else {
+                    successCallback(NetworkResult.Error(errorBody().toString()))
+                }
+            }
+        } catch (e: Exception) {
+            successCallback(NetworkResult.Error(e.message.toString()))
+        }
+    }
+
 
     override suspend fun userPreferencesDislikeApi(
         successCallback: (response: NetworkResult<String>) -> Unit,dislike_search:String?,dislike_num:String?
