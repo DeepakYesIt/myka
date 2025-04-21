@@ -135,6 +135,8 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             llBottomNavigation.visibility = View.GONE
         }
 
+
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         locationManager =
             requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
@@ -151,20 +153,38 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                 }
             })
 
-        if (!hasShownPopup) {
-            addressDialog()
-            hasShownPopup = true
-        } else {
-            if (BaseApplication.isOnline(requireActivity())) {
-                getBasketList()
+        if ((activity as? MainActivity)?.Subscription_status==1){
+            binding.btnLock.visibility=View.VISIBLE
+            launchApi()
+        }else{
+            binding.btnLock.visibility=View.GONE
+            if (!hasShownPopup) {
+                addressDialog()
+                hasShownPopup = true
             } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                launchApi()
             }
+
+            binding.textShoppingList.setOnClickListener {
+                findNavController().navigate(R.id.shoppingListFragment)
+            }
+        }
+
+        binding.btnLock.setOnClickListener {
+            (activity as? MainActivity)?.subscriptionAlertError()
         }
 
         initialize()
 
         return binding.root
+    }
+
+    private fun launchApi(){
+        if (BaseApplication.isOnline(requireActivity())) {
+            getBasketList()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
     }
 
     private fun initialize() {
@@ -183,10 +203,6 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
 
         binding.textSeeAll3.setOnClickListener {
             findNavController().navigate(R.id.shoppingMissingIngredientsFragment)
-        }
-
-        binding.textShoppingList.setOnClickListener {
-            findNavController().navigate(R.id.shoppingListFragment)
         }
 
         binding.textConfirmOrder.setOnClickListener {
@@ -274,7 +290,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 dialogMiles?.dismiss()
-                getBasketList()
+                launchApi()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -408,7 +424,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
 
         dialogMiles?.setOnDismissListener {
             // Call your API here when dialog is dismissed
-            getBasketList()
+            launchApi()
         }
 
         getAddressList()
@@ -606,7 +622,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             val apiModel = Gson().fromJson(data, AddAddressModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success == true) {
-                getBasketList()
+                launchApi()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -910,7 +926,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                getBasketList()
+                launchApi()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -1012,7 +1028,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                     }
                 }
 
-                getBasketList()
+                launchApi()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)

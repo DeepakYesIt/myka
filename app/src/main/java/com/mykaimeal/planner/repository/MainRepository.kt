@@ -170,6 +170,9 @@ interface MainRepository {
 
     suspend fun userPreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit)
 
+
+    suspend fun userSubscriptionCountApi(successCallback: (response: NetworkResult<String>) -> Unit)
+
     suspend fun updateAllergiesApi(successCallback: (response: NetworkResult<String>) -> Unit, allergies:List<String>?)
     suspend fun userPreferencesAllergiesApi(successCallback: (response: NetworkResult<String>) -> Unit,allergicSearch:String?,allergicNum:String?)
     suspend fun addToCartUrlApi(successCallback: (response: NetworkResult<String>) -> Unit,foodIds: MutableList<String>?,

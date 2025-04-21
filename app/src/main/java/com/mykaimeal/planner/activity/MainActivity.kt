@@ -37,6 +37,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.NavHostFragment.Companion
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -69,13 +70,18 @@ import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apire
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.Data
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.RecipesModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.CookBookListResponse
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apisubscription.SubscriptionModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import com.mykaimeal.planner.model.DataModel
 import com.mykaimeal.planner.model.DateModel
 import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -124,6 +130,11 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
     private var adapterUrlIngredients: AdapterUrlIngredientItem? = null
     private var loadDataStatus: Boolean = false
     private var uri: String = ""
+    var Subscription_status: Int?=1
+    var addmeal: Int?=0
+    var favorite: Int?=0
+    var imageSearch: Int?=0
+    var urlSearch: Int?=0
 
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -158,14 +169,36 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             }
         }
 
+
+        // Start API polling
+        startRepeatingApiCall()
+
+
         //using function for find destination graph
         startDestination()
 
-//        fetchDataOnLoad()
         startTimer(this@MainActivity)
 
 
     }
+
+
+    private fun startRepeatingApiCall() {
+        lifecycleScope.launch {
+            while (isActive) {
+                withContext(Dispatchers.IO) {
+                    if (BaseApplication.isOnline(this@MainActivity)) {
+                        mealRoutineViewModel.userSubscriptionCountApi {
+                            handleApiSubscriptionResponse(it)
+                        }
+                    }
+                }
+                delay(8000)
+            }
+        }
+    }
+
+
 
 
     private fun searchBottomDialog(submittedResult: String?) {
@@ -719,7 +752,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         if (code == ErrorMessage.code) {
             showAlertFunction(message, true)
         } else {
-            showAlertFunction(message, false)
+            Log.d("@Error", "****$message")
         }
     }
 
@@ -1083,7 +1116,15 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             }
 
             R.id.relAddRecipeWeb -> {
-                addRecipeFromWeb()
+                if (Subscription_status==1){
+                    if (urlSearch!! <=2){
+                        addRecipeFromWeb()
+                    }else{
+                        subscriptionAlertError()
+                    }
+                }else{
+                    addRecipeFromWeb()
+                }
             }
 
             R.id.relCreateNewRecipe -> {
@@ -1095,8 +1136,18 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             }
 
             R.id.relRecipeImage->{
-                findNavController(R.id.frameContainerMain).navigate(R.id.createRecipeImageFragment)
-                binding.cardViewAddRecipe.visibility = View.GONE
+                if (Subscription_status==1){
+                    if (imageSearch!! <=2){
+                        findNavController(R.id.frameContainerMain).navigate(R.id.createRecipeImageFragment)
+                        binding.cardViewAddRecipe.visibility = View.GONE
+                    }else{
+                        subscriptionAlertError()
+                    }
+
+                }else{
+                    findNavController(R.id.frameContainerMain).navigate(R.id.createRecipeImageFragment)
+                    binding.cardViewAddRecipe.visibility = View.GONE
+                }
             }
         }
     }
@@ -1263,11 +1314,22 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             }
         }
     }
+
+
     private fun handleApiCookBookResponse(result: NetworkResult<String>) {
         when (result) {
             is NetworkResult.Success -> handleSuccessCookBookResponse(result.data.toString())
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
+        }
+    }
+
+
+    private fun handleApiSubscriptionResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleApiSubscriptionResponse(result.data.toString())
+            is NetworkResult.Error -> Log.d("@Error","****"+result.message)
+            else -> Log.d("@Error","****"+result.message)
         }
     }
 
@@ -1288,6 +1350,39 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun handleApiSubscriptionResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, SubscriptionModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                Log.d("subscription data","**********")
+                apiModel.data?.let {
+                    apiModel.data.Subscription_status?.let {
+                        Subscription_status=it
+                    }
+                    apiModel.data.addmeal?.let {
+                        addmeal=it
+                    }
+                    apiModel.data.favorite?.let {
+                        favorite=it
+                    }
+                    apiModel.data.imageSearch?.let {
+                        imageSearch=it
+                    }
+                    apiModel.data.urlSearch?.let {
+                        urlSearch=it
+                    }
+                }
+            } else {
+                handleError(apiModel.code,apiModel.message)
+            }
+        } catch (e: Exception) {
+            Log.d("@Error","****"+e.message)
         }
     }
 
@@ -1409,6 +1504,32 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
     override fun onDestroy() {
         super.onDestroy()
         stopTimer()
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    fun subscriptionAlertError(){
+        val dialog= Dialog(this, R.style.BottomSheetDialog)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.alert_dialog_subscription_error)
+        val layoutParams = WindowManager.LayoutParams()
+        layoutParams.copyFrom(dialog.window!!.attributes)
+        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
+        layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT
+        dialog.window!!.attributes = layoutParams
+        val tvTitle: TextView =dialog.findViewById(R.id.tv_text)
+        val btnOk: RelativeLayout =dialog.findViewById(R.id.btn_okay)
+        val btnCancel: ImageView =dialog.findViewById(R.id.crossImages)
+        tvTitle.text="Oops! Your limit has been exceeded. Please purchase your subscription to regain access to all features."
+        btnOk.setOnClickListener {
+            dialog.dismiss()
+            findNavController(R.id.frameContainerMain).navigate(R.id.homeSubscriptionAllPlanFragment)
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
 }

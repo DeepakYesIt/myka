@@ -1263,11 +1263,17 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 if (type == swapMealType) {
                     swapApiImplement(position, type)
                 } else {
-                    chooseDayDialog(position, type)
+                    if ((activity as? MainActivity)?.Subscription_status==1){
+                        if ((activity as? MainActivity)?.addmeal!! < 1){
+                            chooseDayDialog(position, type)
+                        }else{
+                            (activity as? MainActivity)?.subscriptionAlertError()
+                        }
+                    }else{
+                        chooseDayDialog(position, type)
+                    }
                 }
-
             }
-
             "2" -> {
                 if (BaseApplication.isOnline(requireActivity())) {
                     toggleIsLike(type ?: "", position, "basket")
@@ -1275,15 +1281,26 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }
-
             "4" -> {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    toggleIsLike(type ?: "", position, "like")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                if ((activity as? MainActivity)?.Subscription_status==1){
+                    if ((activity as? MainActivity)?.favorite!! <= 2){
+                        if (BaseApplication.isOnline(requireActivity())) {
+                            toggleIsLike(type ?: "", position, "like")
+                        } else {
+                            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                        }
+                    }else{
+                        (activity as? MainActivity)?.subscriptionAlertError()
+                    }
+
+                }else{
+                    if (BaseApplication.isOnline(requireActivity())) {
+                        toggleIsLike(type ?: "", position, "like")
+                    } else {
+                        BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                    }
                 }
             }
-
             else -> {
                 val bundle = Bundle().apply {
                     putString("uri", type)

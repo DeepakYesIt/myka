@@ -100,6 +100,19 @@ class CookBookFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
 
         initialize()
 
+
+
+        if ((activity as? MainActivity)?.Subscription_status==1){
+            binding.btnLock.visibility=View.VISIBLE
+
+        }else{
+            binding.btnLock.visibility=View.GONE
+        }
+
+        binding.btnLock.setOnClickListener {
+            (activity as? MainActivity)?.subscriptionAlertError()
+        }
+
         if (BaseApplication.isOnline(requireActivity())) {
             getCookBookList()
         } else {

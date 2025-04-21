@@ -376,6 +376,58 @@ class SubscriptionAllPlanFragment : Fragment() {
                     binding.rlNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
                     Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_SHORT).show()
                 }else{
+
+                    when(apiModel.data?.active_plan){
+                        AppConstant.Premium_Monthly ->  selectPlan(
+                            binding.relPopularPlan,
+                            binding.imgPopularClick,
+                            binding.imagePreviousMonthly,
+                            binding.tvProkaiUser,
+                            binding.tvNewDollarMonthly,
+                            listOf(binding.relSubscriptionBasic, binding.relBestPlan),
+                            listOf(binding.imagePrevious, binding.imagePreviousyearly),
+                            listOf(binding.imgBasicClick, binding.imgBaseClick),
+                            listOf(binding.tvNewKai, binding.tvLovekaiUser),
+                            listOf(binding.tvNewDollar, binding.tvNewDollaryearly),AppConstant.Premium_Monthly,"Popular"
+                        )
+                        AppConstant.Premium_Annual -> selectPlan(
+                            binding.relBestPlan,
+                            binding.imgBaseClick,
+                            binding.imagePreviousyearly,
+                            binding.tvLovekaiUser,
+                            binding.tvNewDollaryearly,
+                            listOf(binding.relSubscriptionBasic, binding.relPopularPlan),
+                            listOf(binding.imagePrevious, binding.imagePreviousMonthly),
+                            listOf(binding.imgBasicClick, binding.imgPopularClick),
+                            listOf(binding.tvNewKai, binding.tvProkaiUser),
+                            listOf(binding.tvNewDollar, binding.tvNewDollarMonthly),AppConstant.Premium_Annual,"Best")
+                        AppConstant.Premium_Weekly ->  selectPlan(
+                            binding.relSubscriptionBasic,
+                            binding.imgBasicClick,
+                            binding.imagePrevious,
+                            binding.tvNewKai,
+                            binding.tvNewDollar,
+                            listOf(binding.relPopularPlan, binding.relBestPlan),
+                            listOf(binding.imagePreviousMonthly, binding.imagePreviousyearly),
+                            listOf(binding.imgPopularClick, binding.imgBaseClick),
+                            listOf(binding.tvProkaiUser, binding.tvLovekaiUser),
+                            listOf(binding.tvNewDollarMonthly, binding.tvNewDollaryearly),AppConstant.Premium_Weekly,"Starter")
+                        else -> {
+                            selectPlan(
+                                binding.relSubscriptionBasic,
+                                binding.imgBasicClick,
+                                binding.imagePrevious,
+                                binding.tvNewKai,
+                                binding.tvNewDollar,
+                                listOf(binding.relPopularPlan, binding.relBestPlan),
+                                listOf(binding.imagePreviousMonthly, binding.imagePreviousyearly),
+                                listOf(binding.imgPopularClick, binding.imgBaseClick),
+                                listOf(binding.tvProkaiUser, binding.tvLovekaiUser),
+                                listOf(binding.tvNewDollarMonthly, binding.tvNewDollaryearly),AppConstant.Premium_Weekly,"Starter")
+                        }
+                    }
+
+
                     if (apiModel.data?.Subscription_status==1){
                         binding.rlNextBtn.isClickable=true
                         binding.rlNextBtn.setBackgroundResource(R.drawable.green_btn_background)

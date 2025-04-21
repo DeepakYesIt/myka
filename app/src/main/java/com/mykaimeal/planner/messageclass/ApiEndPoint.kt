@@ -53,6 +53,7 @@ object ApiEndPoint {
     const val addBasketeDetailsUrl="ingredient-basket"
 
     const val  getUserPreferences="user-prefrence"
+    const val  getSubscriptionDeltailsUrl="getSubscriptionDeltails"
 
     const val  updateUserPreferences="update-user-prefrence"
     const val recipeSearch="recipe"

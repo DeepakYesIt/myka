@@ -16,6 +16,8 @@ class AuthActivity : AppCompatActivity() {
     var backType:String=""
 
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding=ActivityAuthBinding.inflate(LayoutInflater.from(this))

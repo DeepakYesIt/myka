@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_above="@+id/llIndicator"
         android:layout_centerHorizontal="true"
-        android:visibility="visible"
+        android:visibility="gone"
         android:background="#90FFFFFF"
         android:layout_height="match_parent">
         <androidx.cardview.widget.CardView

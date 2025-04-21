@@ -305,7 +305,16 @@ class RecipeDetailsFragment : Fragment(), OnItemSelectListener {
         }
 
         binding.tvAddToPlan.setOnClickListener {
-            chooseDayDialog()
+            if ((activity as? MainActivity)?.Subscription_status==1){
+                if ((activity as? MainActivity)?.addmeal!! < 1){
+                    // Safely get the item and position
+                    chooseDayDialog()
+                }else{
+                    (activity as? MainActivity)?.subscriptionAlertError()
+                }
+            }else{
+                chooseDayDialog()
+            }
         }
 
         binding.relBack.setOnClickListener {
