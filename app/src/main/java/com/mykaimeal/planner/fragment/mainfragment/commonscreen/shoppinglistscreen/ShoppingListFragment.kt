@@ -71,6 +71,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private var textChangedJob: Job? = null
     private var dislikedIngredientData: MutableList<DislikedIngredientsModelData>? = null
     private var popupWindow: PopupWindow? = null
+    private var tvLabel:EditText?=null
     private var ingredientsAdapterItem: IngredientsAdapterItem? = null
 
     override fun onCreateView(
@@ -99,6 +100,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
+
         return binding.root
     }
 
@@ -120,6 +122,10 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         binding.rlAddMore.setOnClickListener {
             addItemDialog()
         }
+
+        binding.textCheckoutTesco.setOnClickListener{
+            addToCartUrlApi()
+        }
     }
 
     private fun addItemDialog() {
@@ -138,7 +144,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         val imageMinus = dialog.findViewById<ImageView>(R.id.imageMinus)
         val imagePlus = dialog.findViewById<ImageView>(R.id.imagePlus)
         tvCounter = dialog.findViewById(R.id.tvCounter)
-        val tvLabel = dialog.findViewById<EditText>(R.id.tvLabel)
+        tvLabel = dialog.findViewById(R.id.tvLabel)
         val tvDialogAddBtn = dialog.findViewById<TextView>(R.id.tvDialogAddBtn)
         rlWriteNameHere = dialog.findViewById(R.id.rlWriteNameHere)
 
@@ -156,7 +162,6 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                         delay(1000)
                         if (searchText == searchFor) {
                             searchable(searchText)
-
                         }
                     }
                 }
@@ -165,10 +170,10 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             override fun afterTextChanged(s: Editable?) {}
         }
 
-        tvLabel.addTextChangedListener(textListener)
+        tvLabel?.addTextChangedListener(textListener)
 
         dialog.setOnDismissListener {
-            tvLabel.removeTextChangedListener(textListener)
+            tvLabel?.removeTextChangedListener(textListener)
         }
 
         imageMinus.setOnClickListener {
@@ -176,11 +181,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 quantity--
                 updateValue()
             } else {
-                Toast.makeText(
-                    requireActivity(),
-                    ErrorMessage.servingError,
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(requireActivity(), ErrorMessage.servingError, Toast.LENGTH_LONG).show()
             }
         }
 
@@ -200,7 +201,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         tvDialogAddBtn.setOnClickListener {
-            val inputName = tvLabel.text.toString().trim()
+            val inputName = tvLabel?.text.toString().trim()
             val quantityText = tvCounter?.text.toString()
             val schId = quantityText.toIntOrNull()
 
@@ -257,6 +258,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                                     showDataInUi(dietaryModel.data)
                                 }
                             } else {
+                                popupWindow?.dismiss()
                                 if (dietaryModel.code == ErrorMessage.code) {
                                     showAlertFunction(dietaryModel.message, true)
                                 } else {
@@ -264,27 +266,29 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                                 }
                             }
                         } catch (e: Exception) {
+                            popupWindow?.dismiss()
                             Log.d("IngredientDislike@@@@", "message:--" + e.message)
                         }
                     }
 
                     is NetworkResult.Error -> {
+                        popupWindow?.dismiss()
                         showAlertFunction(it.message, false)
                     }
 
                     else -> {
+                        popupWindow?.dismiss()
                         showAlertFunction(it.message, false)
                     }
                 }
             }, editText, "Shopping")
-
         }
     }
 
     private fun showDataInUi(searchModelData: MutableList<DislikedIngredientsModelData>) {
         try {
             dislikedIngredientData = searchModelData
-//            loadSearch()
+            loadSearch()
 
         } catch (e: Exception) {
             popupWindow?.dismiss()
@@ -293,17 +297,11 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     }
 
     private fun loadSearch() {
-        val inflater =
-            requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater?
+        val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater?
         val popupView: View? = inflater?.inflate(R.layout.item_select_layoutdrop, null)
         // Allows dismissing the popup when touching outside
         popupWindow?.isOutsideTouchable = true
-        popupWindow = PopupWindow(
-            popupView,
-            rlWriteNameHere.width,
-            RelativeLayout.LayoutParams.WRAP_CONTENT,
-            true
-        )
+        popupWindow = PopupWindow(popupView, rlWriteNameHere.width, RelativeLayout.LayoutParams.WRAP_CONTENT, true)
         popupWindow?.showAsDropDown(rlWriteNameHere, 0, 0, Gravity.CENTER)
         val rcyData = popupView?.findViewById<RecyclerView>(R.id.rcy_data)
         ingredientsAdapterItem = dislikedIngredientData?.let { IngredientsAdapterItem(it, requireActivity(), this) }
@@ -316,31 +314,30 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     }
 
 
-    private fun addToCartUrlApi(dismiss: Dialog) {
+    private fun addToCartUrlApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
             shoppingListViewModel.addShoppingCartUrlApi({
                 BaseApplication.dismissMe()
-                handleCartApiResponse(it, dismiss)
+                handleCartApiResponse(it)
             }, foodIds, schIds, foodName, statusType)
         }
     }
 
-    private fun handleCartApiResponse(result: NetworkResult<String>, dismiss: Dialog) {
+    private fun handleCartApiResponse(result: NetworkResult<String>) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessCartResponse(result.data.toString(), dismiss)
+            is NetworkResult.Success -> handleSuccessCartResponse(result.data.toString())
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessCartResponse(data: String, dismiss: Dialog) {
+    private fun handleSuccessCartResponse(data: String) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ Recipe Details ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                dismiss.dismiss()
                 Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
@@ -424,8 +421,8 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     override fun itemClick(position: Int?, status: String?, type: String?) {
 
         if (type=="IngredientsItem"){
-
-
+            tvLabel?.setText(status.toString().trim())
+            popupWindow?.dismiss()
         }
 
     }

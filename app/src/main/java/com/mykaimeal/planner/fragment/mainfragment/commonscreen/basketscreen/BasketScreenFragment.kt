@@ -162,13 +162,6 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             }
         }
 
-        /*     if (BaseApplication.isOnline(requireActivity())) {
-                 getBasketList()
-             } else {
-                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-             }*/
-
-
         initialize()
 
         return binding.root

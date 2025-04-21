@@ -75,9 +75,7 @@
                     android:layout_marginTop="@dimen/_10sdp"
                     android:orientation="horizontal" />
 
-
             </RelativeLayout>
-
 
             <RelativeLayout
                 android:id="@+id/rlIngredients"
@@ -153,9 +151,7 @@
                         android:textSize="@dimen/_8ssp" />
 
                 </RelativeLayout>
-
             </RelativeLayout>
-
 
             <TextView
                 android:id="@+id/textCheckoutTesco"
@@ -164,7 +160,7 @@
                 android:layout_marginHorizontal="@dimen/_20sdp"
                 android:layout_marginTop="@dimen/_20sdp"
                 android:layout_marginBottom="@dimen/_20sdp"
-                android:background="@drawable/button_bg"
+                android:background="@drawable/gray_btn_unselect_background"
                 android:fontFamily="@font/poppins"
                 android:paddingVertical="@dimen/_9sdp"
                 android:text="Save"
