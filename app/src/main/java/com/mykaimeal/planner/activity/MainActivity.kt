@@ -188,7 +188,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             while (isActive) {
                 withContext(Dispatchers.IO) {
                     if (BaseApplication.isOnline(this@MainActivity)) {
-                        mealRoutineViewModel.userSubscriptionCountApi {
+                        mealRoutineViewModel.userSubscriptionCountApi {0
                             handleApiSubscriptionResponse(it)
                         }
                     }
