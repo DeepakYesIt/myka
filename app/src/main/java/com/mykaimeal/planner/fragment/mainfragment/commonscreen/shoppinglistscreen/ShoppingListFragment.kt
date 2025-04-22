@@ -59,8 +59,8 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private var adapterRecipe: BasketYourRecipeAdapter? = null
     private var tvCounter: TextView? = null
     private var quantity: Int = 1
-    private var recipe: MutableList<Recipes>? = null
-    private var ingredientList: MutableList<Ingredient>? = null
+    private var recipe: MutableList<Recipes> = mutableListOf()
+    private var ingredientList: MutableList<Ingredient> = mutableListOf()
     private var foodIds = mutableListOf<String>()
     private var schIds = mutableListOf<String>()
     private var foodName = mutableListOf<String>()
@@ -74,6 +74,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private var tvLabel:EditText?=null
     private var ingredientsAdapterItem: IngredientsAdapterItem? = null
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -81,17 +82,16 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         // Inflate the layout for this fragment
         binding = FragmentShoppingListBinding.inflate(layoutInflater, container, false)
 
-        shoppingListViewModel =
-            ViewModelProvider(requireActivity())[ShoppingListViewModel::class.java]
+        shoppingListViewModel = ViewModelProvider(requireActivity())[ShoppingListViewModel::class.java]
         commonWorkUtils = CommonWorkUtils(requireActivity())
 
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    findNavController().navigateUp()
-                }
-            })
+        adapterRecipe = BasketYourRecipeAdapter(recipe, requireActivity(), this)
+        binding.rcvYourRecipes.adapter = adapterRecipe
+
+        adapterShoppingAdapter = IngredientsShoppingAdapter(ingredientList, requireActivity(), this)
+        binding.rcvIngredients.adapter = adapterShoppingAdapter
+
+        backButton()
 
         initialize()
 
@@ -102,6 +102,17 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         return binding.root
+    }
+
+
+    private fun backButton(){
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
     }
 
     @SuppressLint("DefaultLocale")
@@ -230,7 +241,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 user_id = null
             )
 
-            ingredientList?.let {
+            ingredientList.let {
                 it.add(newIngredient)
                 adapterShoppingAdapter.notifyItemInserted(it.size - 1)
             }
@@ -385,42 +396,50 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                     showDataShoppingUI(apiModel.data)
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
     }
 
+    private fun handleError(code: Int, message: String) {
+        if (code == ErrorMessage.code) {
+            showAlert(message, true)
+        } else {
+            showAlert(message, false)
+        }
+    }
+
     private fun showDataShoppingUI(data: ShoppingListModelData) {
 
-        if (data.recipe != null && data.recipe.size > 0) {
+
+        recipe.clear()
+        ingredientList.clear()
+
+        data.recipe?.let {
+            recipe.addAll(it)
+        }
+
+        data.ingredient?.let {
+            ingredientList.addAll(it)
+        }
+
+        if (recipe.size > 0) {
             binding.rlYourRecipes.visibility = View.VISIBLE
-            recipe = data.recipe
-            adapterRecipe = BasketYourRecipeAdapter(data.recipe, requireActivity(), this)
-            binding.rcvYourRecipes.adapter = adapterRecipe
+            adapterRecipe?.updateList(recipe)
         } else {
             binding.rlYourRecipes.visibility = View.GONE
         }
 
-        if (ingredientList != null) {
-            ingredientList?.clear()
-        }
-
-        if (data.ingredient != null && data.ingredient.size > 0) {
-            ingredientList = data.ingredient
-            adapterShoppingAdapter = IngredientsShoppingAdapter(data.ingredient, requireActivity(), this)
-            binding.rcvIngredients.adapter = adapterShoppingAdapter
+        if (ingredientList.size > 0) {
+            adapterShoppingAdapter.updateList(ingredientList)
         }
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
 
-        if (type=="IngredientsItem"){
+        if (type.equals("IngredientsItem",true)){
             tvLabel?.setText(status.toString().trim())
             popupWindow?.dismiss()
         }
@@ -428,14 +447,14 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     }
 
     override fun itemSelect(position: Int?, status: String?, type: String?) {
-        if (type == "YourRecipe") {
-            if (status == "Minus") {
+        if (type.equals("YourRecipe",true)) {
+            if (status.equals("Minus",true)) {
                 if (BaseApplication.isOnline(requireActivity())) {
                     removeAddRecipeServing(position, "minus")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-            } else if (status == "Plus") {
+            } else if (status.equals("Plus",true)) {
                 if (BaseApplication.isOnline(requireActivity())) {
                     removeAddRecipeServing(position, "plus")
                 } else {
@@ -444,20 +463,20 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             } else {
                 removeRecipeBasketDialog(status, position)
             }
-        } else if (type == "ShoppingIngredients") {
-            if (status == "Minus") {
+        } else if (type.equals("ShoppingIngredients",true)) {
+            if (status.equals("Minus",true)) {
                 if (BaseApplication.isOnline(requireActivity())) {
                     removeAddIngServing(position, "minus")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-            } else if (status == "Plus") {
+            } else if (status.equals("Plus",true)) {
                 if (BaseApplication.isOnline(requireActivity())) {
                     removeAddIngServing(position, "plus")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
-            } else if (status == "Delete") {
+            } else if (status.equals("Delete",true)) {
                 if (BaseApplication.isOnline(requireActivity())) {
                     removeAddIngServing(position, "Delete")
                 } else {

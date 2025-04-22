@@ -193,7 +193,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
                         }
                     }
                 }
-                delay(8000)
+                delay(4000)
             }
         }
     }
@@ -595,7 +595,14 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             })
 
             rlAddPlanButton.setOnClickListener {
-                chooseDayDialog()
+                if (Subscription_status==1){
+                    if (addmeal!! < 1){
+                        chooseDayDialog()
+                    }else{ subscriptionAlertError()
+                    }
+                }else{
+                    chooseDayDialog()
+                }
             }
 
             rlAddCartButton.setOnClickListener {
@@ -853,6 +860,11 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             println("\nAfter clicking 'Next':")
             showWeekDates()
         }
+
+
+
+
+
     }
 
     private fun chooseDayMealTypeDialog() {
@@ -1208,11 +1220,24 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
     override fun itemClick(position: Int?, status: String?, type: String?) {
         when (status) {
             "4" -> {
+                if (Subscription_status==1){
+                    if (favorite!! <= 2){
+                    if (BaseApplication.isOnline(this)) {
+                        toggleIsLike()
+                    } else {
+                        BaseApplication.alertError(this, ErrorMessage.networkError, false)
+                    }
+                    }else{
+                        subscriptionAlertError()
+                   }
+
+            }else{
                 if (BaseApplication.isOnline(this)) {
                     toggleIsLike()
                 } else {
                     BaseApplication.alertError(this, ErrorMessage.networkError, false)
                 }
+            }
             }
         }
     }

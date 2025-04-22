@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.adapter
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,7 @@ import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.AdapterLayoutYourRecipeItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Recipes
+import com.mykaimeal.planner.messageclass.ErrorMessage
 
 class BasketYourRecipeAdapter(private var yourRecipesData: MutableList<Recipes>?,
                               private var requireActivity: FragmentActivity,
@@ -29,6 +31,7 @@ class BasketYourRecipeAdapter(private var yourRecipesData: MutableList<Recipes>?
         return ViewHolder(binding)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val data= yourRecipesData?.get(position)
@@ -77,7 +80,7 @@ class BasketYourRecipeAdapter(private var yourRecipesData: MutableList<Recipes>?
             if (yourRecipesData?.get(position)?.serving.toString().toInt() > 1) {
                 onItemSelectListener.itemSelect(position,"Minus","YourRecipe")
             }else{
-                Toast.makeText(requireActivity,"Minimum serving at least value is one", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity,ErrorMessage.servingError, Toast.LENGTH_LONG).show()
             }
         }
 

@@ -21,7 +21,7 @@ class CookingForMyselfActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityCookingMyselfBinding.inflate(layoutInflater)
         setContentView(binding.root)
-       
+
         sessionManagement = SessionManagement(this)
         Log.d("sessionManagement.getCookingFor() ","****"+sessionManagement.getCookingFor())
 

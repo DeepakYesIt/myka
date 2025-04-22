@@ -373,14 +373,14 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             if (recipesDateModel != null) {
                 // Breakfast
                 if (recipesDateModel?.Breakfast != null && recipesDateModel?.Breakfast?.size!! > 0) {
-                    setupDragScrollForRecyclerView(binding.rcySearchBreakFast, "BreakFast")
+                    setupDragScrollForRecyclerView(binding.rcySearchBreakFast, ErrorMessage.Breakfast)
                     binding.llBreakFast.visibility = View.VISIBLE
                     ingredientBreakFastAdapter = IngredientsBreakFastAdapter(
                         recipesDateModel?.Breakfast,
                         requireActivity(),
                         this,
                         this,
-                        "BreakFast"
+                        ErrorMessage.Breakfast
                     )
                     binding.rcySearchBreakFast.adapter = ingredientBreakFastAdapter
                 } else {
@@ -389,14 +389,14 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
                 ///Lunch
                 if (recipesDateModel?.Lunch != null && recipesDateModel?.Lunch?.size!! > 0) {
-                    setupDragScrollForRecyclerView(binding.rcySearchLunch, "Lunch")
+                    setupDragScrollForRecyclerView(binding.rcySearchLunch, ErrorMessage.Lunch)
                     binding.llLunch.visibility = View.VISIBLE
                     ingredientLunchAdapter = IngredientsLunchAdapter(
                         recipesDateModel?.Lunch,
                         requireActivity(),
                         this,
                         this,
-                        "Lunch"
+                        ErrorMessage.Lunch
                     )
                     binding.rcySearchLunch.adapter = ingredientLunchAdapter
                 } else {
@@ -405,14 +405,14 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
                 // Dinner
                 if (recipesDateModel?.Dinner != null && recipesDateModel?.Dinner?.size!! > 0) {
-                    setupDragScrollForRecyclerView(binding.rcySearchDinner, "Dinner")
+                    setupDragScrollForRecyclerView(binding.rcySearchDinner, ErrorMessage.Dinner)
                     binding.llDinner.visibility = View.VISIBLE
                     ingredientDinnerAdapter = IngredientsDinnerAdapter(
                         recipesDateModel?.Dinner,
                         requireActivity(),
                         this,
                         this,
-                        "Dinner"
+                        ErrorMessage.Dinner
                     )
                     binding.rcySearchDinner.adapter = ingredientDinnerAdapter
 
@@ -422,11 +422,11 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
                 // Snacks
                 if (recipesDateModel?.Snacks != null && recipesDateModel?.Snacks?.size!! > 0) {
-                    setupDragScrollForRecyclerView(binding.rcySearchSnacks, "Snacks")
+                    setupDragScrollForRecyclerView(binding.rcySearchSnacks, ErrorMessage.Snacks)
                     binding.llSnacks.visibility = View.VISIBLE
                     ingredientSnacksAdapter = IngredientsSnacksAdapter(
                         recipesDateModel?.Snacks, requireActivity(), this,
-                        this, "Snacks"
+                        this, ErrorMessage.Snacks
                     )
                     binding.rcySearchSnacks.adapter = ingredientSnacksAdapter
                 } else {
@@ -435,14 +435,14 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
                 // TeaTime
                 if (recipesDateModel?.Teatime != null && recipesDateModel?.Teatime?.size!! > 0) {
-                    setupDragScrollForRecyclerView(binding.rcySearchTeaTime, "Brunch")
+                    setupDragScrollForRecyclerView(binding.rcySearchTeaTime, ErrorMessage.Brunch)
                     binding.llTeaTime.visibility = View.VISIBLE
                     ingredientTeaTimeAdapter = IngredientsTeaTimeAdapter(
                         recipesDateModel?.Teatime,
                         requireActivity(),
                         this,
                         this,
-                        "Brunch"
+                        ErrorMessage.Brunch
                     )
                     binding.rcySearchTeaTime.adapter = ingredientTeaTimeAdapter
                 } else {
@@ -868,10 +868,23 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
     override fun itemSelectUnSelect(id: Int?, status: String?, type: String?, position: Int?) {
         if (status == "heart") {
-            if (BaseApplication.isOnline(requireActivity())) {
-                toggleIsLike(type ?: "", position)
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            if ((activity as? MainActivity)?.Subscription_status==1){
+                if ((activity as? MainActivity)?.favorite!! <= 2){
+                    if (BaseApplication.isOnline(requireActivity())) {
+                        toggleIsLike(type ?: "", position)
+                    } else {
+                        BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                    }
+                }else{
+                    (activity as? MainActivity)?.subscriptionAlertError()
+                }
+
+            }else{
+                if (BaseApplication.isOnline(requireActivity())) {
+                    toggleIsLike(type ?: "", position)
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
         } else if (status == "minus") {
             /*if (status == "1") {*/
@@ -880,11 +893,11 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
 
         } else if (status == "missingIng") {
             val (mealList) = when (type) {
-                "BreakFast" -> recipesDateModel!!.Breakfast to ingredientBreakFastAdapter
-                "Lunch" -> recipesDateModel!!.Lunch to ingredientLunchAdapter
-                "Dinner" -> recipesDateModel?.Dinner to ingredientDinnerAdapter
-                "Snacks" -> recipesDateModel!!.Snacks to ingredientSnacksAdapter
-                "Brunch" -> recipesDateModel!!.Teatime to ingredientTeaTimeAdapter
+                ErrorMessage.Breakfast -> recipesDateModel!!.Breakfast to ingredientBreakFastAdapter
+                ErrorMessage.Lunch -> recipesDateModel!!.Lunch to ingredientLunchAdapter
+                ErrorMessage.Dinner -> recipesDateModel?.Dinner to ingredientDinnerAdapter
+                ErrorMessage.Snacks -> recipesDateModel!!.Snacks to ingredientSnacksAdapter
+                ErrorMessage.Brunch -> recipesDateModel!!.Teatime to ingredientTeaTimeAdapter
                 else -> null to null
             }
 
@@ -901,11 +914,11 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
             }
         } else {
             val (mealList) = when (type) {
-                "BreakFast" -> recipesDateModel!!.Breakfast to ingredientBreakFastAdapter
-                "Lunch" -> recipesDateModel!!.Lunch to ingredientLunchAdapter
-                "Dinner" -> recipesDateModel?.Dinner to ingredientDinnerAdapter
-                "Snacks" -> recipesDateModel!!.Snacks to ingredientSnacksAdapter
-                "Brunch" -> recipesDateModel!!.Teatime to ingredientTeaTimeAdapter
+                ErrorMessage.Breakfast -> recipesDateModel!!.Breakfast to ingredientBreakFastAdapter
+                ErrorMessage.Lunch -> recipesDateModel!!.Lunch to ingredientLunchAdapter
+                ErrorMessage.Dinner -> recipesDateModel?.Dinner to ingredientDinnerAdapter
+                ErrorMessage.Snacks -> recipesDateModel!!.Snacks to ingredientSnacksAdapter
+                ErrorMessage.Brunch -> recipesDateModel!!.Teatime to ingredientTeaTimeAdapter
                 else -> null to null
             }
 
@@ -928,11 +941,11 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
     private fun toggleIsLike(type: String, position: Int?) {
         // Map the type to the corresponding list and adapter
         val (mealList) = when (type) {
-            "BreakFast" -> recipesDateModel!!.Breakfast to ingredientBreakFastAdapter
-            "Lunch" -> recipesDateModel!!.Lunch to ingredientLunchAdapter
-            "Dinner" -> recipesDateModel?.Dinner to ingredientDinnerAdapter
-            "Snacks" -> recipesDateModel!!.Snacks to ingredientSnacksAdapter
-            "Brunch" -> recipesDateModel!!.Teatime to ingredientTeaTimeAdapter
+            ErrorMessage.Breakfast -> recipesDateModel!!.Breakfast to ingredientBreakFastAdapter
+            ErrorMessage.Lunch -> recipesDateModel!!.Lunch to ingredientLunchAdapter
+            ErrorMessage.Dinner -> recipesDateModel?.Dinner to ingredientDinnerAdapter
+            ErrorMessage.Snacks -> recipesDateModel!!.Snacks to ingredientSnacksAdapter
+            ErrorMessage.Brunch -> recipesDateModel!!.Teatime to ingredientTeaTimeAdapter
             else -> null to null
         }
 
@@ -1011,11 +1024,11 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                 mealList[position!!] = item
 
                 when (type) {
-                    "Breakfast" -> ingredientBreakFastAdapter?.updateList(mealList)
-                    "Lunch" -> ingredientLunchAdapter?.updateList(mealList)
-                    "Dinner" -> ingredientDinnerAdapter?.updateList(mealList)
-                    "Snacks" -> ingredientSnacksAdapter?.updateList(mealList)
-                    "Brunch" -> ingredientTeaTimeAdapter?.updateList(mealList)
+                    ErrorMessage.Breakfast -> ingredientBreakFastAdapter?.updateList(mealList)
+                    ErrorMessage.Lunch -> ingredientLunchAdapter?.updateList(mealList)
+                    ErrorMessage.Dinner -> ingredientDinnerAdapter?.updateList(mealList)
+                    ErrorMessage.Snacks -> ingredientSnacksAdapter?.updateList(mealList)
+                    ErrorMessage.Brunch -> ingredientTeaTimeAdapter?.updateList(mealList)
                 }
 
             } else {
@@ -1156,11 +1169,11 @@ class FullCookedScheduleFragment : Fragment(), OnItemSelectUnSelectListener,
                         val cookedModel = gson.fromJson(it.data, CookedTabModel::class.java)
                         if (cookedModel.code == 200 && cookedModel.success) {
                             when (status) {
-                                "Breakfast" -> ingredientBreakFastAdapter?.removeItem(position!!)
-                                "Lunch" -> ingredientLunchAdapter?.removeItem(position!!)
-                                "Dinner" -> ingredientDinnerAdapter?.removeItem(position!!)
-                                "Snacks" -> ingredientSnacksAdapter?.removeItem(position!!)
-                                "Brunch" -> ingredientTeaTimeAdapter?.removeItem(position!!)
+                                ErrorMessage.Breakfast -> ingredientBreakFastAdapter?.removeItem(position!!)
+                                ErrorMessage.Lunch -> ingredientLunchAdapter?.removeItem(position!!)
+                                ErrorMessage.Dinner -> ingredientDinnerAdapter?.removeItem(position!!)
+                                ErrorMessage.Snacks -> ingredientSnacksAdapter?.removeItem(position!!)
+                                ErrorMessage.Brunch -> ingredientTeaTimeAdapter?.removeItem(position!!)
                             }
                             dialogScheduleDay.dismiss()
                         } else {
