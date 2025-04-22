@@ -458,10 +458,24 @@ class CookedFragment : Fragment(), OnItemClickListener {
     override fun itemClick(position: Int?, status: String?, type: String?) {
         when (status) {
             "1" -> {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddServing(type ?: "", position, "like")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+
+                if ((activity as? MainActivity)?.Subscription_status==1){
+                    if ((activity as? MainActivity)?.favorite!! <= 2){
+                        if (BaseApplication.isOnline(requireActivity())) {
+                            removeAddServing(type ?: "", position, "like")
+                        } else {
+                            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                        }
+                    }else{
+                        (activity as? MainActivity)?.subscriptionAlertError()
+                    }
+
+                }else{
+                    if (BaseApplication.isOnline(requireActivity())) {
+                        removeAddServing(type ?: "", position, "like")
+                    } else {
+                        BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                    }
                 }
             }
             "2" -> {

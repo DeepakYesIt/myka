@@ -163,6 +163,11 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             }
         }
 
+        binding.textShoppingList.setOnClickListener {
+            findNavController().navigate(R.id.shoppingListFragment)
+        }
+
+
         binding.btnLock.setOnClickListener {
             (activity as? MainActivity)?.subscriptionAlertError()
         }
