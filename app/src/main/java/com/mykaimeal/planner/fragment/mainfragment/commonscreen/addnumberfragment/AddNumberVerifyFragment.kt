@@ -34,7 +34,8 @@ import java.util.Locale
 class AddNumberVerifyFragment : Fragment() {
     private lateinit var binding: FragmentAddNumberVerifyBinding
     private lateinit var addNumberVerifyViewModel: AddNumberVerifyViewModel
-    var lastNumber: String = ""
+    private var lastNumber: String = ""
+    private var userNumber: String = ""
     private var countryCode: String = "+1"
     private lateinit var commonWorkUtils: CommonWorkUtils
     private val START_TIME_IN_MILLIS: Long = 120000
@@ -50,9 +51,7 @@ class AddNumberVerifyFragment : Fragment() {
         binding = FragmentAddNumberVerifyBinding.inflate(layoutInflater, container, false)
 
         commonWorkUtils = CommonWorkUtils(requireActivity())
-
         addNumberVerifyViewModel = ViewModelProvider(requireActivity())[AddNumberVerifyViewModel::class.java]
-
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -76,31 +75,84 @@ class AddNumberVerifyFragment : Fragment() {
         binding.countryCodePicker.resetToDefaultCountry()
 
         binding.etRegPhone.addTextChangedListener(object : TextWatcher {
+            private var isFormatting: Boolean = false
+            private var lastFormatted = ""
+
             @SuppressLint("ResourceAsColor")
             override fun afterTextChanged(s: Editable?) {
-                val input = s.toString()
-                // Enable button only if the phone number is valid (10 digits)
-                if (input == lastNumber) {
+                if (isFormatting || s == null) return
+
+                isFormatting = true
+
+                // Remove dashes and non-digit characters
+                val digits = s.toString().replace(Regex("[^\\d]"), "")
+
+                // Format as XXX-XXX-XXXX
+                val formatted = StringBuilder()
+                for (i in digits.indices) {
+                    if (i == 3 || i == 6) formatted.append('-')
+                    if (i < 10) formatted.append(digits[i])
+                }
+
+                // Avoid re-setting the same formatted text
+                val newFormatted = formatted.toString()
+                if (newFormatted != lastFormatted) {
+                    binding.etRegPhone.setText(newFormatted)
+                    binding.etRegPhone.setSelection(newFormatted.length)
+                    lastFormatted = newFormatted
+                }
+
+                isFormatting = false
+
+                // Validation logic (using raw number)
+                if (digits == lastNumber) {
                     binding.tvVerify.isClickable = false
                     binding.tvVerify.isEnabled = false
-                    binding.tvVerify.setTextColor(Color.parseColor("#D7D7D7")) // Gray color for inactive state
+                    binding.tvVerify.setTextColor(Color.parseColor("#D7D7D7")) // Gray
                 } else {
-                    if (input.length >= 10) {
+                    if (digits.length == 10) {
                         binding.tvVerify.isClickable = true
                         binding.tvVerify.isEnabled = true
-                        binding.tvVerify.setTextColor(Color.parseColor("#06C169")) // Green color for active state
+                        binding.tvVerify.setTextColor(Color.parseColor("#06C169")) // Green
                     } else {
                         binding.tvVerify.isClickable = false
                         binding.tvVerify.isEnabled = false
-                        binding.tvVerify.setTextColor(Color.parseColor("#D7D7D7")) // Gray color for inactive state
+                        binding.tvVerify.setTextColor(Color.parseColor("#D7D7D7")) // Gray
                     }
                 }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+
+
+        /*  binding.etRegPhone.addTextChangedListener(object : TextWatcher {
+              @SuppressLint("ResourceAsColor")
+              override fun afterTextChanged(s: Editable?) {
+                  val input = s.toString()
+                  // Enable button only if the phone number is valid (10 digits)
+                  if (input == lastNumber) {
+                      binding.tvVerify.isClickable = false
+                      binding.tvVerify.isEnabled = false
+                      binding.tvVerify.setTextColor(Color.parseColor("#D7D7D7")) // Gray color for inactive state
+                  } else {
+                      if (input.length >= 10) {
+                          binding.tvVerify.isClickable = true
+                          binding.tvVerify.isEnabled = true
+                          binding.tvVerify.setTextColor(Color.parseColor("#06C169")) // Green color for active state
+                      } else {
+                          binding.tvVerify.isClickable = false
+                          binding.tvVerify.isEnabled = false
+                          binding.tvVerify.setTextColor(Color.parseColor("#D7D7D7")) // Gray color for inactive state
+                      }
+                  }
+              }
+
+              override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+              override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+          })*/
 
         binding.countryCodePicker.setOnCountryChangeListener {
             countryCode = "+" + binding.countryCodePicker.selectedCountryCode
@@ -110,6 +162,7 @@ class AddNumberVerifyFragment : Fragment() {
         // Click Listener
         binding.tvVerify.setOnClickListener {
             status = "verify"
+            userNumber=binding.etRegPhone.text.toString().replace("-", "")
             if (validate()) {
                 lastFourDigits = if (binding.etRegPhone.text.toString().length >= 4) binding.etRegPhone.text.toString().takeLast(3) else binding.etRegPhone.text.toString()
                 if (BaseApplication.isOnline(requireActivity())) {
@@ -168,8 +221,18 @@ class AddNumberVerifyFragment : Fragment() {
 
     /// add validation based on valid phone number
     private fun validNumber(): Boolean {
+        val input = binding.etRegPhone.text.toString().trim()
+        val digitsOnly = input.replace(Regex("[^\\d]"), "") // Remove dashes and other non-digit characters
+
+        // Check if it's exactly 10 digits
+        return digitsOnly.length == 10
+    }
+
+
+    /// add validation based on valid phone number
+/*    private fun validNumber(): Boolean {
         val email: String = binding.etRegPhone.text.toString().trim()
-        if (email.length != 10) {
+        if (email.length != 12) {
             return false
         }
         var onlyDigits = true
@@ -180,7 +243,7 @@ class AddNumberVerifyFragment : Fragment() {
             }
         }
         return onlyDigits
-    }
+    }*/
 
     private fun getOtpUrl() {
         BaseApplication.showMe(requireContext())
@@ -188,7 +251,7 @@ class AddNumberVerifyFragment : Fragment() {
             addNumberVerifyViewModel.sendOtpUrl({
                 BaseApplication.dismissMe()
                 handleApiOtpSendResponse(it)
-            }, countryCode + binding.etRegPhone.text.toString().trim())
+            }, countryCode + userNumber)
         }
     }
 

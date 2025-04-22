@@ -226,17 +226,13 @@ class DropOffOptionsScreenFragment : Fragment(), View.OnClickListener {
             }
 
             R.id.rlUpdate -> {
-                if (validate()) {
+                /*if (validate()) {*/
                     if (BaseApplication.isOnline(requireActivity())) {
                         addNotesUrl()
                     } else {
-                        BaseApplication.alertError(
-                            requireContext(),
-                            ErrorMessage.networkError,
-                            false
-                        )
+                        BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                     }
-                }
+             /*   }*/
             }
 
             R.id.relMeetDoor -> {
@@ -427,7 +423,7 @@ class DropOffOptionsScreenFragment : Fragment(), View.OnClickListener {
     }
 
 
-    /// add validation based on valid email or phone
+/*    /// add validation based on valid email or phone
     private fun validate(): Boolean {
         // Check if email/phone is empty
 
@@ -437,7 +433,7 @@ class DropOffOptionsScreenFragment : Fragment(), View.OnClickListener {
         }
         return true
 
-    }
+    }*/
 
     private fun addNotesUrl() {
         BaseApplication.showMe(requireContext())
