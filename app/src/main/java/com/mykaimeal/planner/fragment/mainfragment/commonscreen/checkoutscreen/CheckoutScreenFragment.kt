@@ -928,8 +928,8 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         val newYork = LatLng(lat, lng)
         val customMarker = bitmapDescriptorFromVector(
             R.drawable.map_marker_icon,
-            45,
-            60
+            40,
+            40
         ) // Change with your drawable
 
         /*        val newYork = LatLng(40.7128, -74.0060)

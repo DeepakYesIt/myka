@@ -120,7 +120,6 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var locationManager: LocationManager? = null
     private lateinit var commonWorkUtils: CommonWorkUtils
-
     private var hasShownPopup = false
 
     override fun onCreateView(
@@ -134,8 +133,6 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             llIndicator.visibility = View.GONE
             llBottomNavigation.visibility = View.GONE
         }
-
-
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         locationManager =
@@ -164,10 +161,6 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             } else {
                 launchApi()
             }
-
-            binding.textShoppingList.setOnClickListener {
-                findNavController().navigate(R.id.shoppingListFragment)
-            }
         }
 
         binding.btnLock.setOnClickListener {
@@ -188,6 +181,10 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     }
 
     private fun initialize() {
+
+        binding.textShoppingList.setOnClickListener {
+            findNavController().navigate(R.id.shoppingListFragment)
+        }
 
         binding.textSeeAll1.setOnClickListener {
             findNavController().navigate(R.id.superMarketsNearByFragment)

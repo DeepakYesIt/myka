@@ -371,19 +371,8 @@ class TurnOnLocationFragment : Fragment() {
                     BaseApplication.dismissMe()
                     handleApiAddAddressResponse(it)
                 },
-                latitude,
-                longitude,
-                streetName,
-                streetNum,
-                apartNum,
-                city,
-                states,
-                country,
-                zipcode,
-                "1",
-                "",
-                setStatus
-            )
+                latitude, longitude, streetName, streetNum, apartNum, city, states, country,
+                zipcode, "1", "", setStatus)
         }
     }
 

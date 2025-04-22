@@ -347,7 +347,7 @@ class AddressMapFullScreenFragment : Fragment(), OnMapReadyCallback {
         // 🔹 Clear all markers (if any exist)
         mMap.clear()
         val initialPosition = LatLng(lat, lng) // Example: Sydney
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialPosition, 12f))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialPosition, 15f))
 
         // 🔹 Change marker image when map is moving
         mMap.setOnCameraMoveStartedListener {
