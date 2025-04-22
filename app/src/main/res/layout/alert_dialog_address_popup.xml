@@ -262,7 +262,7 @@
                         android:layout_below="@+id/relAddress"
                         android:layout_marginTop="@dimen/_15sdp"
                         android:fontFamily="@font/poppins"
-                        android:text="Postal code"
+                        android:text="Zip code"
                         android:textColor="@color/black"
                         android:textSize="@dimen/_15sdp" />
 

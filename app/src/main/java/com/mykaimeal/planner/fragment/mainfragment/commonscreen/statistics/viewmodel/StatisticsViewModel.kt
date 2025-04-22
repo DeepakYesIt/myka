@@ -22,10 +22,7 @@ class StatisticsViewModel @Inject constructor(private val repository: MainReposi
         repository.generateLinkUrl({ successCallback(it) }, link, image)
     }
 
-    suspend fun getGraphScreenUrl(
-        successCallback: (response: NetworkResult<String>) -> Unit,
-        month: String?
-    ) {
+    suspend fun getGraphScreenUrl(successCallback: (response: NetworkResult<String>) -> Unit, month: String?) {
         repository.getGraphScreenUrl({ successCallback(it) }, month)
     }
 

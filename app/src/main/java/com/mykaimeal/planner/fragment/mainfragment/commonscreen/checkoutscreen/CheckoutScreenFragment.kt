@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.location.Address
@@ -486,6 +487,8 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         val llSetWork = dialogMiles?.findViewById<LinearLayout>(R.id.llSetWork)
         val llSetHome = dialogMiles?.findViewById<LinearLayout>(R.id.llSetHome)
         val relTrialBtn = dialogMiles?.findViewById<RelativeLayout>(R.id.relTrialBtn)
+        val imageHome = dialogMiles?.findViewById<ImageView>(R.id.imageHome)
+        val imageWork = dialogMiles?.findViewById<ImageView>(R.id.imageWork)
         tvAddress = dialogMiles?.findViewById<AutoCompleteTextView>(R.id.tvAddress)!!
         rcySavedAddress = dialogMiles?.findViewById(R.id.rcySavedAddress)
 
@@ -499,12 +502,18 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
             statusTypes = "Home"
             llSetHome.setBackgroundResource(R.drawable.outline_address_green_border_bg)
             llSetWork?.setBackgroundResource(R.drawable.height_type_bg)
+
+            imageHome?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.light_orange), PorterDuff.Mode.SRC_IN)
+            imageWork?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.light_grays), PorterDuff.Mode.SRC_IN)
         }
 
         llSetWork?.setOnClickListener {
             statusTypes = "Work"
             llSetHome?.setBackgroundResource(R.drawable.height_type_bg)
             llSetWork.setBackgroundResource(R.drawable.outline_address_green_border_bg)
+
+            imageHome?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.light_grays), PorterDuff.Mode.SRC_IN)
+            imageWork?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.light_orange), PorterDuff.Mode.SRC_IN)
         }
 
         relTrialBtn?.setOnClickListener {

@@ -73,7 +73,6 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
     private var stores: MutableList<Store>?=null
     private var clickStatus: Boolean = false
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -91,12 +90,6 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
                     findNavController().navigateUp()
                 }
             })
-
-        if (BaseApplication.isOnline(requireActivity())){
-            getBasketDetailsApi()
-        }else{
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
 
         initialize()
 
@@ -150,6 +143,12 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
                     ), 100
                 )
             }
+        }else{
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+
+        if (BaseApplication.isOnline(requireActivity())){
+            getBasketDetailsApi()
         }else{
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
@@ -305,8 +304,6 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
 
     private fun bottomSheetDialog() {
         getSuperMarketsList()
-        /*  superMarketModel()*/
-
     }
 
     private fun getSuperMarketsList() {
@@ -374,13 +371,13 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
         if (type=="Product"){
             if (status=="Plus"){
                 if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing(position, "plus")
+                    removeAddIngServing(position, status)
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }else if (status=="Minus"){
                 if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing(position, "minus")
+                    removeAddIngServing(position, status)
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
@@ -451,7 +448,7 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
 
     private fun removeAddIngServing(position: Int?, type: String) {
         val item= position?.let { products?.get(it) }
-        if (type.equals("plus",true) || type.equals("minus",true)) {
+        if (type.equals("Plus",true) || type.equals("Minus",true)) {
             var count = item?.sch_id
             val foodId= item?.food_id
             count = when (type.lowercase()) {

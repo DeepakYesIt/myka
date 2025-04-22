@@ -811,6 +811,12 @@ interface ApiInterface {
         @Field("month") month: String?
     ): Response<JsonObject>
 
+    @FormUrlEncoded
+    @POST(ApiEndPoint.tipUrl)
+    suspend fun getTipUrl(
+        @Field("tip") tip: String?
+    ): Response<JsonObject>
+
 
     @Multipart
     @POST(ApiEndPoint.generateLinkUrl)

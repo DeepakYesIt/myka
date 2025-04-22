@@ -70,8 +70,10 @@ class SuperMarketListAdapter(
                 val roundedNetTotal = it.total.let {
                     BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
                 }
-                holder.binding.tvSuperMarketRupees.text = "$$roundedNetTotal"
+                holder.binding.tvSuperMarketRupees.text =
+                    if (roundedNetTotal == 0.0) "$0" else "$$roundedNetTotal"
             }
+
             /*
                         holder.binding.tvSuperMarketItems.text = it.store_name ?: ""*/
             // ✅ Load image with Glide
@@ -109,11 +111,7 @@ class SuperMarketListAdapter(
         // ✅ Click event for selection
         holder.binding.relativeLayoutMain.setOnClickListener {
             updateSelection(position)
-            onItemSelectListener.itemSelect(
-                position,
-                storesData!![position].store_uuid.toString(),
-                "SuperMarket"
-            )
+            onItemSelectListener.itemSelect(position, storesData!![position].store_uuid.toString(), "SuperMarket")
 
             /*    val previousPosition = storesData?.indexOfFirst { it.is_slected == 1 }
                 if (previousPosition != null && previousPosition != -1 && previousPosition != position) {

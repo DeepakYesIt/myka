@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.location.Address
 import android.location.Geocoder
@@ -166,7 +167,6 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
         binding.textShoppingList.setOnClickListener {
             findNavController().navigate(R.id.shoppingListFragment)
         }
-
 
         binding.btnLock.setOnClickListener {
             (activity as? MainActivity)?.subscriptionAlertError()
@@ -419,6 +419,8 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
         val llSetWork = dialogMiles?.findViewById<LinearLayout>(R.id.llSetWork)
         val llSetHome = dialogMiles?.findViewById<LinearLayout>(R.id.llSetHome)
         val relTrialBtn = dialogMiles?.findViewById<RelativeLayout>(R.id.relTrialBtn)
+        val imageHome = dialogMiles?.findViewById<ImageView>(R.id.imageHome)
+        val imageWork = dialogMiles?.findViewById<ImageView>(R.id.imageWork)
         tvAddress = dialogMiles?.findViewById(R.id.tvAddress)!!
         rcySavedAddress = dialogMiles?.findViewById(R.id.rcySavedAddress)
 
@@ -437,16 +439,22 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             statusTypes = "Home"
             llSetHome.setBackgroundResource(R.drawable.outline_address_green_border_bg)
             llSetWork?.setBackgroundResource(R.drawable.height_type_bg)
+
+            imageHome?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.light_orange), PorterDuff.Mode.SRC_IN)
+            imageWork?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.light_grays), PorterDuff.Mode.SRC_IN)
         }
 
         llSetWork?.setOnClickListener {
             statusTypes = "Work"
             llSetHome?.setBackgroundResource(R.drawable.height_type_bg)
             llSetWork.setBackgroundResource(R.drawable.outline_address_green_border_bg)
+
+            imageHome?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.light_grays), PorterDuff.Mode.SRC_IN)
+            imageWork?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.light_orange), PorterDuff.Mode.SRC_IN)
         }
 
         relTrialBtn?.setOnClickListener {
-            dialogMiles?.dismiss()
+//            dialogMiles?.dismiss()
             if (BaseApplication.isOnline(requireContext())) {
                 if (ContextCompat.checkSelfPermission(
                         requireContext(),
@@ -1116,16 +1124,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
         type: String?,
         isZiggleEnabled: String
     ) {
-        /*   if (isZiggleEnabled == "Click") {
-               selectType = isZiggleEnabled
-               userLatitude = status.toString()
-               userLongitude = type.toString()
-               if (BaseApplication.isOnline(requireActivity())) {
-                   getBasketList()
-               } else {
-                   BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-               }
-           } else*/ if (isZiggleEnabled == "SelectPrimary") {
+       if (isZiggleEnabled == "SelectPrimary") {
             selectType = isZiggleEnabled
             addressId = position.toString()
         } else if (isZiggleEnabled == "Edit") {

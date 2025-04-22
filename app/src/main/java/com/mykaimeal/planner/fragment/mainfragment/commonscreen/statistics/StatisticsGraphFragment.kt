@@ -150,7 +150,7 @@ class StatisticsGraphFragment : Fragment() {
 
         copyShareInviteLink()
 
-    /*    if (BaseApplication.isOnline(requireContext())) {
+      /*  if (BaseApplication.isOnline(requireContext())) {
             getGraphList()
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
@@ -204,9 +204,7 @@ class StatisticsGraphFragment : Fragment() {
 
         @SuppressLint("SetTextI18n")
         private fun showSpendingChart(response: StatisticsGraphModelData) {
-
-
-
+/*
             // Create chart data
             val data = listOf(
                 SpendingChartView.BarData(300f, "01", "Jun", Color.parseColor("#FFA500")),
@@ -215,9 +213,9 @@ class StatisticsGraphFragment : Fragment() {
                 SpendingChartView.BarData(600f, "21", "Jun", Color.parseColor("#32CD32")),
                 SpendingChartView.BarData(200f, "03", "Jun", Color.parseColor("#FF4040")))
 
-            binding.spendingChart.setData(data, 1566f, 60f)
+            binding.spendingChart.setData(data, 1566f, 60f)*/
 
- /*           if (response.total_spent!=null){
+            if (response.total_spent!=null){
                 binding.textSpent.text="Total spent $"+response.total_spent.toString().trim()
             }
 
@@ -235,7 +233,7 @@ class StatisticsGraphFragment : Fragment() {
                 response.graph_data.week_4
             )
 
-            val colors = listOf(
+         /*   val colors = listOf(
                 ContextCompat.getColor(requireContext(), R.color.orange),
                 ContextCompat.getColor(requireContext(), R.color.light_green),
                 ContextCompat.getColor(requireContext(), R.color.red),

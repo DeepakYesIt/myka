@@ -22,8 +22,8 @@ android {
         versionName = "1.2"*/
 
         ///for my-kai app development
-        versionCode = 4
-        versionName = "1.3"
+        versionCode = 5
+        versionName = "1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -203,5 +203,7 @@ dependencies {
     ///for phone number
     implementation ("com.googlecode.libphonenumber:libphonenumber:8.13.32") // or latest
 
+
+ /*   implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")*/
 
 }

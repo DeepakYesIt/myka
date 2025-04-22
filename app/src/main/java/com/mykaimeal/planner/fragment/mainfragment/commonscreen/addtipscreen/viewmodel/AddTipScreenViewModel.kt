@@ -13,4 +13,9 @@ class AddTipScreenViewModel@Inject constructor(private val repository: MainRepos
           repository.getOrderProductUrl{ successCallback(it) }
       }
 
+
+    suspend fun getTipUrl(successCallback: (response: NetworkResult<String>) -> Unit, tip: String?){
+          repository.getTipUrl({ successCallback(it) },tip)
+      }
+
 }
