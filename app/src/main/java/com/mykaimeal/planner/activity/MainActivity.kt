@@ -364,10 +364,10 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
 
             if (data.ingredients!=null && data.ingredients.size>0){
                 adapterUrlIngredients = AdapterUrlIngredientItem(data.ingredients, this)
-                rcyIngredients!!.adapter = adapterUrlIngredients
-                rcyIngredients!!.visibility=View.VISIBLE
+                rcyIngredients?.adapter = adapterUrlIngredients
+                rcyIngredients?.visibility=View.VISIBLE
             }else{
-                rcyIngredients!!.visibility=View.GONE
+                rcyIngredients?.visibility=View.GONE
             }
             loadDataStatus=true
 
