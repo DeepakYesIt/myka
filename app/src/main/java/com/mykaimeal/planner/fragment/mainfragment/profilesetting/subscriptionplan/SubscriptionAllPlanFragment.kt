@@ -175,11 +175,17 @@ class SubscriptionAllPlanFragment : Fragment() {
             if (binding.rlNextBtn.isClickable){
                 if (isOnline(requireContext())) {
                     if (!planID.equals("",true)){
+                        binding.rlNextBtn.isClickable=false
+                        binding.rlNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
                         planPurchases()
                     }else{
+                        binding.rlNextBtn.isClickable=true
+                        binding.rlNextBtn.setBackgroundResource(R.drawable.gray_btn_select_background)
                         alertError(requireContext(), ErrorMessage.planError, false)
                     }
                 } else {
+                    binding.rlNextBtn.isClickable=true
+                    binding.rlNextBtn.setBackgroundResource(R.drawable.gray_btn_select_background)
                     alertError(requireContext(), ErrorMessage.networkError, false)
                 }
             }
@@ -280,25 +286,25 @@ class SubscriptionAllPlanFragment : Fragment() {
                         requireActivity(), "Already Subscribed", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED -> Toast.makeText(
-                        requireActivity(), "FEATURE_NOT_SUPPORTED", Toast.LENGTH_LONG).show()
+                        requireActivity(), "Feature not supported", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.BILLING_UNAVAILABLE -> Toast.makeText(
-                        requireActivity(), "BILLING_UNAVAILABLE", Toast.LENGTH_LONG).show()
+                        requireActivity(), "Billing inavailable", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.USER_CANCELED -> Toast.makeText(
-                        requireActivity(), "USER_CANCELLED", Toast.LENGTH_LONG).show()
+                        requireActivity(), "User cancelled", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.DEVELOPER_ERROR -> Toast.makeText(
-                        requireActivity(), "DEVELOPER_ERROR", Toast.LENGTH_LONG).show()
+                        requireActivity(), "Developer error", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.ITEM_UNAVAILABLE -> Toast.makeText(
-                        requireActivity(), "ITEM_UNAVAILABLE", Toast.LENGTH_LONG).show()
+                        requireActivity(), "Item unavailable", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.NETWORK_ERROR -> Toast.makeText(
-                        requireActivity(), "NETWORK_ERROR", Toast.LENGTH_LONG).show()
+                        requireActivity(), "Network error", Toast.LENGTH_LONG).show()
 
                     BillingClient.BillingResponseCode.SERVICE_DISCONNECTED -> Toast.makeText(
-                        requireActivity(), "SERVICE_DISCONNECTED", Toast.LENGTH_LONG).show()
+                        requireActivity(), "Service disconnected", Toast.LENGTH_LONG).show()
 
                     else -> Toast.makeText(
                         requireActivity(), "Error " + billingResult.debugMessage, Toast.LENGTH_LONG).show()

@@ -87,7 +87,6 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
 
         binding.imageBackIcon.setOnClickListener(this)
 
-
         textListener = object : TextWatcher {
             private var searchFor = "" // Or view.editText.text.toString()
 

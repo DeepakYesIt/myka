@@ -2,8 +2,11 @@ package com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -14,8 +17,10 @@ import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +31,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -41,11 +47,17 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.common.api.PendingResult
+import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResult
+import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -59,9 +71,12 @@ import com.google.gson.Gson
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.mykaimeal.planner.OnItemLongClickListener
+import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.R
+import com.mykaimeal.planner.adapter.AdapterCardPreferredItem
 import com.mykaimeal.planner.adapter.AdapterCheckoutIngredientsItem
 import com.mykaimeal.planner.adapter.AdapterGetAddressItem
+import com.mykaimeal.planner.adapter.IngredientsShoppingAdapter
 import com.mykaimeal.planner.adapter.PlacesAutoCompleteAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
@@ -71,9 +86,11 @@ import com.mykaimeal.planner.databinding.FragmentCheckoutScreenBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addressmapfullscreen.model.AddAddressModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.GetAddressListModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.GetAddressListModelData
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.model.CheckoutScreenModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.model.CheckoutScreenModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.viewmodel.CheckoutScreenViewModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.productpaymentscreen.model.GetCardMealMeModelData
 import com.mykaimeal.planner.listener.OnPlacesDetailsListener
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import com.mykaimeal.planner.model.Place
@@ -87,11 +104,10 @@ import java.math.RoundingMode
 import java.util.Locale
 
 @AndroidEntryPoint
-class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickListener {
+class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickListener,OnItemSelectListener {
     private var binding: FragmentCheckoutScreenBinding? = null
     private lateinit var mapView: MapView
     private var mMap: GoogleMap? = null
-    private var status: Boolean = false
     private var openStatus: Boolean = false
     private lateinit var checkoutScreenViewModel: CheckoutScreenViewModel
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
@@ -101,12 +117,16 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
     private var dialogMiles: Dialog? = null
     private var selectType: String? = ""
     private var addressId: String? = ""
+    private val tAG = "CheckOut"
 
     private lateinit var adapterCheckoutIngredients: AdapterCheckoutIngredientsItem
+    private lateinit var adapterCardPreferred: AdapterCardPreferredItem
+    private var cardMealMe: MutableList<GetCardMealMeModelData> = mutableListOf()
 
     private var latitude: String? = ""
     private var longitude: String? = ""
     private var totalPrices: String? = ""
+    private var cardId: String? = ""
     private var statusTypes: String? = "Home"
 
     private lateinit var edtStreetName: EditText
@@ -129,6 +149,10 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
     private var adapterGetAddressItem: AdapterGetAddressItem? = null
     private var addressList: MutableList<GetAddressListModelData>?=null
 
+    private var phoneNumber: String? = ""
+    private var notes: String? = ""
+    private var card: String? = ""
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -144,6 +168,9 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
 
         sessionManagement = SessionManagement(requireContext())
         commonWorkUtils = CommonWorkUtils(requireActivity())
+
+        adapterCardPreferred = AdapterCardPreferredItem(requireContext(),cardMealMe, this,0)
+        binding?.rcyCardDetails?.adapter = adapterCardPreferred
 
         mapView = binding!!.mapView
         mapView.onCreate(savedInstanceState)
@@ -174,7 +201,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
             findNavController().navigateUp()
         }
 
-
         binding!!.layEdit.setOnClickListener {
             val bundle = Bundle().apply {
                 putString("latitude", latitude.toString())
@@ -192,10 +218,14 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         }
 
         binding!!.textPayBtn.setOnClickListener {
-            val bundle = Bundle().apply {
-                putString("totalPrices", totalPrices)
+            if (validatation()){
+                val bundle = Bundle().apply {
+                    putString("totalPrices", totalPrices)
+                    putString("cardId", cardId)
+                }
+                findNavController().navigate(R.id.addTipScreenFragment, bundle)
             }
-            findNavController().navigate(R.id.addTipScreenFragment, bundle)
+
         }
 
         binding!!.relSetMeetAtDoor.setOnClickListener {
@@ -210,7 +240,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
             findNavController().navigate(R.id.paymentCreditDebitFragment)
         }
 
-        binding!!.imageCheckRadio.setOnClickListener {
+  /*      binding!!.imageCheckRadio.setOnClickListener {
             if (status) {
                 status = false
                 binding!!.imageCheckRadio.setImageResource(R.drawable.radio_uncheck_gray_icon)
@@ -218,7 +248,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
                 binding!!.imageCheckRadio.setImageResource(R.drawable.radio_green_icon)
                 status = true
             }
-        }
+        }*/
 
         binding!!.imageDown.setOnClickListener {
             if (openStatus) {
@@ -282,6 +312,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
     private fun showDataInUI(data: CheckoutScreenModelData?) {
 
         if (data!!.phone != null || data.country_code != null) {
+            phoneNumber="1"
                 val rawNumber = data.phone.toString().filter { it.isDigit() }
                 val formattedNumber = if (rawNumber.length >= 10) {
                     "-${rawNumber.substring(0, 3)}-${rawNumber.substring(3, 6)}-${rawNumber.substring(6, 10)}"
@@ -290,7 +321,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
                 }
                 binding?.tvAddNumber?.text = data.country_code+formattedNumber
                 binding?.tvAddNumber?.setTextColor(Color.parseColor("#000000"))
-
         }
 
         data.address?.let { address ->
@@ -334,6 +364,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
 
         if (data.note != null) {
             if (data.note.pickup != null) {
+                notes="1"
                 binding!!.tvSetDoorStep.text = data.note.pickup.toString()
             }
 
@@ -371,12 +402,18 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
             binding!!.textDeliveryPrice.text = "$$roundedDelivery"
         }
 
-        if (data.card != null) {
+        if (data.card != null && data.card.size>0) {
+
+            cardMealMe=data.card
+            card="1"
             binding!!.relCardDetails.visibility = View.VISIBLE
-            if (data.card.card_num != null) {
+
+            adapterCardPreferred.updateList(cardMealMe)
+            /*if (data.card.card_num != null) {
                 binding!!.tvCardNumber.text = "**** **** **** " + data.card.card_num.toString()
-            }
+            }*/
         } else {
+            card=""
             binding!!.relCardDetails.visibility = View.GONE
         }
 
@@ -393,8 +430,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         }
 
         if (!data.ingredient.isNullOrEmpty()) {
-            adapterCheckoutIngredients =
-                AdapterCheckoutIngredientsItem(data.ingredient, requireActivity())
+            adapterCheckoutIngredients = AdapterCheckoutIngredientsItem(data.ingredient, requireActivity())
             binding!!.rcyIngredients.adapter = adapterCheckoutIngredients
         }
 
@@ -515,19 +551,10 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         }
 
         relTrialBtn?.setOnClickListener {
-            dialogMiles?.dismiss()
-            if (BaseApplication.isOnline(requireContext())) {
-                if (ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    getCurrentLocation()
-                } else {
-                    requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100)
-                }
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation()
             } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 100)
             }
         }
 
@@ -634,12 +661,10 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
                 if (location != null) {
                     latitude = location.latitude.toString()
                     longitude = location.longitude.toString()
-                    tvAddress.text.clear()
                     requireActivity().runOnUiThread {
                         getAddressFromLocation(location.latitude, location.longitude)
-
                     }
-
+                    tvAddress.setText(userAddress)
                 } else {
                     // When location result is null
                     val locationRequest =
@@ -647,7 +672,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
                             .setInterval(10000)
                             .setFastestInterval(1000)
                             .setNumUpdates(1)
-
                     val locationCallback: LocationCallback = object : LocationCallback() {
                         override fun onLocationResult(locationResult: LocationResult) {
                             // Initialize
@@ -655,10 +679,10 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
                             val location1 = locationResult.lastLocation
                             latitude = location1!!.latitude.toString()
                             longitude = location1.longitude.toString()
-                            tvAddress.text.clear()
                             requireActivity().runOnUiThread {
                                 getAddressFromLocation(location1.latitude, location1.longitude)
                             }
+                            tvAddress.setText(userAddress)
                         }
                     }
                     // Request location updates
@@ -677,6 +701,74 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ), 100
             )
+        }
+    }
+
+
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 100 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            displayLocationSettingsRequest(requireContext())
+        } else {
+            showLocationError(requireContext(), ErrorMessage.locationError)
+        }
+
+    }
+
+    private fun showLocationError(context: Context?, msg: String?) {
+        val dialog = context?.let { Dialog(it, R.style.BottomSheetDialog) }
+        dialog?.setCancelable(false)
+        dialog?.setContentView(R.layout.alert_dialog_box_error)
+        val tvTitle: TextView = dialog!!.findViewById(R.id.tv_text)
+        val btnOk: RelativeLayout = dialog.findViewById(R.id.btn_okay)
+        tvTitle.text = msg
+        btnOk.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            val uri = Uri.fromParts("package", requireContext().packageName, null)
+            intent.data = uri
+            startActivityForResult(intent, 200)
+        }
+        dialog.show()
+    }
+
+    private fun displayLocationSettingsRequest(context: Context) {
+        val googleApiClient = GoogleApiClient.Builder(context)
+            .addApi(LocationServices.API).build()
+        googleApiClient.connect()
+        val locationRequest: LocationRequest = LocationRequest.create()
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        locationRequest.interval = 10000
+        locationRequest.fastestInterval = 1000
+        locationRequest.numUpdates = 1
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        builder.setAlwaysShow(true)
+        val result: PendingResult<LocationSettingsResult> =
+            LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build())
+        result.setResultCallback { result ->
+            val status: Status = result.status
+            when (status.statusCode) {
+                LocationSettingsStatusCodes.SUCCESS -> {
+                    Log.i(tAG, "All location settings are satisfied.")
+                    getCurrentLocation()
+                }
+                LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
+                    Log.i(tAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ")
+                    try {
+                        // Show the dialog by calling startResolutionForResult(), and check the result
+                        // in onActivityResult().
+                        status.resolution?.let {
+                            startIntentSenderForResult(it.intentSender, 100, null, 0, 0, 0, null)
+                        }
+
+                    } catch (e: IntentSender.SendIntentException) {
+                        Log.i(tAG, "PendingIntent unable to execute request.")
+                    }
+                }
+                LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> Log.i(tAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.")
+
+            }
         }
     }
 
@@ -709,6 +801,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         try {
             val addresses: List<Address> = geocoder.getFromLocation(latitude, longitude, 1)!!
             if (addresses.isNotEmpty()) {
+
                 val address = addresses[0]
                 streetName = address.thoroughfare ?: "" // Street Name
                 streetNum = address.subThoroughfare ?: "" // Street Number
@@ -717,6 +810,8 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
                 states = address.adminArea ?: "" // State/Province
                 country = address.countryName ?: "" // Country
                 zipcode = address.postalCode ?: "" // Zip Code
+
+                userAddress=address.getAddressLine(0) ?: ""  // Full Address
 
                 Log.d("Address", "Street Name: $streetName")
                 Log.d("Address", "Street Number: $streetNum")
@@ -729,7 +824,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
             e.printStackTrace()
         }
     }
-
 
     private fun fullAddressDialog() {
         val dialogMiles: Dialog = context?.let { Dialog(it) }!!
@@ -803,7 +897,6 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         }
     }
 
-
     private fun addFullAddressApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
@@ -854,6 +947,21 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
+    }
+
+    private fun validatation(): Boolean {
+        // Check if email/phone is empty
+        if (phoneNumber.equals("",true)) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validPhone, false)
+            return false
+        } else if (notes.equals("",true)) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validPickUp, false)
+            return false
+        } /*else if (card.equals("",true)) {
+            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.cardDetailsError, false)
+            return false
+        }*/
+        return true
     }
 
     private fun validate(): Boolean {
@@ -929,14 +1037,13 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         Log.d("Location longitude", "********$longitude")
         mMap = gmap
 
-        val lat =
-            latitude?.toDoubleOrNull() ?: 0.0  // Convert String to Double, default to 0.0 if null
+        val lat = latitude?.toDoubleOrNull() ?: 0.0  // Convert String to Double, default to 0.0 if null
         val lng = longitude?.toDoubleOrNull() ?: 0.0
         val newYork = LatLng(lat, lng)
         val customMarker = bitmapDescriptorFromVector(
             R.drawable.map_marker_icon,
-            40,
-            40
+            50,
+            50
         ) // Change with your drawable
 
         /*        val newYork = LatLng(40.7128, -74.0060)
@@ -960,10 +1067,7 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
     }
 
     private fun bitmapDescriptorFromVector(
-        vectorResId: Int,
-        width: Int,
-        height: Int
-    ): BitmapDescriptor? {
+        vectorResId: Int, width: Int, height: Int): BitmapDescriptor? {
         val vectorDrawable: Drawable? = ContextCompat.getDrawable(requireContext(), vectorResId)
         if (vectorDrawable == null) {
             return null
@@ -1026,7 +1130,32 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
             findNavController().navigate(R.id.addressMapFullScreenFragment, bundle)
             dialogMiles?.dismiss()
         }
+    }
 
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 100) {
+            if (Activity.RESULT_OK == resultCode) {
+                getCurrentLocation()
+            } else {
+                Toast.makeText(requireContext(), "Please turn on location", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        if (requestCode == 200) {
+            // This condition for check location run time permission
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation()
+            } else {
+                showLocationError(requireContext(), ErrorMessage.locationError)
+            }
+        }
+    }
+
+    override fun itemSelect(position: Int?, status: String?, type: String?) {
+
+        cardId=cardMealMe[position!!].id.toString()
     }
 
 }

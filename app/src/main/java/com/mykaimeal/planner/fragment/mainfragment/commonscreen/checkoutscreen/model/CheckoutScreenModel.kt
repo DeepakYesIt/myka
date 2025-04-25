@@ -1,5 +1,7 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.model
 
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.productpaymentscreen.model.GetCardMealMeModelData
+
 data class CheckoutScreenModel(
     val code: Int?,
     val `data`: CheckoutScreenModelData?,
@@ -10,10 +12,10 @@ data class CheckoutScreenModel(
 data class CheckoutScreenModelData(
     val Store: String?,
     val address: Addres?,
-    val card: Card?,
+    val card: MutableList<GetCardMealMeModelData>?,
     val country_code: String?,
     val delivery: Int?,
-    val ingredient: List<IngredientList>?,
+    val ingredient: MutableList<IngredientList>?,
     val ingredient_count: Int?,
     val net_total: Double?,
     val note: Note?,
@@ -44,18 +46,6 @@ data class IngredientList(
     val status: Int?,
     val updated_at: String?,
     val user_id: Int?
-)
-
-
-data class Card(
-    val card_num: Int?,
-    val created_at: String,
-    val deleted_at: Any,
-    val id: Int,
-    val payment_id: String,
-    val updated_at: String,
-    val user_id: Int,
-    val status: Int
 )
 
 data class Addres(

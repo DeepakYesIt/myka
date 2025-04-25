@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <com.chauthai.swipereveallayout.SwipeRevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -88,19 +89,21 @@
                         android:maxLines="3"
                         android:text=""
                         android:textColor="#0A2533"
+                        android:fontFamily="@font/montserrat"
                         android:textSize="@dimen/_10ssp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/tvFoodGram"
+                        android:id="@+id/tvIngAvNot"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/tvFoodName"
                         android:singleLine="true"
-                        android:text="60 G"
+                        android:text="Not Available"
                         android:textColor="#999999"
                         android:textSize="@dimen/_10ssp"
                         android:visibility="gone" />
+
                 </RelativeLayout>
                 <RelativeLayout
                     android:id="@+id/relPriceQuantitys"
@@ -108,16 +111,20 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginEnd="@dimen/_4sdp">
                     android:layout_alignParentTop="true"
-                    android:layout_marginEnd="@dimen/_6sdp">
+                    android:layout_marginEnd="@dimen/_6sdp"/>
+
                     <TextView
                         android:id="@+id/tvFoodPrice"
-                        android:layout_width="wrap_content"
+                        android:layout_width="@dimen/_45sdp"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_marginEnd="@dimen/_38sdp"
                         android:singleLine="true"
-                        android:text=""
+                        android:fontFamily="@font/montserrat"
+                        android:text="$34"
+                        android:textAlignment="center"
                         android:textColor="#06C169"
                         android:textSize="@dimen/_10ssp" />
                     <RelativeLayout
@@ -139,6 +146,7 @@
                             android:layout_height="wrap_content"
                             android:layout_toEndOf="@+id/imageMinusIcon"
                             android:text="2"
+                            android:fontFamily="@font/montserrat"
                             android:textAlignment="center"
                             android:textColor="@color/black" />
 

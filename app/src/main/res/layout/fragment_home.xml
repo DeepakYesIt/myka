@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -54,9 +53,10 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/pullToRefresh"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@id/relMainLayout"
-        android:layout_marginTop="@dimen/_10sdp"
-        android:layout_height="match_parent">
+        android:layout_marginTop="@dimen/_10sdp">
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -143,9 +143,7 @@
                                 android:text="Plan a Meal"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/_12sdp" />
-
                         </RelativeLayout>
-
                     </RelativeLayout>
 
                     <LinearLayout
@@ -253,9 +251,7 @@
                                     android:text="See All"
                                     android:textColor="@color/white"
                                     android:textSize="@dimen/_12sdp" />
-
                             </RelativeLayout>
-
                         </RelativeLayout>
 
                         <LinearLayout
@@ -380,7 +376,6 @@
                                             android:text="-"
                                             android:textColor="@color/black"
                                             android:textSize="@dimen/_13sdp" />
-
                                     </LinearLayout>
 
                                     <LinearLayout
@@ -416,7 +411,6 @@
                                             android:text="-"
                                             android:textColor="@color/black"
                                             android:textSize="@dimen/_13sdp" />
-
                                     </LinearLayout>
 
                                     <LinearLayout
@@ -452,7 +446,6 @@
                                             android:text="-"
                                             android:textColor="@color/black"
                                             android:textSize="@dimen/_13sdp" />
-
                                     </LinearLayout>
 
                                     <LinearLayout
@@ -489,10 +482,7 @@
                                             android:gravity="center_vertical"
                                             android:text="-"
                                             android:textColor="@color/black"
-
                                             android:textSize="@dimen/_13sdp" />
-
-
                                     </LinearLayout>
 
                                     <LinearLayout
@@ -597,9 +587,7 @@
                                     android:textColor="@color/white"
                                     android:textSize="@dimen/_12sdp" />
                             </RelativeLayout>
-
                         </RelativeLayout>
-
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -657,9 +645,7 @@
                                     android:textColor="@color/white"
                                     android:textSize="@dimen/_12sdp" />
                             </RelativeLayout>
-
                         </RelativeLayout>
-
                     </RelativeLayout>
 
                     <ImageView
@@ -685,9 +671,7 @@
                     android:layout_marginHorizontal="@dimen/_15sdp"
                     android:layout_marginBottom="@dimen/_25sdp"
                     android:src="@drawable/monthly_savings_free_trial" />
-
             </RelativeLayout>
         </ScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
 </RelativeLayout>

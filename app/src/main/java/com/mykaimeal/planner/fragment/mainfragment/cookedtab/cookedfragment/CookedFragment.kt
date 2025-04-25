@@ -95,6 +95,8 @@ class CookedFragment : Fragment(), OnItemClickListener {
          
         backButton()
 
+        (activity as MainActivity?)?.alertStatus=false
+
         initialize()
 
         return binding.root

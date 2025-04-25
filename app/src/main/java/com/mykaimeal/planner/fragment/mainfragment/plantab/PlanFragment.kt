@@ -224,28 +224,28 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         // Initialize the adapter with the updated date list
         calendarAdapter = CalendarDayDateAdapter(updatedDaysBetween.toMutableList()) { selectedPosition ->
-                // Update the list to reflect the selected date
-                updatedDaysBetween.forEachIndexed { index, dateModel ->
-                    dateModel.status = (index == selectedPosition)
-                    lastDateSelected = updatedDaysBetween[selectedPosition].date
-                    viewModel.setDate(lastDateSelected)
-                    Log.d("dateModel Date ", "*****${dateModel.date}")
-                }
-                Log.d("Date ", "*****$updatedDaysBetween")
-
-                // Notify the adapter to refresh the data
-                calendarAdapter?.updateList(updatedDaysBetween.toMutableList())
-
-                // Update the current date selection
-                currentDateSelected = updatedDaysBetween[selectedPosition].date
-
-                // Fetch data for the selected date if online
-                if (BaseApplication.isOnline(requireActivity())) {
-                    dataFatchByDate(currentDateSelected,"2")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
+            // Update the list to reflect the selected date
+            updatedDaysBetween.forEachIndexed { index, dateModel ->
+                dateModel.status = (index == selectedPosition)
+                lastDateSelected = updatedDaysBetween[selectedPosition].date
+                viewModel.setDate(lastDateSelected)
+                Log.d("dateModel Date ", "*****${dateModel.date}")
             }
+            Log.d("Date ", "*****$updatedDaysBetween")
+
+            // Notify the adapter to refresh the data
+            calendarAdapter?.updateList(updatedDaysBetween.toMutableList())
+
+            // Update the current date selection
+            currentDateSelected = updatedDaysBetween[selectedPosition].date
+
+            // Fetch data for the selected date if online
+            if (BaseApplication.isOnline(requireActivity())) {
+                dataFatchByDate(currentDateSelected,"2")
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
         // Update the RecyclerView
         binding.recyclerViewWeekDays.adapter = calendarAdapter
 

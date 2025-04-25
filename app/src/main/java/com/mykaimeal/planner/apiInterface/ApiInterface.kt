@@ -683,17 +683,15 @@ interface ApiInterface {
     @POST(ApiEndPoint.getCheckoutUrl)
     suspend fun getCheckoutScreenUrl(): Response<JsonObject>
 
-
+    @FormUrlEncoded
     @POST(ApiEndPoint.getOrderProductUrl)
-    suspend fun getOrderProductUrl(): Response<JsonObject>
+    suspend fun getOrderProductUrl(@Field("tip") tip:String?, @Field("card_id") card_id:String?): Response<JsonObject>
 
     @POST(ApiEndPoint.getStoreProductsUrl)
     suspend fun getStoreProductUrl(): Response<JsonObject>
 
-
     @POST(ApiEndPoint.getCardMealMeUrl)
     suspend fun getCardMealMeUrl(): Response<JsonObject>
-
 
     @FormUrlEncoded
     @POST(ApiEndPoint.getProductsUrl)

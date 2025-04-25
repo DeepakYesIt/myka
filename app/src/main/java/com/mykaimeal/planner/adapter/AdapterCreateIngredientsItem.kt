@@ -41,7 +41,6 @@ class AdapterCreateIngredientsItem(var datalist: MutableList<RecyclerViewItemMod
 
         val item = datalist[position]
 
-
         holder.binding.relImages.setOnClickListener{
             uploadImage.uploadImage(position)
         }
@@ -51,7 +50,6 @@ class AdapterCreateIngredientsItem(var datalist: MutableList<RecyclerViewItemMod
                 "pinch", "dash", "drop", "handful", "slice", "stick", "piece", "can", "bottle", "jar", "packet", "bunch", "sprig", "inch", "cm", "feet")
         )
 
-
         if (item.status) {
             holder.binding.llLayouts.setBackgroundResource(R.drawable.create_select_bg) // Change this drawable
         } else {
@@ -60,11 +58,18 @@ class AdapterCreateIngredientsItem(var datalist: MutableList<RecyclerViewItemMod
 
         item.measurement?.let {
             if (!it.equals("<unit>",true)){
+                if (!it.equals("null",true)){
+                    holder.binding.spinnerQntType.text = it
+                }else{
+                    holder.binding.spinnerQntType.text = " "
+                }
+
                  if (!it.equals("null",true)){
                      holder.binding.spinnerQntType.text = it
                  }else{
                      holder.binding.spinnerQntType.text = " "
                  }
+
             }else{
                 holder.binding.spinnerQntType.text = " "
             }
@@ -119,7 +124,6 @@ class AdapterCreateIngredientsItem(var datalist: MutableList<RecyclerViewItemMod
             holder.binding.layProgess.root.visibility= View.GONE
         }
 
-
         holder.ingredientsWatcher?.let { holder.binding.etAddIngredients.removeTextChangedListener(it) }
         holder.quantityWatcher?.let { holder.binding.etAddIngQuantity.removeTextChangedListener(it) }
 
@@ -128,6 +132,21 @@ class AdapterCreateIngredientsItem(var datalist: MutableList<RecyclerViewItemMod
             holder.binding.etAddIngredients.setSelection(holder.binding.etAddIngredients.text.length)
         }
 
+    /*    val quantityStr = item.quantity?.let { quantity ->
+            quantity.toDoubleOrNull()?.let { quantityDouble ->
+                if (quantityDouble % 1 == 0.0) {
+                    quantityDouble.toInt().toString()
+                } else {
+                    String.format("%.1f", quantityDouble)
+                }
+            } ?: quantity
+        } ?: ""
+
+        val quantityEditText = holder.binding.etAddIngQuantity
+        if (quantityEditText.text.toString() != quantityStr) {
+            quantityEditText.setText(quantityStr)
+            quantityEditText.setSelection(quantityStr.length)
+        }*/
 
         val quantityStr = item.quantity?.let { quantity ->
             quantity.toDoubleOrNull()?.let { quantityDouble ->
@@ -172,7 +191,6 @@ class AdapterCreateIngredientsItem(var datalist: MutableList<RecyclerViewItemMod
 
         holder.ingredientsWatcher = ingredientsWatcher
         holder.quantityWatcher = quantityWatcher
-
 
     }
 

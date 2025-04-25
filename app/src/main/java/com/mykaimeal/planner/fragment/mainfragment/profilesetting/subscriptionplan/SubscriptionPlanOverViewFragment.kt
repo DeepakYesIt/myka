@@ -51,7 +51,6 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 import java.util.stream.Collectors
 
-
 @AndroidEntryPoint
 class SubscriptionPlanOverViewFragment : Fragment() {
     private lateinit var binding: FragmentSubscriptionPlanOverViewBinding

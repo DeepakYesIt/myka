@@ -85,7 +85,7 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
 
         // Inflate the layout for this fragment
         binding = FragmentCreateRecipeBinding.inflate(layoutInflater, container, false)
-        
+
         (activity as? MainActivity)?.binding?.let {
             it.llIndicator.visibility = View.GONE
             it.llBottomNavigation.visibility = View.GONE
@@ -155,7 +155,7 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
                     updatedItem.quantity?.isNotBlank() == true &&
                     updatedItem.measurement?.isNotBlank() == true
             ingredientList[updatedPosition] = updatedItem
-           binding.rcyCreateIngredients.adapter?.notifyItemChanged(updatedPosition)
+            binding.rcyCreateIngredients.adapter?.notifyItemChanged(updatedPosition)
         }
         binding.rcyCreateIngredients.adapter = adapter
 
@@ -497,7 +497,7 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
                             }else{
                                 RecyclerViewItemModel(uri = response.image, ingredientName = response.food.toString(), quantity = response.quantity.toString(), measurement = response.measure.toString(), status = false)
                             }
-                         }.toMutableList()
+                        }.toMutableList()
                         adapter?.update(ingredientList)
                     }
                 }
@@ -530,7 +530,7 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 if (apiModel.data != null && apiModel.data.size > 0) {
-              /*      binding.spinnerCookBook.setItems(cookbookList.map { it.name })*/
+                    /*      binding.spinnerCookBook.setItems(cookbookList.map { it.name })*/
                     cookbookList.retainAll { it == cookbookList[0] }
                     cookbookList.addAll(apiModel.data)
 
@@ -553,9 +553,9 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
     private fun handleSuccessCreateApiResponse(data: String) {
         try {
             val apiModel = Gson().fromJson(data, CreateRecipeSuccessModel::class.java)
-                 Log.d("@@@ addMea List ", "message :- $data")
+            Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                     addRecipeSuccessDialog()
+                addRecipeSuccessDialog()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)

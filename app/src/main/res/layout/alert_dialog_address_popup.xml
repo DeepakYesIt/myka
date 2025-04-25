@@ -40,6 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvConfirmAddress"
+                android:layout_marginBottom="@dimen/_15sdp"
                 android:fillViewport="true">
 
                 <RelativeLayout
@@ -297,7 +298,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/relPostalCode"
                         android:layout_marginTop="@dimen/_15sdp"
-                        android:layout_marginBottom="@dimen/_20sdp"
+                        android:layout_marginBottom="@dimen/_5sdp"
                         android:background="@drawable/green_btn_background">
 
                         <TextView

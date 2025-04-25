@@ -380,11 +380,11 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
-            val bundle = Bundle().apply {
-                putString("recipeName",status)
-                putString("screenType","Search")
-            }
-            findNavController().navigate(R.id.searchedRecipeBreakfastFragment,bundle)
+        val bundle = Bundle().apply {
+            putString("recipeName",status)
+            putString("screenType","Search")
+        }
+        findNavController().navigate(R.id.searchedRecipeBreakfastFragment,bundle)
     }
 
 

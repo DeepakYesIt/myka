@@ -96,11 +96,7 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
             }else{
                 holder.binding.layProgess.root.visibility= View.GONE
             }
-
-
         }
-
-
 
         holder.binding.imageMinusIcon.setOnClickListener{
             if (ingredientsData?.get(position)?.sch_id.toString().toInt() > 1) {

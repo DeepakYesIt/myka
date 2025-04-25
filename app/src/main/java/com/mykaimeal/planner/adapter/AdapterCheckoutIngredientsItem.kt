@@ -8,7 +8,7 @@ import com.mykaimeal.planner.databinding.AdapterCheckoutIngredientsItemBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.checkoutscreen.model.IngredientList
 
-class AdapterCheckoutIngredientsItem(private var ingredientsData: List<IngredientList>?,
+class AdapterCheckoutIngredientsItem(private var ingredientsData: MutableList<IngredientList>?,
                                      private var requireActivity: FragmentActivity
 ):
     RecyclerView.Adapter<AdapterCheckoutIngredientsItem.ViewHolder>() {

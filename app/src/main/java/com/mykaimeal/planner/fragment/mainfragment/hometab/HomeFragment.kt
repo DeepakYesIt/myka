@@ -121,7 +121,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         cookbookList.clear()
         val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("", "", 0, "", "Favorites", 0, "", 0)
         cookbookList.add(0, data)
-        
+
         initialize()
 
 
@@ -399,8 +399,8 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
             userDataLocal.is_supermarket?.let {
                 if (it==1){
-                // fetch location form the user
-                getLatLong()
+                    // fetch location form the user
+                    getLatLong()
                 }
             }
 
@@ -413,7 +413,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private fun showAlert(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)
     }
-    
+
     @SuppressLint("SetTextI18n")
     private fun initialize() {
 
@@ -452,7 +452,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         }
 
     }
-    
+
     private fun getCurrentLocation() {
         // Initialize Location manager
         val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -521,7 +521,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             )
         }
     }
-    
+
     override fun onClick(item: View?) {
         when (item!!.id) {
             R.id.textSeeAll -> {
@@ -568,9 +568,9 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 findNavController().navigate(R.id.subscriptionPlanOverViewFragment)
             }
 
-          /*  R.id.imgFreeTrial -> {
-                findNavController().navigate(R.id.homeSubscriptionFragment)
-            }*/
+            /*  R.id.imgFreeTrial -> {
+                  findNavController().navigate(R.id.homeSubscriptionFragment)
+              }*/
         }
     }
 
@@ -706,7 +706,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             else -> showAlert(result.message, false)
         }
     }
-    
+
     private fun recipeLikeAndUnlikeData(
         position: Int?,
         likeType: String,
@@ -768,7 +768,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         }
     }
 
-    
+
     override fun itemSelect(position: Int?, status: String?, type: String?) {
 
         storeUuid= position?.let { superMarketData?.get(it)?.store_uuid.toString() }.toString()

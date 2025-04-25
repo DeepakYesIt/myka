@@ -7,6 +7,7 @@
         android:id="@+id/relCardDetails"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_5sdp"
         android:layout_marginTop="@dimen/_10sdp">
 
         <ImageView
@@ -38,6 +39,7 @@
                 android:layout_marginStart="@dimen/_20sdp"
                 android:layout_marginTop="@dimen/_2sdp"
                 android:text="Preferred"
+                android:visibility="gone"
                 android:textSize="@dimen/_10sdp"
                 android:textColor="#FE9F45"/>
 
@@ -54,13 +56,12 @@
 
         <ImageView
             android:id="@+id/imageCheckRadio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/_10sdp"
-            android:src="@drawable/radio_uncheck_gray_icon"/>
-
+            android:src="@drawable/radio_uncheck_gray_icon" />
 
     </RelativeLayout>
 

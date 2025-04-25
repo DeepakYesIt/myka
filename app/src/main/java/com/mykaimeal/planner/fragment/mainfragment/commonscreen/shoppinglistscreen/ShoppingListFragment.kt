@@ -287,7 +287,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                                 }
                             } else {
                                 popupWindow?.dismiss()
-                               handleError(dietaryModel.code,dietaryModel.message)
+                                handleError(dietaryModel.code,dietaryModel.message)
                             }
                         } catch (e: Exception) {
                             popupWindow?.dismiss()
@@ -336,24 +336,24 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
     private fun addToCartUrlApi() {
         BaseApplication.showMe(requireContext())
-         val foodIds = mutableListOf<String>()
-         val schIds = mutableListOf<String>()
-         val foodName = mutableListOf<String>()
-         val statusType = mutableListOf<String>()
+        val foodIds = mutableListOf<String>()
+        val schIds = mutableListOf<String>()
+        val foodName = mutableListOf<String>()
+        val statusType = mutableListOf<String>()
 
-         foodIds.clear()
-         schIds.clear()
-         foodName.clear()
-         statusType.clear()
+        foodIds.clear()
+        schIds.clear()
+        foodName.clear()
+        statusType.clear()
 
-            ingredientList.forEach {
-                if (it.newStatus==true){
-                    foodIds.add(it.id.toString())
-                    schIds.add(it.quantity.toString())
-                    foodName.add(it.name.toString())
-                    statusType.add("3")
-                }
+        ingredientList.forEach {
+            if (it.newStatus==true){
+                foodIds.add(it.id.toString())
+                schIds.add(it.quantity.toString())
+                foodName.add(it.name.toString())
+                statusType.add("3")
             }
+        }
         lifecycleScope.launch {
             shoppingListViewModel.addShoppingCartUrlApi({
                 BaseApplication.dismissMe()

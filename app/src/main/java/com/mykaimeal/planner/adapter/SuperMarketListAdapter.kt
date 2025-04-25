@@ -110,8 +110,10 @@ class SuperMarketListAdapter(
 
         // ✅ Click event for selection
         holder.binding.relativeLayoutMain.setOnClickListener {
-            updateSelection(position)
-            onItemSelectListener.itemSelect(position, storesData!![position].store_uuid.toString(), "SuperMarket")
+            if (data?.is_slected != 1){
+                updateSelection(position)
+                onItemSelectListener.itemSelect(position, storesData!![position].store_uuid.toString(), "SuperMarket")
+            }
 
             /*    val previousPosition = storesData?.indexOfFirst { it.is_slected == 1 }
                 if (previousPosition != null && previousPosition != -1 && previousPosition != position) {
