@@ -19,7 +19,7 @@ data class BasketScreenModelData(
 
 data class Ingredient(
     val created_at: String?,
-    val deleted_at: Any,
+    val deleted_at: String?,
     val food_id: String?,
     val id: Int?,
     val market_id: Any,

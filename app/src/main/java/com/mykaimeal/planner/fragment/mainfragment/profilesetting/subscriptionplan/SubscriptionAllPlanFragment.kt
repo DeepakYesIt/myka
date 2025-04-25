@@ -273,6 +273,8 @@ class SubscriptionAllPlanFragment : Fragment() {
                     }
                 }
             } else {
+                binding.rlNextBtn.isClickable=true
+                binding.rlNextBtn.setBackgroundResource(R.drawable.gray_btn_select_background)
                 when (billingResult.responseCode) {
                     BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> Toast.makeText(
                         requireActivity(), "Already Subscribed", Toast.LENGTH_LONG).show()

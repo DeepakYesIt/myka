@@ -31,8 +31,8 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsde
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.model.BasketProductsDetailsModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.model.BasketProductsDetailsModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.model.ProductSwapSuccessModel
-import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.viewmodel.BasketProductsDetailsViewModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.BasketScreenModelData
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.viewmodel.BasketScreenViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
@@ -463,27 +463,33 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
         lifecycleScope.launch {
             basketScreenViewModel.getSelectProductsUrl({
                 BaseApplication.dismissMe()
-                handleApiProductsSwapApiResponse(it)
+                handleApiProductsSwapApiResponse(it,productId)
             }, id, productId, schId)
         }
     }
 
 
-    private fun handleApiProductsSwapApiResponse(result: NetworkResult<String>) {
+    private fun handleApiProductsSwapApiResponse(result: NetworkResult<String>,productId:String?) {
         when (result) {
-            is NetworkResult.Success -> handleApiProductsSwapApiResponse(result.data.toString())
+            is NetworkResult.Success -> handleApiProductsSwapApiResponseShow(result.data.toString(),productId)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleApiProductsSwapApiResponse(data: String) {
+    private fun handleApiProductsSwapApiResponseShow(data: String, productId: String?) {
         try {
             val apiModel = Gson().fromJson(data, ProductSwapSuccessModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-
+                val index = basketScreenViewModel.dataBasket?.ingredient?.indexOfFirst { it.id == id.toInt() }
+                basketScreenViewModel.dataBasket?.ingredient?.removeAt(index!!)
+                val result = basketProductsDetailsModelData.find { it.product_id?.toInt() == productId?.toInt() }
+                val data=Ingredient(null,null,result?.food_id,null,result?.product_id.toString(),
+                    null,result?.formatted_price!!.toInt(),null,null, result.name,null,
+                    result.product_id,result.sch_id.toString(), result.sch_id,null,false,null,null)
+                basketScreenViewModel.dataBasket?.ingredient?.add(index!!,data)
                 findNavController().navigateUp()
             } else {
                 handleError(apiModel.code,apiModel.message)

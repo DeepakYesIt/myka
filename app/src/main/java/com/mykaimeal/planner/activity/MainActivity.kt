@@ -175,14 +175,13 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         }
 
 
-//        // Start API polling
-//        startRepeatingApiCall()
+        // Start API polling
+        startRepeatingApiCall()
 
-
-        //using function for find destination graph
+        // using function for find destination graph
         startDestination()
 
-//        startTimer(this@MainActivity)
+        startTimer(this@MainActivity)
 
 
     }

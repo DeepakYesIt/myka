@@ -495,8 +495,6 @@ class SubscriptionPlanOverViewFragment : Fragment() {
                     binding.tvRestorePurchase.visibility = View.INVISIBLE
                     Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_SHORT).show()
                 }else{
-
-
                     if (apiModel.data?.last_plan.equals("",true)){
                         binding.tvRestorePurchase.visibility = View.INVISIBLE
                     }else{
