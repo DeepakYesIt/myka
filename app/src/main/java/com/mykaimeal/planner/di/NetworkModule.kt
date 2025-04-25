@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import com.mykaimeal.planner.BuildConfig
 import com.mykaimeal.planner.activity.AuthActivity
 import com.mykaimeal.planner.apiInterface.ApiInterface
 import com.mykaimeal.planner.apiInterface.BaseUrl
@@ -53,9 +54,12 @@ object NetworkModule {
     @Singleton
     @Provides
     fun mykaOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-
+        val loggingInterceptor = HttpLoggingInterceptor { message -> Log.d("RetrofitLog", message) }
+        if (BuildConfig.DEBUG) {
+            loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+        }else{
+            loggingInterceptor.level = HttpLoggingInterceptor.Level.NONE
+        }
 
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
@@ -70,10 +74,9 @@ object NetworkModule {
                 }
                 response // Return the response
             }
-            .connectTimeout(120, TimeUnit.MINUTES)
-            .writeTimeout(120, TimeUnit.MINUTES)
-            .readTimeout(120, TimeUnit.MINUTES)
-    
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
             .build()
     }
 

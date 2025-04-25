@@ -151,14 +151,10 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
 
         // Set up RecyclerView and Adapter
         adapter = AdapterCreateIngredientsItem(ingredientList, requireActivity(), this){ updatedPosition, updatedItem ->
-
-            // ✅ Update the status of the specific item
             updatedItem.status = updatedItem.ingredientName?.isNotBlank() == true &&
                     updatedItem.quantity?.isNotBlank() == true &&
                     updatedItem.measurement?.isNotBlank() == true
-            // ✅ Update the item in the list
             ingredientList[updatedPosition] = updatedItem
-            // ✅ Refresh only the changed child
            binding.rcyCreateIngredients.adapter?.notifyItemChanged(updatedPosition)
         }
         binding.rcyCreateIngredients.adapter = adapter
@@ -553,7 +549,7 @@ class CreateRecipeFragment : Fragment(), AdapterCreateIngredientsItem.UploadImag
         }
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "SuspiciousIndentation")
     private fun handleSuccessCreateApiResponse(data: String) {
         try {
             val apiModel = Gson().fromJson(data, CreateRecipeSuccessModel::class.java)

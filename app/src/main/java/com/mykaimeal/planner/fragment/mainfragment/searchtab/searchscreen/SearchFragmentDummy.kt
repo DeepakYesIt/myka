@@ -92,7 +92,7 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
         (activity as MainActivity?)?.changeBottom("addRecipe")
-
+        (activity as MainActivity?)?.alertStatus=false
         (activity as? MainActivity)?.binding?.let {
             it.llIndicator.visibility = View.VISIBLE
             it.llBottomNavigation.visibility = View.VISIBLE
@@ -116,14 +116,15 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
 
 
         binding.cardViewAddRecipe.visibility=View.GONE
-//
-//        if (clickedUrl!=""){
-//            searchBottomDialog()
-//        }
 
         initialize()
 
-        lunchApi()
+        if (searchRecipeViewModel.data!=null){
+            showData(searchRecipeViewModel.data)
+        }else{
+            // This Api call when the screen in loaded
+            lunchApi()
+        }
 
 
         return binding.root
@@ -405,18 +406,12 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
 
             if (data?.preference_status!=null){
                 if (data.preference_status == 0){
-                    Glide.with(requireActivity())
-                        .load(R.drawable.toggle_off_icon)
-                        .into(binding.imgPreferences)
+                    binding.imgPreferences.setImageResource(R.drawable.toggle_off_icon)
                 }else{
-                    Glide.with(requireActivity())
-                        .load(R.drawable.toggle_on_icon)
-                        .into(binding.imgPreferences)
+                    binding.imgPreferences.setImageResource(R.drawable.toggle_on_icon)
                 }
             }else{
-                Glide.with(requireActivity())
-                    .load(R.drawable.toggle_off_icon)
-                    .into(binding.imgPreferences)
+                binding.imgPreferences.setImageResource(R.drawable.toggle_off_icon)
             }
 
         }catch (e:Exception){

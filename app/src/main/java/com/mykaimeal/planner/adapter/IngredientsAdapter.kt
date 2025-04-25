@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.adapter
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
@@ -26,40 +27,47 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
                          private var onItemSelectListener: OnItemSelectListener):
     RecyclerView.Adapter<IngredientsAdapter.ViewHolder>() {
 
+
+    // Track currently opened swipe layout
+    private var openedSwipeLayout: SwipeRevealLayout? = null
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding: AdapterBasketIngItemBinding = AdapterBasketIngItemBinding.inflate(inflater, parent,false);
         return ViewHolder(binding)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val data= ingredientsData?.get(position)
 
-        if (data != null) {
-            if (data.sch_id!=null){
-                holder.binding.textCount.text=data.sch_id.toString()
+        data?.let {
+
+            if (it.sch_id!=null){
+                holder.binding.textCount.text=""+it.sch_id.toString()
             }
 
-            if (data.pro_price!=null){
-                if (data.pro_price!="Not available"){
-                    holder.binding.tvFoodPrice.text=data.pro_price.toString()
+            if (it.pro_price!=null){
+                if (!it.pro_price.equals("Not available",true)){
+                    holder.binding.tvFoodPrice.text=it.pro_price.toString()
                 }else{
                     holder.binding.tvFoodPrice.text="$0"
                 }
             }
 
-            if (data.pro_name!=null){
-                val foodName = data.pro_name
+            if (it.pro_name!=null){
+                val foodName = it.pro_name
                 val result = foodName.mapIndexed { index, c ->
                     if (index == 0 || c.isUpperCase()) c.uppercaseChar() else c
                 }.joinToString("")
                 holder.binding.tvFoodName.text=result
             }
 
-            if (data.pro_img!=null){
+            if (it.pro_img!=null){
                 Glide.with(requireActivity)
-                    .load(data.pro_img)
+                    .load(it.pro_img)
                     .error(R.drawable.no_image)
                     .placeholder(R.drawable.no_image)
                     .listener(object : RequestListener<Drawable> {
@@ -88,7 +96,10 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
             }else{
                 holder.binding.layProgess.root.visibility= View.GONE
             }
+
+
         }
+
 
 
         holder.binding.imageMinusIcon.setOnClickListener{
@@ -106,21 +117,34 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
             }
         }
 
+        // Swipe layout behavior
         holder.binding.swipeLayout.setSwipeListener(object : SwipeRevealLayout.SwipeListener {
             override fun onClosed(view: SwipeRevealLayout) {
+                if (openedSwipeLayout == view) {
+                    openedSwipeLayout = null
+                }
             }
 
             override fun onOpened(view: SwipeRevealLayout) {
-                // Change to desired background color
+                if (openedSwipeLayout != null && openedSwipeLayout != view) {
+                    openedSwipeLayout?.close(true)
+                }
+                openedSwipeLayout = view
             }
 
             override fun onSlide(view: SwipeRevealLayout, slideOffset: Float) {
-                // Optional: Gradually change color based on slide offset
+                // Optional: Animate background color or something else
             }
         })
 
         holder.binding.deleteLayout.setOnClickListener{
-                onItemSelectListener.itemSelect(position,"Delete","Ingredients")
+            // Close the swipe layout before deletion to prevent UI artifacts
+            holder.binding.swipeLayout.close(true)
+            // Reset the reference to the opened swipe layout
+            if (openedSwipeLayout == holder.binding.swipeLayout) {
+                openedSwipeLayout = null
+            }
+            onItemSelectListener.itemSelect(position,"Delete","Ingredients")
         }
 
 
@@ -130,6 +154,7 @@ class IngredientsAdapter(private var ingredientsData: MutableList<Ingredient>?,
         return ingredientsData!!.size
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateList(ingredientList: MutableList<Ingredient>) {
         ingredientsData=ingredientList
         notifyDataSetChanged()

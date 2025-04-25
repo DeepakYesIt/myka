@@ -36,7 +36,7 @@ class AdapterCreateIngredientsItem(var datalist: MutableList<RecyclerViewItemMod
         return ViewHolder(binding)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged", "DefaultLocale", "SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val item = datalist[position]
@@ -58,9 +58,18 @@ class AdapterCreateIngredientsItem(var datalist: MutableList<RecyclerViewItemMod
             holder.binding.llLayouts.setBackgroundResource(R.drawable.create_unselect_bg)  // Default background
         }
 
-        if (item.measurement!=null){
-            holder.binding.spinnerQntType.text = item.measurement.toString()
+        item.measurement?.let {
+            if (!it.equals("<unit>",true)){
+                 if (!it.equals("null",true)){
+                     holder.binding.spinnerQntType.text = it
+                 }else{
+                     holder.binding.spinnerQntType.text = " "
+                 }
+            }else{
+                holder.binding.spinnerQntType.text = " "
+            }
         }
+
 
         var previousSelectedItem: String? = null
 
@@ -114,18 +123,27 @@ class AdapterCreateIngredientsItem(var datalist: MutableList<RecyclerViewItemMod
         holder.ingredientsWatcher?.let { holder.binding.etAddIngredients.removeTextChangedListener(it) }
         holder.quantityWatcher?.let { holder.binding.etAddIngQuantity.removeTextChangedListener(it) }
 
-
-
         if (holder.binding.etAddIngredients.text.toString() != (item.ingredientName ?: "")) {
             holder.binding.etAddIngredients.setText(item.ingredientName ?: "")
             holder.binding.etAddIngredients.setSelection(holder.binding.etAddIngredients.text.length)
         }
 
-        if (holder.binding.etAddIngQuantity.text.toString() != (item.quantity ?: "")) {
-            holder.binding.etAddIngQuantity.setText(item.quantity ?: "")
-            holder.binding.etAddIngQuantity.setSelection(holder.binding.etAddIngQuantity.text.length)
-        }
 
+        val quantityStr = item.quantity?.let { quantity ->
+            quantity.toDoubleOrNull()?.let { quantityDouble ->
+                if (quantityDouble % 1 == 0.0) {
+                    quantityDouble.toInt().toString()
+                } else {
+                    String.format("%.1f", quantityDouble)
+                }
+            } ?: quantity
+        } ?: ""
+
+        val quantityEditText = holder.binding.etAddIngQuantity
+        if (quantityEditText.text.toString() != quantityStr) {
+            quantityEditText.setText(quantityStr)
+            quantityEditText.setSelection(quantityStr.length)
+        }
 
 
         val ingredientsWatcher = object : TextWatcher {
@@ -137,6 +155,7 @@ class AdapterCreateIngredientsItem(var datalist: MutableList<RecyclerViewItemMod
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         }
+
         val quantityWatcher = object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 datalist[holder.adapterPosition].quantity = s.toString()
@@ -148,6 +167,7 @@ class AdapterCreateIngredientsItem(var datalist: MutableList<RecyclerViewItemMod
         }
 
         holder.binding.etAddIngredients.addTextChangedListener(ingredientsWatcher)
+
         holder.binding.etAddIngQuantity.addTextChangedListener(quantityWatcher)
 
         holder.ingredientsWatcher = ingredientsWatcher

@@ -267,6 +267,8 @@ class SubscriptionAllPlanFragment : Fragment() {
                         val purchaseToken1 = purchase.purchaseToken
                         Log.d("TESTING_SPARK", "$orderId orderId")
                         Log.d("TESTING_Spark", "$purchaseToken1 purchase token1")
+                        binding.rlNextBtn.isClickable=false
+                        binding.rlNextBtn.setBackgroundResource(R.drawable.gray_btn_unselect_background)
                         handlePurchase(purchase)
                     }
                 }

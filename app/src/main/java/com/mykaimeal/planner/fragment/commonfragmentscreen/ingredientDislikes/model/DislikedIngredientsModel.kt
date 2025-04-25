@@ -2,7 +2,7 @@ package com.mykaimeal.planner.fragment.commonfragmentscreen.ingredientDislikes.m
 
 data class DislikedIngredientsModel(
     val code: Int,
-    val `data`: MutableList<DislikedIngredientsModelData>,
+    val `data`: MutableList<DislikedIngredientsModelData>?,
     val message: String,
     val success: Boolean
 )

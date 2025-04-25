@@ -38,6 +38,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.NavHostFragment.Companion
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -64,8 +65,11 @@ import com.mykaimeal.planner.databinding.ActivityMainBinding
 import com.mykaimeal.planner.fragment.commonfragmentscreen.commonModel.GetUserPreference
 import com.mykaimeal.planner.fragment.commonfragmentscreen.mealRoutine.model.MealRoutineModelData
 import com.mykaimeal.planner.fragment.commonfragmentscreen.mealRoutine.viewmodel.MealRoutineViewModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.viewmodel.BasketScreenViewModel
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.model.SearchMealUrlModel
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.model.SearchMealUrlModelData
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.HomeViewModel
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.PlanViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.BreakfastModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.Data
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.RecipesModel
@@ -135,7 +139,8 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
     var favorite: Int?=0
     var imageSearch: Int?=0
     var urlSearch: Int?=0
-
+    var alertStatus:Boolean=false
+    private var status:String?="RecipeSearch"
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -170,14 +175,14 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         }
 
 
-        // Start API polling
-        startRepeatingApiCall()
+//        // Start API polling
+//        startRepeatingApiCall()
 
 
         //using function for find destination graph
         startDestination()
 
-        startTimer(this@MainActivity)
+//        startTimer(this@MainActivity)
 
 
     }
@@ -1105,11 +1110,15 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             }
 
             R.id.llSearch -> {
-                binding.cardViewAddRecipe.visibility = View.GONE
-                val bundle = Bundle().apply {
-                    putString("ClickedUrl","")
+                if (alertStatus){
+                    searchRecipeDialog()
+                }else{
+                    binding.cardViewAddRecipe.visibility = View.GONE
+                    val bundle = Bundle().apply {
+                        putString("ClickedUrl","")
+                    }
+                    findNavController(R.id.frameContainerMain).navigate(R.id.searchFragment,bundle)
                 }
-                findNavController(R.id.frameContainerMain).navigate(R.id.searchFragment,bundle)
             }
 
             R.id.llAddRecipe -> {
@@ -1535,7 +1544,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
     @SuppressLint("SetTextI18n")
     fun subscriptionAlertError(){
         val dialog= Dialog(this, R.style.BottomSheetDialog)
-        dialog.setCancelable(false)
+        dialog.setCancelable(true)
         dialog.setContentView(R.layout.alert_dialog_subscription_error)
         val layoutParams = WindowManager.LayoutParams()
         layoutParams.copyFrom(dialog.window!!.attributes)
@@ -1556,5 +1565,132 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
         }
         dialog.show()
     }
+
+
+    fun upDateHomeData(){
+        ViewModelProvider(this)[HomeViewModel::class.java].setData(null)
+    }
+
+    fun upBasket(){
+        ViewModelProvider(this)[BasketScreenViewModel::class.java].setBasketData(null)
+    }
+
+    fun upDatePlan(){
+        ViewModelProvider(this)[PlanViewModel::class.java].setData(null)
+        ViewModelProvider(this)[PlanViewModel::class.java].setPlanDate(null)
+    }
+
+    private fun searchRecipeDialog() {
+        val dialogSearchDialog: Dialog =Dialog(this)
+        dialogSearchDialog.setContentView(R.layout.alert_dialog_search_recipe)
+        dialogSearchDialog.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        dialogSearchDialog.setCancelable(true)
+        dialogSearchDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val relRecipeSearch = dialogSearchDialog.findViewById<RelativeLayout>(R.id.relRecipeSearch)
+        val relFavouritesRecipes = dialogSearchDialog.findViewById<RelativeLayout>(R.id.relFavouritesRecipes)
+        val relFromWeb = dialogSearchDialog.findViewById<RelativeLayout>(R.id.relFromWeb)
+        val relAddYourOwnRecipe = dialogSearchDialog.findViewById<RelativeLayout>(R.id.relAddYourOwnRecipe)
+        val relTakingAPicture = dialogSearchDialog.findViewById<RelativeLayout>(R.id.relTakingAPicture)
+
+        val tvRecipeSearch = dialogSearchDialog.findViewById<TextView>(R.id.tvRecipeSearch)
+        val tvFavouritesRecipes = dialogSearchDialog.findViewById<TextView>(R.id.tvFavouritesRecipes)
+        val tvFromWeb = dialogSearchDialog.findViewById<TextView>(R.id.tvFromWeb)
+        val tvAddYourOwnRecipe = dialogSearchDialog.findViewById<TextView>(R.id.tvAddYourOwnRecipe)
+        val tvTakingAPicture = dialogSearchDialog.findViewById<TextView>(R.id.tvTakingAPicture)
+
+        val rlSearch = dialogSearchDialog.findViewById<RelativeLayout>(R.id.rlSearch)
+        val imgCrossSearch = dialogSearchDialog.findViewById<ImageView>(R.id.imgCrossSearch)
+
+        dialogSearchDialog.show()
+        dialogSearchDialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        rlSearch.setOnClickListener {
+            when (status) {
+                "RecipeSearch" -> {
+                    findNavController(R.id.frameContainerMain).navigate(R.id.searchFragment)
+                }
+                "FavouritesRecipes" -> {
+                    findNavController(R.id.frameContainerMain).navigate(R.id.cookBookFragment)
+                }
+                "Web" -> {
+                    addRecipeFromWeb()
+                }
+                "AddRecipe" -> {
+                    val bundle = Bundle().apply {
+                        putString("name","")
+                    }
+                    findNavController(R.id.frameContainerMain).navigate(R.id.createRecipeFragment,bundle)
+                }
+                else -> {
+                    findNavController(R.id.frameContainerMain).navigate(R.id.createRecipeImageFragment)
+                }
+            }
+            dialogSearchDialog.dismiss()
+        }
+
+        imgCrossSearch.setOnClickListener{
+            dialogSearchDialog.dismiss()
+        }
+
+        fun updateSelection(selectedView: View, tvTakingAPicture: TextView) {
+            val allViews = listOf(relRecipeSearch, relFavouritesRecipes, relFromWeb, relAddYourOwnRecipe, relTakingAPicture)
+            val textViews = listOf(tvRecipeSearch, tvFavouritesRecipes, tvFromWeb, tvAddYourOwnRecipe, tvTakingAPicture)
+            val drawableLeft = ContextCompat.getDrawable(this, R.drawable.orange_tick_icon) // Replace with your drawable
+            allViews.forEach { it.setBackgroundResource(R.drawable.gray_box_border_bg) }
+            textViews.forEach { it.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null) }
+            selectedView.setBackgroundResource(R.drawable.orange_box_bg)
+            tvTakingAPicture.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableLeft, null)
+        }
+
+        relRecipeSearch.setOnClickListener {
+            status = "RecipeSearch"
+            updateSelection(relRecipeSearch,tvRecipeSearch)
+        }
+
+        relFavouritesRecipes.setOnClickListener {
+            status = "FavouritesRecipes"
+            updateSelection(relFavouritesRecipes,tvFavouritesRecipes)
+        }
+
+        relFromWeb.setOnClickListener {
+            if (Subscription_status==1){
+                if (urlSearch!! <=2){
+                    status = "Web"
+                    updateSelection(relFromWeb,tvFromWeb)
+                }else{
+                    subscriptionAlertError()
+                }
+
+            }else{
+                status = "Web"
+                updateSelection(relFromWeb,tvFromWeb)
+            }
+        }
+
+        relAddYourOwnRecipe.setOnClickListener {
+            status = "AddRecipe"
+            updateSelection(relAddYourOwnRecipe,tvAddYourOwnRecipe)
+        }
+
+        relTakingAPicture.setOnClickListener {
+            if (Subscription_status==1){
+                if (urlSearch!! <=2){
+                    status = "TakingPicture"
+                    updateSelection(relTakingAPicture,tvTakingAPicture)
+                }else{
+                    subscriptionAlertError()
+                }
+            }else{
+                status = "TakingPicture"
+                updateSelection(relTakingAPicture,tvTakingAPicture)
+            }
+        }
+
+    }
+
 
 }

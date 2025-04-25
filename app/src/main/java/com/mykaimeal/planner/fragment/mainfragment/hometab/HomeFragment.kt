@@ -109,8 +109,8 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         locationManager = requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
 
         val main= (activity as MainActivity?)
-
         if (main != null) {
+            main.alertStatus=false
             main.changeBottom("home")
             main.binding.apply {
                 llIndicator.visibility = View.VISIBLE
@@ -124,8 +124,14 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         
         initialize()
 
-        // When screen load then api call
-        fetchDataOnLoad()
+
+        if (viewModel.data!=null){
+            showData(viewModel.data)
+        }else{
+            // When screen load then api call
+            fetchDataOnLoad()
+        }
+
 
         return binding.root
     }
@@ -141,8 +147,16 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
     private fun fetchDataOnLoad() {
         if (BaseApplication.isOnline(requireActivity())) {
-            fetchHomeDetailsData()
+            BaseApplication.showMe(requireContext())
+            lifecycleScope.launch {
+                viewModel.homeDetailsRequest {
+                    BaseApplication.dismissMe()
+                    binding.pullToRefresh.isRefreshing=false
+                    handleApiResponse(it,"HomeData")
+                }
+            }
         } else {
+            binding.pullToRefresh.isRefreshing=false
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
     }
@@ -155,15 +169,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         }
     }
 
-    private fun fetchHomeDetailsData() {
-        BaseApplication.showMe(requireContext())
-        lifecycleScope.launch {
-            viewModel.homeDetailsRequest {
-                BaseApplication.dismissMe()
-                handleApiResponse(it,"HomeData")
-            }
-        }
-    }
+
 
     private fun superMarketDetailsData() {
         lifecycleScope.launch {
@@ -276,8 +282,8 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     @SuppressLint("SetTextI18n")
     private fun showData(data: com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.DataModel?) {
         try {
-            userDataLocal = data!!
-
+            viewModel.setData(data!!)
+            userDataLocal = data
             if (userDataLocal.userData != null && userDataLocal.userData!!.size > 0) {
                 binding.relPlanMeal.visibility = View.GONE
                 binding.llRecipesCooked.visibility = View.VISIBLE
@@ -439,6 +445,11 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 //        binding!!.relMonthlySavings.setOnClickListener(this)
         binding.imageCheckSav.setOnClickListener(this)
         binding.rlLayCheckSavings.setOnClickListener(this)
+
+        binding.pullToRefresh.setOnRefreshListener {
+            // When screen load then api call
+            fetchDataOnLoad()
+        }
 
     }
     

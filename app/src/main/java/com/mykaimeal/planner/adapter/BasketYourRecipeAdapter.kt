@@ -92,7 +92,7 @@ class BasketYourRecipeAdapter(private var yourRecipesData: MutableList<Recipes>?
         }
 
         holder.binding.imageCross.setOnClickListener{
-            onItemSelectListener.itemSelect(position,data!!.id.toString(),"YourRecipe")
+            onItemSelectListener.itemSelect(position,"remove","YourRecipe")
         }
 
     }
@@ -101,6 +101,7 @@ class BasketYourRecipeAdapter(private var yourRecipesData: MutableList<Recipes>?
         return yourRecipesData!!.size
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateList(recipe: MutableList<Recipes>?) {
         yourRecipesData=recipe
         notifyDataSetChanged()

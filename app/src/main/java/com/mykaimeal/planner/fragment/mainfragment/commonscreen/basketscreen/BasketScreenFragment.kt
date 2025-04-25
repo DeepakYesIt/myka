@@ -2,16 +2,21 @@ package com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.location.Address
 import android.location.Geocoder
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -33,11 +38,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.common.api.PendingResult
+import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResult
+import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.android.libraries.places.api.Places
 import com.google.gson.Gson
 import com.mykaimeal.planner.OnItemLongClickListener
@@ -78,36 +89,37 @@ import java.util.Locale
 
 @AndroidEntryPoint
 class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectListener {
+
     private lateinit var binding: FragmentBasketScreenBinding
     private var adapter: SuperMarketListAdapter? = null
     private var adapterGetAddressItem: AdapterGetAddressItem? = null
     private var adapterRecipe: BasketYourRecipeAdapter? = null
-    private lateinit var adapterIngredients: IngredientsAdapter
+    private  var adapterIngredients: IngredientsAdapter? = null
     private lateinit var basketScreenViewModel: BasketScreenViewModel
     private var rcySavedAddress: RecyclerView? = null
-    private var recipe: MutableList<Recipes>? = null
-    private var ingredientList: MutableList<Ingredient>? = null
+    private var recipe: MutableList<Recipes> = mutableListOf()
+    private var ingredientList: MutableList<Ingredient> = mutableListOf()
     private var storeUid: String? = ""
     private var storeName: String? = ""
-    private var clickStatus: Boolean = false
     private var dialogMiles: Dialog? = null
-    private lateinit var tvAddress: AutoCompleteTextView
+    private var dialogAddress: Dialog?=null
+    private var tvAddress: AutoCompleteTextView?=null
     private var statusTypes: String? = "Home"
     private var latitude: String? = ""
     private var longitude: String? = ""
     private var addressId: String? = ""
-    private var stores: MutableList<Store>? = null
+    private var stores: MutableList<Store> = mutableListOf()
     private var addressList: MutableList<GetAddressListModelData>? = null
 
     private var userLatitude: String? = ""
     private var userLongitude: String? = ""
-    private lateinit var edtStreetName: EditText
-    private lateinit var edtStreetNumber: EditText
-    private lateinit var edtApartNumber: EditText
-    private lateinit var edtCity: EditText
-    private lateinit var edtStates: EditText
-    private lateinit var edtPostalCode: EditText
-    private lateinit var edtAddress: EditText
+    private  var edtStreetName: EditText?=null
+    private  var edtStreetNumber: EditText?=null
+    private  var edtApartNumber: EditText?=null
+    private  var edtCity: EditText?=null
+    private  var edtStates: EditText?=null
+    private  var edtPostalCode: EditText?=null
+    private  var edtAddress: EditText?=null
     private var userAddress: String? = ""
     private var streetName: String? = ""
     private var streetNum: String? = ""
@@ -120,8 +132,9 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var locationManager: LocationManager? = null
     private lateinit var commonWorkUtils: CommonWorkUtils
-
     private var hasShownPopup = false
+    private var tAG: String = "Location"
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -135,43 +148,46 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             llBottomNavigation.visibility = View.GONE
         }
 
-
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        locationManager =
-            requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
-
-        basketScreenViewModel =
-            ViewModelProvider(requireActivity())[BasketScreenViewModel::class.java]
+        basketScreenViewModel = ViewModelProvider(requireActivity())[BasketScreenViewModel::class.java]
         commonWorkUtils = CommonWorkUtils(requireActivity())
 
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    findNavController().navigateUp()
-                }
-            })
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        locationManager = requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
 
-        if ((activity as? MainActivity)?.Subscription_status==1){
+
+        adapter = SuperMarketListAdapter(stores, requireActivity(), this)
+        binding.rcvSuperMarket.adapter = adapter
+
+        adapterRecipe = BasketYourRecipeAdapter(recipe, requireActivity(), this)
+        binding.rcvYourRecipes.adapter = adapterRecipe
+
+        adapterIngredients = IngredientsAdapter(ingredientList, requireActivity(), this)
+        binding.rcvIngredients.adapter = adapterIngredients
+
+        buttonBack()
+
+        basketScreenViewModel.setBasketDetailsStore("no")
+
+        if ((activity as? MainActivity)?.Subscription_status==0){
             binding.btnLock.visibility=View.VISIBLE
-            launchApi()
+            viewModelData()
         }else{
             binding.btnLock.visibility=View.GONE
             if (!hasShownPopup) {
                 addressDialog()
                 hasShownPopup = true
             } else {
-                launchApi()
+                viewModelData()
             }
-
-
         }
 
         binding.textShoppingList.setOnClickListener {
             findNavController().navigate(R.id.shoppingListFragment)
         }
 
+        binding.pullToRefresh.setOnRefreshListener {
+            launchApi()
+        }
 
         binding.btnLock.setOnClickListener {
             (activity as? MainActivity)?.subscriptionAlertError()
@@ -182,16 +198,36 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
         return binding.root
     }
 
+    private fun viewModelData(){
+        if (basketScreenViewModel.dataBasket!=null){
+            showDataInUI(basketScreenViewModel.dataBasket!!)
+        }else{
+            launchApi()
+        }
+    }
+
+    private fun buttonBack(){
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().navigateUp()
+                }
+            })
+    }
+
     private fun launchApi(){
         if (BaseApplication.isOnline(requireActivity())) {
             getBasketList()
         } else {
+            binding.pullToRefresh.isRefreshing=false
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
     }
 
     private fun initialize() {
 
+        binding.textConfirmOrder.isClickable=false
         binding.textSeeAll1.setOnClickListener {
             findNavController().navigate(R.id.superMarketsNearByFragment)
         }
@@ -209,12 +245,13 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
         }
 
         binding.textConfirmOrder.setOnClickListener {
-            if (clickStatus) {
+            if (binding.textConfirmOrder.isClickable) {
                 findNavController().navigate(R.id.basketDetailSuperMarketFragment)
             } else {
                 showAlert(getString(R.string.available_products), false)
             }
         }
+
     }
 
     private fun getAddressList() {
@@ -233,8 +270,9 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
         lifecycleScope.launch {
             basketScreenViewModel.getBasketUrl({
                 BaseApplication.dismissMe()
+                binding.pullToRefresh.isRefreshing=false
                 handleApiBasketResponse(it)
-            }, "014d3d2e-ad5d-4b00-9198-af07acce2f3a", userLatitude, userLongitude)
+            }, "", userLatitude, userLongitude)
         }
     }
 
@@ -274,14 +312,18 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                     showDataInUI(apiModel.data)
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
+        }
+    }
+
+    private fun handleError(code: Int?, message: String?) {
+        if (code == ErrorMessage.code) {
+            showAlert(message, true)
+        } else {
+            showAlert(message, false)
         }
     }
 
@@ -295,11 +337,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                 dialogMiles?.dismiss()
                 launchApi()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -324,11 +362,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                     showDataInAddressUI(apiModel.data)
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -344,56 +378,55 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
 
     @SuppressLint("SetTextI18n")
     private fun showDataInUI(data: BasketScreenModelData) {
-
-        if (data.billing != null) {
-            if (data.billing.recipes != null) {
-                binding.textRecipeCount.text = data.billing.recipes.toString()
-            }
-
-            if (data.billing.net_total != null) {
-                val roundedNetTotal = data.billing.net_total.let {
-                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
-                }
-                binding.textNetTotalProduct.text = roundedNetTotal.toString()
-            }
-
-            if (data.billing.net_total == null || data.billing.net_total == 0.0) {
-                clickStatus = false
-            } else {
-                clickStatus = true
-                val roundedTotal = data.billing.net_total.let {
-                    BigDecimal(it).setScale(2, RoundingMode.HALF_UP).toDouble()
-                }
-                binding.textTotalAmount.text = "$$roundedTotal*"
+        basketScreenViewModel.setBasketData(data)
+        data.billing?.let {
+            if (it.recipes != null) {
+                binding.textRecipeCount.text = it.recipes.toString()
             }
         }
 
-        if (data.stores != null && data.stores.size > 0) {
-            stores = data.stores
+        stores.clear()
+        recipe.clear()
+        ingredientList.clear()
+
+        data.stores?.let {
+            stores.addAll(it)
+        }
+        data.recipe?.let {
+            recipe.addAll(it)
+        }
+        data.ingredient?.let {
+            ingredientList.addAll(it)
+        }
+
+        if (stores.size > 0) {
             binding.rlSuperMarket.visibility = View.VISIBLE
-            adapter = SuperMarketListAdapter(stores, requireActivity(), this)
-            binding.rcvSuperMarket.adapter = adapter
+            adapter?.updateList(stores)
         } else {
             binding.rlSuperMarket.visibility = View.GONE
         }
 
-        if (data.recipe != null && data.recipe.size > 0) {
+        if (recipe.size > 0) {
             binding.rlYourRecipes.visibility = View.VISIBLE
-            recipe = data.recipe
-            adapterRecipe = BasketYourRecipeAdapter(data.recipe, requireActivity(), this)
-            binding.rcvYourRecipes.adapter = adapterRecipe
+             adapterRecipe?.updateList(recipe)
         } else {
             binding.rlYourRecipes.visibility = View.GONE
         }
 
-        if (data.ingredient != null && data.ingredient.size > 0) {
-            ingredientList = data.ingredient
+        if (ingredientList.size > 0) {
             binding.rlIngredients.visibility = View.VISIBLE
-            adapterIngredients = IngredientsAdapter(data.ingredient, requireActivity(), this)
-            binding.rcvIngredients.adapter = adapterIngredients
+            adapterIngredients?.updateList(ingredientList)
+
+            val count=getTotalPrice()
+            binding.textNetTotalProduct.text="$$count*"
+            binding.textTotalAmount.text="$$count*"
+
+
         } else {
             binding.rlIngredients.visibility = View.GONE
         }
+
+
     }
 
     private fun showAlert(message: String?, status: Boolean) {
@@ -401,10 +434,10 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     }
 
     private fun addressDialog() {
-        dialogMiles = context?.let { Dialog(it) }!!
-        dialogMiles?.setContentView(R.layout.alert_dialog_addresses_popup)
-        dialogMiles?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialogMiles?.window!!.setLayout(
+        dialogAddress = context?.let { Dialog(it) }
+        dialogAddress?.setContentView(R.layout.alert_dialog_addresses_popup)
+        dialogAddress?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialogAddress?.window!!.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT
         )
@@ -416,23 +449,23 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
 
         val placesApi = PlaceAPI.Builder().apiKey(apiKey).build(requireContext())
 
-        val relDone = dialogMiles?.findViewById<RelativeLayout>(R.id.relDone)
-        val llSetWork = dialogMiles?.findViewById<LinearLayout>(R.id.llSetWork)
-        val llSetHome = dialogMiles?.findViewById<LinearLayout>(R.id.llSetHome)
-        val relTrialBtn = dialogMiles?.findViewById<RelativeLayout>(R.id.relTrialBtn)
-        tvAddress = dialogMiles?.findViewById(R.id.tvAddress)!!
-        rcySavedAddress = dialogMiles?.findViewById(R.id.rcySavedAddress)
+        val relDone = dialogAddress?.findViewById<RelativeLayout>(R.id.relDone)
+        val llSetWork = dialogAddress?.findViewById<LinearLayout>(R.id.llSetWork)
+        val llSetHome = dialogAddress?.findViewById<LinearLayout>(R.id.llSetHome)
+        val relTrialBtn = dialogAddress?.findViewById<RelativeLayout>(R.id.relTrialBtn)
+        tvAddress = dialogAddress?.findViewById(R.id.tvAddress)
+        rcySavedAddress = dialogAddress?.findViewById(R.id.rcySavedAddress)
 
-        dialogMiles?.show()
+        dialogAddress?.show()
 
-        dialogMiles?.setOnDismissListener {
+        dialogAddress?.setOnDismissListener {
             // Call your API here when dialog is dismissed
             launchApi()
         }
 
         getAddressList()
 
-        dialogMiles?.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        dialogAddress?.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
         llSetHome?.setOnClickListener {
             statusTypes = "Home"
@@ -447,30 +480,21 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
         }
 
         relTrialBtn?.setOnClickListener {
-            dialogMiles?.dismiss()
-            if (BaseApplication.isOnline(requireContext())) {
-                if (ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    getCurrentLocation()
-                } else {
-                    requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100)
-                }
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation()
             } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 100)
             }
         }
 
-        tvAddress.setAdapter(PlacesAutoCompleteAdapter(requireContext(), placesApi))
-        tvAddress.setOnItemClickListener { parent, _, position, _ ->
+        tvAddress?.setAdapter(PlacesAutoCompleteAdapter(requireContext(), placesApi))
+
+        tvAddress?.setOnItemClickListener { parent, _, position, _ ->
             val place = parent.getItemAtPosition(position) as Place
-            tvAddress.setText(place.description)
+            tvAddress?.setText(place.description)
             userAddress = place.description
             getPlaceDetails(place.id, placesApi)
         }
-
 
         relDone?.setOnClickListener {
             if (selectType != "") {
@@ -481,105 +505,202 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                 }
             } else {
                 fullAddressDialog()
-                dialogMiles?.dismiss()
+            }
+        }
+
+
+    }
+
+
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 100 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            displayLocationSettingsRequest(requireContext())
+        } else {
+            showLocationError(requireContext(), ErrorMessage.locationError)
+        }
+
+    }
+
+
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 100) {
+            if (Activity.RESULT_OK == resultCode) {
+                getCurrentLocation()
+            } else {
+                Toast.makeText(requireContext(), "Please turn on location", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        if (requestCode == 200) {
+            // This condition for check location run time permission
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation()
+            } else {
+                showLocationError(requireContext(), ErrorMessage.locationError)
             }
         }
     }
 
+
+    private fun showLocationError(context: Context?, msg: String?) {
+        val dialog = context?.let { Dialog(it, R.style.BottomSheetDialog) }
+        dialog?.setCancelable(false)
+        dialog?.setContentView(R.layout.alert_dialog_box_error)
+        val tvTitle: TextView = dialog!!.findViewById(R.id.tv_text)
+        val btnOk: RelativeLayout = dialog.findViewById(R.id.btn_okay)
+        tvTitle.text = msg
+        btnOk.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            val uri = Uri.fromParts("package", requireContext().packageName, null)
+            intent.data = uri
+            startActivityForResult(intent, 200)
+        }
+        dialog.show()
+    }
+
+
+
+    private fun displayLocationSettingsRequest(context: Context) {
+        val googleApiClient = GoogleApiClient.Builder(context)
+            .addApi(LocationServices.API).build()
+        googleApiClient.connect()
+        val locationRequest: LocationRequest = LocationRequest.create()
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        locationRequest.interval = 10000
+        locationRequest.fastestInterval = 1000
+        locationRequest.numUpdates = 1
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        builder.setAlwaysShow(true)
+        val result: PendingResult<LocationSettingsResult> =
+            LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build())
+        result.setResultCallback { result ->
+            val status: Status = result.status
+            when (status.statusCode) {
+                LocationSettingsStatusCodes.SUCCESS -> {
+                    Log.i(tAG, "All location settings are satisfied.")
+                    getCurrentLocation()
+                }
+                LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
+                    Log.i(tAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ")
+                    try {
+                        // Show the dialog by calling startResolutionForResult(), and check the result
+                        // in onActivityResult().
+                        status.resolution?.let {
+                            startIntentSenderForResult(it.intentSender, 100, null, 0, 0, 0, null)
+                        }
+
+                    } catch (e: IntentSender.SendIntentException) {
+                        Log.i(tAG, "PendingIntent unable to execute request.")
+                    }
+                }
+                LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> Log.i(tAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.")
+
+            }
+        }
+    }
+
+
     private fun fullAddressDialog() {
-        val dialogMiles: Dialog = context?.let { Dialog(it) }!!
-        dialogMiles.setContentView(R.layout.alert_dialog_address_popup)
-        dialogMiles.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialogMiles.setCancelable(false)
-        dialogMiles.window!!.setLayout(
+        dialogMiles = context?.let { Dialog(it) }
+        dialogMiles?.setContentView(R.layout.alert_dialog_address_popup)
+        dialogMiles?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialogMiles?.setCancelable(false)
+        dialogMiles?.window!!.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT
         )
-        val relConfirm = dialogMiles.findViewById<RelativeLayout>(R.id.relConfirm)
-        val imageCross = dialogMiles.findViewById<ImageView>(R.id.imageCross)
-        edtStreetName = dialogMiles.findViewById(R.id.edtStreetName)
-        edtStreetNumber = dialogMiles.findViewById(R.id.edtStreetNumber)
-        edtApartNumber = dialogMiles.findViewById(R.id.edtApartNumber)
-        edtCity = dialogMiles.findViewById(R.id.edtCity)
-        edtStates = dialogMiles.findViewById(R.id.edtStates)
-        edtPostalCode = dialogMiles.findViewById(R.id.edtPostalCode)
-        edtAddress = dialogMiles.findViewById(R.id.edtAddress)
-        dialogMiles.show()
+        val relConfirm = dialogMiles?.findViewById<RelativeLayout>(R.id.relConfirm)
+        val imageCross = dialogMiles?.findViewById<ImageView>(R.id.imageCross)
+        edtStreetName = dialogMiles?.findViewById(R.id.edtStreetName)
+        edtStreetNumber = dialogMiles?.findViewById(R.id.edtStreetNumber)
+        edtApartNumber = dialogMiles?.findViewById(R.id.edtApartNumber)
+        edtCity = dialogMiles?.findViewById(R.id.edtCity)
+        edtStates = dialogMiles?.findViewById(R.id.edtStates)
+        edtPostalCode = dialogMiles?.findViewById(R.id.edtPostalCode)
+        edtAddress = dialogMiles?.findViewById(R.id.edtAddress)
+        dialogMiles?.show()
 
         if (streetName != "") {
-            edtStreetName.setText(streetName.toString())
+            edtStreetName?.setText(streetName.toString())
         }
 
         if (streetNum != "") {
-            edtStreetNumber.setText(streetNum.toString())
+            edtStreetNumber?.setText(streetNum.toString())
         }
 
         if (apartNum != "") {
-            edtApartNumber.setText(apartNum.toString())
+            edtApartNumber?.setText(apartNum.toString())
         }
 
         if (city != "") {
-            edtCity.setText(city.toString())
+            edtCity?.setText(city.toString())
         }
 
         if (states != "") {
-            edtStates.setText(states.toString())
+            edtStates?.setText(states.toString())
         }
 
         if (userAddress != "") {
-            edtAddress.setText(userAddress.toString())
+            edtAddress?.setText(userAddress.toString())
         }
 
         if (zipcode != "") {
-            edtPostalCode.setText(zipcode.toString())
+            edtPostalCode?.setText(zipcode.toString())
         }
 
-        dialogMiles.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        relConfirm.setOnClickListener {
+        dialogMiles?.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        relConfirm?.setOnClickListener {
             if (BaseApplication.isOnline(requireContext())) {
                 if (validate()) {
-                    streetName = edtStreetName.text.toString().trim()
-                    streetNum = edtStreetNumber.text.toString().trim()
-                    apartNum = edtApartNumber.text.toString().trim()
-                    city = edtCity.text.toString().trim()
-                    states = edtStates.text.toString().trim()
-                    userAddress = edtAddress.text.toString().trim()
-                    zipcode = edtPostalCode.text.toString().trim()
+                    streetName = edtStreetName?.text.toString().trim()
+                    streetNum = edtStreetNumber?.text.toString().trim()
+                    apartNum = edtApartNumber?.text.toString().trim()
+                    city = edtCity?.text.toString().trim()
+                    states = edtStates?.text.toString().trim()
+                    userAddress = edtAddress?.text.toString().trim()
+                    zipcode = edtPostalCode?.text.toString().trim()
                     addFullAddressApi()
                 }
             } else {
                 BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-            dialogMiles.dismiss()
+            dialogMiles?.dismiss()
         }
 
-        imageCross.setOnClickListener {
-            dialogMiles.dismiss()
+        imageCross?.setOnClickListener {
+            dialogMiles?.dismiss()
         }
     }
 
 
     private fun validate(): Boolean {
         // Check if email/phone is empty
-        if (edtStreetName.text.toString().trim().isEmpty()) {
+        if (edtStreetName?.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.streetNameError, false)
             return false
-        } else if (edtStreetNumber.text.toString().trim().isEmpty()) {
+        } else if (edtStreetNumber?.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.streetNumberError, false)
             return false
-        } else if (edtApartNumber.text.toString().trim().isEmpty()) {
+        } else if (edtApartNumber?.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.apartNumberError, false)
             return false
-        } else if (edtCity.text.toString().trim().isEmpty()) {
+        } else if (edtCity?.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.cityEnterError, false)
             return false
-        } else if (edtStates.text.toString().trim().isEmpty()) {
+        } else if (edtStates?.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.statesEnterError, false)
             return false
-        } else if (edtAddress.text.toString().trim().isEmpty()) {
+        } else if (edtAddress?.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.addressError, false)
             return false
-        } else if (edtPostalCode.text.toString().trim().isEmpty()) {
+        } else if (edtPostalCode?.text.toString().trim().isEmpty()) {
             commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.postalCodeError, false)
             return false
         }
@@ -625,13 +746,10 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             val apiModel = Gson().fromJson(data, AddAddressModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success == true) {
-                launchApi()
+                dialogAddress?.dismiss()
+                dialogMiles?.dismiss()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -676,6 +794,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                 states = address.adminArea ?: "" // State/Province
                 country = address.countryName ?: "" // Country
                 zipcode = address.postalCode ?: "" // Zip Code
+                userAddress=address.getAddressLine(0) ?: ""  // Full Address
 
                 Log.d("Address", "Street Name: $streetName")
                 Log.d("Address", "Street Number: $streetNum")
@@ -724,12 +843,10 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                 if (location != null) {
                     latitude = location.latitude.toString()
                     longitude = location.longitude.toString()
-                    tvAddress.text.clear()
                     requireActivity().runOnUiThread {
                         getAddressFromLocation(location.latitude, location.longitude)
-
                     }
-
+                    tvAddress?.setText(userAddress)
                 } else {
                     // When location result is null
                     val locationRequest =
@@ -737,7 +854,6 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                             .setInterval(10000)
                             .setFastestInterval(1000)
                             .setNumUpdates(1)
-
                     val locationCallback: LocationCallback = object : LocationCallback() {
                         override fun onLocationResult(locationResult: LocationResult) {
                             // Initialize
@@ -745,10 +861,10 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                             val location1 = locationResult.lastLocation
                             latitude = location1!!.latitude.toString()
                             longitude = location1.longitude.toString()
-                            tvAddress.text.clear()
                             requireActivity().runOnUiThread {
                                 getAddressFromLocation(location1.latitude, location1.longitude)
                             }
+                            tvAddress?.setText(userAddress)
                         }
                     }
                     // Request location updates
@@ -832,21 +948,17 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 dialogRemoveDay.dismiss()
-                if (recipe != null) {
-                    recipe!!.removeAt(position!!)
-                }
-
+                recipe.removeAt(position!!)
                 // Update the adapter
-                if (recipe != null) {
+                if (recipe.size>0) {
                     adapterRecipe?.updateList(recipe)
+                    binding.rcvYourRecipes.visibility=View.VISIBLE
+                }else{
+                    binding.rcvYourRecipes.visibility=View.GONE
                 }
-
+                launchApi()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+               handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -855,56 +967,27 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
 
 
     override fun itemSelect(position: Int?, recipeId: String?, type: String?) {
-
-        if (type == "YourRecipe") {
-            if (recipeId == "Minus") {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddRecipeServing(position, "minus")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        if (BaseApplication.isOnline(requireActivity())) {
+            if (type.equals("YourRecipe",true)) {
+                if (recipeId.equals("remove",true)){
+                    val data=recipe[position!!]
+                    removeRecipeBasketDialog(data.id.toString(), position)
+                }else{
+                    removeAddRecipeServing(position, recipeId.toString())
                 }
-            } else if (recipeId == "Plus") {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddRecipeServing(position, "plus")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            } else {
-                removeRecipeBasketDialog(recipeId, position)
             }
-        } else if (type == "SuperMarket") {
-            storeName = position?.let { stores?.get(it)?.store_name.toString() }
-            storeUid = position?.let { stores?.get(it)?.store_uuid.toString() }
-
-            if (BaseApplication.isOnline(requireActivity())) {
+            if (type.equals("SuperMarket",true)) {
+                storeName = position?.let { stores[it].store_name.toString() }
+                storeUid = position?.let { stores[it].store_uuid.toString() }
                 selectSuperMarketApi()
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        } else {
-            if (recipeId == "Minus") {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing(position, "minus")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            } else if (recipeId == "Plus") {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing(position, "plus")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            } else if (recipeId == "Delete") {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing(position, "Delete")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
+            if (type.equals("Ingredients",true)){
+                removeAddIngServing(position, recipeId.toString())
             }
+        }else{
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
-
     }
-
 
     private fun selectSuperMarketApi() {
         lifecycleScope.launch {
@@ -931,11 +1014,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             if (apiModel.code == 200 && apiModel.success) {
                 launchApi()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -944,7 +1023,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
 
 
     private fun removeAddRecipeServing(position: Int?, type: String) {
-        val item = position?.let { recipe?.get(it) }
+        val item = position?.let { recipe.get(it) }
         if (type.equals("plus", true) || type.equals("minus", true)) {
             var count = item?.serving?.toInt()
             val uri = item?.uri
@@ -959,20 +1038,21 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
 
 
     private fun removeAddIngServing(position: Int?, type: String) {
-        val item = position?.let { ingredientList?.get(it) }
+        val item = position?.let { ingredientList.get(it) }
+        val foodId = item?.food_id
+        val qty: String
         if (type.equals("plus", true) || type.equals("minus", true)) {
             var count = item?.sch_id
-            val foodId = item?.food_id
             count = when (type.lowercase()) {
                 "plus" -> count!! + 1
                 "minus" -> count!! - 1
                 else -> count // No change if `apiType` doesn't match
             }
-            increaseIngRecipe(foodId, count.toString(), item, position)
+            qty= count.toString()
         } else {
-            val foodId = item?.food_id
-            increaseIngRecipe(foodId, "0", item, position)
+            qty="0"
         }
+        increaseIngRecipe(foodId, qty, item, position)
     }
 
     private fun increaseIngRecipe(
@@ -1018,26 +1098,29 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-
-                if (quantity != "0") {
+                if (!quantity.equals("0",true)) {
                     // Toggle the is_like value
                     item?.sch_id = quantity.toInt()
                     if (item != null) {
-                        ingredientList?.set(position!!, item)
+                        ingredientList[position!!] = item
                     }
+                }else{
+                    ingredientList.removeAt(position!!)
+                }
+                if (ingredientList.size>0){
                     // Update the adapter
-                    if (ingredientList != null) {
-                        adapterIngredients.updateList(ingredientList!!)
-                    }
+                    adapterIngredients?.updateList(ingredientList)
+                    val count=getTotalPrice()
+                    binding.textNetTotalProduct.text="$$count*"
+                    binding.rcvIngredients.visibility = View.VISIBLE
+                    binding.textTotalAmount.text="$$count*"
+                }else{
+                    binding.rcvIngredients.visibility = View.GONE
+                    binding.textNetTotalProduct.text="$0*"
+                    binding.textTotalAmount.text="$0*"
                 }
-
-                launchApi()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -1092,18 +1175,12 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                 // Toggle the is_like value
                 item?.serving = quantity.toInt().toString()
                 if (item != null) {
-                    recipe?.set(position!!, item)
+                    recipe[position!!] = item
                 }
                 // Update the adapter
-                if (recipe != null) {
-                    adapterRecipe?.updateList(recipe)
-                }
+                adapterRecipe?.updateList(recipe)
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -1111,22 +1188,9 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     }
 
 
-    override fun itemLongClick(
-        position: Int?,
-        status: String?,
-        type: String?,
-        isZiggleEnabled: String
-    ) {
-        /*   if (isZiggleEnabled == "Click") {
-               selectType = isZiggleEnabled
-               userLatitude = status.toString()
-               userLongitude = type.toString()
-               if (BaseApplication.isOnline(requireActivity())) {
-                   getBasketList()
-               } else {
-                   BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-               }
-           } else*/ if (isZiggleEnabled == "SelectPrimary") {
+
+    override fun itemLongClick(position: Int?, status: String?, type: String?, isZiggleEnabled: String) {
+       if (isZiggleEnabled.equals("SelectPrimary",true)) {
             selectType = isZiggleEnabled
             addressId = position.toString()
         } else if (isZiggleEnabled == "Edit") {
@@ -1140,7 +1204,20 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             findNavController().navigate(R.id.addressMapFullScreenFragment, bundle)
             dialogMiles?.dismiss()
         }
-
     }
+
+    @SuppressLint("DefaultLocale")
+    private fun getTotalPrice(): Double {
+        val total = ingredientList.sumOf {
+            val priceString = it.pro_price?.replace("$", "")?.trim()
+            if (priceString != null && !priceString.equals("Not available", ignoreCase = true) && !priceString.equals("Not", ignoreCase = true)) {
+                (priceString.toDoubleOrNull() ?: 0.0) * (it.sch_id?.toInt() ?: 0)
+            } else {
+                0.0
+            }
+        }
+        return String.format("%.2f", total).toDouble()
+    }
+
 
 }

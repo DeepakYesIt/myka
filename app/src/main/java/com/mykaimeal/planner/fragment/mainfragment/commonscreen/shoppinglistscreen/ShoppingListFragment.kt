@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.PopupWindow
@@ -50,6 +51,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 @AndroidEntryPoint
 class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListener {
@@ -58,22 +60,17 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     private lateinit var adapterShoppingAdapter: IngredientsShoppingAdapter
     private var adapterRecipe: BasketYourRecipeAdapter? = null
     private var tvCounter: TextView? = null
-    private var quantity: Int = 1
     private var recipe: MutableList<Recipes> = mutableListOf()
     private var ingredientList: MutableList<Ingredient> = mutableListOf()
-    private var foodIds = mutableListOf<String>()
-    private var schIds = mutableListOf<String>()
-    private var foodName = mutableListOf<String>()
-    private var statusType = mutableListOf<String>()
     private lateinit var commonWorkUtils: CommonWorkUtils
     private lateinit var textListener: TextWatcher
     private lateinit var rlWriteNameHere: RelativeLayout
     private var textChangedJob: Job? = null
-    private var dislikedIngredientData: MutableList<DislikedIngredientsModelData>? = null
     private var popupWindow: PopupWindow? = null
     private var tvLabel:EditText?=null
     private var ingredientsAdapterItem: IngredientsAdapterItem? = null
-
+    // TextWatcher with debounce
+    var searchFor = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -95,13 +92,17 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
         initialize()
 
+        lunchApi()
+
+        return binding.root
+    }
+
+    private fun lunchApi(){
         if (BaseApplication.isOnline(requireContext())) {
             getShoppingList()
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
-
-        return binding.root
     }
 
 
@@ -115,16 +116,12 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             })
     }
 
-    @SuppressLint("DefaultLocale")
-    private fun updateValue() {
-        tvCounter!!.text = String.format("%02d", quantity)
+    @SuppressLint("DefaultLocale", "SetTextI18n")
+    private fun updateValue(value:Int) {
+        tvCounter!!.text = ""+value
     }
 
     private fun initialize() {
-
-        /*    binding.textSeeAll3.setOnClickListener {
-                findNavController().navigate(R.id.shoppingMissingIngredientsFragment)
-            }*/
 
         binding.imageBackIcon.setOnClickListener {
             findNavController().navigateUp()
@@ -135,18 +132,22 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         binding.textCheckoutTesco.setOnClickListener{
-            addToCartUrlApi()
+            if (binding.textCheckoutTesco.isClickable){
+                if (BaseApplication.isOnline(requireContext())) {
+                    addToCartUrlApi()
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            }
         }
+
     }
 
     private fun addItemDialog() {
         val context = requireContext()
         val dialog = Dialog(context)
         dialog.setContentView(R.layout.alert_dialog_add_new_item)
-        dialog.window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
+        dialog.window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
 
@@ -158,15 +159,11 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         tvLabel = dialog.findViewById(R.id.tvLabel)
         val tvDialogAddBtn = dialog.findViewById<TextView>(R.id.tvDialogAddBtn)
         rlWriteNameHere = dialog.findViewById(R.id.rlWriteNameHere)
-
-        // TextWatcher with debounce
-        var searchFor = ""
         textListener = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val searchText = s.toString()
-                if (searchText != searchFor) {
+                if (!searchText.equals(searchFor,true)) {
                     searchFor = searchText
                     textChangedJob?.cancel()
                     textChangedJob = lifecycleScope.launch {
@@ -188,18 +185,20 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         imageMinus.setOnClickListener {
-            if (quantity > 1) {
-                quantity--
-                updateValue()
+            if (tvCounter!!.text.toString().toInt() > 1) {
+                var data = tvCounter!!.text.toString().toInt()
+                data-- // Decrement the value
+                updateValue(data)
             } else {
                 Toast.makeText(requireActivity(), ErrorMessage.servingError, Toast.LENGTH_LONG).show()
             }
         }
 
         imagePlus.setOnClickListener {
-            if (quantity < 99) {
-                quantity++
-                updateValue()
+            if (tvCounter!!.text.toString().toInt() < 99) {
+                var data = tvCounter!!.text.toString().toInt()
+                data++ // Decrement the value
+                updateValue(data)
             }
         }
 
@@ -221,11 +220,12 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 return@setOnClickListener
             }
 
+
             val newIngredient = Ingredient(
                 created_at = null,
                 deleted_at = "",
                 food_id = null,
-                id = null,
+                id = Random.nextInt(10000000, 99999999),
                 market_id = "",
                 name = inputName,
                 price = "",
@@ -237,6 +237,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 quantity = quantityText,
                 sch_id = schId,
                 status = null,
+                newStatus=true,
                 updated_at = null,
                 user_id = null
             )
@@ -245,6 +246,8 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                 it.add(newIngredient)
                 adapterShoppingAdapter.notifyItemInserted(it.size - 1)
             }
+            searchFor=""
+            buttonColor()
 
             dialog.dismiss()
 
@@ -252,6 +255,20 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
 
         dialog.show()
+
+
+    }
+
+
+    private fun buttonColor(){
+        val count = ingredientList.count { it.newStatus == true }
+        if (count==0){
+            binding.textCheckoutTesco.isClickable=false
+            binding.textCheckoutTesco.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+        }else{
+            binding.textCheckoutTesco.isClickable=true
+            binding.textCheckoutTesco.setBackgroundResource(R.drawable.gray_btn_select_background)
+        }
     }
 
     private fun searchable(editText: String) {
@@ -270,11 +287,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                                 }
                             } else {
                                 popupWindow?.dismiss()
-                                if (dietaryModel.code == ErrorMessage.code) {
-                                    showAlertFunction(dietaryModel.message, true)
-                                } else {
-                                    showAlertFunction(dietaryModel.message, false)
-                                }
+                               handleError(dietaryModel.code,dietaryModel.message)
                             }
                         } catch (e: Exception) {
                             popupWindow?.dismiss()
@@ -286,7 +299,6 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
                         popupWindow?.dismiss()
                         showAlertFunction(it.message, false)
                     }
-
                     else -> {
                         popupWindow?.dismiss()
                         showAlertFunction(it.message, false)
@@ -296,27 +308,24 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         }
     }
 
-    private fun showDataInUi(searchModelData: MutableList<DislikedIngredientsModelData>) {
+    private fun showDataInUi(searchModelData: MutableList<DislikedIngredientsModelData>?) {
         try {
-            dislikedIngredientData = searchModelData
-            loadSearch()
+            val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater?
+            val popupView: View? = inflater?.inflate(R.layout.item_select_layoutdrop, null)
+            // Allows dismissing the popup when touching outside
+            popupWindow?.isOutsideTouchable = true
+            popupWindow = PopupWindow(popupView, rlWriteNameHere.width, RelativeLayout.LayoutParams.WRAP_CONTENT, true)
+            popupWindow?.showAsDropDown(rlWriteNameHere, 0, 0, Gravity.CENTER)
+            val rcyData = popupView?.findViewById<RecyclerView>(R.id.rcy_data)
+            searchModelData?.let {
+                ingredientsAdapterItem = IngredientsAdapterItem(it, requireActivity(), this)
+                rcyData!!.adapter = ingredientsAdapterItem
+            }
 
         } catch (e: Exception) {
             popupWindow?.dismiss()
             Log.d("AddMeal", "message:--" + e.message)
         }
-    }
-
-    private fun loadSearch() {
-        val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater?
-        val popupView: View? = inflater?.inflate(R.layout.item_select_layoutdrop, null)
-        // Allows dismissing the popup when touching outside
-        popupWindow?.isOutsideTouchable = true
-        popupWindow = PopupWindow(popupView, rlWriteNameHere.width, RelativeLayout.LayoutParams.WRAP_CONTENT, true)
-        popupWindow?.showAsDropDown(rlWriteNameHere, 0, 0, Gravity.CENTER)
-        val rcyData = popupView?.findViewById<RecyclerView>(R.id.rcy_data)
-        ingredientsAdapterItem = dislikedIngredientData?.let { IngredientsAdapterItem(it, requireActivity(), this) }
-        rcyData!!.adapter = ingredientsAdapterItem
     }
 
 
@@ -327,6 +336,24 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
     private fun addToCartUrlApi() {
         BaseApplication.showMe(requireContext())
+         val foodIds = mutableListOf<String>()
+         val schIds = mutableListOf<String>()
+         val foodName = mutableListOf<String>()
+         val statusType = mutableListOf<String>()
+
+         foodIds.clear()
+         schIds.clear()
+         foodName.clear()
+         statusType.clear()
+
+            ingredientList.forEach {
+                if (it.newStatus==true){
+                    foodIds.add(it.id.toString())
+                    schIds.add(it.quantity.toString())
+                    foodName.add(it.name.toString())
+                    statusType.add("3")
+                }
+            }
         lifecycleScope.launch {
             shoppingListViewModel.addShoppingCartUrlApi({
                 BaseApplication.dismissMe()
@@ -350,6 +377,9 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
             Log.d("@@@ Recipe Details ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
+                binding.textCheckoutTesco.isClickable=false
+                binding.textCheckoutTesco.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                lunchApi()
             } else {
                 if (apiModel.code == ErrorMessage.code) {
                     showAlert(apiModel.message, true)
@@ -438,69 +468,61 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
-
-        if (type.equals("IngredientsItem",true)){
-            tvLabel?.setText(status.toString().trim())
-            popupWindow?.dismiss()
-        }
-
+        searchFor=status.toString().trim()
+        textChangedJob?.cancel()
+        popupWindow?.dismiss()
+        // Set text
+        tvLabel?.setText(status.toString().trim())
+        // Move cursor to the end
+        tvLabel?.text?.let { tvLabel?.setSelection(it.length) }
+        // Hide the keyboard
+        val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(tvLabel?.windowToken, 0)
     }
 
     override fun itemSelect(position: Int?, status: String?, type: String?) {
-        if (type.equals("YourRecipe",true)) {
-            if (status.equals("Minus",true)) {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddRecipeServing(position, "minus")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+
+        if (BaseApplication.isOnline(requireActivity())) {
+            if (type.equals("YourRecipe",true)) {
+                if (status.equals("remove",true)){
+                    val data=recipe[position!!]
+                    removeRecipeBasketDialog(data.id.toString(), position)
+                }else{
+                    removeAddRecipeServing(position, status.toString())
                 }
-            } else if (status.equals("Plus",true)) {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddRecipeServing(position, "plus")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            } else {
-                removeRecipeBasketDialog(status, position)
-            }
-        } else if (type.equals("ShoppingIngredients",true)) {
-            if (status.equals("Minus",true)) {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing(position, "minus")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            } else if (status.equals("Plus",true)) {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing(position, "plus")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
-            } else if (status.equals("Delete",true)) {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing(position, "Delete")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            } else  {
+                val data=ingredientList[position!!]
+                if (data.newStatus==true){
+                    ingredientList.removeAt(position)
+                    if (ingredientList.size>0){
+                        adapterShoppingAdapter.updateList(ingredientList)
+                    }
+                    buttonColor()
+                }else{
+                    removeAddIngServing(position, status.toString())
                 }
             }
+        }else{
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
     }
 
     private fun removeAddIngServing(position: Int?, type: String) {
-        val item = position?.let { ingredientList?.get(it) }
+        val item = position?.let { ingredientList.get(it) }
+        val foodId = item?.food_id
+        val qty: String
         if (type.equals("plus", true) || type.equals("minus", true)) {
             var count = item?.sch_id
-            val foodId = item?.food_id
             count = when (type.lowercase()) {
                 "plus" -> count!! + 1
                 "minus" -> count!! - 1
                 else -> count // No change if `apiType` doesn't match
             }
-            increaseIngRecipe(foodId, count.toString(), item, position)
+            qty= count.toString()
         } else {
-            val foodId = item?.food_id
-            increaseIngRecipe(foodId, "0", item, position)
+            qty="0"
         }
+        increaseIngRecipe(foodId, qty, item, position)
     }
 
     private fun increaseIngRecipe(
@@ -525,47 +547,36 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         position: Int?
     ) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessIngResponse(
-                result.data.toString(),
-                item,
-                quantity,
-                position
-            )
-
+            is NetworkResult.Success -> handleSuccessIngResponse(result.data.toString(), item, quantity, position)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessIngResponse(
-        data: String,
-        item: Ingredient?,
-        quantity: String,
-        position: Int?
-    ) {
+    private fun handleSuccessIngResponse(data: String, item: Ingredient?, quantity: String, position: Int?) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                if (quantity != "0") {
+                if (!quantity.equals("0",true)) {
                     // Toggle the is_like value
                     item?.sch_id = quantity.toInt()
                     if (item != null) {
-                        ingredientList?.set(position!!, item)
+                        ingredientList[position!!] = item
                     }
-                    // Update the adapter
-                    if (ingredientList != null) {
-                        adapterShoppingAdapter.updateList(ingredientList!!)
-                    }
+                }else{
+                    ingredientList.removeAt(position!!)
                 }
-                getShoppingList()
+                if (ingredientList.size>0){
+                    adapterShoppingAdapter.updateList(ingredientList)
+                    binding.rcvIngredients.visibility=View.VISIBLE
+                }else{
+                    binding.rcvIngredients.visibility=View.GONE
+                }
+                Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -573,7 +584,7 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
     }
 
     private fun removeAddRecipeServing(position: Int?, type: String) {
-        val item = position?.let { recipe?.get(it) }
+        val item = position?.let { recipe[it] }
         if (type.equals("plus", true) || type.equals("minus", true)) {
             var count = item?.serving?.toInt()
             val uri = item?.uri
@@ -608,44 +619,25 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         position: Int?
     ) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessQuantityResponse(
-                result.data.toString(),
-                item,
-                quantity,
-                position
-            )
-
+            is NetworkResult.Success -> handleSuccessQuantityResponse(result.data.toString(), item, quantity, position)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessQuantityResponse(
-        data: String,
-        item: Recipes?,
-        quantity: String,
-        position: Int?
-    ) {
+    private fun handleSuccessQuantityResponse(data: String, item: Recipes?, quantity: String, position: Int?) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 // Toggle the is_like value
                 item?.serving = quantity.toInt().toString()
-                if (item != null) {
-                    recipe?.set(position!!, item)
-                }
+                recipe.set(position!!, item!!)
                 // Update the adapter
-                if (recipe != null) {
-                    adapterRecipe?.updateList(recipe)
-                }
+                adapterRecipe?.updateList(recipe)
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -695,43 +687,30 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
         dialogRemoveDay: Dialog
     ) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessRemoveBasketResponse(
-                result.data.toString(),
-                position,
-                dialogRemoveDay
-            )
-
+            is NetworkResult.Success -> handleSuccessRemoveBasketResponse(result.data.toString(), position, dialogRemoveDay)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessRemoveBasketResponse(
-        data: String,
-        position: Int?,
-        dialogRemoveDay: Dialog
-    ) {
+    private fun handleSuccessRemoveBasketResponse(data: String, position: Int?, dialogRemoveDay: Dialog) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 dialogRemoveDay.dismiss()
-                if (recipe != null) {
-                    recipe!!.removeAt(position!!)
-                }
-
+                recipe.removeAt(position!!)
                 // Update the adapter
-                if (recipe != null) {
+                if (recipe.size > 0) {
+                    binding.rlYourRecipes.visibility = View.VISIBLE
                     adapterRecipe?.updateList(recipe)
-                }
-
-            } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
                 } else {
-                    showAlert(apiModel.message, false)
+                    binding.rlYourRecipes.visibility = View.GONE
                 }
+                Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_LONG).show()
+            } else {
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)

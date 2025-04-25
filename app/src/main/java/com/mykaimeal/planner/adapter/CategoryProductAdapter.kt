@@ -1,5 +1,6 @@
 package com.mykaimeal.planner.adapter
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,17 +14,13 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.OnItemSelectUnSelectListener
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.databinding.ItemSectionHeaderBinding
-import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.model.Product
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
+import com.mykaimeal.planner.messageclass.ErrorMessage
 
-class CategoryProductAdapter(
-    private var requireActivity: FragmentActivity,
-    private var products: MutableList<Product>,
-    private var onItemSelectListener: OnItemSelectUnSelectListener
-) : RecyclerView.Adapter<CategoryProductAdapter.ProductViewHolder>() {
+class CategoryProductAdapter(private var requireActivity: FragmentActivity, private var products: MutableList<Ingredient>, private var onItemSelectListener: OnItemSelectUnSelectListener) : RecyclerView.Adapter<CategoryProductAdapter.ProductViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val binding = ItemSectionHeaderBinding.inflate(
@@ -33,20 +30,23 @@ class CategoryProductAdapter(
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
-        holder.bind(products[position])
+        holder.bind(products[position],position)
     }
 
     override fun getItemCount(): Int = products.size
-    fun updateList(productss: MutableList<Product>) {
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(productss: MutableList<Ingredient>) {
         products=productss
         notifyDataSetChanged()
-
     }
 
     inner class ProductViewHolder(private val binding: ItemSectionHeaderBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(product: Product) {
+        @SuppressLint("SetTextI18n")
+        fun bind(product: Ingredient, position: Int) {
 
             if (product.pro_name!=null){
                 val foodName = product.pro_name
@@ -101,16 +101,10 @@ class CategoryProductAdapter(
             } else {
                 binding.layProgess.root.visibility = View.GONE
             }
-            /*
-                        binding.productImage.setImageResource(product.image)
-            */
-            /*
-                        binding.textProductQuantity.text = product.quantity
-            */
 
             if (product.pro_price != null) {
-                if (product.pro_price != "Not available") {
-                    binding.textPrice.text = "${product.pro_price.toString()}"
+                if (!product.pro_price.equals("Not available",true)) {
+                    binding.textPrice.text = "${product.pro_price}"
                 }else{
                     binding.textPrice.text="$0"
                 }
@@ -121,7 +115,7 @@ class CategoryProductAdapter(
                 if (product.sch_id.toString().toInt() > 1) {
                     onItemSelectListener.itemSelectUnSelect(position,"Minus","Product",position)
                 }else{
-                    Toast.makeText(requireActivity,"Minimum serving at least value is one", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireActivity,ErrorMessage.servingError, Toast.LENGTH_LONG).show()
                 }
                 // Decrease quantity logic
             }
@@ -133,7 +127,7 @@ class CategoryProductAdapter(
             }
 
             binding.imageSwap.setOnClickListener {
-                onItemSelectListener.itemSelectUnSelect(product.id,product.name.toString(),"Product", position)
+                onItemSelectListener.itemSelectUnSelect(position ,"swap","Product", position)
               /*  onItemSelectListener.itemSelect(
                     product.id,
                     product.name.toString(),

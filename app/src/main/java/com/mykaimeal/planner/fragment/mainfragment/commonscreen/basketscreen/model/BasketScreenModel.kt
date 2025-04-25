@@ -33,6 +33,7 @@ data class Ingredient(
     val quantity: Any,
     var sch_id: Int?,
     val status: Int?,
+    val newStatus: Boolean?=false,
     val updated_at: String?,
     val user_id: Int?
 )

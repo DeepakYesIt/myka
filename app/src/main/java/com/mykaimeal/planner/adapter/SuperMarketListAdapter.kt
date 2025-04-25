@@ -46,14 +46,7 @@ class SuperMarketListAdapter(
             }
         }
 
-        /*     // ✅ Correctly update the background based on selection
-             if (selectedPosition == position) {
-                 // ✅ Notify selection change
-                 onItemSelectListener.itemSelect(position, data!!.store_uuid.toString(), "SuperMarket")
-                 holder.binding.relativeLayoutMain.setBackgroundResource(R.drawable.supermarket_selection_bg) // Default
-             } else {
-                 holder.binding.relativeLayoutMain.background=null // Selected
-             }*/
+
 
         data?.let {
             if (it.missing !=null) {
@@ -106,36 +99,26 @@ class SuperMarketListAdapter(
             holder.binding.layProgess.root.visibility = View.GONE
         }
 
-        // ✅ Click event for selection
         holder.binding.relativeLayoutMain.setOnClickListener {
             updateSelection(position)
-            onItemSelectListener.itemSelect(
-                position,
-                storesData!![position].store_uuid.toString(),
-                "SuperMarket"
-            )
-
-            /*    val previousPosition = storesData?.indexOfFirst { it.is_slected == 1 }
-                if (previousPosition != null && previousPosition != -1 && previousPosition != position) {
-                    storesData!![previousPosition].is_slected = 0
-                    notifyItemChanged(previousPosition)
-                }
-
-                if (previousPosition != position) {
-                    data?.is_slected = 1
-                    onItemSelectListener.itemSelect(position, data!!.store_uuid.toString(), "SuperMarket")
-                    notifyItemChanged(position)
-                }*/
+            onItemSelectListener.itemSelect(position, storesData!![position].store_uuid.toString(), "SuperMarket")
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun updateSelection(selectedPosition: Int) {
         storesData?.forEachIndexed { index, stores ->
             stores.is_slected = if (index == selectedPosition) 1 else 0
         }
-
         notifyDataSetChanged()
     }
+
+
+    fun updateList(list: MutableList<Store>){
+        storesData=list
+        notifyDataSetChanged()
+    }
+
 
     override fun getItemCount(): Int {
         return storesData?.size ?: 0

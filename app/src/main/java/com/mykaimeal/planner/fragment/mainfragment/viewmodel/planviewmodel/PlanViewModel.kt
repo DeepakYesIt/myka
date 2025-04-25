@@ -3,6 +3,8 @@ package com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel
 import androidx.lifecycle.ViewModel
 import com.google.gson.JsonObject
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponse.Data
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsebydate.DataPlayByDate
 import com.mykaimeal.planner.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -11,8 +13,19 @@ import javax.inject.Inject
 class PlanViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
 
-    suspend fun planRequest(successCallback: (response: NetworkResult<String>) -> Unit,
-                                    q: String){
+
+    private var _data: Data? = null
+    private var _dataPlan: DataPlayByDate? = null
+    private var _date: String? = null
+
+
+    val data: Data? get() = _data
+    val dataPlan: DataPlayByDate? get() = _dataPlan
+    val date: String? get() = _date
+
+
+
+    suspend fun planRequest(successCallback: (response: NetworkResult<String>) -> Unit, q: String){
         repository.planRequestApi({ successCallback(it) },q)
     }
 
@@ -62,6 +75,23 @@ class PlanViewModel @Inject constructor(private val repository: MainRepository) 
     ){
         repository.addToBasketAllUrl({ successCallback(it) },date)
     }
+
+
+
+    fun setData(data: Data?){
+        _data=data
+    }
+
+
+    fun setPlanDate(data: DataPlayByDate?){
+        _dataPlan=data
+    }
+
+
+    fun setDate(data: String?){
+        _date=data
+    }
+
 
 
 }

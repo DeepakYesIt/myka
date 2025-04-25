@@ -53,6 +53,7 @@ import java.util.Locale
 class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
 
     private var _binding: FragmentSearchedRecipeBreakfastBinding? = null
+
     private val binding get() = _binding!!
     private var tvWeekRange: TextView? = null
     private var rcyChooseDaySch: RecyclerView? = null
@@ -120,8 +121,20 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
 
         initialize()
 
-        // This Api call when the screen in loaded
-        launchApi()
+
+        if (searchedRecipeViewModel.data!=null){
+            showDataInUi(searchedRecipeViewModel.data!!)
+        }else{
+            // This Api call when the screen in loaded
+            launchApi()
+        }
+
+
+        binding.pullToRefresh.setOnRefreshListener {
+            // This Api call when the screen in loaded
+            launchApi()
+        }
+
 
         return binding.root
     }
@@ -149,20 +162,27 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
     }
 
     private fun launchApi() {
-        BaseApplication.showMe(requireContext())
-        lifecycleScope.launch {
-            if (screenType.equals("Search",true) || screenType.equals("Ingredients",true)){
-                searchedRecipeViewModel.recipeSearchedApi({
-                    BaseApplication.dismissMe()
-                    handleApiSearchResponse(it)
-                }, recipeType)
-            }else{
-                searchedRecipeViewModel.recipeFilterSearchApi({
-                    BaseApplication.dismissMe()
-                    handleApiSearchResponse(it)
-                }, fullListMealType,fullListDietType,fullListCookTime)
-            }
+        if (BaseApplication.isOnline(requireContext())){
+            BaseApplication.showMe(requireContext())
+            lifecycleScope.launch {
+                if (screenType.equals("Search",true) || screenType.equals("Ingredients",true)){
+                    searchedRecipeViewModel.recipeSearchedApi({
+                        binding.pullToRefresh.isRefreshing=false
+                        BaseApplication.dismissMe()
+                        handleApiSearchResponse(it)
+                    }, recipeType)
+                }else{
+                    searchedRecipeViewModel.recipeFilterSearchApi({
+                        BaseApplication.dismissMe()
+                        binding.pullToRefresh.isRefreshing=false
+                        handleApiSearchResponse(it)
+                    }, fullListMealType,fullListDietType,fullListCookTime)
+                }
 
+            }
+        }else{
+            binding.pullToRefresh.isRefreshing=false
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
     }
 
@@ -215,6 +235,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
 
     private fun showDataInUi(searchModelData: SearchModelData) {
         try {
+            searchedRecipeViewModel.setData(searchModelData)
             recipes.clear()
             searchModelData.recipes?.let {
                 recipes.addAll(it)
@@ -222,8 +243,7 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
             if (recipes.size > 0) {
                 binding.rcySearchedItem.visibility = View.VISIBLE
                 binding.tvnoData.visibility = View.GONE
-                adapterSearchedRecipeItem =
-                    AdapterSearchedRecipeItem(recipes, requireActivity(), this)
+                adapterSearchedRecipeItem = AdapterSearchedRecipeItem(recipes, requireActivity(), this)
                 binding.rcySearchedItem.adapter = adapterSearchedRecipeItem
             } else {
                 showNoData()
@@ -857,6 +877,11 @@ class SearchedRecipeBreakfastFragment : Fragment(), OnItemClickListener {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        searchedRecipeViewModel.setData(null)
     }
 
 }

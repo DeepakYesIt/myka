@@ -408,7 +408,7 @@ class IngredientDislikesFragment : Fragment(), OnItemClickedListener {
         }
     }
 
-    private fun showDataFirstUi(dislikeIngModelData: MutableList<DislikedIngredientsModelData>,type:String) {
+    private fun showDataFirstUi(dislikeIngModelData: MutableList<DislikedIngredientsModelData>?,type:String) {
         try {
             if (dislikeIngModelData != null && dislikeIngModelData.size>0) {
                 dislikeIngredientModelData.clear()
