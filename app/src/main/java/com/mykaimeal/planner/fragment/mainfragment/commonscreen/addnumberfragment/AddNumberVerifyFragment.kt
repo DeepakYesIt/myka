@@ -125,35 +125,6 @@ class AddNumberVerifyFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
-
-
-        /*  binding.etRegPhone.addTextChangedListener(object : TextWatcher {
-              @SuppressLint("ResourceAsColor")
-              override fun afterTextChanged(s: Editable?) {
-                  val input = s.toString()
-                  // Enable button only if the phone number is valid (10 digits)
-                  if (input == lastNumber) {
-                      binding.tvVerify.isClickable = false
-                      binding.tvVerify.isEnabled = false
-                      binding.tvVerify.setTextColor(Color.parseColor("#D7D7D7")) // Gray color for inactive state
-                  } else {
-                      if (input.length >= 10) {
-                          binding.tvVerify.isClickable = true
-                          binding.tvVerify.isEnabled = true
-                          binding.tvVerify.setTextColor(Color.parseColor("#06C169")) // Green color for active state
-                      } else {
-                          binding.tvVerify.isClickable = false
-                          binding.tvVerify.isEnabled = false
-                          binding.tvVerify.setTextColor(Color.parseColor("#D7D7D7")) // Gray color for inactive state
-                      }
-                  }
-              }
-
-              override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-              override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-          })*/
-
         binding.countryCodePicker.setOnCountryChangeListener {
             countryCode = "+" + binding.countryCodePicker.selectedCountryCode
             Log.d("CountryCode", "Selected Country Code: $countryCode")

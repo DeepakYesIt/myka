@@ -418,22 +418,8 @@ class DropOffOptionsScreenFragment : Fragment(), View.OnClickListener {
                 )
                 binding!!.imgLeaveReception.setImageResource(R.drawable.radio_green_icon)
             }
-
         }
     }
-
-
-/*    /// add validation based on valid email or phone
-    private fun validate(): Boolean {
-        // Check if email/phone is empty
-
-        if (binding!!.edtInstructions.text.toString().trim().isEmpty()) {
-            commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.deliveryInstructions, false)
-            return false
-        }
-        return true
-
-    }*/
 
     private fun addNotesUrl() {
         BaseApplication.showMe(requireContext())

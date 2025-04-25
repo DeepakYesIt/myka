@@ -627,14 +627,12 @@ interface ApiInterface {
     @POST(ApiEndPoint.filterSearchUrl)
     suspend fun getFilterList(): Response<JsonObject>
 
-
     @FormUrlEncoded
     @POST(ApiEndPoint.superMarketsUrl)
     suspend fun getSuperMarket(
         @Field("latitude") latitude: String?,
         @Field("longitude") longitude: String?
     ): Response<JsonObject>
-
 
     @FormUrlEncoded
     @POST(ApiEndPoint.subscriptionGoogleUrl)
@@ -644,11 +642,8 @@ interface ApiInterface {
         @Field("subscription_id") subscriptionId: String?
     ): Response<JsonObject>
 
-
-
     @POST(ApiEndPoint.checkSubscriptionUrl)
     suspend fun subscriptionPurchaseType(): Response<JsonObject>
-
 
     @FormUrlEncoded
     @POST(ApiEndPoint.getBasketListUrl)
@@ -668,7 +663,6 @@ interface ApiInterface {
         @Field("otp") otp: String?,
         @Field("country_code") countryCode: String?
     ): Response<JsonObject>
-
 
     @POST(ApiEndPoint.getAddressUrl)
     suspend fun getAddressUrl(): Response<JsonObject>
