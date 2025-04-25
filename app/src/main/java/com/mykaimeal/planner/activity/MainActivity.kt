@@ -176,13 +176,13 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
 
 
 //        // Start API polling
-//        startRepeatingApiCall()
+        startRepeatingApiCall()
 
 
         //using function for find destination graph
         startDestination()
 
-//        startTimer(this@MainActivity)
+        startTimer(this@MainActivity)
 
 
     }
