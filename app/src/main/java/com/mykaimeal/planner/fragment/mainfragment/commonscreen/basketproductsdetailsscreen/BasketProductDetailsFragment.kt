@@ -498,5 +498,4 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
             showAlert(e.message, false)
         }
     }
-
 }
