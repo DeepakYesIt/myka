@@ -174,8 +174,6 @@ class MainActivity : AppCompatActivity(), OnClickListener, OnItemClickListener{
             }
         }
 
-
-        // Start API polling
         startRepeatingApiCall()
 
         // using function for find destination graph

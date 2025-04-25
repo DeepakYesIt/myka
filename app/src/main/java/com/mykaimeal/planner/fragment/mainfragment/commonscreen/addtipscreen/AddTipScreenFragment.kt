@@ -18,11 +18,15 @@ import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentAddTipScreenBinding
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addtipscreen.model.GetTipModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addtipscreen.model.GetTipModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addtipscreen.model.OrderProductTrackModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addtipscreen.model.Response
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addtipscreen.viewmodel.AddTipScreenViewModel
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.dropoffoptionscreen.model.DropOffOptionsModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import kotlinx.coroutines.launch
+import kotlin.math.round
 
 class AddTipScreenFragment : Fragment() {
 
@@ -31,8 +35,6 @@ class AddTipScreenFragment : Fragment() {
     private lateinit var addTipScreenViewModel: AddTipScreenViewModel
     private var totalPrices = ""
     private var status = ""
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,7 +51,6 @@ class AddTipScreenFragment : Fragment() {
         addTipScreenViewModel = ViewModelProvider(requireActivity())[AddTipScreenViewModel::class.java]
 
         totalPrices = arguments?.getString("totalPrices") ?: ""
-
 
         setupBackNavigation()
 
@@ -77,69 +78,11 @@ class AddTipScreenFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-//        binding.linearNotNow.setOnClickListener {
-//            status="1"
-//            searchable()
-//            binding.linearNotNow.setBackgroundResource(R.drawable.outline_green_border_bg)
-//            binding.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llTwelveDollar.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llFifteenDollar.setBackgroundResource(R.drawable.edittext_bg)
-//        }
-//
-//        binding.llSevenDollar.setOnClickListener {
-//            status="1"
-//            searchable()
-//            binding.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llSevenDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
-//            binding.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llTwelveDollar.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llFifteenDollar.setBackgroundResource(R.drawable.edittext_bg)
-//        }
-//
-//        binding.llNineDollar.setOnClickListener {
-//            status="1"
-//            searchable()
-//            binding.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llNineDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
-//            binding.llTwelveDollar.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llFifteenDollar.setBackgroundResource(R.drawable.edittext_bg)
-//
-//        }
-//
-//        binding.llTwelveDollar.setOnClickListener {
-//            status="1"
-//            searchable()
-//            binding.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llTwelveDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
-//            binding.llFifteenDollar.setBackgroundResource(R.drawable.edittext_bg)
-//        }
-//
-//        binding.llFifteenDollar.setOnClickListener {
-//            status="1"
-//            searchable()
-//            binding.linearNotNow.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llSevenDollar.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llNineDollar.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llTwelveDollar.setBackgroundResource(R.drawable.edittext_bg)
-//            binding.llFifteenDollar.setBackgroundResource(R.drawable.outline_green_border_bg)
-//        }
-
-//        binding.rlProceedAndPay.setOnClickListener {
-//            if (status!=""){
-//                if (BaseApplication.isOnline(requireContext())) {
-//                    paymentCreditDebitApi()
-//                } else {
-//                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-//                }
-//            }
-////            findNavController().navigate(R.id.paymentCreditDebitFragment)
-//        }
-
-
+        if (BaseApplication.isOnline(requireActivity())) {
+            getTipUrl()
+        } else {
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
 
         binding.linearNotNow.setOnClickListener { updateSelection(binding.linearNotNow) }
         binding.llSevenDollar.setOnClickListener { updateSelection(binding.llSevenDollar) }
@@ -156,10 +99,70 @@ class AddTipScreenFragment : Fragment() {
                 }
             }
         }
-
-
     }
 
+    private fun getTipUrl() {
+        BaseApplication.showMe(requireContext())
+        lifecycleScope.launch {
+            addTipScreenViewModel.getTipUrl({
+                BaseApplication.dismissMe()
+                handleApiTipResponse(it)
+            }, totalPrices)
+        }
+    }
+
+    private fun handleApiTipResponse(result: NetworkResult<String>) {
+        when (result) {
+            is NetworkResult.Success -> handleSuccessTipResponse(result.data.toString())
+            is NetworkResult.Error -> showAlert(result.message, false)
+            else -> showAlert(result.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun handleSuccessTipResponse(data: String) {
+        try {
+            val apiModel = Gson().fromJson(data, GetTipModel::class.java)
+            Log.d("@@@ addMea List ", "message :- $data")
+            if (apiModel.code == 200 && apiModel.success) {
+                if (apiModel.data!=null){
+                    showDataInTipUI(apiModel.data)
+                }
+            } else {
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
+            }
+        } catch (e: Exception) {
+            showAlert(e.message, false)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showDataInTipUI(data: GetTipModelData) {
+
+        if (data.tip10!=null){
+            val roundedTipTen = round(data.tip10).toInt()
+            binding.tvDollarSeven.text= "$$roundedTipTen"
+        }
+
+        if (data.tip15!=null){
+            val roundedTipFifteen = round(data.tip15).toInt()
+            binding.tvDollarNine.text= "$$roundedTipFifteen"
+        }
+
+        if (data.tip20!=null){
+            val roundedTipTwenty = round(data.tip20).toInt()
+            binding.tvDollarTwelve.text="$$roundedTipTwenty"
+        }
+
+        if (data.tip25!=null){
+            val roundedTipTwentyFive = round(data.tip25).toInt()
+            binding.tvDollarFifteen.text="$$roundedTipTwentyFive"
+        }
+    }
 
 
     private fun updateSelection(selectedView: View) {
