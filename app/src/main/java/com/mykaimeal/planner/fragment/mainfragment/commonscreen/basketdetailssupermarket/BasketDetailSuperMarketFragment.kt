@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -32,13 +33,10 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import com.mykaimeal.planner.OnItemClickListener
-import com.mykaimeal.planner.OnItemSelectListener
 import com.mykaimeal.planner.OnItemSelectUnSelectListener
 import com.mykaimeal.planner.R
-import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.adapter.AdapterSuperMarket
 import com.mykaimeal.planner.adapter.CategoryProductAdapter
-import com.mykaimeal.planner.adapter.IngredientsAdapter
 import com.mykaimeal.planner.basedata.BaseApplication
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.databinding.FragmentBasketDetailSuperMarketBinding
@@ -46,16 +44,14 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssup
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.model.BasketDetailsSuperMarketModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.model.Product
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.viewmodel.BasketDetailsSuperMarketViewModel
-import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.BasketScreenModelData
-import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Store
-import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.StoreData
-import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.viewmodel.BasketScreenViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.SuperMarketModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @AndroidEntryPoint
 class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
@@ -66,69 +62,44 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
     private var bottomSheetDialog: BottomSheetDialog? = null
     private var adapter: AdapterSuperMarket? = null
     private var rcvBottomDialog: RecyclerView? = null
-    private lateinit var basketScreenViewModel: BasketScreenViewModel
+    private var products:MutableList<Product>?=null
+    private lateinit var basketDetailsSuperMarketViewModel: BasketDetailsSuperMarketViewModel
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private var latitude = "0.0"
     private var longitude = "0.0"
     private var storeUid: String? = ""
     private var storeName: String? = ""
-    private var storeImage: String? = ""
-    private var ingredientList: MutableList<Ingredient> = mutableListOf()
-    private var stores: MutableList<Store> = mutableListOf()
+
+    private var stores: MutableList<Store>?=null
     private var clickStatus: Boolean = false
 
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this fragment
         binding = FragmentBasketDetailSuperMarketBinding.inflate(layoutInflater, container, false)
 
-        basketScreenViewModel = ViewModelProvider(requireActivity())[BasketScreenViewModel::class.java]
+        basketDetailsSuperMarketViewModel = ViewModelProvider(requireActivity())[BasketDetailsSuperMarketViewModel::class.java]
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        itemSectionAdapter = CategoryProductAdapter(requireActivity(),ingredientList, this)
-        binding.recyclerItemList.adapter = itemSectionAdapter
-
-
-        backButton()
-
-        if (basketScreenViewModel.dataBasket!=null){
-            showDataInUIFromBasket(basketScreenViewModel.dataBasket!!)
-        }else{
-            launchApi()
-        }
-
-        initialize()
-
-        return binding.root
-
-
-    }
-
-    private fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (basketScreenViewModel.dataStore.equals("yes",true)){
-                        (activity as MainActivity?)?.upBasket()
-                    }
                     findNavController().navigateUp()
                 }
             })
-    }
 
-    private fun launchApi(){
-        if (BaseApplication.isOnline(requireActivity())){
-            getBasketDetailsApi()
-        }else{
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
+        initialize()
+
+        return binding.root
     }
 
     private fun getBasketDetailsApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            basketScreenViewModel.getStoreProductUrl {
+            basketDetailsSuperMarketViewModel.getStoreProductUrl {
                 BaseApplication.dismissMe()
                 handleApiBasketDetailsResponse(it)
             }
@@ -142,9 +113,6 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
         }
 
         binding.imageBackIcon.setOnClickListener {
-            if (basketScreenViewModel.dataStore.equals("yes",true)){
-                (activity as MainActivity?)?.upBasket()
-            }
             findNavController().navigateUp()
         }
 
@@ -156,6 +124,88 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
             }
         }
 
+        if (BaseApplication.isOnline(requireActivity())){
+            // This condition for check location run time permission
+            if (ContextCompat.checkSelfPermission(
+                    requireActivity(),
+                    android.Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                    requireActivity(),
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                getCurrentLocation()
+            } else {
+                requestPermissions(
+                    arrayOf(
+                        android.Manifest.permission.ACCESS_FINE_LOCATION,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION
+                    ), 100
+                )
+            }
+        }else{
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+
+        if (BaseApplication.isOnline(requireActivity())){
+            getBasketDetailsApi()
+        }else{
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getCurrentLocation() {
+        // Initialize Location manager
+        val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        // Check condition
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+                LocationManager.NETWORK_PROVIDER
+            )
+        ) {
+            // When location service is enabled
+            // Get last location
+            fusedLocationClient!!.lastLocation.addOnCompleteListener { task ->
+                // Initialize location
+                // Check condition
+                if (task.isSuccessful && task.result != null) {
+                    val location = task.result
+                    // When location result is not
+                    // null set latitude
+                    latitude = location.latitude.toString()
+                    longitude = location.longitude.toString()
+                } else {
+                    // When location result is null
+                    // initialize location request
+                    val locationRequest = LocationRequest()
+                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                        .setInterval(10000)
+                        .setFastestInterval(1000)
+                    // Initialize location call back
+                    val locationCallback: LocationCallback = object : LocationCallback() {
+                        override fun onLocationResult(locationResult: LocationResult) {
+                            // location
+                            val location1 = locationResult.lastLocation
+                            latitude = location1!!.latitude.toString()
+                            longitude = location1.longitude.toString()
+
+                        }
+                    }
+                    fusedLocationClient!!.requestLocationUpdates(
+                        locationRequest,
+                        locationCallback,
+                        Looper.myLooper()
+                    )
+                }
+            }
+        } else {
+            requestPermissions(
+                arrayOf(
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ), 100
+            )
+        }
     }
 
     private fun handleApiBasketDetailsResponse(result: NetworkResult<String>) {
@@ -181,51 +231,46 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
                     showDataInUI(apiModel.data)
                 }
             } else {
-                handleError(apiModel.code,apiModel.message)
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
     }
 
-
-
-    private fun handleError(code: Int?, message: String?) {
-        if (code == ErrorMessage.code) {
-            showAlert(message, true)
-        } else {
-            showAlert(message, false)
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
     private fun showDataInUI(data: BasketDetailsSuperMarketModelData?) {
-        bottomSheetDialog?.dismiss()
-        (activity as MainActivity?)?.upBasket()
-        ingredientList.clear()
-        val ingredient: MutableList<Ingredient> = mutableListOf()
-        ingredient.clear()
-        data?.product?.let {
-            ingredient.addAll(it)
-        }
-        val localStores: MutableList<Store> = mutableListOf()
-        data?.store?.let {
-            localStores.add(Store(null,null,null,it.store_name,
-                it.store_uuid,storeImage,null,1,null,null))
-        }
-        val localData=BasketScreenModelData(ingredient,null,localStores,null)
-        basketScreenViewModel.setBasketData(localData)
-        basketScreenViewModel.setBasketDetailsStore("yes")
-        showDataInUIFromBasket(basketScreenViewModel.dataBasket)
-    }
 
-    @SuppressLint("SetTextI18n")
-    private fun showDataInUIFromBasket(data: BasketScreenModelData?) {
-        val activeStores = data?.stores?.firstOrNull { it.is_slected == 1 }
-        activeStores?.let {
-            if (it.image != null) {
+        if (data!!.total!=null || data.total=="0.0"){
+            clickStatus = true
+            binding.textPrice.text=data.total.toString()
+        }
+
+        if (data.product!= null) {
+            products=data.product
+            binding.recyclerItemList.layoutManager = LinearLayoutManager(requireActivity())
+            /* itemSectionAdapter = ItemSectionAdapter(data.product,this)
+             binding.recyclerItemList.adapter = itemSectionAdapter  */
+
+            itemSectionAdapter = CategoryProductAdapter(requireActivity(),data.product, this)
+            binding.recyclerItemList.adapter = itemSectionAdapter
+            /*    binding.rcyBreakfast.visibility=View.VISIBLE
+                binding.tvBreakFast.visibility=View.VISIBLE
+                yourRecipeAdapter = YourRecipeAdapter(data.Breakfast,requireActivity(), this,"Breakfast")
+                binding.rcyBreakfast.adapter = yourRecipeAdapter*/
+        } else {
+            /*     binding.rcyBreakfast.visibility=View.GONE
+                 binding.tvBreakFast.visibility=View.GONE*/
+        }
+
+
+        if (data.store != null) {
+            if (data.store.image != null) {
                 Glide.with(requireActivity())
-                    .load(it.image)
+                    .load(data.store.image)
                     .error(R.drawable.no_image)
                     .placeholder(R.drawable.no_image)
                     .listener(object : RequestListener<Drawable> {
@@ -255,33 +300,16 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
                 binding.layProgess.root.visibility = View.GONE
             }
         }
-        ingredientList.clear()
-        data?.ingredient?.let {
-            ingredientList.addAll(it)
-        }
-        if (ingredientList.size > 0) {
-            binding.recyclerItemList.visibility = View.VISIBLE
-            itemSectionAdapter.updateList(ingredientList)
-            val count=getTotalPrice()
-            binding.textPrice.text="$$count"
-        } else {
-            binding.textPrice.text="$0"
-            binding.recyclerItemList.visibility = View.GONE
-        }
     }
 
     private fun bottomSheetDialog() {
-        if (BaseApplication.isOnline(requireActivity())){
-            getSuperMarketsList()
-        }else{
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
+        getSuperMarketsList()
     }
 
     private fun getSuperMarketsList() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            basketScreenViewModel.getSuperMarket({
+            basketDetailsSuperMarketViewModel.getSuperMarket({
                 BaseApplication.dismissMe()
                 handleMarketApiResponse(it)
             },latitude, longitude)
@@ -304,7 +332,11 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
             if (apiModel.code == 200 && apiModel.success==true) {
                 showUIData(apiModel.data)
             } else {
-               handleError(apiModel.code,apiModel.message)
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -313,18 +345,15 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
 
     private fun showUIData(data: MutableList<Store>?) {
         try {
-            data?.let {
-                stores.clear()
-                stores.addAll(it)
-            }
-            bottomSheetDialog = BottomSheetDialog(requireActivity(), R.style.BottomSheetDialog)
-            bottomSheetDialog?.setContentView(R.layout.bottom_sheet_select_super_market_near_me)
-            rcvBottomDialog = bottomSheetDialog!!.findViewById(R.id.rcvBottomDialog)
-            bottomSheetDialog?.show()
-            if (stores.size>0){
+            if (data!=null){
+                bottomSheetDialog = BottomSheetDialog(requireActivity(), R.style.BottomSheetDialog)
+                bottomSheetDialog!!.setContentView(R.layout.bottom_sheet_select_super_market_near_me)
+                rcvBottomDialog = bottomSheetDialog!!.findViewById<RecyclerView>(R.id.rcvBottomDialog)
+                bottomSheetDialog!!.show()
                 adapter = AdapterSuperMarket(data, requireActivity(), this)
-                rcvBottomDialog?.adapter = adapter
+                rcvBottomDialog!!.adapter = adapter
             }
+
         }catch (e:Exception){
             showAlert(e.message, false)
         }
@@ -332,40 +361,58 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
 
+      /*  if (status == "2") {
+            findNavController().navigate(R.id.tescoCartItemFragmentFragment)
+        }*/
     }
 
     override fun itemSelectUnSelect(id: Int?, status: String?, type: String?, position: Int?) {
-        if (BaseApplication.isOnline(requireActivity())) {
-            if (type.equals("Product",true)){
-                if (status.equals("swap")){
-                    val item= position?.let { ingredientList[it] }
-                    val bundle = Bundle().apply {
-                        putString("id",item?.id.toString())
-                        putString("SwapProId",item?.pro_id.toString())
-                        putString("SwapProName",item?.name.toString())
-                        putString("foodId",item?.food_id.toString())
-                        putString("schId",item?.sch_id.toString())
-                    }
-                    findNavController().navigate(R.id.basketProductDetailsFragment,bundle)
-                }else {
-                    removeAddIngServing(position, status.toString())
+
+        if (type=="Product"){
+            if (status=="Plus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddIngServing(position, status)
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
+            }else if (status=="Minus"){
+                if (BaseApplication.isOnline(requireActivity())) {
+                    removeAddIngServing(position, status)
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
+            } else{
+                val mainId:String= products!![position!!].id.toString()
+                val productId:String= products!![position].pro_id.toString()
+                val productName:String= products!![position].name.toString()
+                val foodId:String= products!![position].food_id.toString()
+                val schId:String= products!![position].sch_id.toString()
+                val bundle = Bundle().apply {
+                    putString("id",mainId)
+                    putString("SwapProId",productId)
+                    putString("SwapProName",productName)
+                    putString("foodId",foodId)
+                    putString("schId",schId)
+                }
+                findNavController().navigate(R.id.basketProductDetailsFragment,bundle)
             }
-            if (type.equals("SuperMarket",true)){
-                storeUid = position?.let { stores[it].store_uuid.toString() }
-                storeName = position?.let { stores[it].store_name.toString() }
-                storeImage = position?.let { stores[it].image.toString() }
+        }else if (type=="SuperMarket"){
+            bottomSheetDialog!!.dismiss()
+
+            storeUid = position?.let { stores?.get(it)?.store_uuid.toString() }
+            storeName = position?.let { stores?.get(it)?.store_name.toString() }
+
+            if (BaseApplication.isOnline(requireActivity())) {
                 selectSuperMarketApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
     }
 
     private fun selectSuperMarketApi() {
-        BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            basketScreenViewModel.selectStoreProductUrl({
+            basketDetailsSuperMarketViewModel.selectStoreProductUrl({
                 BaseApplication.dismissMe()
                 handleSelectSupermarketApiResponse(it)
             }, storeName, storeUid)
@@ -386,9 +433,13 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                launchApi()
+                getBasketDetailsApi()
             } else {
-                handleError(apiModel.code,apiModel.message)
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -396,8 +447,8 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
     }
 
     private fun removeAddIngServing(position: Int?, type: String) {
-        val item= position?.let { ingredientList[it] }
-        if (type.equals("plus",true) || type.equals("minus",true)) {
+        val item= position?.let { products?.get(it) }
+        if (type.equals("Plus",true) || type.equals("Minus",true)) {
             var count = item?.sch_id
             val foodId= item?.food_id
             count = when (type.lowercase()) {
@@ -409,17 +460,17 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
         }
     }
 
-    private fun increaseIngRecipe(foodId: String?, quantity: String, item: Ingredient?, position: Int?) {
-        BaseApplication.showMe(requireContext())
+    private fun increaseIngRecipe(foodId: String?, quantity: String, item: Product?, position: Int?) {
+//        BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            basketScreenViewModel.basketIngIncDescUrl({
+            basketDetailsSuperMarketViewModel.basketIngIncDescUrl({
                 BaseApplication.dismissMe()
                 handleApiIngResponse(it,item,quantity,position)
             },foodId,quantity)
         }
     }
 
-    private fun handleApiIngResponse(result: NetworkResult<String>, item: Ingredient?, quantity: String, position: Int?) {
+    private fun handleApiIngResponse(result: NetworkResult<String>, item: Product?, quantity: String, position: Int?) {
         when (result) {
             is NetworkResult.Success -> handleSuccessIngResponse(result.data.toString(),item,quantity,position)
             is NetworkResult.Error -> showAlert(result.message, false)
@@ -428,38 +479,33 @@ class BasketDetailSuperMarketFragment : Fragment(), OnItemClickListener,
     }
 
     @SuppressLint("SetTextI18n")
-    private fun handleSuccessIngResponse(data: String, item: Ingredient?, quantity: String, position: Int?) {
+    private fun handleSuccessIngResponse(data: String, item: Product?, quantity: String, position: Int?) {
         try {
             val apiModel = Gson().fromJson(data, SuccessResponseModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
                 // Toggle the is_like value
                 item?.sch_id = quantity.toInt()
-                ingredientList[position!!] = item!!
+                if (item!= null) {
+                    products?.set(position!!, item)
+                }
                 // Update the adapter
-                itemSectionAdapter.updateList(ingredientList)
-                val count=getTotalPrice()
-                binding.textPrice.text="$$count"
+                if (products != null) {
+                    itemSectionAdapter.updateList(products!!)
+                }
+
+                getBasketDetailsApi()
             } else {
-                handleError(apiModel.code,apiModel.message)
+                if (apiModel.code == ErrorMessage.code) {
+                    showAlert(apiModel.message, true)
+                } else {
+                    showAlert(apiModel.message, false)
+                }
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
     }
 
-
-    @SuppressLint("DefaultLocale")
-    private fun getTotalPrice(): Double {
-        val total = ingredientList.sumOf {
-            val priceString = it.pro_price?.replace("$", "")?.trim()
-            if (priceString != null && !priceString.equals("Not available", ignoreCase = true) && !priceString.equals("Not", ignoreCase = true)) {
-                (priceString.toDoubleOrNull() ?: 0.0) * (it.sch_id?.toInt() ?: 0)
-            } else {
-                0.0
-            }
-        }
-        return String.format("%.2f", total).toDouble()
-    }
 
 }
