@@ -262,7 +262,6 @@ class ShoppingListFragment : Fragment(), OnItemClickListener, OnItemSelectListen
 
     private fun buttonColor(){
         val count = ingredientList.count { it.newStatus == true }
-
         if (count==0){
             binding.textCheckoutTesco.isClickable=false
             binding.textCheckoutTesco.setBackgroundResource(R.drawable.gray_btn_unselect_background)

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <com.chauthai.swipereveallayout.SwipeRevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -48,7 +49,6 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-
                 <RelativeLayout
                     android:id="@+id/relImageFood"
                     android:layout_width="@dimen/_50sdp"
@@ -74,7 +74,6 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true" />
                 </RelativeLayout>
-
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -101,13 +100,11 @@
                         android:layout_below="@+id/tvFoodName"
                         android:singleLine="true"
                         android:text="Not Available"
-                        android:visibility="gone"
                         android:textColor="#999999"
                         android:textSize="@dimen/_10ssp"
-                        />
+                        android:visibility="gone" />
 
                 </RelativeLayout>
-
                 <RelativeLayout
                     android:id="@+id/relPriceQuantitys"
                     android:layout_width="wrap_content"
@@ -115,6 +112,8 @@
                     android:layout_alignParentEnd="true"
                     android:layout_marginTop="@dimen/_5sdp"
                     android:layout_marginEnd="@dimen/_4sdp">
+                    android:layout_alignParentTop="true"
+                    android:layout_marginEnd="@dimen/_6sdp"/>
 
                     <TextView
                         android:id="@+id/tvFoodPrice"
@@ -128,7 +127,6 @@
                         android:textAlignment="center"
                         android:textColor="#06C169"
                         android:textSize="@dimen/_10ssp" />
-
                     <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -162,7 +160,6 @@
                     </RelativeLayout>
                 </RelativeLayout>
             </RelativeLayout>
-            .
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
 </com.chauthai.swipereveallayout.SwipeRevealLayout>

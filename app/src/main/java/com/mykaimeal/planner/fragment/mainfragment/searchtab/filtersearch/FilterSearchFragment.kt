@@ -78,12 +78,28 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
 
         initialize()
 
-        // This Api call when the screen in loaded
-        if (BaseApplication.isOnline(requireActivity())) {
-            launchApi()
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+
+        if (filterSearchViewModel.fullListMealType!=null && filterSearchViewModel.originalFullList!=null&& filterSearchViewModel.fullListCookTime!=null){
+            fullListMealType = filterSearchViewModel.fullListMealType!!
+            originalFullList = filterSearchViewModel.originalFullList!!
+            fullListCookTime = filterSearchViewModel.fullListCookTime!!
+
+
+            showFullList.clear()
+            showMealType.clear()
+            showListCookTime.clear()
+
+            upDateUi()
+        }else{
+            // This Api call when the screen in loaded
+            if (BaseApplication.isOnline(requireActivity())) {
+                launchApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
         }
+
+
 
         return binding.root
     }
@@ -162,69 +178,80 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
             data.cook_time?.let {
                 fullListCookTime.addAll(it)
             }
-            if (fullListMealType.size > 0) {
-                fullListMealType.forEachIndexed { index, diet ->
-                    if (index<5){
-                        showMealType.add(diet)
-                    }
-                }
-                if (showMealType.size>5){
-                    showMealType.add(MealType(id = -1, image = "", name = "More", "",selected = true))
-                }
-                val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
-                    flexDirection = FlexDirection.ROW
-                    flexWrap = FlexWrap.WRAP
-                    justifyContent = JustifyContent.FLEX_START
-                }
-                binding.rcyMealType.layoutManager = flexboxLayoutManager
-                adapterFilterMealItem = AdapterFilterMealItem(showMealType, requireActivity(), this)
-                binding.rcyMealType.adapter = adapterFilterMealItem
-            }
-            if (originalFullList.size > 0) {
-                originalFullList.forEachIndexed { index, diet ->
-                    if (index<5){
-                        showFullList.add(diet)
-                    }
-                }
 
-                if (showFullList.size>5){
-                    showFullList.add(Diet(name = "More", selected = true,""))
-                }
 
-                val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
-                    flexDirection = FlexDirection.ROW
-                    flexWrap = FlexWrap.WRAP
-                    justifyContent = JustifyContent.FLEX_START
-                }
-                binding.rcyDiet.layoutManager = flexboxLayoutManager
-                adapterFilterDietItem = AdapterFilterDietItem(showFullList, requireActivity(), this)
-                binding.rcyDiet.adapter = adapterFilterDietItem
-            }
+            filterSearchViewModel.setOriginalFullList(originalFullList)
+            filterSearchViewModel.setFullListCookTime(fullListCookTime)
+            filterSearchViewModel.setFullListMealType(fullListMealType)
 
-            if (fullListCookTime.size > 0) {
-                fullListCookTime.forEachIndexed { index, diet ->
-                    if (index<2){
-                        showListCookTime.add(diet)
-                    }
-                }
-
-                if (showListCookTime.size>5){
-                    showListCookTime.add(CookTime(name = "More", value = "", selected = true))
-                }
-                val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
-                    flexDirection = FlexDirection.ROW
-                    flexWrap = FlexWrap.WRAP
-                    justifyContent = JustifyContent.FLEX_START
-                }
-                binding.rcyCookTime.layoutManager = flexboxLayoutManager
-                adapterFilterCookBookItem = AdapterFilterCookTimeItem(showListCookTime, requireActivity(), this)
-                binding.rcyCookTime.adapter = adapterFilterCookBookItem
-            }
-
+            upDateUi()
 
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
+    }
+
+    private fun upDateUi(){
+        if (fullListMealType.size > 0) {
+            fullListMealType.forEachIndexed { index, diet ->
+                if (index<5){
+                    showMealType.add(diet)
+                }
+            }
+            if (showMealType.size>5){
+                showMealType.add(MealType(id = -1, image = "", name = "More", "",selected = true))
+            }
+            val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+                flexDirection = FlexDirection.ROW
+                flexWrap = FlexWrap.WRAP
+                justifyContent = JustifyContent.FLEX_START
+            }
+            binding.rcyMealType.layoutManager = flexboxLayoutManager
+            adapterFilterMealItem = AdapterFilterMealItem(showMealType, requireActivity(), this)
+            binding.rcyMealType.adapter = adapterFilterMealItem
+        }
+        if (originalFullList.size > 0) {
+            originalFullList.forEachIndexed { index, diet ->
+                if (index<5){
+                    showFullList.add(diet)
+                }
+            }
+
+            if (showFullList.size>5){
+                showFullList.add(Diet(name = "More", selected = true,""))
+            }
+
+            val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+                flexDirection = FlexDirection.ROW
+                flexWrap = FlexWrap.WRAP
+                justifyContent = JustifyContent.FLEX_START
+            }
+            binding.rcyDiet.layoutManager = flexboxLayoutManager
+            adapterFilterDietItem = AdapterFilterDietItem(showFullList, requireActivity(), this)
+            binding.rcyDiet.adapter = adapterFilterDietItem
+        }
+        if (fullListCookTime.size > 0) {
+            fullListCookTime.forEachIndexed { index, diet ->
+                if (index<2){
+                    showListCookTime.add(diet)
+                }
+            }
+
+            if (showListCookTime.size>5){
+                showListCookTime.add(CookTime(name = "More", value = "", selected = true))
+            }
+            val flexboxLayoutManager = FlexboxLayoutManager(requireContext()).apply {
+                flexDirection = FlexDirection.ROW
+                flexWrap = FlexWrap.WRAP
+                justifyContent = JustifyContent.FLEX_START
+            }
+            binding.rcyCookTime.layoutManager = flexboxLayoutManager
+            adapterFilterCookBookItem = AdapterFilterCookTimeItem(showListCookTime, requireActivity(), this)
+            binding.rcyCookTime.adapter = adapterFilterCookBookItem
+        }
+
+        buttonActive()
+
     }
 
     private fun showAlert(message: String?, status: Boolean) {
@@ -299,7 +326,6 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
 
     }
 
-
     private fun filter(text: String) {
         val list1: MutableList<MealType> = mutableListOf()
         val list2: MutableList<Diet> = mutableListOf()
@@ -364,9 +390,6 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
 
     @SuppressLint("SetTextI18n")
     override fun itemClick(position: Int?, status: String?, type: String?) {
-//        if (type.equals("check")){
-//
-//        }else{
         if (type.equals("MealType",true)) {
             showMealType.removeLast()
             for (i in 5 until fullListMealType.size step 5) {
@@ -388,9 +411,10 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
             }
             adapterFilterCookBookItem?.updateList(showListCookTime)
         }
-//        }
+        buttonActive()
+    }
 
-
+    private fun buttonActive(){
         val count = showMealType.count { it.selected == true } + showFullList.count { it.selected == true } + showListCookTime.count { it.selected == true }
 
 
@@ -406,12 +430,20 @@ class FilterSearchFragment : Fragment(), OnItemClickListener {
             binding.relApplyBtn.isClickable=true
             binding.relApplyBtn.setBackgroundResource(R.drawable.green_btn_background)
         }
-
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        filterSearchViewModel.setOriginalFullList(null)
+        filterSearchViewModel.setFullListCookTime(null)
+        filterSearchViewModel.setFullListMealType(null)
+    }
+
 
 }

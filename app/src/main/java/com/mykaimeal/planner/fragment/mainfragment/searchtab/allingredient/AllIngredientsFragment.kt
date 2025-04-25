@@ -63,7 +63,8 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
 
         adapterAllIngCategoryItem = AllIngredientsCategoryItem(categoryModel, requireActivity(),this)
         binding.rcyIngredientCategory.adapter = adapterAllIngCategoryItem
-        allIngredientsModelData = ViewModelProvider(this)[AllIngredientsViewModel::class.java]
+
+        allIngredientsModelData = ViewModelProvider(requireActivity())[AllIngredientsViewModel::class.java]
 
 
         showCount(0)
@@ -117,7 +118,14 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
         }
 
 
-        searchRecipeApi("")
+        if (allIngredientsModelData.dataIngredients!=null && allIngredientsModelData.dataCategories!=null){
+            ingredients = allIngredientsModelData.dataIngredients!!
+            categoryModel = allIngredientsModelData.dataCategories!!
+            upDateUI()
+        }else{
+            searchRecipeApi("")
+        }
+
 
         binding.relApplyBtn.setOnClickListener {
             if (binding.relApplyBtn.isClickable){
@@ -195,22 +203,30 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
                 categoryModel.add(CategoryModel(it, it.equals(lastSelected,true)))
             }
 
-            if (categoryModel.size>0){
-                adapterAllIngCategoryItem?.filterList(categoryModel)
-            }
 
-            if (ingredients.size>0){
-                val count = ingredients.count { it.status == true }
-                showCount(count)
-                adapterAllIngItem?.filterList(ingredients)
-                binding.rcyAllIngredients.visibility = View.VISIBLE
-                binding.tvNodata.visibility = View.GONE
-            } else {
-                binding.rcyAllIngredients.visibility = View.GONE
-                binding.tvNodata.visibility = View.VISIBLE
-            }
+            allIngredientsModelData.setIngredients(ingredients)
+            allIngredientsModelData.setCategories(categoryModel)
+
+            upDateUI()
         } catch (e: Exception) {
             showAlert(e.message, false)
+        }
+    }
+
+
+    private fun upDateUI(){
+        if (categoryModel.size>0){
+            adapterAllIngCategoryItem?.filterList(categoryModel)
+        }
+        if (ingredients.size>0){
+            val count = ingredients.count { it.status == true }
+            showCount(count)
+            adapterAllIngItem?.filterList(ingredients)
+            binding.rcyAllIngredients.visibility = View.VISIBLE
+            binding.tvNodata.visibility = View.GONE
+        } else {
+            binding.rcyAllIngredients.visibility = View.GONE
+            binding.tvNodata.visibility = View.VISIBLE
         }
     }
 
@@ -261,5 +277,11 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
             binding.relApplyBtn.isClickable=true
             binding.relApplyBtn.setBackgroundResource(R.drawable.green_btn_background)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        allIngredientsModelData.setIngredients(null)
+        allIngredientsModelData.setCategories(null)
     }
 }

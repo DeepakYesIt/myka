@@ -48,6 +48,7 @@
                 android:drawableStart="@drawable/yellow_search_icon"
                 android:drawablePadding="@dimen/_10sdp"
                 android:ellipsize="end"
+                android:singleLine="true"
                 android:gravity="center|start"
                 android:paddingVertical="@dimen/_10sdp"
                 android:hint="@string/enter_address"

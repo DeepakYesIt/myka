@@ -32,7 +32,8 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsde
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.model.BasketProductsDetailsModelData
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.model.ProductSwapSuccessModel
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketproductsdetailsscreen.viewmodel.BasketProductsDetailsViewModel
-import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.BasketScreenModelData
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.viewmodel.BasketScreenViewModel
 import com.mykaimeal.planner.fragment.mainfragment.viewmodel.walletviewmodel.apiresponse.SuccessResponseModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,18 +44,18 @@ import java.util.Locale
 class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
     private lateinit var binding: FragmentBasketProductDetailsBinding
     private var adapterProductsDetailsSelectItem: AdapterProductsDetailsSelectItem? = null
-    private lateinit var basketProductsDetailsViewModel: BasketProductsDetailsViewModel
+    private lateinit var basketScreenViewModel: BasketScreenViewModel
     private var proId: String = ""
     private var proName: String = ""
     private var id: String = ""
     private var foodId: String = ""
     private var schId: String = ""
-    private var basketProductsDetailsModelData: MutableList<BasketProductsDetailsModelData>? = null
+    private var basketProductsDetailsModelData: MutableList<BasketProductsDetailsModelData> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentBasketProductDetailsBinding.inflate(layoutInflater, container, false)
 
@@ -64,9 +65,78 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
         foodId = arguments?.getString("foodId", "").toString()
         schId = arguments?.getString("schId", "").toString()
 
-        basketProductsDetailsViewModel =
-            ViewModelProvider(requireActivity())[BasketProductsDetailsViewModel::class.java]
+        basketScreenViewModel = ViewModelProvider(requireActivity())[BasketScreenViewModel::class.java]
+        adapterProductsDetailsSelectItem = AdapterProductsDetailsSelectItem(basketProductsDetailsModelData, requireActivity(), this)
+        binding.rcyProductItems.adapter = adapterProductsDetailsSelectItem
 
+        if (basketScreenViewModel.dataBasket!=null){
+            showDataInUIFromBasket(basketScreenViewModel.dataBasket!!)
+        }
+
+        if (basketScreenViewModel.dataBasketItemDetails!=null){
+            showDataInUI(basketScreenViewModel.dataBasketItemDetails!!)
+        }else{
+            if (BaseApplication.isOnline(requireContext())) {
+                getProductsRelatedApi()
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
+
+        backButton()
+
+        initialize()
+
+        return binding.root
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun showDataInUIFromBasket(data: BasketScreenModelData?) {
+
+        try {
+            val result = data?.ingredient?.find { it.id == id.toInt() }
+            result?.let {
+                if (it.pro_img != null) {
+                    Glide.with(requireActivity())
+                        .load(it.pro_img)
+                        .error(R.drawable.no_image)
+                        .placeholder(R.drawable.no_image)
+                        .listener(object : RequestListener<Drawable> {
+                            override fun onLoadFailed(
+                                e: GlideException?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                binding.layProgess.root.visibility = View.GONE
+                                return false
+                            }
+
+                            override fun onResourceReady(
+                                resource: Drawable?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                dataSource: DataSource?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                binding.layProgess.root.visibility = View.GONE
+                                return false
+                            }
+                        })
+                        .into(binding.imageSuperMarket)
+                } else {
+                    binding.layProgess.root.visibility = View.GONE
+                }
+                binding.tvProductName.text = it.pro_name
+                binding.tvProductsprices.text = it.pro_price
+            }
+        }catch (e:Exception){
+            Log.d("@Error","*******"+e.message)
+        }
+    }
+
+    private fun backButton(){
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -74,10 +144,6 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
                     findNavController().navigateUp()
                 }
             })
-
-        initialize()
-
-        return binding.root
     }
 
     private fun initialize() {
@@ -96,11 +162,6 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
             findNavController().navigate(R.id.basketIngredientsDetailsFragment, bundle)
         }
 
-        if (BaseApplication.isOnline(requireContext())) {
-            getProductsDetailsApi()
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
 
         binding.etIngDislikesSearchBar.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -114,6 +175,8 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
                 }
             }
         })
+
+
     }
 
     private fun filterIngredients(editText: String) {
@@ -145,7 +208,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
     private fun getProductsDetailsApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            basketProductsDetailsViewModel.getProductsDetailsUrl({
+            basketScreenViewModel.getProductsDetailsUrl({
                 BaseApplication.dismissMe()
                 handleApiProductsDetailsApiResponse(it)
             }, proId, proName, foodId, schId)
@@ -179,7 +242,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
-        getProductsRelatedApi()
+
     }
 
     private fun showDataProductsInUI(data: BasketDetailsModelData?) {
@@ -231,7 +294,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
     private fun getProductsRelatedApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            basketProductsDetailsViewModel.getProductsUrl({
+            basketScreenViewModel.getProductsUrl({
                 BaseApplication.dismissMe()
                 handleApiProductsDetailsResponse(it)
             }, proName, foodId, schId)
@@ -261,60 +324,58 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
                     showDataInUI(apiModel.data)
                 }
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
     }
 
+    private fun handleError(code: Int, message: String) {
+        if (code == ErrorMessage.code) {
+            showAlert(message, true)
+        } else {
+            showAlert(message, false)
+        }
+    }
+
     private fun showDataInUI(data: MutableList<BasketProductsDetailsModelData>) {
-        if (data.size > 0) {
-            basketProductsDetailsModelData = data
+        basketScreenViewModel.setBasketProductDetail(data)
+        basketProductsDetailsModelData.clear()
+        data.let {
+            basketProductsDetailsModelData.addAll(data)
+        }
+        if (basketProductsDetailsModelData.size > 0) {
             binding.relNoProductsFound.visibility = View.GONE
-            adapterProductsDetailsSelectItem = AdapterProductsDetailsSelectItem(data, requireActivity(), this)
-            binding.rcyProductItems.adapter = adapterProductsDetailsSelectItem
+            binding.rcyProductItems.visibility = View.VISIBLE
+            adapterProductsDetailsSelectItem?.filterList(basketProductsDetailsModelData)
         } else {
             binding.relNoProductsFound.visibility = View.VISIBLE
+            binding.rcyProductItems.visibility = View.GONE
         }
     }
 
     override fun itemSelect(position: Int?, productId: String?, type: String?) {
-
-        if (type == "products") {
-            if (BaseApplication.isOnline(requireContext())) {
+        if (BaseApplication.isOnline(requireActivity())) {
+            if (type.equals("products",true)) {
                 getProductsSwapApi(productId, position.toString())
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
             }
-        } else if (type == "swap") {
-            val bundle = Bundle().apply {
-                putString("SwapProId", productId)
-                putString("SwapProName", position?.let { basketProductsDetailsModelData?.get(it)?.name })
-                putString("foodId", position?.let { basketProductsDetailsModelData?.get(it)?.food_id })
-                putString("schId", position?.let { basketProductsDetailsModelData?.get(it)?.sch_id.toString() })
-            }
-            findNavController().navigate(R.id.basketIngredientsDetailsFragment, bundle)
-        } else if (type == "Ingredients") {
-            if (productId == "Minus") {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing(position, "minus")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            if (type.equals("swap",true)) {
+                val bundle = Bundle().apply {
+                    putString("SwapProId", productId)
+                    putString("SwapProName", position?.let { basketProductsDetailsModelData?.get(it)?.name })
+                    putString("foodId", position?.let { basketProductsDetailsModelData?.get(it)?.food_id })
+                    putString("schId", position?.let { basketProductsDetailsModelData?.get(it)?.sch_id.toString() })
                 }
-            } else if (productId == "Plus") {
-                if (BaseApplication.isOnline(requireActivity())) {
-                    removeAddIngServing(position, "plus")
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
+                findNavController().navigate(R.id.basketIngredientsDetailsFragment, bundle)
             }
-
+            if (type.equals("Ingredients")) {
+                removeAddIngServing(position, productId.toString())
+            }
+        }else{
+            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
+
     }
 
     private fun removeAddIngServing(position: Int?, type: String) {
@@ -336,7 +397,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
         foodId: String?, quantity: String, item: BasketProductsDetailsModelData?, position: Int?
     ) {
         lifecycleScope.launch {
-            basketProductsDetailsViewModel.basketIngIncDescUrl({
+            basketScreenViewModel.basketIngIncDescUrl({
                 BaseApplication.dismissMe()
                 handleApiIngResponse(it, item, quantity, position)
             }, foodId, quantity)
@@ -400,7 +461,7 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
     private fun getProductsSwapApi(productId: String?, schId: String) {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            basketProductsDetailsViewModel.getSelectProductsUrl({
+            basketScreenViewModel.getSelectProductsUrl({
                 BaseApplication.dismissMe()
                 handleApiProductsSwapApiResponse(it)
             }, id, productId, schId)
@@ -422,13 +483,10 @@ class BasketProductDetailsFragment : Fragment(), OnItemSelectListener {
             val apiModel = Gson().fromJson(data, ProductSwapSuccessModel::class.java)
             Log.d("@@@ addMea List ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
+
                 findNavController().navigateUp()
             } else {
-                if (apiModel.code == ErrorMessage.code) {
-                    showAlert(apiModel.message, true)
-                } else {
-                    showAlert(apiModel.message, false)
-                }
+                handleError(apiModel.code,apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)

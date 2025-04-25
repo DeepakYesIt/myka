@@ -52,7 +52,7 @@ import java.util.Locale
 class CookedFragment : Fragment(), OnItemClickListener {
 
     private lateinit var binding: FragmentCookedBinding
-    private var cookedTabViewModel: CookedTabViewModel? = null
+    private lateinit var cookedTabViewModel: CookedTabViewModel
     private var foodListBreakFastAdapter: AdapterFoodListItem? = null
     private var foodListLunchAdapter: AdapterFoodListItem? = null
     private var foodListDinnerAdapter: AdapterFoodListItem? = null
@@ -60,8 +60,6 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private var foodListTeaTimeAdapter: AdapterFoodListItem? = null
     private var planType: String = "1"
     private var currentDate = Date() // Current date
-    private var currentDateLocal = Date() // Current date
-
     // Define global variables
     private lateinit var startDate: Date
     private lateinit var endDate: Date
@@ -80,6 +78,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
         // Inflate the layout for this fragment
         binding = FragmentCookedBinding.inflate(inflater, container, false)
         (activity as MainActivity?)?.changeBottom("cooked")
+        (activity as MainActivity?)?.alertStatus=false
 
         (activity as? MainActivity)?.binding?.let {
             it.llIndicator.visibility = View.VISIBLE
@@ -88,7 +87,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
 
         currentDateSelected = BaseApplication.currentDateFormat().toString()
         lastDateSelected=currentDateSelected
-        cookedTabViewModel = ViewModelProvider(this)[CookedTabViewModel::class.java]
+        cookedTabViewModel = ViewModelProvider(requireActivity())[CookedTabViewModel::class.java]
         cookbookList.clear()
 
         val data= com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("","",0,"","Favorites",0,"",0)
@@ -177,12 +176,24 @@ class CookedFragment : Fragment(), OnItemClickListener {
             findNavController().navigate(R.id.addMealCookedFragment)
         }
 
+
+//        if (cookedTabViewModel.data!=null){
+//            showDataInUi(cookedTabViewModel.data)
+//        }else{
+//            updateUI(true)
+//        }
+
+        updateUI(true)
+
+    }
+
+
+    private fun loadApi(){
         if (BaseApplication.isOnline(requireActivity())) {
             cookedTabApi(currentDateSelected)
         } else {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -256,11 +267,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
             Log.d("Date ", "*****$dateList")
             // Notify the adapter to refresh the changed position
             calendarAdapter!!.updateList(dateList)
-            if (BaseApplication.isOnline(requireActivity())) {
-                cookedTabApi(currentDateSelected)
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
+            loadApi()
         }
         // Update the RecyclerView
         binding.recyclerViewWeekDays.adapter = calendarAdapter
@@ -313,7 +320,7 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private fun cookedTabApi(date: String) {
         BaseApplication.showMe(requireActivity())
         lifecycleScope.launch {
-            cookedTabViewModel!!.cookedDateRequest({
+            cookedTabViewModel.cookedDateRequest({
                 BaseApplication.dismissMe()
                 when (it) {
                     is NetworkResult.Success -> {
@@ -355,9 +362,9 @@ class CookedFragment : Fragment(), OnItemClickListener {
     private fun showDataInUi(cookedTabModelData: CookedTabModelData?) {
         try {
             if (cookedTabModelData != null) {
+                cookedTabViewModel.setData(cookedTabModelData)
                 recipesModel = cookedTabModelData
                 if (cookedTabModelData.fridge != null && cookedTabModelData.freezer != null) {
-
                     fun updateFridgeVisibility(condition: Boolean) {
                         if (condition) {
                             binding.llEmptyFridge.visibility = View.VISIBLE
@@ -450,11 +457,8 @@ class CookedFragment : Fragment(), OnItemClickListener {
         binding.llFilledFridge.visibility = if (isFridgeSelected) View.VISIBLE else View.GONE
         binding.llEmptyFridge.visibility = View.GONE
         planType = if (isFridgeSelected) "1" else "2"
-        if (BaseApplication.isOnline(requireActivity())) {
-            cookedTabApi(currentDateSelected)
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
+//        cookedTabViewModel.type=planType
+        loadApi()
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {

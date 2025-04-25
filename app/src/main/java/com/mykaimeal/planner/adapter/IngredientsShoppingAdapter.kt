@@ -25,6 +25,11 @@ class IngredientsShoppingAdapter(private var ingredientsData: MutableList<Ingred
 ):
     RecyclerView.Adapter<IngredientsShoppingAdapter.ViewHolder>() {
 
+
+    // Track currently opened swipe layout
+    private var openedSwipeLayout: SwipeRevealLayout? = null
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding: AdapterBasketIngItemBinding = AdapterBasketIngItemBinding.inflate(inflater, parent,false);
@@ -105,20 +110,34 @@ class IngredientsShoppingAdapter(private var ingredientsData: MutableList<Ingred
             }
         }
 
+        // Swipe layout behavior
         holder.binding.swipeLayout.setSwipeListener(object : SwipeRevealLayout.SwipeListener {
             override fun onClosed(view: SwipeRevealLayout) {
+                if (openedSwipeLayout == view) {
+                    openedSwipeLayout = null
+                }
             }
 
             override fun onOpened(view: SwipeRevealLayout) {
-                // Change to desired background color
+                if (openedSwipeLayout != null && openedSwipeLayout != view) {
+                    openedSwipeLayout?.close(true)
+                }
+                openedSwipeLayout = view
             }
 
             override fun onSlide(view: SwipeRevealLayout, slideOffset: Float) {
-                // Optional: Gradually change color based on slide offset
+                // Optional: Animate background color or something else
             }
         })
 
+
         holder.binding.deleteLayout.setOnClickListener{
+            // Close the swipe layout before deletion to prevent UI artifacts
+            holder.binding.swipeLayout.close(true)
+            // Reset the reference to the opened swipe layout
+            if (openedSwipeLayout == holder.binding.swipeLayout) {
+                openedSwipeLayout = null
+            }
             onItemSelectListener.itemSelect(position,"Delete","Ingredients")
         }
 

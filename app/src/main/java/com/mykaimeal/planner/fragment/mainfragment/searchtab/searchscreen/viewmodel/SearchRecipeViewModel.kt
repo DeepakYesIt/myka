@@ -3,6 +3,7 @@ package com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.viewm
 import androidx.lifecycle.ViewModel
 import com.mykaimeal.planner.basedata.NetworkResult
 import com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen.apiresponse.Data
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.DataModel
 import com.mykaimeal.planner.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -11,7 +12,8 @@ import javax.inject.Inject
 class SearchRecipeViewModel @Inject constructor(private val repository: MainRepository) : ViewModel()  {
 
 
-    private var dataLocal: Data?=null
+    private var _data: Data? = null
+    val data: Data? get() = _data
 
     suspend fun recipeSearchApi(successCallback: (response: NetworkResult<String>) -> Unit, itemSearch: String?){
         repository.recipeSearchApi ({ successCallback(it) },itemSearch)
@@ -23,11 +25,7 @@ class SearchRecipeViewModel @Inject constructor(private val repository: MainRepo
 
 
     fun setData(data: Data?){
-        dataLocal=data
-    }
-
-    fun getData():Data?{
-        return dataLocal
+        _data=data
     }
 
     suspend fun recipePreferencesApi(successCallback: (response: NetworkResult<String>) -> Unit){

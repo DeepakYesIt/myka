@@ -1,5 +1,7 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketdetailssupermarket.model
 
+import com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen.model.Ingredient
+
 data class BasketDetailsSuperMarketModel(
     val code: Int?,
     val `data`: BasketDetailsSuperMarketModelData?,
@@ -8,7 +10,7 @@ data class BasketDetailsSuperMarketModel(
 )
 
 data class BasketDetailsSuperMarketModelData(
-    val product: MutableList<Product>?,
+    val product: MutableList<Ingredient>?,
     val store: Store?,
     val total: String?
 )
@@ -25,7 +27,7 @@ data class Product(
     val pro_img: String?,
     val pro_name: String?,
     val pro_price: String?,
-    val product_id: Any,
+    val product_id: String,
     val quantity: Int,
     var sch_id: Int?,
     val status: Int?,
@@ -40,4 +42,5 @@ data class Store(
     val operational_hours: Any,
     val store_name: String?,
     val store_uuid: String?
+
 )

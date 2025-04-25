@@ -161,12 +161,10 @@ class CheckoutScreenFragment : Fragment(), OnMapReadyCallback, OnItemLongClickLi
         // Inflate the layout for this fragment
         binding = FragmentCheckoutScreenBinding.inflate(layoutInflater, container, false)
 
-        checkoutScreenViewModel =
-            ViewModelProvider(requireActivity())[CheckoutScreenViewModel::class.java]
+        checkoutScreenViewModel = ViewModelProvider(requireActivity())[CheckoutScreenViewModel::class.java]
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        locationManager =
-            requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
+        locationManager = requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
 
         sessionManagement = SessionManagement(requireContext())
         commonWorkUtils = CommonWorkUtils(requireActivity())

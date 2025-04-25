@@ -57,7 +57,6 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
     private var searchRecipeAdapter: SearchRecipeAdapter? = null
     private var searchMealAdapter: SearchMealAdapter? = null
     private var searchMealCatAdapter: SearchMealCatAdapter? = null
-    private var status:String?="RecipeSearch"
     private lateinit var commonWorkUtils: CommonWorkUtils
     private lateinit var sessionManagement: SessionManagement
     private lateinit var searchRecipeViewModel:SearchRecipeViewModel
@@ -67,7 +66,6 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
     private var category: MutableList<Category>?= mutableListOf()
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> = mutableListOf()
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -76,6 +74,7 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
         (activity as MainActivity?)?.changeBottom("search")
+        (activity as MainActivity?)?.alertStatus=false
 
         (activity as? MainActivity)?.binding?.let {
             it.llIndicator.visibility = View.VISIBLE
@@ -86,9 +85,7 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
 
         clickedUrl = arguments?.getString("ClickedUrl", "").toString()
 
-        (activity as MainActivity?)?.alertStatus=false
-
-        searchRecipeViewModel = ViewModelProvider(this)[SearchRecipeViewModel::class.java]
+        searchRecipeViewModel = ViewModelProvider(requireActivity())[SearchRecipeViewModel::class.java]
 
         cookbookList.clear()
 
@@ -107,8 +104,13 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
 
         initialize()
 
-        // This Api call when the screen in loaded
-        lunchApi()
+        if (searchRecipeViewModel.data!=null){
+            showData(searchRecipeViewModel.data)
+        }else{
+            // This Api call when the screen in loaded
+            lunchApi()
+        }
+
 
         return binding.root
     }
@@ -160,6 +162,7 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
 
     private fun showData(data: Data?) {
         try {
+            searchRecipeViewModel.setData(data)
             if (data?.ingredient!=null && data.ingredient.size>0){
                 ingredient=data.ingredient
                 searchRecipeAdapter = SearchRecipeAdapter(data.ingredient, requireActivity())
@@ -189,18 +192,12 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
 
             if (data?.preference_status!=null){
                 if (data.preference_status == 0){
-                    Glide.with(requireActivity())
-                        .load(R.drawable.toggle_off_icon)
-                        .into(binding.imgPreferences)
+                    binding.imgPreferences.setImageResource(R.drawable.toggle_off_icon)
                 }else{
-                    Glide.with(requireActivity())
-                        .load(R.drawable.toggle_on_icon)
-                        .into(binding.imgPreferences)
+                    binding.imgPreferences.setImageResource(R.drawable.toggle_on_icon)
                 }
             }else{
-                Glide.with(requireActivity())
-                    .load(R.drawable.toggle_off_icon)
-                    .into(binding.imgPreferences)
+                binding.imgPreferences.setImageResource(R.drawable.toggle_off_icon)
             }
 
         }catch (e:Exception){
@@ -318,133 +315,6 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
         }
     }
 
-    private fun addRecipeFromWeb() {
-        val dialogWeb = Dialog(requireActivity())
-        dialogWeb.setContentView(R.layout.alert_dialog_add_recipe_form_web)
-        dialogWeb.window!!.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
-        dialogWeb.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val etPasteURl = dialogWeb.findViewById<EditText>(R.id.etPasteURl)
-        val rlSearchRecipe = dialogWeb.findViewById<RelativeLayout>(R.id.rlSearchRecipe)
-        val imageCrossWeb = dialogWeb.findViewById<ImageView>(R.id.imageCrossWeb)
-        dialogWeb.show()
-        dialogWeb.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-
-        rlSearchRecipe.setOnClickListener {
-            if (etPasteURl.text.toString().isEmpty()){
-                commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.pasteUrl, false)
-            } /*else if (isValidUrl(etPasteURl.text.toString().trim())){
-                commonWorkUtils.alertDialog(requireActivity(), ErrorMessage.validUrl, false)
-            } */else{
-                val bundle = Bundle().apply {
-                    putString("url",etPasteURl.text.toString().trim())
-                }
-                findNavController().navigate(R.id.webViewByUrlFragment,bundle)
-                dialogWeb.dismiss()
-            }
-        }
-
-        imageCrossWeb.setOnClickListener{
-            dialogWeb.dismiss()
-        }
-    }
-
-    private fun searchRecipeDialog() {
-        val dialogSearchDialog: Dialog = context?.let { Dialog(it) }!!
-        dialogSearchDialog.setContentView(R.layout.alert_dialog_search_recipe)
-        dialogSearchDialog.window!!.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
-        dialogSearchDialog.setCancelable(false)
-        dialogSearchDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-        val relRecipeSearch = dialogSearchDialog.findViewById<RelativeLayout>(R.id.relRecipeSearch)
-        val relFavouritesRecipes = dialogSearchDialog.findViewById<RelativeLayout>(R.id.relFavouritesRecipes)
-        val relFromWeb = dialogSearchDialog.findViewById<RelativeLayout>(R.id.relFromWeb)
-        val relAddYourOwnRecipe = dialogSearchDialog.findViewById<RelativeLayout>(R.id.relAddYourOwnRecipe)
-        val relTakingAPicture = dialogSearchDialog.findViewById<RelativeLayout>(R.id.relTakingAPicture)
-
-        val tvRecipeSearch = dialogSearchDialog.findViewById<TextView>(R.id.tvRecipeSearch)
-        val tvFavouritesRecipes = dialogSearchDialog.findViewById<TextView>(R.id.tvFavouritesRecipes)
-        val tvFromWeb = dialogSearchDialog.findViewById<TextView>(R.id.tvFromWeb)
-        val tvAddYourOwnRecipe = dialogSearchDialog.findViewById<TextView>(R.id.tvAddYourOwnRecipe)
-        val tvTakingAPicture = dialogSearchDialog.findViewById<TextView>(R.id.tvTakingAPicture)
-
-        val rlSearch = dialogSearchDialog.findViewById<RelativeLayout>(R.id.rlSearch)
-        val imgCrossSearch = dialogSearchDialog.findViewById<ImageView>(R.id.imgCrossSearch)
-
-        dialogSearchDialog.show()
-        dialogSearchDialog.window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-
-        rlSearch.setOnClickListener {
-            when (status) {
-                "RecipeSearch" -> {
-
-                }
-                "FavouritesRecipes" -> {
-                    findNavController().navigate(R.id.cookBookFragment)
-                }
-                "Web" -> {
-                    addRecipeFromWeb()
-                }
-                "AddRecipe" -> {
-                    val bundle = Bundle().apply {
-                        putString("name","")
-                    }
-                    findNavController().navigate(R.id.createRecipeFragment,bundle)
-                }
-                else -> {
-                    findNavController().navigate(R.id.createRecipeImageFragment)
-                }
-            }
-            dialogSearchDialog.dismiss()
-        }
-
-        imgCrossSearch.setOnClickListener{
-            dialogSearchDialog.dismiss()
-        }
-
-        fun updateSelection(selectedView: View, tvTakingAPicture: TextView) {
-            val allViews = listOf(relRecipeSearch, relFavouritesRecipes, relFromWeb, relAddYourOwnRecipe, relTakingAPicture)
-            val textViews = listOf(tvRecipeSearch, tvFavouritesRecipes, tvFromWeb, tvAddYourOwnRecipe, tvTakingAPicture)
-            val drawableLeft = ContextCompat.getDrawable(requireContext(), R.drawable.orange_tick_icon) // Replace with your drawable
-            allViews.forEach { it.setBackgroundResource(R.drawable.gray_box_border_bg) }
-            textViews.forEach { it.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null) }
-            selectedView.setBackgroundResource(R.drawable.orange_box_bg)
-            tvTakingAPicture.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableLeft, null)
-        }
-
-        relRecipeSearch.setOnClickListener {
-            status = "RecipeSearch"
-            updateSelection(relRecipeSearch,tvRecipeSearch)
-        }
-
-        relFavouritesRecipes.setOnClickListener {
-            status = "FavouritesRecipes"
-            updateSelection(relFavouritesRecipes,tvFavouritesRecipes)
-        }
-
-        relFromWeb.setOnClickListener {
-            status = "Web"
-            updateSelection(relFromWeb,tvFromWeb)
-        }
-
-        relAddYourOwnRecipe.setOnClickListener {
-            status = "AddRecipe"
-            updateSelection(relAddYourOwnRecipe,tvAddYourOwnRecipe)
-        }
-
-        relTakingAPicture.setOnClickListener {
-            status = "TakingPicture"
-            updateSelection(relTakingAPicture,tvTakingAPicture)
-        }
-
-    }
-
-
     override fun onClick(item: View?) {
         when(item!!.id){
             R.id.relViewAll->{
@@ -499,6 +369,7 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
         try {
             val updateModel = Gson().fromJson(data, UpdatePreferenceSuccessfully::class.java)
             if (updateModel.code == 200 && updateModel.success) {
+                (activity as MainActivity?)?.upDatePlan()
                 lunchApi()
             } else {
                 handleError(updateModel.code,updateModel.message)
@@ -509,11 +380,11 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
     }
 
     override fun itemClick(position: Int?, status: String?, type: String?) {
-            val bundle = Bundle().apply {
-                putString("recipeName",status)
-                putString("screenType","Search")
-            }
-            findNavController().navigate(R.id.searchedRecipeBreakfastFragment,bundle)
+        val bundle = Bundle().apply {
+            putString("recipeName",status)
+            putString("screenType","Search")
+        }
+        findNavController().navigate(R.id.searchedRecipeBreakfastFragment,bundle)
     }
 
 

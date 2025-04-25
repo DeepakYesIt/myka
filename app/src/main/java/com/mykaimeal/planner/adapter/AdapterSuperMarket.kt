@@ -35,6 +35,7 @@ class AdapterSuperMarket(
         return ViewHolder(binding)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
 
         val data = storesData?.get(position)
@@ -46,13 +47,6 @@ class AdapterSuperMarket(
                 holder.binding.relativeLayoutMain.background = null // Selected
             }
         }
-
-        /* // ✅ Correctly update the background based on selection
-         if (selectedPosition == position) {
-             holder.binding.relativeLayoutMain.setBackgroundResource(R.drawable.supermarket_selection_bg) // Default
-         } else {
-             holder.binding.relativeLayoutMain.background=null // Selected
-         }*/
 
         data?.let {
             if (it.missing != "0") {
@@ -77,60 +71,43 @@ class AdapterSuperMarket(
                 holder.binding.tvSuperMarketRupees.text = "$$roundedNetTotal"
             }
 
-            /*
-                        holder.binding.tvSuperMarketItems.text = it.store_name ?: ""
-            */
+            it.image?.let {
+                Glide.with(requireActivity)
+                    .load(it)
+                    .error(R.drawable.no_image)
+                    .placeholder(R.drawable.no_image)
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            holder.binding.layProgess.root.visibility = View.GONE
+                            return false
+                        }
 
-            // ✅ Load image with Glide
-            Glide.with(requireActivity)
-                .load(it.image)
-                .error(R.drawable.no_image)
-                .placeholder(R.drawable.no_image)
-                .listener(object : RequestListener<Drawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        holder.binding.layProgess.root.visibility = View.GONE
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        holder.binding.layProgess.root.visibility = View.GONE
-                        return false
-                    }
-                })
-                .into(holder.binding.imageSuperMarket)
-        } ?: run {
-            holder.binding.layProgess.root.visibility = View.GONE
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            holder.binding.layProgess.root.visibility = View.GONE
+                            return false
+                        }
+                    })
+                    .into(holder.binding.imageSuperMarket)
+            }?:run {
+                holder.binding.layProgess.root.visibility = View.GONE
+            }
         }
 
-        // ✅ Click event for selection
+
         holder.binding.relativeLayoutMain.setOnClickListener {
             updateSelection(position)
-            onItemSelectListener.itemSelectUnSelect(
-                position,
-                storesData!![position].store_uuid.toString(),
-                "SuperMarket",
-                position
-            )
-
-            /*        val previousPosition = selectedPosition
-                selectedPosition = position // ✅ Use `position` instead of `holder.adapterPosition`
-                // Refresh the UI for both previously selected and newly selected item
-                notifyItemChanged(previousPosition)
-                notifyItemChanged(selectedPosition)
-
-                // ✅ Notify selection change
-                onItemSelectListener.itemSelectUnSelect(position,data!!.store_uuid.toString(),"SuperMarket",position)*/
+            onItemSelectListener.itemSelectUnSelect(position, storesData!![position].store_uuid.toString(), "SuperMarket", position)
         }
     }
 
@@ -138,7 +115,6 @@ class AdapterSuperMarket(
         storesData?.forEachIndexed { index, stores ->
             stores.is_slected = if (index == selectedPosition) 1 else 0
         }
-
         notifyDataSetChanged()
     }
 

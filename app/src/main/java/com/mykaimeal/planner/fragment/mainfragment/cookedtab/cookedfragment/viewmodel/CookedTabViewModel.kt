@@ -3,12 +3,22 @@ package com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.vie
 import androidx.lifecycle.ViewModel
 import com.google.gson.JsonObject
 import com.mykaimeal.planner.basedata.NetworkResult
+import com.mykaimeal.planner.fragment.mainfragment.cookedtab.cookedfragment.model.CookedTabModelData
+import com.mykaimeal.planner.fragment.mainfragment.viewmodel.homeviewmodel.apiresponse.DataModel
 import com.mykaimeal.planner.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class CookedTabViewModel@Inject constructor(private val repository: MainRepository) : ViewModel()  {
+
+
+
+    private var _data: CookedTabModelData? = null
+    val data: CookedTabModelData? get() = _data
+    private var status:String="1"
+    val type: String get() = status
+
 
     suspend fun cookedDateRequest(successCallback: (response: NetworkResult<String>) -> Unit,
                                 date: String,planType:String){
@@ -32,6 +42,13 @@ class CookedTabViewModel@Inject constructor(private val repository: MainReposito
     suspend fun recipeServingCountRequest(successCallback: (response: NetworkResult<String>) -> Unit, jsonObject: JsonObject
     ){
         repository.recipeAddToPlanRequestApi({ successCallback(it) },jsonObject)
+    }
+
+
+
+    // set Home Data
+    fun setData(dataItem: CookedTabModelData?) {
+        _data = dataItem
     }
 
 }

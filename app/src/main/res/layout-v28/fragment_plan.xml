@@ -1320,9 +1320,7 @@
                     android:layout_marginTop="@dimen/_10sdp"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
             </LinearLayout>
-
             <LinearLayout
                 android:id="@+id/llBottomBtn"
                 android:layout_width="match_parent"
@@ -1333,7 +1331,6 @@
                 android:visibility="visible"
                 android:layout_marginBottom="@dimen/_30sdp"
                 android:weightSum="2">
-
                 <TextView
                     android:id="@+id/tvAddAnotherMealBtn"
                     android:layout_width="match_parent"
@@ -1346,14 +1343,7 @@
                     android:text="Add Another Meal Type"
                     android:textColor="@color/light_green"
                     android:textSize="@dimen/_12sdp" />
-
-
-
             </LinearLayout>
-
-
         </RelativeLayout>
-
     </ScrollView>
-
 </RelativeLayout>

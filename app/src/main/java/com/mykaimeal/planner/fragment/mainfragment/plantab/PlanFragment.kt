@@ -124,9 +124,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
         }
 
         (activity as MainActivity?)?.changeBottom("plan")
-
         (activity as MainActivity?)?.alertStatus=true
-
         sessionManagement = SessionManagement(requireContext())
 
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -170,10 +168,18 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         setUpListener()
 
-        // When screen load then api call
-        fetchDataOnLoad()
+        if (viewModel.data!=null){
+            lastDateSelected=viewModel.date.toString()
+            showData(viewModel.data!!)
+        }else{
+            lastDateSelected = currentDateSelected
+            viewModel.setDate(lastDateSelected)
+            // When screen load then api call
+            fetchDataOnLoad()
+        }
 
-        lastDateSelected = currentDateSelected
+
+
         // Display current week dates
         showWeekDates()
 
@@ -184,7 +190,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     fun showWeekDates() {
         Log.d("currentDate :- ", "******$currentDate")
         Log.d("lastDateSelected :- ", "******$lastDateSelected")
-
+        viewModel.setDate(lastDateSelected)
         // Define the date format (update to match your `date` string format)
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formattedCurrentDate =
@@ -218,34 +224,37 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         // Initialize the adapter with the updated date list
         calendarAdapter = CalendarDayDateAdapter(updatedDaysBetween.toMutableList()) { selectedPosition ->
-                // Update the list to reflect the selected date
-                updatedDaysBetween.forEachIndexed { index, dateModel ->
-                    dateModel.status = (index == selectedPosition)
-                    lastDateSelected = updatedDaysBetween[selectedPosition].date
-                    Log.d("dateModel Date ", "*****${dateModel.date}")
-                }
-                Log.d("Date ", "*****$updatedDaysBetween")
-
-                // Notify the adapter to refresh the data
-                calendarAdapter?.updateList(updatedDaysBetween.toMutableList())
-
-                // Update the current date selection
-                currentDateSelected = updatedDaysBetween[selectedPosition].date
-
-                // Fetch data for the selected date if online
-                if (BaseApplication.isOnline(requireActivity())) {
-                    dataFatchByDate(currentDateSelected)
-                } else {
-                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-                }
+            // Update the list to reflect the selected date
+            updatedDaysBetween.forEachIndexed { index, dateModel ->
+                dateModel.status = (index == selectedPosition)
+                lastDateSelected = updatedDaysBetween[selectedPosition].date
+                viewModel.setDate(lastDateSelected)
+                Log.d("dateModel Date ", "*****${dateModel.date}")
             }
+            Log.d("Date ", "*****$updatedDaysBetween")
+
+            // Notify the adapter to refresh the data
+            calendarAdapter?.updateList(updatedDaysBetween.toMutableList())
+
+            // Update the current date selection
+            currentDateSelected = updatedDaysBetween[selectedPosition].date
+
+            // Fetch data for the selected date if online
+            if (BaseApplication.isOnline(requireActivity())) {
+                dataFatchByDate(currentDateSelected,"2")
+            } else {
+                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+            }
+        }
         // Update the RecyclerView
         binding.recyclerViewWeekDays.adapter = calendarAdapter
 
     }
 
-    private fun dataFatchByDate(date: String) {
-        BaseApplication.showMe(requireContext())
+    private fun dataFatchByDate(date: String,type:String) {
+        if (!type.equals("1")){
+            BaseApplication.showMe(requireContext())
+        }
         lifecycleScope.launch {
             viewModel.planDateRequest({
                 BaseApplication.dismissMe()
@@ -392,7 +401,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
                 Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
                 // Fetch data for the selected date if online
                 if (BaseApplication.isOnline(requireActivity())) {
-                    dataFatchByDate(currentDateSelected)
+                    dataFatchByDate(currentDateSelected,"2")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }
@@ -497,240 +506,257 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
     }
 
     private fun showData(data: Data) {
-        recipesModel = data.recipes
-        if (recipesModel != null) {
-            fun setupMealAdapter(
-                mealRecipes: MutableList<BreakfastModel>?, recyclerView: RecyclerView, type: String
-            ): AdapterPlanBreakFast? {
-                return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
-                    val adapter = AdapterPlanBreakFast(mealRecipes, requireActivity(), this, type)
-                    recyclerView.adapter = adapter
-                    adapter
-                } else {
-                    null
-                }
-            }
+        try {
+            viewModel.setData(data)
+            recipesModel = data.recipes
 
-            binding.llCalculateBmr.visibility = View.GONE
-
-            // Breakfast
-            if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
-                breakfastAdapter =
-                    setupMealAdapter(recipesModel?.Breakfast, binding.rcyBreakFast, ErrorMessage.Breakfast)
-                binding.linearBreakfast.visibility = View.VISIBLE
-            } else {
-                binding.linearBreakfast.visibility = View.GONE
-            }
-
-            // Lunch
-            if (recipesModel?.Lunch != null && recipesModel?.Lunch?.size!! > 0) {
-                lunchAdapter = setupMealAdapter(recipesModel?.Lunch, binding.rcyLunch, ErrorMessage.Lunch)
-                binding.linearLunch.visibility = View.VISIBLE
-            } else {
-                binding.linearLunch.visibility = View.GONE
-            }
-
-            // Dinner
-            if (recipesModel?.Dinner != null && recipesModel?.Dinner?.size!! > 0) {
-                dinnerAdapter =
-                    setupMealAdapter(recipesModel?.Dinner, binding.rcyDinner, ErrorMessage.Dinner)
-                binding.linearDinner.visibility = View.VISIBLE
-            } else {
-                binding.linearDinner.visibility = View.GONE
-            }
-
-
-            // Snacks
-            if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
-                snackesAdapter =
-                    setupMealAdapter(recipesModel?.Snack, binding.rcySnacks, ErrorMessage.Snacks)
-                binding.linearSnacks.visibility = View.VISIBLE
-            } else {
-                binding.linearSnacks.visibility = View.GONE
-            }
-
-            // TeaTime
-            if (recipesModel?.Teatime != null && recipesModel?.Teatime?.size!! > 0) {
-                teaTimeAdapter =
-                    setupMealAdapter(recipesModel?.Teatime, binding.rcyTeatime, ErrorMessage.Brunch)
-                binding.linearTeatime.visibility = View.VISIBLE
-            } else {
-                binding.linearTeatime.visibility = View.GONE
-            }
-        }
-
-        // Fetch data for the selected date if online
-        if (BaseApplication.isOnline(requireActivity())) {
-            dataFatchByDate(currentDateSelected)
-        } else {
-            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-        }
-    }
-
-    @SuppressLint("DefaultLocale", "SetTextI18n")
-    private fun showDataAccordingDate(data: DataPlayByDate?) {
-
-        recipesDateModel = null
-        recipesDateModel = data
-
-        Log.d("fdfd", "fdfdff" + recipesDateModel)
-
-        if (recipesDateModel != null) {
-
-            if (recipesDateModel!!.show == 0) {
-                binding.imgBmr.visibility = View.VISIBLE
-                binding.llCalculateBmr.visibility = View.VISIBLE
-            } else {
-                binding.imgBmr.visibility = View.GONE
-                binding.llCalculateBmr.visibility = View.VISIBLE
-            }
-
-
-            if (recipesDateModel!!.fat != null || recipesDateModel!!.protein != null || recipesDateModel!!.kcal != null || recipesDateModel!!.carbs != null) {
-                if (recipesDateModel!!.fat != 0 || recipesDateModel!!.protein != 0 ||
-                    recipesDateModel!!.kcal != 0 || recipesDateModel!!.carbs != 0
-                ) {
-                    if (recipesDateModel!!.show == 1) {
-                        binding.tvCalories.text = ""+recipesDateModel!!.kcal
-                        binding.tvFats.text = ""+recipesDateModel!!.fat
-                        binding.tvCarbohydrates.text = ""+recipesDateModel!!.carbs
-                        binding.tvProteins.text = ""+recipesDateModel!!.protein
-
+            if (recipesModel != null) {
+                fun setupMealAdapter(
+                    mealRecipes: MutableList<BreakfastModel>?, recyclerView: RecyclerView, type: String
+                ): AdapterPlanBreakFast? {
+                    return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
+                        val adapter = AdapterPlanBreakFast(mealRecipes, requireActivity(), this, type)
+                        recyclerView.adapter = adapter
+                        adapter
+                    } else {
+                        null
                     }
                 }
-            }
 
-            var status = false
+                binding.llCalculateBmr.visibility = View.GONE
 
-            fun setupMealAdapter(
-                mealRecipes: MutableList<BreakfastModelPlanByDate>?,
-                recyclerView: RecyclerView,
-                type: String
-            ): AdapterPlanBreakByDateFast? {
-                return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
-                    val adapter =
-                        AdapterPlanBreakByDateFast(mealRecipes, requireActivity(), this, type)
-                    recyclerView.adapter = adapter
-                    adapter
-                } else {
-                    null
-                }
-            }
-
-
-            fun setupMealTopAdapter(
-                mealRecipes: MutableList<BreakfastModel>?,
-                recyclerView: RecyclerView,
-                type: String
-            ): AdapterPlanBreakFast? {
-                return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
-                    val adapter = AdapterPlanBreakFast(mealRecipes, requireActivity(), this, type)
-                    recyclerView.adapter = adapter
-                    adapter
-                } else {
-                    null
-                }
-            }
-
-            // Breakfast
-            if (recipesDateModel?.Breakfast != null && recipesDateModel?.Breakfast?.size!! > 0) {
-                adapterPlanBreakByDateFast = setupMealAdapter(
-                    recipesDateModel!!.Breakfast!!,
-                    binding.rcyBreakFast,
-                    ErrorMessage.Breakfast
-                )
-                binding.linearBreakfast.visibility = View.VISIBLE
-                status = true
-            } else {
                 // Breakfast
                 if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
-                    breakfastAdapter = setupMealTopAdapter(
-                        recipesModel?.Breakfast,
-                        binding.rcyBreakFast,
-                        ErrorMessage.Breakfast
-                    )
+                    breakfastAdapter =
+                        setupMealAdapter(recipesModel?.Breakfast, binding.rcyBreakFast, ErrorMessage.Breakfast)
                     binding.linearBreakfast.visibility = View.VISIBLE
                 } else {
                     binding.linearBreakfast.visibility = View.GONE
                 }
-            }
 
-            // Lunch
-            if (recipesDateModel?.Lunch != null && recipesDateModel?.Lunch?.size!! > 0) {
-                adapterLunchByDateFast = setupMealAdapter(data?.Lunch, binding.rcyLunch, ErrorMessage.Lunch)
-                binding.linearLunch.visibility = View.VISIBLE
-                status = true
-            } else {
+                // Lunch
                 if (recipesModel?.Lunch != null && recipesModel?.Lunch?.size!! > 0) {
-                    lunchAdapter =
-                        setupMealTopAdapter(recipesModel?.Lunch, binding.rcyLunch, ErrorMessage.Lunch)
+                    lunchAdapter = setupMealAdapter(recipesModel?.Lunch, binding.rcyLunch, ErrorMessage.Lunch)
                     binding.linearLunch.visibility = View.VISIBLE
                 } else {
                     binding.linearLunch.visibility = View.GONE
                 }
-            }
 
-            // Dinner
-            if (recipesDateModel?.Dinner != null && recipesDateModel?.Dinner?.size!! > 0) {
-                adapterDinnerByDateFast =
-                    setupMealAdapter(data?.Dinner, binding.rcyDinner, ErrorMessage.Dinner)
-                binding.linearDinner.visibility = View.VISIBLE
-                status = true
-            } else {
                 // Dinner
                 if (recipesModel?.Dinner != null && recipesModel?.Dinner?.size!! > 0) {
                     dinnerAdapter =
-                        setupMealTopAdapter(recipesModel?.Dinner, binding.rcyDinner, ErrorMessage.Dinner)
+                        setupMealAdapter(recipesModel?.Dinner, binding.rcyDinner, ErrorMessage.Dinner)
                     binding.linearDinner.visibility = View.VISIBLE
                 } else {
                     binding.linearDinner.visibility = View.GONE
                 }
-            }
 
-            // Snacks
-            if (recipesDateModel?.Snack != null && recipesDateModel?.Snack?.size!! > 0) {
-                adapterSnacksByDateFast =
-                    setupMealAdapter(data?.Snack, binding.rcySnacks, ErrorMessage.Snacks)
-                binding.linearSnacks.visibility = View.VISIBLE
-                status = true
-            } else {
+
                 // Snacks
                 if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
                     snackesAdapter =
-                        setupMealTopAdapter(recipesModel?.Snack, binding.rcySnacks, ErrorMessage.Snacks)
+                        setupMealAdapter(recipesModel?.Snack, binding.rcySnacks, ErrorMessage.Snacks)
                     binding.linearSnacks.visibility = View.VISIBLE
                 } else {
                     binding.linearSnacks.visibility = View.GONE
                 }
-            }
 
-            // TeaTime
-            if (recipesDateModel?.Teatime != null && recipesDateModel?.Teatime?.size!! > 0) {
-                AdapterteaTimeByDateFast =
-                    setupMealAdapter(data?.Teatime, binding.rcyTeatime, ErrorMessage.Brunch)
-                binding.linearTeatime.visibility = View.VISIBLE
-                status = true
-            } else {
                 // TeaTime
                 if (recipesModel?.Teatime != null && recipesModel?.Teatime?.size!! > 0) {
                     teaTimeAdapter =
-                        setupMealTopAdapter(recipesModel?.Teatime, binding.rcyTeatime, ErrorMessage.Brunch)
+                        setupMealAdapter(recipesModel?.Teatime, binding.rcyTeatime, ErrorMessage.Brunch)
                     binding.linearTeatime.visibility = View.VISIBLE
                 } else {
                     binding.linearTeatime.visibility = View.GONE
                 }
             }
 
-            if (status) {
-                clickable = "1"
-                binding.rlAddDayToBasket.isClickable = true
-                binding.rlAddDayToBasket.setBackgroundResource(R.drawable.gray_btn_select_background)
-            } else {
-                clickable = ""
-                binding.rlAddDayToBasket.isClickable = false
-                binding.rlAddDayToBasket.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+            if (viewModel.dataPlan!=null){
+                showDataAccordingDate(viewModel.dataPlan)
+            }else{
+                // Fetch data for the selected date if online
+                if (BaseApplication.isOnline(requireActivity())) {
+                    dataFatchByDate(currentDateSelected,"1")
+                } else {
+                    BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                }
             }
+
+        }catch (e:Exception){
+            Log.d("@Error","******"+e.message)
         }
+    }
+
+    @SuppressLint("DefaultLocale", "SetTextI18n")
+    private fun showDataAccordingDate(data: DataPlayByDate?) {
+
+        try {
+            viewModel.setPlanDate(data)
+            recipesDateModel = null
+            recipesDateModel = data
+
+            Log.d("fdfd", "fdfdff" + recipesDateModel)
+
+            if (recipesDateModel != null) {
+
+                if (recipesDateModel!!.show == 0) {
+                    binding.imgBmr.visibility = View.VISIBLE
+                    binding.llCalculateBmr.visibility = View.VISIBLE
+                } else {
+                    binding.imgBmr.visibility = View.GONE
+                    binding.llCalculateBmr.visibility = View.VISIBLE
+                }
+
+
+                if (recipesDateModel!!.fat != null || recipesDateModel!!.protein != null || recipesDateModel!!.kcal != null || recipesDateModel!!.carbs != null) {
+                    if (recipesDateModel!!.fat != 0 || recipesDateModel!!.protein != 0 ||
+                        recipesDateModel!!.kcal != 0 || recipesDateModel!!.carbs != 0
+                    ) {
+                        if (recipesDateModel!!.show == 1) {
+                            binding.tvCalories.text = ""+recipesDateModel!!.kcal
+                            binding.tvFats.text = ""+recipesDateModel!!.fat
+                            binding.tvCarbohydrates.text = ""+recipesDateModel!!.carbs
+                            binding.tvProteins.text = ""+recipesDateModel!!.protein
+
+                        }
+                    }
+                }
+
+                var status = false
+
+                fun setupMealAdapter(
+                    mealRecipes: MutableList<BreakfastModelPlanByDate>?,
+                    recyclerView: RecyclerView,
+                    type: String
+                ): AdapterPlanBreakByDateFast? {
+                    return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
+                        val adapter =
+                            AdapterPlanBreakByDateFast(mealRecipes, requireActivity(), this, type)
+                        recyclerView.adapter = adapter
+                        adapter
+                    } else {
+                        null
+                    }
+                }
+
+
+                fun setupMealTopAdapter(
+                    mealRecipes: MutableList<BreakfastModel>?,
+                    recyclerView: RecyclerView,
+                    type: String
+                ): AdapterPlanBreakFast? {
+                    return if (mealRecipes != null && mealRecipes.isNotEmpty()) {
+                        val adapter = AdapterPlanBreakFast(mealRecipes, requireActivity(), this, type)
+                        recyclerView.adapter = adapter
+                        adapter
+                    } else {
+                        null
+                    }
+                }
+
+                // Breakfast
+                if (recipesDateModel?.Breakfast != null && recipesDateModel?.Breakfast?.size!! > 0) {
+                    adapterPlanBreakByDateFast = setupMealAdapter(
+                        recipesDateModel!!.Breakfast!!,
+                        binding.rcyBreakFast,
+                        ErrorMessage.Breakfast
+                    )
+                    binding.linearBreakfast.visibility = View.VISIBLE
+                    status = true
+                } else {
+                    // Breakfast
+                    if (recipesModel?.Breakfast != null && recipesModel?.Breakfast?.size!! > 0) {
+                        breakfastAdapter = setupMealTopAdapter(
+                            recipesModel?.Breakfast,
+                            binding.rcyBreakFast,
+                            ErrorMessage.Breakfast
+                        )
+                        binding.linearBreakfast.visibility = View.VISIBLE
+                    } else {
+                        binding.linearBreakfast.visibility = View.GONE
+                    }
+                }
+
+                // Lunch
+                if (recipesDateModel?.Lunch != null && recipesDateModel?.Lunch?.size!! > 0) {
+                    adapterLunchByDateFast = setupMealAdapter(data?.Lunch, binding.rcyLunch, ErrorMessage.Lunch)
+                    binding.linearLunch.visibility = View.VISIBLE
+                    status = true
+                } else {
+                    if (recipesModel?.Lunch != null && recipesModel?.Lunch?.size!! > 0) {
+                        lunchAdapter =
+                            setupMealTopAdapter(recipesModel?.Lunch, binding.rcyLunch, ErrorMessage.Lunch)
+                        binding.linearLunch.visibility = View.VISIBLE
+                    } else {
+                        binding.linearLunch.visibility = View.GONE
+                    }
+                }
+
+                // Dinner
+                if (recipesDateModel?.Dinner != null && recipesDateModel?.Dinner?.size!! > 0) {
+                    adapterDinnerByDateFast =
+                        setupMealAdapter(data?.Dinner, binding.rcyDinner, ErrorMessage.Dinner)
+                    binding.linearDinner.visibility = View.VISIBLE
+                    status = true
+                } else {
+                    // Dinner
+                    if (recipesModel?.Dinner != null && recipesModel?.Dinner?.size!! > 0) {
+                        dinnerAdapter =
+                            setupMealTopAdapter(recipesModel?.Dinner, binding.rcyDinner, ErrorMessage.Dinner)
+                        binding.linearDinner.visibility = View.VISIBLE
+                    } else {
+                        binding.linearDinner.visibility = View.GONE
+                    }
+                }
+
+                // Snacks
+                if (recipesDateModel?.Snack != null && recipesDateModel?.Snack?.size!! > 0) {
+                    adapterSnacksByDateFast =
+                        setupMealAdapter(data?.Snack, binding.rcySnacks, ErrorMessage.Snacks)
+                    binding.linearSnacks.visibility = View.VISIBLE
+                    status = true
+                } else {
+                    // Snacks
+                    if (recipesModel?.Snack != null && recipesModel?.Snack?.size!! > 0) {
+                        snackesAdapter =
+                            setupMealTopAdapter(recipesModel?.Snack, binding.rcySnacks, ErrorMessage.Snacks)
+                        binding.linearSnacks.visibility = View.VISIBLE
+                    } else {
+                        binding.linearSnacks.visibility = View.GONE
+                    }
+                }
+
+                // TeaTime
+                if (recipesDateModel?.Teatime != null && recipesDateModel?.Teatime?.size!! > 0) {
+                    AdapterteaTimeByDateFast =
+                        setupMealAdapter(data?.Teatime, binding.rcyTeatime, ErrorMessage.Brunch)
+                    binding.linearTeatime.visibility = View.VISIBLE
+                    status = true
+                } else {
+                    // TeaTime
+                    if (recipesModel?.Teatime != null && recipesModel?.Teatime?.size!! > 0) {
+                        teaTimeAdapter =
+                            setupMealTopAdapter(recipesModel?.Teatime, binding.rcyTeatime, ErrorMessage.Brunch)
+                        binding.linearTeatime.visibility = View.VISIBLE
+                    } else {
+                        binding.linearTeatime.visibility = View.GONE
+                    }
+                }
+
+                if (status) {
+                    clickable = "1"
+                    binding.rlAddDayToBasket.isClickable = true
+                    binding.rlAddDayToBasket.setBackgroundResource(R.drawable.gray_btn_select_background)
+                } else {
+                    clickable = ""
+                    binding.rlAddDayToBasket.isClickable = false
+                    binding.rlAddDayToBasket.setBackgroundResource(R.drawable.gray_btn_unselect_background)
+                }
+            }
+        }catch (e:Exception){
+            Log.d("@Error","******"+e.message)
+        }
+
     }
 
     private fun showAlert(message: String?, status: Boolean) {
@@ -1362,7 +1388,7 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
                 // Fetch data for the selected date if online
                 if (BaseApplication.isOnline(requireActivity())) {
-                    dataFatchByDate(currentDateSelected)
+                    dataFatchByDate(currentDateSelected,"2")
                 } else {
                     BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
                 }

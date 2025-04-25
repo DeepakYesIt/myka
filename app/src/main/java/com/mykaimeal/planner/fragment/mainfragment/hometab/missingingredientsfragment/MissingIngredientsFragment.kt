@@ -308,6 +308,7 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
             if (apiModel.code == 200 && apiModel.success) {
                 Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_LONG).show()
                 if (statusType[0].equals("0",true)){
+                    (activity as MainActivity?)?.upDateHomeData()
                     findNavController().navigateUp()
                 }else{
                     clearList()
@@ -317,6 +318,7 @@ class MissingIngredientsFragment : Fragment(), OnItemSelectListener {
                     if (missingIngredientList.size>0){
                         showLatestData()
                     }else{
+                        (activity as MainActivity?)?.upDateHomeData()
                         findNavController().navigateUp()
                     }
                 }
