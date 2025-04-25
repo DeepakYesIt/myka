@@ -715,10 +715,18 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/relDebitCreditCard"
+                        android:layout_marginBottom="@dimen/_10sdp"
                         android:layout_marginTop="@dimen/_10sdp"
-                        android:visibility="gone">
+                        android:visibility="visible">
 
-                        <ImageView
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rcyCardDetails"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            android:orientation="vertical"/>
+
+                      <!--  <ImageView
                             android:id="@+id/idVisaImages"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -768,7 +776,7 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="@dimen/_10sdp"
-                            android:src="@drawable/radio_uncheck_gray_icon" />
+                            android:src="@drawable/radio_uncheck_gray_icon" />-->
 
                     </RelativeLayout>
 
@@ -842,6 +850,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/rcyDebitCreditCard"
+                        android:visibility="gone"
                         android:layout_marginTop="@dimen/_15sdp">
 
                         <TextView
@@ -860,6 +869,7 @@
                         android:id="@+id/relGooglePay"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:visibility="gone"
                         android:layout_below="@+id/relPayWallet"
                         android:layout_marginVertical="@dimen/_15sdp">
 

@@ -2191,10 +2191,11 @@ class MainRepositoryImpl @Inject constructor(private val api: ApiInterface) : Ma
 
 
     override suspend fun getOrderProductUrl(
-        successCallback: (response: NetworkResult<String>) -> Unit
+        successCallback: (response: NetworkResult<String>) -> Unit,
+        tip:String?,cardId:String?
     ) {
         try {
-            api.getOrderProductUrl().apply {
+            api.getOrderProductUrl(tip, cardId).apply {
                 if (isSuccessful) {
                     body()?.let {
                         successCallback(NetworkResult.Success(it.toString()))

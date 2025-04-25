@@ -248,7 +248,6 @@ class AddMealCookedFragment : Fragment(), OnItemClickListener, OnItemMealTypeLis
         }
     }
 
-
     private fun addMealsApi() {
         // Create a JsonObject for the main JSON structure
         val jsonObject = JsonObject()
@@ -270,7 +269,6 @@ class AddMealCookedFragment : Fragment(), OnItemClickListener, OnItemMealTypeLis
             }, jsonObject)
         }
     }
-
 
     private fun mealType() {
         val inflater = requireContext().getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater?
@@ -462,7 +460,6 @@ class AddMealCookedFragment : Fragment(), OnItemClickListener, OnItemMealTypeLis
             Log.d("AddMeal", "message:--" + e.message)
         }
     }
-
 
     private fun loadSearch() {
         val inflater = requireContext().getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater?

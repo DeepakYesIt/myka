@@ -1,18 +1,23 @@
 package com.mykaimeal.planner.fragment.mainfragment.commonscreen.addtipscreen
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
+import kotlin.math.roundToInt
 import com.mykaimeal.planner.R
 import com.mykaimeal.planner.activity.MainActivity
 import com.mykaimeal.planner.basedata.BaseApplication
@@ -26,6 +31,7 @@ import com.mykaimeal.planner.fragment.mainfragment.commonscreen.addtipscreen.vie
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.dropoffoptionscreen.model.DropOffOptionsModel
 import com.mykaimeal.planner.messageclass.ErrorMessage
 import kotlinx.coroutines.launch
+import kotlin.math.ceil
 import kotlin.math.round
 
 class AddTipScreenFragment : Fragment() {
@@ -34,7 +40,9 @@ class AddTipScreenFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var addTipScreenViewModel: AddTipScreenViewModel
     private var totalPrices = ""
+    private var cardId = ""
     private var status = ""
+    private var selectedTipPercent: Int? = null // or you can use String if needed
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,6 +59,7 @@ class AddTipScreenFragment : Fragment() {
         addTipScreenViewModel = ViewModelProvider(requireActivity())[AddTipScreenViewModel::class.java]
 
         totalPrices = arguments?.getString("totalPrices") ?: ""
+        cardId = arguments?.getString("cardId") ?: ""
 
         setupBackNavigation()
 
@@ -84,11 +93,28 @@ class AddTipScreenFragment : Fragment() {
             BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
         }
 
+
+        binding.etSignEmailPhone.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            }
+            override fun afterTextChanged(editText: Editable) {
+                if (editText.isNotEmpty()) {
+                    status = "1"
+                    val allViews = listOf(binding.linearNotNow, binding.llTenPerc, binding.llFifteenPerc, binding.llTwentyPerc, binding.lltwentyFivePerc)
+                    allViews.forEach { it.setBackgroundResource(R.drawable.edittext_bg) }
+                }else{
+                    status = ""
+                }
+                searchable()
+            }
+        })
+
         binding.linearNotNow.setOnClickListener { updateSelection(binding.linearNotNow) }
-        binding.llSevenDollar.setOnClickListener { updateSelection(binding.llSevenDollar) }
-        binding.llNineDollar.setOnClickListener { updateSelection(binding.llNineDollar) }
-        binding.llTwelveDollar.setOnClickListener { updateSelection(binding.llTwelveDollar) }
-        binding.llFifteenDollar.setOnClickListener { updateSelection(binding.llFifteenDollar) }
+        binding.llTenPerc.setOnClickListener { updateSelection(binding.llTenPerc) }
+        binding.llFifteenPerc.setOnClickListener { updateSelection(binding.llFifteenPerc) }
+        binding.llTwentyPerc.setOnClickListener { updateSelection(binding.llTwentyPerc) }
+        binding.lltwentyFivePerc.setOnClickListener { updateSelection(binding.lltwentyFivePerc) }
 
         binding.rlProceedAndPay.setOnClickListener {
             if (status.isNotEmpty()) {
@@ -143,23 +169,24 @@ class AddTipScreenFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun showDataInTipUI(data: GetTipModelData) {
 
-        if (data.tip10!=null){
-            val roundedTipTen = round(data.tip10).toInt()
-            binding.tvDollarSeven.text= "$$roundedTipTen"
+        if (data.tip10 != null) {
+            val roundedTipTen = data.tip10.roundToInt()
+//            val roundedTipTen = ceil(data.tip10).toInt()
+            binding.tvDollarSeven.text = "$$roundedTipTen"
         }
 
         if (data.tip15!=null){
-            val roundedTipFifteen = round(data.tip15).toInt()
-            binding.tvDollarNine.text= "$$roundedTipFifteen"
+            val roundedTipFifteen = data.tip15.roundToInt()
+            binding.tvDollarNine.text = "$$roundedTipFifteen"
         }
 
         if (data.tip20!=null){
-            val roundedTipTwenty = round(data.tip20).toInt()
+            val roundedTipTwenty = data.tip20.roundToInt()
             binding.tvDollarTwelve.text="$$roundedTipTwenty"
         }
 
         if (data.tip25!=null){
-            val roundedTipTwentyFive = round(data.tip25).toInt()
+            val roundedTipTwentyFive = data.tip25.roundToInt()
             binding.tvDollarFifteen.text="$$roundedTipTwentyFive"
         }
     }
@@ -168,11 +195,26 @@ class AddTipScreenFragment : Fragment() {
     private fun updateSelection(selectedView: View) {
         status = "1"
         searchable()
-        val allViews = listOf(binding.linearNotNow, binding.llSevenDollar, binding.llNineDollar, binding.llTwelveDollar, binding.llFifteenDollar)
+        val allViews = listOf(binding.linearNotNow, binding.llTenPerc, binding.llFifteenPerc, binding.llTwentyPerc, binding.lltwentyFivePerc)
         allViews.forEach { it.setBackgroundResource(R.drawable.edittext_bg) }
         selectedView.setBackgroundResource(R.drawable.outline_green_border_bg)
-    }
 
+        // Set selected tip value
+        selectedTipPercent = when (selectedView) {
+            binding.linearNotNow -> 0
+            binding.llTenPerc -> 10
+            binding.llFifteenPerc -> 15
+            binding.llTwentyPerc -> 20
+            binding.lltwentyFivePerc -> 25
+            else -> null
+        }
+
+        binding.etSignEmailPhone.text.clear()
+        binding.etSignEmailPhone.clearFocus()
+
+        val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.etSignEmailPhone.windowToken, 0)
+    }
 
     private fun searchable() {
         if (status != "") {
@@ -182,16 +224,15 @@ class AddTipScreenFragment : Fragment() {
             status = ""
             binding.rlProceedAndPay.setBackgroundResource(R.drawable.gray_btn_unselect_background)
         }
-
     }
 
     private fun paymentCreditDebitApi() {
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            addTipScreenViewModel.getOrderProductUrl {
+            addTipScreenViewModel.getOrderProductUrl({
                 BaseApplication.dismissMe()
                 handleApiOrderResponse(it)
-            }
+            },"",cardId)
         }
     }
 

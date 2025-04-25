@@ -15,9 +15,7 @@ import com.mykaimeal.planner.databinding.AdapterBankNameLayoutBinding
 import com.mykaimeal.planner.fragment.mainfragment.commonscreen.productpaymentscreen.model.GetCardMealMeModelData
 import com.mykaimeal.planner.listener.CardBankListener
 
-class AdapterPaymentCreditDebitItem(
-    var context: Context,
-    var itemList: MutableList<GetCardMealMeModelData>?, var onCardBankListener: CardBankListener
+class AdapterPaymentCreditDebitItem(var context: Context, var itemList: MutableList<GetCardMealMeModelData>?, private var onCardBankListener: CardBankListener
 ) : RecyclerView.Adapter<AdapterPaymentCreditDebitItem.ViewHolder>() {
 
     inner class ViewHolder(private val binding: AdapterBankNameLayoutBinding) :

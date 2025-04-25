@@ -393,7 +393,16 @@ class ChristmasCollectionFragment : Fragment(),OnItemClickListener {
     override fun itemClick(position: Int?, status: String?, type: String?) {
         when (status) {
             "1" -> {
-                chooseDayDialog(position, type)
+                if ((activity as? MainActivity)?.Subscription_status==1){
+                    if ((activity as? MainActivity)?.addmeal!! < 1){
+                        chooseDayDialog(position, type)
+                    }else{
+                        (activity as? MainActivity)?.subscriptionAlertError()
+                    }
+                }else{
+                    chooseDayDialog(position, type)
+                }
+
             }
             "2" -> {
                 if (BaseApplication.isOnline(requireActivity())) {

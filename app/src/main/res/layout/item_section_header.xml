@@ -51,23 +51,24 @@
             android:textStyle="bold"
             android:textSize="@dimen/_10sdp" />
 
-   <!--     <TextView
-            android:id="@+id/textProductQuantity"
+        <TextView
+            android:id="@+id/tvIngAvNot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="70 ml"
-            android:textStyle="bold"
+            android:layout_below="@+id/textProductName"
+            android:singleLine="true"
+            android:text="Not Available"
             android:visibility="gone"
             android:textColor="#999999"
-            android: textSize="@dimen/_10ssp"
-             />-->
+            android:textSize="@dimen/_10ssp"
+            />
 
         <ImageView
             android:id="@+id/imageSwap"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/swap_btn_icon"
-            android:layout_below="@+id/textProductName"
+            android:layout_below="@+id/tvIngAvNot"
             android:layout_marginTop="@dimen/_5sdp"/>
 
        <!-- <TextView

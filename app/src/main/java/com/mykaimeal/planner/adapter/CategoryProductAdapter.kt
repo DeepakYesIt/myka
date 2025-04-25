@@ -101,6 +101,7 @@ class CategoryProductAdapter(
             } else {
                 binding.layProgess.root.visibility = View.GONE
             }
+
             /*
                         binding.productImage.setImageResource(product.image)
             */
@@ -110,9 +111,12 @@ class CategoryProductAdapter(
 
             if (product.pro_price != null) {
                 if (product.pro_price != "Not available") {
+                    binding.tvIngAvNot.visibility=View.GONE
                     binding.textPrice.text = "${product.pro_price.toString()}"
                 }else{
                     binding.textPrice.text="$0"
+                    binding.tvIngAvNot.visibility=View.VISIBLE
+
                 }
             }
 

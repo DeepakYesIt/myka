@@ -1,6 +1,5 @@
 package com.mykaimeal.planner.fragment.mainfragment.searchtab.searchscreen
 
-
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
@@ -53,8 +52,6 @@ import com.skydoves.powerspinner.PowerSpinnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-
-
 @AndroidEntryPoint
 class SearchFragmentDummy : Fragment(), OnItemClickListener {
 
@@ -100,6 +97,7 @@ class SearchFragmentDummy : Fragment(), OnItemClickListener {
 
         clickedUrl = arguments?.getString("ClickedUrl", "")?:""
 
+        (activity as MainActivity?)?.alertStatus=false
 
         searchRecipeViewModel = ViewModelProvider(requireActivity())[SearchRecipeViewModel::class.java]
         cookbookList.clear()

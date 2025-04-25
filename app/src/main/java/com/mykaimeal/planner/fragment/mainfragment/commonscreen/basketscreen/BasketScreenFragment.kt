@@ -2,8 +2,11 @@ package com.mykaimeal.planner.fragment.mainfragment.commonscreen.basketscreen
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -11,8 +14,10 @@ import android.graphics.drawable.ColorDrawable
 import android.location.Address
 import android.location.Geocoder
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -34,11 +39,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.common.api.PendingResult
+import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResult
+import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.android.libraries.places.api.Places
 import com.google.gson.Gson
 import com.mykaimeal.planner.OnItemLongClickListener
@@ -97,6 +108,7 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
     private var latitude: String? = ""
     private var longitude: String? = ""
     private var addressId: String? = ""
+    private val tAG = "BasketScreen"
     private var stores: MutableList<Store>? = null
     private var addressList: MutableList<GetAddressListModelData>? = null
 
@@ -453,23 +465,6 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             imageWork?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.light_orange), PorterDuff.Mode.SRC_IN)
         }
 
-        relTrialBtn?.setOnClickListener {
-//            dialogMiles?.dismiss()
-            if (BaseApplication.isOnline(requireContext())) {
-                if (ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    getCurrentLocation()
-                } else {
-                    requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100)
-                }
-            } else {
-                BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
-            }
-        }
-
         tvAddress.setAdapter(PlacesAutoCompleteAdapter(requireContext(), placesApi))
         tvAddress.setOnItemClickListener { parent, _, position, _ ->
             val place = parent.getItemAtPosition(position) as Place
@@ -477,6 +472,17 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             userAddress = place.description
             getPlaceDetails(place.id, placesApi)
         }
+
+        relTrialBtn?.setOnClickListener {
+//            dialogMiles?.dismiss()
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation()
+            } else {
+                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 100)
+            }
+        }
+
+
 
 
         relDone?.setOnClickListener {
@@ -684,6 +690,8 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                 country = address.countryName ?: "" // Country
                 zipcode = address.postalCode ?: "" // Zip Code
 
+                userAddress=address.getAddressLine(0) ?: ""  // Full Address
+
                 Log.d("Address", "Street Name: $streetName")
                 Log.d("Address", "Street Number: $streetNum")
                 Log.d("Address", "Apartment Number: $apartNum")
@@ -731,12 +739,10 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                 if (location != null) {
                     latitude = location.latitude.toString()
                     longitude = location.longitude.toString()
-                    tvAddress.text.clear()
                     requireActivity().runOnUiThread {
                         getAddressFromLocation(location.latitude, location.longitude)
-
                     }
-
+                    tvAddress.setText(userAddress)
                 } else {
                     // When location result is null
                     val locationRequest =
@@ -744,7 +750,6 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                             .setInterval(10000)
                             .setFastestInterval(1000)
                             .setNumUpdates(1)
-
                     val locationCallback: LocationCallback = object : LocationCallback() {
                         override fun onLocationResult(locationResult: LocationResult) {
                             // Initialize
@@ -752,10 +757,10 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                             val location1 = locationResult.lastLocation
                             latitude = location1!!.latitude.toString()
                             longitude = location1.longitude.toString()
-                            tvAddress.text.clear()
                             requireActivity().runOnUiThread {
                                 getAddressFromLocation(location1.latitude, location1.longitude)
                             }
+                            tvAddress.setText(userAddress)
                         }
                     }
                     // Request location updates
@@ -774,6 +779,73 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ), 100
             )
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 100 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            displayLocationSettingsRequest(requireContext())
+        } else {
+            showLocationError(requireContext(), ErrorMessage.locationError)
+        }
+
+    }
+
+    private fun showLocationError(context: Context?, msg: String?) {
+        val dialog = context?.let { Dialog(it, R.style.BottomSheetDialog) }
+        dialog?.setCancelable(false)
+        dialog?.setContentView(R.layout.alert_dialog_box_error)
+        val tvTitle: TextView = dialog!!.findViewById(R.id.tv_text)
+        val btnOk: RelativeLayout = dialog.findViewById(R.id.btn_okay)
+        tvTitle.text = msg
+        btnOk.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            val uri = Uri.fromParts("package", requireContext().packageName, null)
+            intent.data = uri
+            startActivityForResult(intent, 200)
+        }
+        dialog.show()
+    }
+
+    private fun displayLocationSettingsRequest(context: Context) {
+        val googleApiClient = GoogleApiClient.Builder(context)
+            .addApi(LocationServices.API).build()
+        googleApiClient.connect()
+        val locationRequest: LocationRequest = LocationRequest.create()
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        locationRequest.interval = 10000
+        locationRequest.fastestInterval = 1000
+        locationRequest.numUpdates = 1
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        builder.setAlwaysShow(true)
+        val result: PendingResult<LocationSettingsResult> =
+            LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build())
+        result.setResultCallback { result ->
+            val status: Status = result.status
+            when (status.statusCode) {
+                LocationSettingsStatusCodes.SUCCESS -> {
+                    Log.i(tAG, "All location settings are satisfied.")
+                    getCurrentLocation()
+                }
+                LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
+                    Log.i(tAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ")
+                    try {
+                        // Show the dialog by calling startResolutionForResult(), and check the result
+                        // in onActivityResult().
+                        status.resolution?.let {
+                            startIntentSenderForResult(it.intentSender, 100, null, 0, 0, 0, null)
+                        }
+
+                    } catch (e: IntentSender.SendIntentException) {
+                        Log.i(tAG, "PendingIntent unable to execute request.")
+                    }
+                }
+                LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> Log.i(tAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.")
+
+            }
         }
     }
 
@@ -1139,6 +1211,27 @@ class BasketScreenFragment : Fragment(), OnItemLongClickListener, OnItemSelectLi
             dialogMiles?.dismiss()
         }
 
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 100) {
+            if (Activity.RESULT_OK == resultCode) {
+                getCurrentLocation()
+            } else {
+                Toast.makeText(requireContext(), "Please turn on location", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        if (requestCode == 200) {
+            // This condition for check location run time permission
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation()
+            } else {
+                showLocationError(requireContext(), ErrorMessage.locationError)
+            }
+        }
     }
 
 }

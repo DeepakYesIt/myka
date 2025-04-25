@@ -585,13 +585,15 @@
                             android:clickable="false">
 
                             <TextView
+                                android:id="@+id/tvPlanMeal"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingHorizontal="@dimen/_10sdp"
-                                android:paddingVertical="@dimen/_8sdp"
+                                android:paddingVertical="@dimen/_5sdp"
                                 android:text="Plan a meal"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/_12sdp" />
+
                         </RelativeLayout>
 
                     </RelativeLayout>

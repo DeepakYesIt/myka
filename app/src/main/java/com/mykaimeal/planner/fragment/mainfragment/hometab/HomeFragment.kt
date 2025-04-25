@@ -89,7 +89,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private var storeName: String = ""
     private var cookstatus = false
     private var tAG: String = "Location"
-    private var superMarketData: MutableList<SuperMarketModelsData>?=null
+    private var superMarketData: MutableList<SuperMarketModelsData>? = null
     private var cookbookList: MutableList<com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data> =
         mutableListOf()
 
@@ -106,11 +106,12 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         viewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        locationManager = requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
+        locationManager =
+            requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
 
-        val main= (activity as MainActivity?)
-
+        val main = (activity as MainActivity?)
         if (main != null) {
+            main.alertStatus = false
             main.changeBottom("home")
             main.binding.apply {
                 llIndicator.visibility = View.VISIBLE
@@ -119,9 +120,19 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         }
 
         cookbookList.clear()
-        val data = com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data("", "", 0, "", "Favorites", 0, "", 0)
+        val data =
+            com.mykaimeal.planner.fragment.mainfragment.viewmodel.planviewmodel.apiresponsecookbooklist.Data(
+                "",
+                "",
+                0,
+                "",
+                "Favorites",
+                0,
+                "",
+                0
+            )
         cookbookList.add(0, data)
-        
+
         initialize()
 
         // When screen load then api call
@@ -131,8 +142,12 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     }
 
 
-    private fun getLatLong(){
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    private fun getLatLong() {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             getCurrentLocation()
         } else {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100)
@@ -160,7 +175,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         lifecycleScope.launch {
             viewModel.homeDetailsRequest {
                 BaseApplication.dismissMe()
-                handleApiResponse(it,"HomeData")
+                handleApiResponse(it, "HomeData")
             }
         }
     }
@@ -173,9 +188,9 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         }
     }
 
-    private fun handleApiResponse(result: NetworkResult<String>,type:String) {
+    private fun handleApiResponse(result: NetworkResult<String>, type: String) {
         when (result) {
-            is NetworkResult.Success -> handleSuccessResponse(result.data.toString(),type)
+            is NetworkResult.Success -> handleSuccessResponse(result.data.toString(), type)
             is NetworkResult.Error -> showAlert(result.message, false)
             else -> showAlert(result.message, false)
         }
@@ -197,7 +212,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             if (apiModel.code == 200 && apiModel.success == true) {
                 showUIData(apiModel.data)
             } else {
-                handleError(apiModel.code,apiModel.message)
+                handleError(apiModel.code, apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -207,11 +222,14 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private fun showUIData(data: MutableList<SuperMarketModelsData>?) {
         try {
             if (data != null) {
-                superMarketData=data
+                superMarketData = data
                 val dialogAddItem: Dialog = context?.let { Dialog(it) }!!
                 dialogAddItem.setContentView(R.layout.alert_dialog_super_market)
                 dialogAddItem.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                dialogAddItem.window!!.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+                dialogAddItem.window!!.setLayout(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT
+                )
                 recySuperMarket = dialogAddItem.findViewById(R.id.recySuperMarket)
                 val rlDoneBtn = dialogAddItem.findViewById<RelativeLayout>(R.id.rlDoneBtn)
                 dialogAddItem.setCancelable(false)
@@ -221,18 +239,22 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 recySuperMarket!!.adapter = adapterSuperMarket
 
                 rlDoneBtn.setOnClickListener {
-                    if (!storeUuid.equals("",true)){
+                    if (!storeUuid.equals("", true)) {
                         if (BaseApplication.isOnline(requireActivity())) {
                             BaseApplication.showMe(requireContext())
                             lifecycleScope.launch {
-                                viewModel.superMarketSaveRequest( {
+                                viewModel.superMarketSaveRequest({
                                     BaseApplication.dismissMe()
                                     dialogAddItem.dismiss()
-                                    handleApiResponse(it,"storeData")
-                                },storeUuid,storeName)
+                                    handleApiResponse(it, "storeData")
+                                }, storeUuid, storeName)
                             }
                         } else {
-                            BaseApplication.alertError(requireContext(), ErrorMessage.networkError, false)
+                            BaseApplication.alertError(
+                                requireContext(),
+                                ErrorMessage.networkError,
+                                false
+                            )
                         }
                     }
                 }
@@ -250,13 +272,13 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             val apiModel = Gson().fromJson(data, HomeApiResponse::class.java)
             Log.d("@@@ Recipe Details ", "message :- $data")
             if (apiModel.code == 200 && apiModel.success) {
-                if (type.equals("HomeData",true)){
+                if (type.equals("HomeData", true)) {
                     showData(apiModel.data)
-                }else{
-                    Toast.makeText(requireContext(),apiModel.message,Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), apiModel.message, Toast.LENGTH_SHORT).show()
                 }
             } else {
-                handleError(apiModel.code,apiModel.message)
+                handleError(apiModel.code, apiModel.message)
             }
 
         } catch (e: Exception) {
@@ -281,7 +303,8 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             if (userDataLocal.userData != null && userDataLocal.userData!!.size > 0) {
                 binding.relPlanMeal.visibility = View.GONE
                 binding.llRecipesCooked.visibility = View.VISIBLE
-                recipeCookedAdapter = RecipeCookedAdapter(userDataLocal.userData, requireActivity(), this)
+                recipeCookedAdapter =
+                    RecipeCookedAdapter(userDataLocal.userData, requireActivity(), this)
                 binding.rcyRecipesCooked.adapter = recipeCookedAdapter
             } else {
                 binding.relPlanMeal.visibility = View.VISIBLE
@@ -289,11 +312,11 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             }
 
             if (userDataLocal.graph_value == 0) {
-                binding.relMonthlySavingsss.visibility = View.GONE
-                binding.relCheckSavingsss.visibility = View.VISIBLE
-            } else {
                 binding.relMonthlySavingsss.visibility = View.VISIBLE
                 binding.relCheckSavingsss.visibility = View.GONE
+            } else {
+                binding.relMonthlySavingsss.visibility = View.GONE
+                binding.relCheckSavingsss.visibility = View.VISIBLE
             }
 
             if (userDataLocal.date != null && !userDataLocal.date.equals("", true)) {
@@ -387,14 +410,15 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
             userDataLocal.monthly_savings?.let {
                 if (sessionManagement.getUserName() != null) {
-                    binding.tvMonthlySavingsDesc.text="Good job ${sessionManagement.getUserName()}, you are on track to save ${it} this month"
+                    binding.tvMonthlySavingsDesc.text =
+                        "Good job ${sessionManagement.getUserName()}, you are on track to save ${it} this month"
                 }
             }
 
             userDataLocal.is_supermarket?.let {
-                if (it==1){
-                // fetch location form the user
-                getLatLong()
+                if (it == 1) {
+                    // fetch location form the user
+                    getLatLong()
                 }
             }
 
@@ -407,7 +431,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
     private fun showAlert(message: String?, status: Boolean) {
         BaseApplication.alertError(requireContext(), message, status)
     }
-    
+
     @SuppressLint("SetTextI18n")
     private fun initialize() {
 
@@ -420,9 +444,13 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         }
 
         if (sessionManagement.getUserName() != null) {
-            val name = BaseApplication.getColoredSpanned("Hello", "#06C169") + BaseApplication.getColoredSpanned(", " + sessionManagement.getUserName(), "#000000")
+            val name = BaseApplication.getColoredSpanned(
+                "Hello",
+                "#06C169"
+            ) + BaseApplication.getColoredSpanned(", " + sessionManagement.getUserName(), "#000000")
             binding.tvName.text = Html.fromHtml(name)
-            binding.tvMonthlySavingsDesc.text="Good job ${sessionManagement.getUserName()}, you are on track to save £0 this month"
+            binding.tvMonthlySavingsDesc.text =
+                "Good job ${sessionManagement.getUserName()}, you are on track to save £0 this month"
         }
 
 
@@ -435,18 +463,23 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         binding.rlPlanAMealBtn.setOnClickListener(this)
         binding.imgHearRedIcons.setOnClickListener(this)
         binding.imagePlanMeal.setOnClickListener(this)
+        binding.tvPlanMeal.setOnClickListener(this)
 //        binding!!.imageRecipeSeeAll.setOnClickListener(this)
 //        binding!!.relMonthlySavings.setOnClickListener(this)
         binding.imageCheckSav.setOnClickListener(this)
         binding.rlLayCheckSavings.setOnClickListener(this)
 
     }
-    
+
     private fun getCurrentLocation() {
         // Initialize Location manager
-        val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         // Check condition
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+                LocationManager.NETWORK_PROVIDER
+            )
+        ) {
             // When location service is enabled
             // Get last location
             if (ActivityCompat.checkSelfPermission(
@@ -510,7 +543,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             )
         }
     }
-    
+
     override fun onClick(item: View?) {
         when (item!!.id) {
             R.id.textSeeAll -> {
@@ -553,13 +586,17 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 findNavController().navigate(R.id.planFragment)
             }
 
-            R.id.imgFreeTrial->{
+            R.id.imgFreeTrial -> {
                 findNavController().navigate(R.id.subscriptionPlanOverViewFragment)
             }
 
-          /*  R.id.imgFreeTrial -> {
-                findNavController().navigate(R.id.homeSubscriptionFragment)
-            }*/
+            R.id.tvPlanMeal -> {
+                findNavController().navigate(R.id.planFragment)
+            }
+
+            /*  R.id.imgFreeTrial -> {
+                  findNavController().navigate(R.id.homeSubscriptionFragment)
+              }*/
         }
     }
 
@@ -580,19 +617,20 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             "4" -> {
                 if (BaseApplication.isOnline(requireActivity())) {
 
-                    if ((activity as? MainActivity)?.Subscription_status==1){
-                        if ((activity as? MainActivity)?.favorite!! <=2){
+                    if ((activity as? MainActivity)?.Subscription_status == 1) {
+                        if ((activity as? MainActivity)?.favorite!! <= 2) {
                             // Safely get the item and position
-                            val newLikeStatus = if (userDataLocal.userData?.get(position!!)?.is_like == 0) "1" else "0"
+                            val newLikeStatus =
+                                if (userDataLocal.userData?.get(position!!)?.is_like == 0) "1" else "0"
                             if (newLikeStatus.equals("0", true)) {
                                 recipeLikeAndUnlikeData(position, newLikeStatus, "", null)
                             } else {
                                 addFavTypeDialog(position, newLikeStatus)
                             }
-                        }else{
+                        } else {
                             (activity as? MainActivity)?.subscriptionAlertError()
                         }
-                    }else{
+                    } else {
                         // Safely get the item and position
                         val newLikeStatus =
                             if (userDataLocal.userData?.get(position!!)?.is_like == 0) "1" else "0"
@@ -628,7 +666,8 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         dialogAddRecipe.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         val rlDoneBtn = dialogAddRecipe.findViewById<RelativeLayout>(R.id.rlDoneBtn)
         spinnerActivityLevel = dialogAddRecipe.findViewById(R.id.spinnerActivityLevel)
-        val relCreateNewCookBook = dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
+        val relCreateNewCookBook =
+            dialogAddRecipe.findViewById<RelativeLayout>(R.id.relCreateNewCookBook)
         val imgCheckBoxOrange = dialogAddRecipe.findViewById<ImageView>(R.id.imgCheckBoxOrange)
         spinnerActivityLevel.setItems(cookbookList.map { it.name })
         dialogAddRecipe.show()
@@ -645,7 +684,11 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
         }
         rlDoneBtn.setOnClickListener {
             if (spinnerActivityLevel.text.toString().equals("", true)) {
-                BaseApplication.alertError(requireContext(), ErrorMessage.selectCookBookError, false)
+                BaseApplication.alertError(
+                    requireContext(),
+                    ErrorMessage.selectCookBookError,
+                    false
+                )
             } else {
                 val cookBookType = cookbookList[spinnerActivityLevel.selectedIndex].id
                 recipeLikeAndUnlikeData(
@@ -681,7 +724,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                     spinnerActivityLevel.setItems(cookbookList.map { it.name })
                 }
             } else {
-                handleError(apiModel.code,apiModel.message)
+                handleError(apiModel.code, apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
@@ -695,7 +738,7 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             else -> showAlert(result.message, false)
         }
     }
-    
+
     private fun recipeLikeAndUnlikeData(
         position: Int?,
         likeType: String,
@@ -705,11 +748,16 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
 
         BaseApplication.showMe(requireContext())
         lifecycleScope.launch {
-            viewModel.likeUnlikeRequest({
-                BaseApplication.dismissMe()
+            viewModel.likeUnlikeRequest(
+                {
+                    BaseApplication.dismissMe()
 
-                handleLikeAndUnlikeApiResponse(it, position, dialogAddRecipe)
-            }, userDataLocal.userData?.get(position!!)?.recipe?.uri.toString(), likeType, cookbooktype)
+                    handleLikeAndUnlikeApiResponse(it, position, dialogAddRecipe)
+                },
+                userDataLocal.userData?.get(position!!)?.recipe?.uri.toString(),
+                likeType,
+                cookbooktype
+            )
         }
     }
 
@@ -750,22 +798,26 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                 recipeCookedAdapter?.updateList(userDataLocal.userData)
                 dialogAddRecipe?.dismiss()
             } else {
-                handleError(apiModel.code,apiModel.message)
+                handleError(apiModel.code, apiModel.message)
             }
         } catch (e: Exception) {
             showAlert(e.message, false)
         }
     }
 
-    
+
     override fun itemSelect(position: Int?, status: String?, type: String?) {
 
-        storeUuid= position?.let { superMarketData?.get(it)?.store_uuid.toString() }.toString()
-        storeName= position?.let { superMarketData?.get(it)?.store_name.toString() }.toString()
+        storeUuid = position?.let { superMarketData?.get(it)?.store_uuid.toString() }.toString()
+        storeName = position?.let { superMarketData?.get(it)?.store_name.toString() }.toString()
     }
 
     @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 100 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             displayLocationSettingsRequest(requireContext())
@@ -794,8 +846,12 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                     Log.i(tAG, "All location settings are satisfied.")
                     getCurrentLocation()
                 }
+
                 LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
-                    Log.i(tAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ")
+                    Log.i(
+                        tAG,
+                        "Location settings are not satisfied. Show the user a dialog to upgrade location settings "
+                    )
                     try {
                         // Show the dialog by calling startResolutionForResult(), and check the result
                         // in onActivityResult().
@@ -807,7 +863,11 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
                         Log.i(tAG, "PendingIntent unable to execute request.")
                     }
                 }
-                LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> Log.i(tAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.")
+
+                LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> Log.i(
+                    tAG,
+                    "Location settings are inadequate, and cannot be fixed here. Dialog not created."
+                )
 
             }
         }
@@ -821,13 +881,21 @@ class HomeFragment : Fragment(), View.OnClickListener, OnItemClickListener, OnIt
             if (Activity.RESULT_OK == resultCode) {
                 getCurrentLocation()
             } else {
-                Toast.makeText(requireContext(), "Please turn on location", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please turn on location", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 
-        if (requestCode==200){
+        if (requestCode == 200) {
             // This condition for check location run time permission
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
                 getCurrentLocation()
             } else {
                 showLocationError(requireContext(), ErrorMessage.locationError)

@@ -86,7 +86,6 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
 
         binding.imageBackIcon.setOnClickListener(this)
 
-
         textListener = object : TextWatcher {
             private var searchFor = "" // Or view.editText.text.toString()
 
@@ -96,16 +95,23 @@ class AllIngredientsFragment : Fragment(),View.OnClickListener,OnItemClickListen
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val searchText = s.toString()
-                if (searchText!= searchFor) {
-                    searchFor = searchText
-                    textChangedJob?.cancel()
-                    // Launch a new coroutine in the lifecycle scope
-                    textChangedJob = lifecycleScope.launch {
-                        delay(1000)  // Debounce time
-                        if (searchText.equals(searchFor,true)) {
-                            searchRecipeApi(searchText)
+                if (searchText.isNotEmpty()){
+                    if (!searchText.equals(searchFor,true)) {
+                        lastSelected=""
+                        searchFor = searchText
+                        textChangedJob?.cancel()
+                        // Launch a new coroutine in the lifecycle scope
+                        textChangedJob = lifecycleScope.launch {
+                            delay(1000)  // Debounce time
+                            if (searchText.equals(searchFor,true)) {
+                                searchRecipeApi(searchText)
+                            }
                         }
+                    }else{
+                        lastSelected="Fruit"
                     }
+                }else{
+                    lastSelected="Fruit"
                 }
             }
         }

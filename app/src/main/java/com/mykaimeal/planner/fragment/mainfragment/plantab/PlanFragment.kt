@@ -125,6 +125,8 @@ class PlanFragment : Fragment(), OnItemClickListener, OnItemSelectPlanTypeListen
 
         (activity as MainActivity?)?.changeBottom("plan")
 
+        (activity as MainActivity?)?.alertStatus=true
+
         sessionManagement = SessionManagement(requireContext())
 
         requireActivity().onBackPressedDispatcher.addCallback(

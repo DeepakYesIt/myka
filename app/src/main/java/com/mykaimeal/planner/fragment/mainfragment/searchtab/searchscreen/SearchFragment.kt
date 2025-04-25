@@ -86,6 +86,8 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
 
         clickedUrl = arguments?.getString("ClickedUrl", "").toString()
 
+        (activity as MainActivity?)?.alertStatus=false
+
         searchRecipeViewModel = ViewModelProvider(this)[SearchRecipeViewModel::class.java]
 
         cookbookList.clear()
@@ -102,8 +104,6 @@ class SearchFragment : Fragment(),View.OnClickListener, OnItemClickListener {
                 findNavController().navigateUp()
             }
         })
-
-        searchRecipeDialog()
 
         initialize()
 
